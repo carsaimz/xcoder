@@ -1,9 +1,9 @@
-# Acode Development Container
+# XCoder Development Container
 #
 # Devcontainer usage: automatic via devcontainer.json
 # Standalone usage:
-#   docker build --target standalone -t acode-dev .devcontainer/
-#   docker run -it -v $(pwd):/workspaces/acode acode-dev
+#   docker build --target standalone -t xcoder-dev .devcontainer/
+#   docker run -it -v $(pwd):/workspaces/xcoder xcoder-dev
 
 FROM mcr.microsoft.com/devcontainers/java:1-21-bullseye AS base
 
@@ -32,10 +32,10 @@ RUN wget -q "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-
 
 ENV PATH="${PATH}:${GRADLE_HOME}/bin"
 
-WORKDIR /workspaces/acode
+WORKDIR /workspaces/xcoder
 
-LABEL org.opencontainers.image.authors="Acode Foundation <https://github.com/Acode-Foundation/Acode>"
-LABEL description="Development environment for building Acode - Code Editor for Android"
+LABEL org.opencontainers.image.authors="XCoder <https://github.com/carsaimz/xcoder>"
+LABEL description="Development environment for building XCoder - Code Editor for Android"
 
 
 # Devcontainer stage

@@ -1,5 +1,5 @@
 name: Feature Request
-description: "Suggest a new feature for Acode"
+description: "Suggest a new feature for XCoder"
 labels: ["enhancement"]
 body:
   - type: checkboxes

@@ -32,12 +32,12 @@ body:
       required: false
   - type: textarea
     attributes:
-      label: If applicable, attach your Acode.log file to this issue.
+      label: If applicable, attach your XCoder.log file to this issue.
       description: |
-        Search for `Open Log File` in Acode command palette, it will open Acode.log file then share it
-        or Check this location for log file: `/storage/emulated/0/Android/com.foxdebug.acode{in case of free version there will be bit more}/files/Acode.log`
+        Search for `Open Log File` in the XCoder command palette, it will open XCoder.log file then share it
+        or Check this location for log file: `/storage/emulated/0/Android/com.carsaimz.xcoder/files/XCoder.log`
       value: |
-        <details><summary>Acode.log</summary><pre>
+        <details><summary>XCoder.log</summary><pre>
         <!-- Click below this line and paste or drag-and-drop your log-->
 
         <!-- Click above this line and paste or drag-and-drop your log--></pre></details>

@@ -11,7 +11,8 @@
         </config-file>
 
         <source-file src="src/android/Tee.java" target-dir="src/com/carsaimz/xcoder/rk/plugin" />
+        <source-file src="src/android/com/carsaimz/xcoder/rk/plugin/EncryptedPreferenceManager.java" target-dir="src/com/carsaimz/xcoder/rk/plugin" />
 
-           
+        <framework src="androidx.security:security-crypto:1.1.0" />
     </platform>
 </plugin>

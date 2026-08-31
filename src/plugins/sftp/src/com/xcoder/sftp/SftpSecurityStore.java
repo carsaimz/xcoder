@@ -1,7 +1,6 @@
 package com.xcoder.sftp;
 
 import android.content.Context;
-import com.carsaimz.xcoder.rk.auth.EncryptedPreferenceManager;
 import java.security.GeneralSecurityException;
 import java.util.UUID;
 import org.json.JSONException;

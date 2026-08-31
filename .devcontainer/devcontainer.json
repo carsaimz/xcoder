@@ -1,5 +1,5 @@
 {
-  "name": "Acode Development",
+  "name": "XCoder Development",
   "build": {
     "dockerfile": "Dockerfile",
     "target": "devcontainer"

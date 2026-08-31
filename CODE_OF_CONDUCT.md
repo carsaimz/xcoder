@@ -59,7 +59,7 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at Acode.CODE_OF_CONDUCT.md
+reported to the community leaders responsible for enforcement at the XCoder repository: https://github.com/carsaimz/xcoder
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
@@ -73,7 +73,7 @@ the consequences for any action they deem in violation of this Code of Conduct:
 ### 1. Corrections Issues
 
 **Community Impact**: Must Not Use of inappropriate coding language or other hacker behavior deemed
-Any professional or manipulative findings like ease dropping hackers, malware bots, or faulty A.I. that breaks code for attacks against citizens cut-off for those programs and users are rendered fictitious businesses spammers using meta-trans-users causing confusion and corruption problems recirculating systems. Without help fixing these misconducts are responsible with talk back in any encryptions Acode intelligence blocking them from entry to another account. Issues and comments are welcome in the community.
+Any professional or manipulative findings like ease dropping hackers, malware bots, or faulty A.I. that breaks code for attacks against citizens cut-off for those programs and users are rendered fictitious businesses spammers using meta-trans-users causing confusion and corruption problems recirculating systems. Without help fixing these misconducts are responsible with talk back in any encryptions XCoder intelligence blocking them from entry to another account. Issues and comments are welcome in the community.
 
 **Consequence**: A private, written warning from community leaders, providing
 clarity around the nature of the violation and an explanation of why the

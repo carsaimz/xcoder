@@ -23,8 +23,10 @@
 
         <source-file src="src/com/xcoder/sftp/Sftp.java" target-dir="src/com/xcoder/sftp" />
         <source-file src="src/com/xcoder/sftp/SftpSecurityStore.java" target-dir="src/com/xcoder/sftp" />
+        <source-file src="src/com/xcoder/sftp/EncryptedPreferenceManager.java" target-dir="src/com/xcoder/sftp" />
     </platform>
 
+    <framework src="androidx.security:security-crypto:1.1.0" />
     <framework src="commons-io:commons-io:2.11.0" />
     <framework src="com.sshtools:maverick-synergy-client:3.1.4" />
 <!--    <framework src="com.sshtools:maverick-bc:3.1.2" />-->
