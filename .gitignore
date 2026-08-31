@@ -2,17 +2,9 @@
 node_modules/
 .pnpm-store/
 
-# Build output
-www/js/
-www/css/
-www/lang/
-www/icons/
-www/index.html
-
-# Cordova
-platforms/
-plugins/
-res/**/*.png
+# Cordova build dirs (anchored — never match src/api/plugins/ etc.)
+/platforms/
+/plugins/
 
 # IDE / OS
 .vscode/
@@ -32,4 +24,4 @@ dist-cache/
 .env.local
 
 # UI reference material (never ship)
-reference/
+/reference/
