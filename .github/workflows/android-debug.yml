@@ -73,7 +73,7 @@ jobs:
             dist/xcoder-debug.apk
 
       - name: Upload workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: xcoder-debug-apk
           path: dist/xcoder-debug.apk
