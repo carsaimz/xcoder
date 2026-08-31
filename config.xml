@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.carsaimz.xcoder" android-versionCode="100" version="1.0.0"
+    xmlns="http://www.w3.org/ns/widgets"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>XCoder</name>
+    <description>
+        Fast, offline-first code editor and web IDE for Android.
+    </description>
+    <author email="carsaimz@users.noreply.github.com" href="https://github.com/carsaimz">
+        carsaimz
+    </author>
+    <content src="index.html" />
+    <access launch-external="yes" origin="*" />
+    <allow-navigation href="https://*/*" />
+    <allow-navigation href="http://*/*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+
+    <platform name="android">
+        <preference name="GradlePluginKotlinVersion" value="2.3.0" />
+        <preference name="fullscreen" value="false" />
+        <preference name="SplashScreen" value="none" />
+        <preference name="ShowTitle" value="true" />
+        <preference name="DisallowOverscroll" value="true" />
+        <preference name="BackgroundColor" value="0xFF313131" />
+        <preference name="AndroidWindowSplashScreenBackground" value="@color/ic_splash_background" />
+        <preference name="AndroidWindowSplashScreenAnimatedIcon"
+            value="res/android/drawable/ic_launcher_foreground.xml" />
+        <preference name="AndroidPostSplashScreenTheme" value="@style/Theme.App.Activity" />
+        <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+        <preference name="AndroidLaunchMode" value="singleTask" />
+        <preference name="prerendered-icon" value="false" />
+        <preference name="androidxEnabled" value="true" />
+        <preference name="GradlePluginKotlinEnabled" value="true" />
+        <preference name="android-targetSdkVersion" value="36" />
+        <preference name="android-minSdkVersion" value="26" />
+
+
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge"
+            target="/manifest/application">
+            <application
+                android:networkSecurityConfig="@xml/network_security_config"
+                android:hardwareAccelerated="true"
+                android:largeHeap="true"
+                android:requestLegacyExternalStorage="true"
+                android:usesCleartextTraffic="true"
+                android:enableOnBackInvokedCallback="false" />
+        </edit-config>
+
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge"
+            target="/manifest/application/activity[@android:name='MainActivity']">
+            <activity
+                android:resizeableActivity="true"
+                android:windowSoftInputMode="adjustResize" />
+        </edit-config>
+
+        <config-file parent="./application/activity" target="AndroidManifest.xml">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <data android:scheme="file" android:mimeType="*/*" />
+                <data android:scheme="content" android:mimeType="*/*" />
+            </intent-filter>
+            <!-- Allow app to open using url from browser -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="xcoder" />
+            </intent-filter>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+            <uses-permission android:name="android.permission.VIBRATE" />
+        </config-file>
+
+        <hook type="before_prepare" src="hooks/restore-cordova-resources.js" />
+        <hook type="before_prepare" src="hooks/modify-java-files.js" />
+        <hook type="after_prepare" src="hooks/post-process.js" />
+    </platform>
+    <preference name="AndroidBlacklistSecureSocketProtocols" value="SSLv3,TLSv1" />
+</widget>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-xcoder-webview" version="1.0.0">
+  <name>cordova-plugin-xcoder-webview</name>
+  <description>XCoder WebView Plugin API - Create and manage isolated WebView instances</description>
+  <license>Apache 2.0</license>
+
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="XCoderWebView">
+        <param name="android-package" value="com.xcoder.webview.WebViewPlugin"/>
+      </feature>
+    </config-file>
+
+    <config-file parent="./application" target="AndroidManifest.xml">
+      <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode" android:name="com.xcoder.webview.WebViewActivity" android:theme="@style/Theme.App.Activity" android:windowSoftInputMode="adjustResize" android:resizeableActivity="true">
+      </activity>
+    </config-file>
+
+    <source-file src="src/android/com/xcoder/webview/WebViewPlugin.java" target-dir="src/com/xcoder/webview"/>
+    <source-file src="src/android/com/xcoder/webview/WebViewInstance.java" target-dir="src/com/xcoder/webview"/>
+    <source-file src="src/android/com/xcoder/webview/WebViewActivity.java" target-dir="src/com/xcoder/webview"/>
+
+  </platform>
+</plugin>

@@ -1,0 +1,1 @@
+Fast offline code editor with AI agent, terminal and LSP

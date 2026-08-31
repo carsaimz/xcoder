@@ -1,0 +1,17 @@
+{
+  "name": "com.carsaimz.xcoder.rk.customtabs",
+  "version": "1.0.0",
+  "description": "Custom tabs api",
+  "cordova": {
+    "id": "com.carsaimz.xcoder.rk.customtabs",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "@RohitKushvaha01",
+  "license": "MIT"
+}

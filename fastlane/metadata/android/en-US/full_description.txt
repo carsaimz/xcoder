@@ -1,0 +1,17 @@
+XCoder is a fast, offline-first code editor and web IDE for Android.
+
+FEATURES
+- AI coding assistant with agents & subagents (bring your own API key: Groq, OpenRouter, Gemini, OpenAI, Claude, DeepSeek and any OpenAI-compatible endpoint)
+- 100+ languages with syntax highlighting, autocompletion and CodeMirror 6 core
+- LSP support: TypeScript, Python, HTML/CSS/JSON, Tailwind and more
+- Real Linux terminal (Alpine via proot) with background executors
+- Local live preview server and in-app console
+- SFTP and FTP file backends, multi-root workspaces
+- Powerful search & replace across files
+- 20+ editor themes, custom fonts, 40+ UI languages
+- Backup & restore, fully local
+
+PRIVACY
+No account, no ads, no tracking. The app core works fully offline; network is only used by the features you configure (AI providers, remote servers, updates check).
+
+XCoder is open source (MIT).
