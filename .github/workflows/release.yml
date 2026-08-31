@@ -1,0 +1,131 @@
+name: Release (signed APK + AAB)
+
+# Stable release on tags like v1.2.3:
+# 1. generates a conventional-commits changelog
+# 2. builds a signed APK and a signed AAB (keystore from repository secrets)
+# 3. publishes the GitHub release with the artifacts
+#
+# Required secrets:
+#   KEYSTORE_BASE64    - base64 of the release keystore (.jks)
+#   KEYSTORE_PASSWORD  - keystore password
+#   KEY_ALIAS          - key alias
+#   KEY_PASSWORD       - key password
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "!v*-beta*"
+      - "!v*-rc*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Signed release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" >/dev/null
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Add Android platform
+        run: npx cordova platform add android@15 || true
+
+      - name: Prepare keystore from secrets
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Secret KEYSTORE_BASE64 is not set"
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
+          cat > build.json <<JSON
+          {
+            "android": {
+              "release": {
+                "keystore": "keystore.jks",
+                "storePassword": "$KEYSTORE_PASSWORD",
+                "alias": "$KEY_ALIAS",
+                "password": "$KEY_PASSWORD"
+              }
+            }
+          }
+          JSON
+
+      - name: Build signed APK
+        run: |
+          node utils/config.js p
+          npx rspack --mode production
+          npx cordova build android --release --buildConfig build.json -- --packageType=apk
+
+      - name: Build signed AAB
+        run: npx cordova build android --release --buildConfig build.json -- --packageType=bundle
+
+      - name: Collect artifacts
+        id: artifacts
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          cp platforms/android/app/build/outputs/apk/release/app-release.apk "XCoder-v${VERSION}.apk"
+          cp platforms/android/app/build/outputs/bundle/release/app-release.aab "XCoder-v${VERSION}.aab"
+
+      - name: Generate changelog (conventional commits)
+        id: changelog
+        run: |
+          npx --yes conventional-changelog-cli@5 -p angular -o /tmp/changelog.md
+          {
+            echo "body<<CHANGELOG_EOF"
+            head -n 400 /tmp/changelog.md
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: false
+          files: |
+            ${{ steps.artifacts.outputs.version && format('XCoder-v{0}.apk', steps.artifacts.outputs.version) || '' }}
+            ${{ steps.artifacts.outputs.version && format('XCoder-v{0}.aab', steps.artifacts.outputs.version) || '' }}
+          body: |
+            ### XCoder ${{ steps.artifacts.outputs.version }}
+
+            ${{ steps.changelog.outputs.body }}
+
+            ---
+
+            **Install (Android 8+):**
+            - `XCoder-v${{ steps.artifacts.outputs.version }}.apk` — install directly
+            - `XCoder-v${{ steps.artifacts.outputs.version }}.aab` — for Play Store distribution
+
+            Both artifacts are signed with the release key.
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: rm -f keystore.jks build.json

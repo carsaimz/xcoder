@@ -1,0 +1,73 @@
+name: Pre-release (debug APK)
+
+# Debug APK automatically attached to a pre-release for beta tags
+# (v1.2.3-beta.1, v2.0.0-rc.1, ...).
+
+on:
+  push:
+    tags:
+      - "v*-beta*"
+      - "v*-rc*"
+
+permissions:
+  contents: write
+
+jobs:
+  debug-apk:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" >/dev/null
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Add Android platform
+        run: npx cordova platform add android@15 || true
+
+      - name: Build web bundle + debug APK
+        run: |
+          node utils/config.js d
+          npx rspack --mode development
+          npx cordova build android -- --packageType=apk
+
+      - name: Rename APK
+        id: apk
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          SRC=platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          DEST="XCoder-v${VERSION}-debug.apk"
+          cp "$SRC" "$DEST"
+          echo "file=$DEST" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          generate_release_notes: true
+          files: ${{ steps.apk.outputs.file }}
+          body: |
+            ### XCoder ${{ steps.apk.outputs.version }} (pre-release)
+
+            Debug build for early testing. Not signed with a release key.
+
+            **Install:** download the APK and allow installation from unknown sources.
