@@ -2,17 +2,39 @@ import "./style.scss";
 import settings from "lib/settings";
 import { Agent } from "lib/ai/agent";
 import vshell from "lib/ai/vshell";
-import { PROVIDER_MAP } from "lib/ai/providers";
-import { GROUPS } from "lib/ai/providers";
+import { PROVIDER_MAP, GROUPS } from "lib/ai/providers";
+import {
+        loadSessions,
+        saveSessions,
+        loadActiveId,
+        saveActiveId,
+        newSession,
+        deriveTitle,
+        touchSession,
+        formatSessionTime,
+} from "lib/ai/sessions";
+import {
+        SLASH_COMMANDS,
+        matchSlashCommands,
+        expandSlashCommand,
+} from "lib/ai/slashCommands";
+import {
+        getEditorContext as readEditorContext,
+} from "lib/ai/editorBridge";
 import select from "dialogs/select";
 import prompt from "dialogs/prompt";
+import confirm from "dialogs/confirm";
 import toast from "components/toast";
 import fsOperation from "fileSystem";
 import Url from "utils/Url";
 
-const CHAT_STORAGE_KEY = "xcoder.ai.chat";
+const LEGACY_CHAT_KEY = "xcoder.ai.chat";
 /** @type {Array<{type: string, payload?: any, name?: string, toolCallId?: string, toolCalls?: any[]}>} */
 let events = [];
+/** @type {Array<object>} sessions from lib/ai/sessions */
+let sessions = [];
+/** @type {string | null} */
+let activeId = null;
 /** @type {Agent | null} */
 let agent = null;
 let running = false;
@@ -26,6 +48,12 @@ let $input = null;
 let $send = null;
 /** @type {HTMLElement} */
 let $status = null;
+/** @type {HTMLElement} */
+let $slashMenu = null;
+/** @type {HTMLElement} */
+let $modeChip = null;
+/** @type {HTMLElement} */
+let $sessionTitle = null;
 /** @type {Function} */
 let cleanupOnHide = null;
 
@@ -78,6 +106,8 @@ export async function askAI(text) {
                 return false;
         }
 
+        ensureTitle(message);
+
         if (!agent) {
                 agent = new Agent({ onEvent: handleEvent });
                 agent.restore(events);
@@ -110,8 +140,9 @@ function initApp(el) {
         el.classList.add("ai-chat-app");
         el.content = buildUi();
 
-        restore();
+        restoreSessions();
         renderMessages();
+        renderModeChip();
 
         return () => {
                 container = null;
@@ -124,15 +155,30 @@ function buildUi() {
         const provider = PROVIDER_MAP[providerId];
         const model = settings.value.aiModel || provider?.models?.[0] || "—";
 
+        $sessionTitle = <span className="ai-session-title" title=""></span>;
+
+        $modeChip = (
+                <span className="ai-mode-chip" onclick={chooseMode}></span>
+        );
+
         const $header = (
                 <div className="ai-header">
                         <div className="ai-title">
                                 <span className="icon psychology"></span>
-                                <span className="ai-model" title={model}>{model}</span>
+                                <div className="ai-title-text">
+                                        {$sessionTitle}
+                                        <span className="ai-model" title={model}>{model}</span>
+                                </div>
+                                {$modeChip}
                         </div>
                         <div className="ai-actions">
                                 <span
                                         className="icon history"
+                                        title={strings["ai sessions"] || "Chat sessions"}
+                                        onclick={openSessions}
+                                ></span>
+                                <span
+                                        className="icon delete"
                                         title={strings["ai clear chat"] || "Clear chat"}
                                         onclick={clearChat}
                                 ></span>
@@ -154,6 +200,8 @@ function buildUi() {
 
         $status = <div className="ai-status"></div>;
 
+        $slashMenu = <div className="ai-slash-menu" style="display:none"></div>;
+
         $input = (
                 <textarea
                         className="ai-input"
@@ -167,7 +215,7 @@ function buildUi() {
                                         send();
                                 }
                         }}
-                        oninput={autosize}
+                        oninput={onInput}
                 ></textarea>
         );
 
@@ -179,8 +227,11 @@ function buildUi() {
 
         const $composer = (
                 <div className="ai-composer">
-                        {$input}
-                        {$send}
+                        {$slashMenu}
+                        <div className="ai-composer-row">
+                                {$input}
+                                {$send}
+                        </div>
                 </div>
         );
 
@@ -203,12 +254,59 @@ function onSendClick() {
         }
 }
 
+/**
+ * Shows/hides the slash command popup as the user types.
+ * @param {InputEvent} e
+ */
+function onInput(e) {
+        autosize();
+        updateSlashMenu(e.target?.value ?? "");
+}
+
+/**
+ * Renders the filtered slash command list.
+ * @param {string} value
+ */
+function updateSlashMenu(value) {
+        if (!$slashMenu) return;
+        const matches = matchSlashCommands(value);
+        if (!matches.length || /\s/.test(value.slice(1))) {
+                $slashMenu.style.display = "none";
+                $slashMenu.content = "";
+                return;
+        }
+        $slashMenu.content = matches.map((command) => (
+                <div
+                        className="ai-slash-item"
+                        onclick={() => {
+                                $input.value = `/${command.id} `;
+                                updateSlashMenu($input.value);
+                                $input.focus();
+                        }}
+                >
+                        <span className="ai-slash-cmd">/{command.id}</span>
+                        <span className="ai-slash-desc">
+                                {strings[command.descriptionKey] || command.fallbackDescription}
+                        </span>
+                </div>
+        ));
+        $slashMenu.style.display = "block";
+}
+
 async function send() {
-        const text = ($input.value || "").trim();
-        if (!text || running) return;
+        const raw = ($input.value || "").trim();
+        if (!raw || running) return;
 
         $input.value = "";
         autosize();
+        $slashMenu.style.display = "none";
+        $slashMenu.content = "";
+
+        // slash command expansion uses the live editor context (selection/file)
+        const expanded = expandSlashCommand(raw, getEditorContext());
+        const text = expanded || raw;
+
+        ensureTitle(raw);
 
         if (!agent) {
                 agent = new Agent({ onEvent: handleEvent });
@@ -224,6 +322,48 @@ async function send() {
                 setRunning(false);
                 persist();
         }
+}
+
+/**
+ * Live editor context for slash expansion: selection text + file name.
+ * @returns {{hasFile: boolean, fileName?: string, selection?: string}}
+ */
+function getEditorContext() {
+        try {
+                const manager = window.editorManager;
+                const context = readEditorContext(manager);
+                if (!context.hasFile) return { hasFile: false };
+
+                let selection = "";
+                if (context.hasSelection && manager?.editor?.state) {
+                        const { from, to } = manager.editor.state.selection.main;
+                        selection = String(manager.editor.state.doc.toString())
+                                .slice(from, to)
+                                .slice(0, 8000);
+                }
+                return {
+                        hasFile: true,
+                        fileName: context.name,
+                        selection,
+                };
+        } catch {
+                return { hasFile: false };
+        }
+}
+
+/**
+ * Sets the session title from the first user message when it is still
+ * the default.
+ * @param {string} rawText
+ */
+function ensureTitle(rawText) {
+        const session = activeSession();
+        if (!session) return;
+        if (session.title && session.title !== "New chat") return;
+        const title = deriveTitle(rawText);
+        if (!title) return;
+        session.title = title;
+        renderSessionTitle();
 }
 
 /**
@@ -376,10 +516,276 @@ function renderMessages() {
         scrollToEnd();
 }
 
-function clearChat() {
+function renderSessionTitle() {
+        const session = activeSession();
+        if ($sessionTitle) {
+                $sessionTitle.textContent = session?.title || "New chat";
+                $sessionTitle.title = session?.title || "";
+        }
+}
+
+/**
+ * Renders the chat/agent mode chip from settings.aiMode.
+ */
+function renderModeChip() {
+        if (!$modeChip) return;
+        const mode = settings.value.aiMode === "chat" ? "chat" : "agent";
+        $modeChip.textContent =
+                mode === "chat"
+                        ? strings["ai mode chat"] || "Chat"
+                        : strings["ai mode agent"] || "Agent";
+        $modeChip.dataset.mode = mode;
+        $modeChip.title =
+                strings["ai mode"] || "AI mode";
+}
+
+/**
+ * Mode picker (chat = conversation only, agent = full tools).
+ */
+async function chooseMode() {
+        const choice = await select(
+                strings["ai mode"] || "AI mode",
+                [
+                        {
+                                value: "agent",
+                                text: strings["ai mode agent"] || "Agent — full tools and file edits",
+                                icon: "smart_toy",
+                        },
+                        {
+                                value: "chat",
+                                text: strings["ai mode chat"] || "Chat — conversation without tools",
+                                icon: "chat_bubble",
+                        },
+                ],
+        );
+        if (!choice) return;
+
+        settings.value.aiMode = choice;
+        settings.update();
+        agent = null; // rebuilt on next message with the new mode
+        renderModeChip();
+}
+
+/** @returns {object | undefined} the currently active session */
+function activeSession() {
+        return sessions.find((session) => session.id === activeId);
+}
+
+/** Persists the current events into the active session (if any). */
+function persist() {
+        const session = activeSession();
+        if (!session) return;
+        session.events = events.slice();
+        touchSession(session);
+        saveSessions(sessions);
+        saveActiveId(activeId);
+}
+
+/**
+ * Loads sessions (with legacy single-chat migration) and restores the
+ * active one.
+ */
+function restoreSessions() {
+        sessions = loadSessions();
+        activeId = loadActiveId();
+
+        if (!sessions.length) {
+                // migrate the pre-multi-session chat if present
+                let legacy = [];
+                try {
+                        legacy = JSON.parse(localStorage.getItem(LEGACY_CHAT_KEY) || "[]");
+                } catch {
+                        legacy = [];
+                }
+                const session = newSession(
+                        legacy.length
+                                ? strings["ai imported"] || "Previous chat"
+                                : strings["ai new chat"] || "New chat",
+                );
+                session.events = Array.isArray(legacy) ? legacy.slice(-200) : [];
+                if (session.events.length) {
+                        const firstUser = session.events.find(
+                                (event) => event.type === "user",
+                        );
+                        if (firstUser) session.title = deriveTitle(firstUser.payload);
+                }
+                sessions = [session];
+                activeId = session.id;
+                saveSessions(sessions);
+                saveActiveId(activeId);
+                localStorage.removeItem(LEGACY_CHAT_KEY);
+        }
+
+        if (!activeSession()) {
+                activeId = sessions[sessions.length - 1]?.id || null;
+                if (!activeId) {
+                        const session = newSession();
+                        sessions = [session];
+                        activeId = session.id;
+                        saveSessions(sessions);
+                }
+                saveActiveId(activeId);
+        }
+
+        events = [...(activeSession()?.events || [])];
+        renderSessionTitle();
+}
+
+/**
+ * Session manager: list chats, create, open, rename or delete.
+ */
+async function openSessions() {
+        const items = [
+                {
+                        value: "__new__",
+                        text: strings["ai new chat"] || "New chat",
+                        icon: "add",
+                },
+                ...sessions.map((session) => ({
+                        value: session.id,
+                        text:
+                                (session.id === activeId
+                                        ? `● ${session.title}`
+                                        : session.title) + `  ·  ${formatSessionTime(session.updatedAt)}`,
+                })),
+        ];
+
+        const choice = await select(
+                strings["ai sessions"] || "Chat sessions",
+                items,
+        );
+        if (!choice) return;
+
+        if (choice === "__new__") {
+                startNewChat();
+                return;
+        }
+
+        const action = await select(
+                sessions.find((s) => s.id === choice)?.title || "",
+                [
+                        { value: "open", text: strings["ai open session"] || "Open", icon: "visibility" },
+                        { value: "rename", text: strings["ai rename session"] || "Rename", icon: "edit" },
+                        { value: "delete", text: strings["ai delete session"] || "Delete", icon: "delete" },
+                ],
+        );
+
+        if (action === "open") {
+                switchSession(choice);
+        } else if (action === "rename") {
+                await renameSession(choice);
+        } else if (action === "delete") {
+                await deleteSession(choice);
+        }
+}
+
+/** Starts a fresh chat session. */
+function startNewChat() {
+        if (activeSession() && !events.length) {
+                // already on an empty chat — just focus
+                renderMessages();
+                return;
+        }
+        persist();
+        const session = newSession();
+        sessions.push(session);
+        activeId = session.id;
         events = [];
         agent = null;
-        localStorage.removeItem(CHAT_STORAGE_KEY);
+        saveSessions(sessions);
+        saveActiveId(activeId);
+        renderSessionTitle();
+        renderMessages();
+}
+
+/**
+ * @param {string} id
+ */
+function switchSession(id) {
+        if (id === activeId) return;
+        persist();
+        const session = sessions.find((item) => item.id === id);
+        if (!session) return;
+        activeId = id;
+        events = [...(session.events || [])];
+        agent = null;
+        saveActiveId(activeId);
+        renderSessionTitle();
+        renderMessages();
+}
+
+/**
+ * @param {string} id
+ */
+async function renameSession(id) {
+        const session = sessions.find((item) => item.id === id);
+        if (!session) return;
+        const title = await prompt(
+                strings["ai rename session"] || "Rename",
+                session.title,
+                "text",
+        );
+        if (!title || !title.trim()) return;
+        session.title = title.trim().slice(0, 80);
+        if (id === activeId) renderSessionTitle();
+        persist();
+        toast(strings["ai session renamed"] || "Chat renamed");
+}
+
+/**
+ * @param {string} id
+ */
+async function deleteSession(id) {
+        const session = sessions.find((item) => item.id === id);
+        if (!session) return;
+
+        const ok = await confirm(
+                strings["ai delete session"] || "Delete chat",
+                (strings["ai delete session confirm"] || "Delete chat '{title}'?").replace(
+                        "{title}",
+                        session.title,
+                ),
+        );
+        if (!ok) return;
+
+        sessions = sessions.filter((item) => item.id !== id);
+        if (id === activeId) {
+                const remaining = [...sessions].sort(
+                        (a, b) => (b.updatedAt || 0) - (a.updatedAt || 0),
+                );
+                if (remaining.length) {
+                        activeId = remaining[0].id;
+                        events = [...(activeSession()?.events || [])];
+                } else {
+                        const fresh = newSession();
+                        sessions = [fresh];
+                        activeId = fresh.id;
+                        events = [];
+                }
+                agent = null;
+                renderSessionTitle();
+                renderMessages();
+        }
+        saveSessions(sessions);
+        saveActiveId(activeId);
+        toast(strings["ai session deleted"] || "Chat deleted");
+}
+
+/**
+ * Clears the events of the current chat (the session itself is kept).
+ */
+async function clearChat() {
+        const ok = await confirm(
+                strings["ai clear chat"] || "Clear chat",
+                strings["ai confirm clear"] || "Clear this chat?",
+        );
+        if (!ok) return;
+
+        events = [];
+        agent = null;
+        const session = activeSession();
+        if (session) session.events = [];
+        persist();
         renderMessages();
 }
 
@@ -410,23 +816,6 @@ function scrollToEnd() {
 function autosize() {
         $input.style.height = "auto";
         $input.style.height = `${Math.min($input.scrollHeight, 140)}px`;
-}
-
-function persist() {
-        try {
-                localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(events.slice(-80)));
-        } catch {
-                /* storage full — ignore */
-        }
-}
-
-function restore() {
-        try {
-                const raw = localStorage.getItem(CHAT_STORAGE_KEY);
-                if (raw) events = JSON.parse(raw) || [];
-        } catch {
-                events = [];
-        }
 }
 
 /**
