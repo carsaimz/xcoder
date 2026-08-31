@@ -41,6 +41,5 @@
     <framework src="androidx.core:core:1.6.0" />
     <framework src="androidx.core:core-google-shortcuts:1.0.0" />
     <framework src="androidx.documentfile:documentfile:1.0.1" />
-    <source-file src="android/com/xcoder/system/RewardPassManager.java" target-dir="src/com/xcoder/system"/>
   </platform>
 </plugin>
