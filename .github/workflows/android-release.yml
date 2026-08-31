@@ -76,7 +76,8 @@ jobs:
           JSON
 
       - name: Build release APK
-        run: npx cordova build android --release --no-telemetry
+        # cordova-android 13 defaults packageType to bundle — be explicit
+        run: npx cordova build android --release -- --packageType=apk --no-telemetry
 
       - name: Build release AAB
         run: npx cordova build android --release -- --packageType=bundle --no-telemetry
