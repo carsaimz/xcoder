@@ -85,7 +85,7 @@
     "@rspack/core": "^2.2.1",
     "cordova": "^13.0.0",
     "prettier": "^3.6.0",
-    "typescript": "^5.9.2",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.0"
   },
   "engines": {
