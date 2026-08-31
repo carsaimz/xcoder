@@ -1,54 +1,95 @@
 {
   "name": "xcoder",
-  "version": "1.2.0",
-  "description": "XCoder \u2014 a mobile-first code editor & IDE for the web and Android, built on CodeMirror 6. Community fork of Acode.",
-  "main": "www/bundle.js",
+  "version": "1.1.0",
+  "description": "XCoder — a mobile-first code editor and IDE for Android. CodeMirror 6 powered.",
   "license": "MIT",
+  "author": {
+    "name": "XCoder Contributors",
+    "url": "https://github.com/xcoder-app/xcoder"
+  },
+  "homepage": "https://github.com/xcoder-app/xcoder#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/carsaimz/xcoder.git"
+    "url": "git+https://github.com/xcoder-app/xcoder.git"
   },
   "bugs": {
-    "url": "https://github.com/carsaimz/xcoder/issues"
+    "url": "https://github.com/xcoder-app/xcoder/issues"
   },
   "keywords": [
-    "code-editor",
     "ide",
+    "code-editor",
     "codemirror",
-    "mobile",
     "cordova",
-    "web",
-    "acode"
+    "android",
+    "mobile",
+    "vscode",
+    "text-editor"
   ],
+  "main": "www/js/xcoder.js",
+  "type": "commonjs",
   "scripts": {
-    "build": "tsc --noEmit && rspack build",
-    "build:dev": "NODE_ENV=development rspack build",
-    "dev": "rspack serve",
+    "build:dev": "rspack build --mode development",
+    "build:prod": "rspack build --mode production",
+    "watch": "rspack build --mode development --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:locales": "node utils/lang-cli.mjs",
-    "gen:plugin": "node utils/plugin-cli.mjs",
-    "serve": "npx serve www"
+    "lint": "biome check src utils",
+    "lint:fix": "biome check --write src utils",
+    "format": "biome format --write src utils",
+    "lang": "node utils/lang-cli.js",
+    "plugin": "node utils/plugin-cli.js",
+    "cordova:android": "cordova build android",
+    "cordova:run": "cordova run android",
+    "postinstall": "echo \"XCoder: run 'pnpm run build:dev' to compile www/, then 'cordova platform add android' for native builds.\""
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.6",
-    "@codemirror/commands": "^6.8.1",
-    "@codemirror/language": "^6.10.8",
-    "@codemirror/language-data": "^6.5.1",
+    "@codemirror/commands": "^6.9.0",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/lint": "^6.8.5",
     "@codemirror/search": "^6.5.11",
     "@codemirror/state": "^6.5.2",
-    "@codemirror/view": "^6.36.8",
-    "jszip": "^3.10.1",
-    "prettier": "^3.5.3"
+    "@codemirror/view": "^6.43.0",
+    "@codemirror/lang-angular": "^0.1.4",
+    "@codemirror/lang-cpp": "^6.0.3",
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-go": "^6.0.1",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-java": "^6.0.1",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-jinja": "^6.0.1",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-less": "^6.0.2",
+    "@codemirror/lang-liquid": "^6.2.0",
+    "@codemirror/lang-markdown": "^6.3.1",
+    "@codemirror/lang-php": "^6.0.0",
+    "@codemirror/lang-python": "^6.1.6",
+    "@codemirror/lang-rust": "^6.0.1",
+    "@codemirror/lang-sass": "^6.0.2",
+    "@codemirror/lang-sql": "^6.8.0",
+    "@codemirror/lang-vue": "^0.1.3",
+    "@codemirror/lang-wast": "^6.0.2",
+    "@codemirror/lang-xml": "^6.1.0",
+    "@codemirror/lang-yaml": "^6.1.1",
+    "@lezer/common": "^1.2.3",
+    "@lezer/highlight": "^1.2.1",
+    "@lezer/lr": "^1.4.1",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "@rspack/cli": "^1.3.11",
-    "@rspack/core": "^1.3.11",
-    "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "@biomejs/biome": "^2.5.0",
+    "@rspack/cli": "^2.2.1",
+    "@rspack/core": "^2.2.1",
+    "cordova": "^13.0.0",
+    "prettier": "^3.6.0",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.0"
   },
   "engines": {
-    "node": ">=18"
-  }
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
 }

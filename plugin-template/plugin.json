@@ -1,0 +1,15 @@
+{
+  "id": "com.xcoder.my-plugin",
+  "name": "My Plugin",
+  "version": "1.0.0",
+  "main": "main.js",
+  "icon": "icon.png",
+  "author": {
+    "name": "Your Name",
+    "email": "you@example.com",
+    "github": "username"
+  },
+  "files": ["main.js", "icon.png"],
+  "minAppVersion": "1.0.0",
+  "description": "Describe what this plugin does in one sentence."
+}

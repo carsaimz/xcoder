@@ -1,96 +1,49 @@
 /**
- * xcoder facade — the single object exposed to plugins and power users
- * (also available as `window.xcoder`). `xcoder.require('module')` returns
- * the module facade; unknown names throw with the list of valid modules.
+ * Service registry behind `xcoder.require()`.
+ * Facades are imported here (and only here) to resolve the full API graph.
+ * Every name maps to the SAME object shape documented in docs/api-reference.md.
  */
+import { commands } from './commands';
+import * as cacheModule from './cache';
+import { settings } from './settings';
+import { dialog } from './dialog';
+import { toast } from './toast';
+import { events } from './events';
+import { editorManager } from './editorManager';
+import { editorLanguages } from './editorLanguages';
+import { editorThemes } from './editorThemes';
+import { fileSystem } from './fileSystem';
+import { terminalApi } from './terminal';
+import { lsp } from './lsp';
+import { ai } from './ai';
+import { pluginsApi } from './plugins/public';
+import * as codemirror from './codemirror';
 
-import * as pathMod from '../lib/path';
-import { bus, EventBus } from '../lib/events';
-import { storage, createStore } from '../lib/storage';
-import * as helpers from '../lib/helpers';
-import { t, setLocale, getLocale, listLocales, registerLocale, detectLocale } from '../lib/i18n';
-import { commands, CommandRegistry } from './commands';
-import { settings, SettingsManager } from './settings';
-import { toast, ToastType } from './toast';
-import * as dialog from './dialog';
-import { cache, TTLCache } from './cache';
-import { plugins, PluginManager } from './plugins';
-import { fs, Workspace } from '../core/file';
-import { editorManager } from '../core/editor/editorManager';
-import { Shell } from '../core/terminal/shell';
-import { agents } from '../core/agent';
-import { providers } from '../core/ai';
-import { PRESETS, getPreset, presetsByGroup } from '../core/ai/presets';
-import { createClient } from '../core/ai/clients';
-import { LSPClient } from '../core/lsp/client';
-import { VERSION } from '../version';
+const services: Record<string, unknown> = {
+  commands,
+  editorManager,
+  editorLanguages,
+  editorThemes,
+  'xcoder.codemirror': codemirror,
+  fileSystem,
+  terminal: terminalApi,
+  lsp,
+  ai,
+  settings,
+  dialog,
+  toast,
+  events,
+  cache: cacheModule,
+  plugins: pluginsApi
+};
 
-export interface RegistryDeps {
-  shell: Shell;
-}
-
-export function buildFacade(deps: RegistryDeps) {
-  const facade: Record<string, unknown> = {
-    // lib
-    path: pathMod,
-    bus,
-    EventBus,
-    storage,
-    createStore,
-    helpers,
-    i18n: { t, setLocale, getLocale, listLocales, registerLocale, detectLocale },
-    // api
-    commands,
-    settings,
-    toast,
-    dialog,
-    cache,
-    plugins,
-    // core
-    fs,
-    editor: editorManager,
-    shell: deps.shell,
-    agents,
-    ai: {
-      providers,
-      presets: PRESETS,
-      getPreset,
-      presetsByGroup,
-      createClient,
-    },
-    lsp: { LSPClient },
-    version: VERSION,
-  };
-
-  function require(name: string): unknown {
-    if (name in facade) return facade[name];
-    throw new Error(`xcoder.require: unknown module "${name}". Available: ${Object.keys(facade).join(', ')}`);
+export function requireModule<T = unknown>(name: string): T {
+  if (!(name in services)) {
+    throw new Error(`[xcoder] unknown module "${name}" — see docs/api-reference.md`);
   }
-
-  return { require, facade, modules: () => Object.keys(facade) };
+  return services[name] as T;
 }
 
-export type XcoderFacade = ReturnType<typeof buildFacade>;
-
-let instance: XcoderFacade | null = null;
-
-export function initRegistry(deps: RegistryDeps): XcoderFacade {
-  instance = buildFacade(deps);
-  const xcoder = {
-    require: instance.require,
-    modules: instance.modules,
-    version: VERSION,
-  };
-  if (typeof window !== 'undefined') {
-    (window as unknown as Record<string, unknown>).xcoder = xcoder;
-  }
-  return instance;
+export function moduleNames(): string[] {
+  return Object.keys(services);
 }
-
-export function getRegistry(): XcoderFacade {
-  if (!instance) throw new Error('registry not initialized');
-  return instance;
-}
-
-export type { CommandRegistry, SettingsManager, PluginManager, TTLCache, Workspace };
-export type { ToastType };

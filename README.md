@@ -1,167 +1,209 @@
+<div align="center">
+
 # XCoder
 
-**A mobile-first code editor & IDE for the web and Android — built on CodeMirror 6.**
+**A mobile-first code editor and IDE for Android — CodeMirror 6 powered, plugin extensible.**
 
-XCoder is a community fork of [Acode](https://github.com/Acode-Foundation/acode), rewritten in
-strict TypeScript with a modern toolchain (Rspack + Vitest) and extended with an
-AI agent system, a virtual terminal with git, and a plugin platform.
+*Original project · own architecture and API surface (`xcoder.*`)*
 
-[![CI](https://github.com/carsaimz/xcoder/actions/workflows/ci.yml/badge.svg)](https://github.com/carsaimz/xcoder/actions/workflows/ci.yml)
-[![Release](https://github.com/carsaimz/xcoder/actions/workflows/release.yml/badge.svg)](https://github.com/carsaimz/xcoder/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Locales](https://img.shields.io/badge/locales-43-green)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Engine](https://img.shields.io/badge/editor-CodeMirror%206-7c5cff)](https://codemirror.net/)
+[![Platform](https://img.shields.io/badge/platform-Android%20%7C%20Web-3fb950)](./docs/build.md)
+[![Build](https://img.shields.io/badge/bundler-Rspack%202-0969da)](https://rspack.dev/)
+[![Tests](https://img.shields.io/badge/tests-Vitest%204-success)](./tests)
+[![Locales](https://img.shields.io/badge/locales-43%20scaffolded-f0883e)](./docs/i18n.md)
+
+[Features](#-features) · [Quickstart](#-quickstart) · [Architecture](#-architecture) · [Plugins](#-plugins) · [Docs](#-documentation) · [Roadmap](#-roadmap)
+
+**🇵🇹 🇧🇷 [Leia-me em português](./README.pt.md)**
+
+</div>
 
 ---
 
-## ✨ Highlights
+## Why XCoder?
 
-- **📝 CodeMirror 6 editor** — 100+ languages loaded on demand, 3 themes (dark / light / ocean),
-  bracket matching, autocomplete, search & replace, fold gutter, selection match highlight.
-- **📁 Multi-root workspace** — pluggable backends: browser storage (IndexedDB), in-memory,
-  WebDAV, and device storage through Cordova on Android.
-- **⌨️ Virtual terminal** — 25+ commands (`ls`, `cat`, `grep`, `wc`, `cp`…), pipes and output
-  redirection, `node -e`, `python` (Pyodide), npm/apk mocks and a **full git state machine**
-  (init / add / commit / log / diff / branch / checkout / merge / remote / push / pull / clone)
-  persisted per repository.
-- **🤖 AI Agent** — an autonomous agent that can read, write and edit your files, run git
-  commands and execute bash/JS/Python locally. Subagents (`coder`, `analyzer`, `ops`) can be
-  spawned for focused subtasks. Every dangerous action asks for permission.
-- **🔌 Bring your own AI** — 17 provider presets in 3 groups (*free*, *paid with free tier*,
-  *premium enterprise*) speaking OpenAI, Anthropic and Gemini dialects, plus any custom
-  OpenAI-compatible endpoint.
-- **🧩 Plugins** — install `.zip` packages built with `npm run gen:plugin`; plugins get the
-  same `xcoder.require()` facade as the core (commands, fs, editor, agents, ai, …).
-- **🌍 43 locales** — complete English, Portuguese and Spanish dictionaries plus generated
-  stubs for 40 more languages (`npm run gen:locales`).
-- **⚡ Command palette & Quick Open** — `Ctrl+K` commands, `Ctrl+P` fuzzy file switcher.
-- **📐 Format on demand** — Prettier (lazy-loaded) for JS/TS/JSON/CSS/HTML/Markdown/YAML.
-- **🔍 Global search & replace** — project-wide search with regex, case and whole-word
-  options, results grouped by file, click-to-open at line, and bulk replace with
-  confirmation (`Ctrl+Shift+F`).
-- **🌿 Visual Git panel** — branch, staged/unstaged/untracked files, staging, commit,
-  push/pull and commit log without touching the terminal.
-- **📖 Markdown live preview** — split-pane rendered preview (overlay on phones) with a
-  zero-dependency, XSS-safe renderer supporting tables, task lists and fenced code.
-- **📊 Status bar** — current branch, cursor position (Ln/Col), file type and dirty state.
+Edit real code on your phone: a VS Code–flavoured editor, a real file system
+layer (device storage, browser storage, WebDAV), an integrated terminal with
+a virtual shell, LSP-powered intelligence, and a plugin system designed for
+the whole experience — not bolted on.
 
-## 🚀 Quick start (web)
+XCoder is written from the ground up for Android, with an independently named,
+fully documented API so plugins stay clean and evolve without legacy constraints.
+
+## ✨ Features
+
+**Editor** — CodeMirror 6 engine
+Syntax highlighting for **23 languages** (21 `@codemirror/lang-*` bundles +
+TypeScript/SCSS variants) · multi-cursor · search & replace with regex · code
+folding · bracket matching & auto-close · snippets · fuzzy command palette ·
+quick open (`Ctrl+P`).
+
+**Files** — URL-based abstraction (`scheme://path`)
+Device storage via Cordova · browser storage (IndexedDB) · **WebDAV** remote
+· in-memory FS · multi-root workspaces (`.xcoder-workspace`) · recursive
+filename + content search · SFTP/FTP interfaces defined (native bridge on
+the roadmap).
+
+**Terminal** — xterm.js + virtual shell (xsh)
+POSIX-flavoured shell over the FS abstraction: `ls cd cat echo mkdir touch rm
+mv cp grep wc head find open …` · **git** with real state
+(init/add/commit/log/branch/checkout/diff) · **npm** mock wired to
+`package.json` · **apk** catalog · `node -e` · history, tab completion ·
+Proot/Alpine userland manager for Android (real Linux, no root).
+
+**LSP** — Language Server Protocol client
+JSON-RPC 2.0 over WebSocket or Web Worker · completion, hover, definition,
+references, diagnostics · per-language servers configured in settings ·
+CodeMirror bridges for autocomplete, tooltips and squiggles.
+
+**Plugins** — first-class extension host
+`xcoder.setPluginInit(id, init)` / `xcoder.setPluginUnmount(id, unmount)` ·
+per-plugin page UI (`$page`) · persistent per-plugin cache · zip or
+directory install · ship commands, themes, languages, FS backends, shell
+commands, LSP servers.
+
+**And** — 3 themes (Dark+ / Light / Solarized) · 43-locale i18n scaffold
+(pt/en/es complete) · settings drawer · session restore · auto-save ·
+responsive mobile UI.
+
+## 🚀 Quickstart
+
+### Run in a browser (no Android required)
 
 ```bash
-git clone https://github.com/carsaimz/xcoder.git
+git clone https://github.com/xcoder-app/xcoder.git
 cd xcoder
-npm install
-npm run dev          # dev server on http://localhost:8080
+pnpm install
+pnpm run build:dev
+npx serve www            # → http://localhost:3000
 ```
 
-Production build:
+You get the full IDE: open files, edit, `Ctrl+S`, `` Ctrl+` `` for the
+terminal, `Ctrl+Shift+P` for commands.
+
+### Build for Android
 
 ```bash
-npm test             # typecheck + 88 unit tests
-npm run build        # emits www/ (bundle.js + lazy chunks)
-npm run serve        # static server for www/
+cordova platform add android
+pnpm run build:prod
+cordova build android
+# → platforms/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Open the app and try:
+Full prerequisites, release signing and troubleshooting:
+**[docs/build.md](./docs/build.md)**.
 
-| Action | How |
-| --- | --- |
-| Command palette | `Ctrl+K` or the ⌕ toolbar button |
-| Quick open file | `Ctrl+P` |
-| Terminal | toolbar `>_` button, then `help` |
-| AI agent | robot button (configure a provider first: Settings → AI providers) |
-| Format document | `editor.format` command in the palette |
-
-## 🤖 AI agent in 30 seconds
-
-1. **Settings → AI providers → Add provider** and pick a preset:
-   - *Free*: Groq, Cerebras, OpenRouter (`:free` models), Hugging Face, GitHub Models, Ollama (local)
-   - *Paid with free tier*: OpenAI, Anthropic, Gemini, Mistral, DeepSeek, Together, Cohere
-   - *Premium*: Azure OpenAI, AWS Bedrock, Google Vertex, IBM watsonx
-2. Paste your **API key** (Ollama needs none) and press **Test connection**.
-3. Open the **AI agent** panel and describe a task:
-
-> *“create utils/date.ts with a formatDate helper, then commit it”*
-
-The agent plans, calls tools (`fs.read`, `fs.write`, `code.edit`, `git.commit`, `exec.run`…),
-asks before every write, and reports back. Read-only subagent (`analyzer`) and command-runner
-subagent (`ops`) are one tap away.
-
-Full details: [docs/agents.md](docs/agents.md) · API contract: [docs/api-reference.md](docs/api-reference.md)
-
-## 📱 Android builds (CI)
-
-| Build | Trigger | Output |
-| --- | --- | --- |
-| Debug APK | every push to `main` | rolling [`dev-build` pre-release](https://github.com/carsaimz/xcoder/releases/tag/dev-build) |
-| Signed APK + AAB | tag `v*` (or *Release* workflow dispatch) | attached to the versioned GitHub release |
-
-Signing uses repository secrets — see [docs/build.md](docs/build.md):
-
-| Secret | Description |
-| --- | --- |
-| `KEYSTORE_BASE64` | base64 of your `.keystore` file |
-| `KEYSTORE_PASSWORD` | keystore password |
-| `KEY_ALIAS` | key alias |
-| `KEY_PASSWORD` | key password |
-
-Without secrets the release pipeline still publishes **unsigned** artifacts.
-
-## 🗂 Project layout
+## 🏗 Architecture
 
 ```
-├── src/
-│   ├── lib/          # path (scheme-aware), events, storage, i18n, dom, helpers
-│   ├── api/          # commands, settings, toast, dialog, plugins, registry (xcoder.require)
-│   ├── core/
-│   │   ├── file/     # FileSystemBackend + memory/browser/cordova/webdav + workspace
-│   │   ├── editor/   # CodeMirror 6 manager, themes, languages, prettier format
-│   │   ├── terminal/ # virtual shell + git state machine
-│   │   ├── lsp/      # JSON-RPC 2.0 client, WebSocket/Worker transports
-│   │   ├── ai/       # provider presets (3 groups) + OpenAI/Anthropic/Gemini clients
-│   │   └── agent/    # agent loop, 17 tools, subagents, permission manager
-│   ├── ui/           # IDE shell, file tree, palettes, terminal panel, agent panel, settings
-│   ├── lang/         # en/pt/es dictionaries + 40 generated locales
-│   └── main.ts       # bootstrap
-├── utils/            # lang-cli, plugin-cli + plugin template
-├── tests/            # 88 vitest cases
-├── docs/             # architecture, api-reference, agents, build, i18n, plugins, migration
-└── .github/          # workflows (ci/release/android-*), dependabot, labeler, greetings, stale
+┌─────────────────────────────────────────────────────────────┐
+│                     XCoder Application                      │
+├──────────────┬──────────────┬──────────────┬────────────────┤
+│  UI Layer    │  Editor Core │  Terminal    │  LSP Client    │
+│  (HTML/CSS,  │  (CodeMirror │  (xterm.js + │  (JSON-RPC 2.0 │
+│  Components) │   6 views)   │   xsh shell) │   WS / Worker) │
+├──────────────┴──────────────┴──────────────┴────────────────┤
+│                Public API — window.xcoder                   │
+│      require() · setPluginInit() · setPluginUnmount()       │
+├──────────────┬──────────────┬───────────────────────────────┤
+│ Plugin System│ Commands     │ Events · Settings · Cache     │
+├──────────────┴──────────────┴───────────────────────────────┤
+│        File System Abstraction (backend registry)           │
+│   memory:// · browser:// · file:// · webdav://  (+sftp/ftp) │
+├─────────────────────────────────────────────────────────────┤
+│               Apache Cordova Bridge Layer                   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## 🛠 Development
+Layer rules: everything above the FS abstraction speaks **file URLs**, never
+`cordova.*`; the public surface is only what `src/api/` facades export;
+core modules never import UI. Deep dive: **[docs/architecture.md](./docs/architecture.md)**.
+
+**Stack**: TypeScript 5.9 (strict) · Rspack 2 (SWC loader) · CodeMirror 6 +
+Lezer · xterm.js 6 · Cordova 13 · Vitest 4 · Biome.
+
+## 🔌 Plugins
+
+```js
+// main.js — classic script, no bundler needed
+function init(baseUrl, $page, cache) {
+  const commands = xcoder.require('commands');
+  const editorManager = xcoder.require('editorManager');
+  const toast = xcoder.require('toast');
+
+  commands.addCommand({
+    name: 'my-plugin.wordcount',
+    description: 'Count words in the active file',
+    bindKey: { win: 'Ctrl-Alt-W', mac: 'Command-Alt-W' },
+    exec: () => {
+      const ed = editorManager.activeEditor;
+      if (!ed) return toast.warning('No file is open');
+      const words = (ed.view.state.doc.toString().match(/\S+/g) || []).length;
+      $page.innerHTML = `<h2>${ed.title}</h2><p>Words: <b>${words}</b></p>`;
+      $page.show();
+    }
+  });
+}
+
+function unmount() {
+  xcoder.require('commands').removeCommand('my-plugin.wordcount');
+}
+
+xcoder.setPluginInit('my-plugin', init);
+xcoder.setPluginUnmount('my-plugin', unmount);
+```
+
+Scaffold, pack and validate with:
 
 ```bash
-npm run typecheck    # tsc --noEmit (strict)
-npm test             # vitest run
-npm run test:watch   # vitest watch
-npm run build        # production bundle
-npm run build:dev    # development bundle with sourcemaps
-npm run gen:locales  # regenerate locale stubs (43 locales)
-npm run gen:plugin   # scaffold a new plugin project
+pnpm run plugin -- new "My Plugin"
+pnpm run plugin -- pack ./my-plugin
 ```
 
-### Conventional commits
+Guide: **[docs/plugin-development.md](./docs/plugin-development.md)** · API
+reference: **[docs/api-reference.md](./docs/api-reference.md)** · typings:
+[`src/types/xcoder.d.ts`](./src/types/xcoder.d.ts).
 
-This repo follows [Conventional Commits](https://www.conventionalcommits.org/):
+## 🧪 Development
 
+```bash
+pnpm run typecheck     # strict tsc
+pnpm run test          # 34 vitest tests (shell, git mock, commands, i18n…)
+pnpm run lint          # biome
+pnpm run lang -- stats # translation coverage
 ```
-feat(agent): add ops subagent
-fix(path): keep scheme when resolving absolute fragments
-chore(release): v1.2.0
-```
 
-The release workflow groups commits (`feat` → *Features*, `fix` → *Bug fixes*, …) into the
-release notes and keeps `CHANGELOG.md` up to date.
+Contribution guide: **[CONTRIBUTING.md](./CONTRIBUTING.md)**.
 
-## 🤝 Contributing
+## 🗺 Roadmap
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) — especially the sections on
-conventional commits, locale translation and plugin authoring.
+- [x] Core editor, FS backends, virtual shell, git/npm/apk mocks
+- [x] Plugin host + template + CLI
+- [x] LSP client (completion, hover, definition, references, diagnostics)
+- [x] i18n scaffold (43 locales)
+- [ ] SFTP/FTP backends (native socket bridge)
+- [ ] Real Proot userland on Android (`cordova-plugin-xcoder-proot`)
+- [ ] Split editor panels
+- [ ] In-app plugin marketplace browser
+- [ ] AI coding agents via terminal (Claude Code / Codex / OpenCode)
 
-## 📄 License
+## 📚 Documentation
 
-MIT — see [LICENSE](LICENSE). XCoder is a fork of
-[Acode](https://github.com/Acode-Foundation/acode); the original copyright is preserved in the
-license file.
+| Document | Contents |
+|---|---|
+| [docs/architecture.md](./docs/architecture.md) | Layers, modules, bootstrap, design rules |
+| [docs/api-reference.md](./docs/api-reference.md) | Every `xcoder.require()` module + events |
+| [docs/plugin-development.md](./docs/plugin-development.md) | Plugin lifecycle, manifest, packaging |
+| [docs/build.md](./docs/build.md) | Build, Android, release signing |
+| [docs/i18n.md](./docs/i18n.md) | Locale system + CLI |
+| [docs/glossary.pt.md](./docs/glossary.pt.md) | Glossário PT dos termos técnicos |
+| [CHANGELOG.md](./CHANGELOG.md) | Release history |
 
-Português: [README.pt.md](README.pt.md)
+## License
+
+[MIT](./LICENSE) — © XCoder Contributors.
+
+Built on the shoulders of [CodeMirror 6](https://codemirror.net/),
+[xterm.js](https://xtermjs.org/), [Rspack](https://rspack.dev/),
+[Vitest](https://vitest.dev/) and [Apache Cordova](https://cordova.apache.org/).

@@ -1,398 +1,198 @@
 /**
- * EditorManager — CodeMirror 6 owner: tabs, sessions, language/theme
- * compartments, auto-save and document formatting (prettier, lazy loaded).
+ * Tab lifecycle: open/activate/close/save, session restore, and global
+ * reconfiguration when settings or themes change.
  */
+import type { Editor } from './editor';
+import { Editor as EditorClass } from './editor';
+import * as fs from '@core/file/fs';
+import { supportFor } from './languages';
+import { getTheme } from './themes';
+import { settings } from '@api/settings';
+import { events } from '@api/events';
+import { toast } from '@api/toast';
+import { dialog } from '@api/dialog';
+import { KVStore } from '@lib/storage';
+import { i18n } from '@lib/i18n';
 
-import { bus } from '../../lib/events';
-import * as path from '../../lib/path';
-import { fs } from '../file';
-import { settings } from '../../api/settings';
-import {
-  EditorState,
-  Compartment,
-  StateEffect,
-  Extension,
-  Text,
-} from '@codemirror/state';
-import {
-  EditorView,
-  keymap,
-  lineNumbers,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  drawSelection,
-  dropCursor,
-  rectangularSelection,
-  crosshairCursor,
-} from '@codemirror/view';
-import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
-import {
-  bracketMatching,
-  foldGutter,
-  foldKeymap,
-  indentOnInput,
-  indentUnit,
-  syntaxHighlighting,
-} from '@codemirror/language';
-import { closeBrackets, closeBracketsKeymap, autocompletion, completionKeymap } from '@codemirror/autocomplete';
-import {
-  searchKeymap,
-  highlightSelectionMatches,
-  search,
-} from '@codemirror/search';
-import { themeExtensions, ThemeName } from './themes';
-import { loadLanguage, findLanguage } from './languages';
+const session = new KVStore('kv', 'session:');
 
-export interface EditorSession {
-  id: string;
-  path: string;
-  state: EditorState;
-  dirty: boolean;
-  savedAt: number;
-}
-
-interface SessionRestore {
-  paths: string[];
-  active: string | null;
-}
-
-const languageCompartment = new Compartment();
-const themeCompartment = new Compartment();
-const wrapCompartment = new Compartment();
-const tabCompartment = new Compartment();
-
-export class EditorManager {
-  sessions = new Map<string, EditorSession>();
-  order: string[] = [];
-  activeId: string | null = null;
-  view: EditorView | null = null;
+class EditorManagerImpl {
+  private editors: Editor[] = [];
+  private active: Editor | null = null;
   private container: HTMLElement | null = null;
-  private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private autoSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-  // ---- setup ------------------------------------------------------------------
-
-  /** Attach the CodeMirror view to a DOM container. */
-  attach(container: HTMLElement): void {
+  /** Called by the UI during boot. */
+  mount(container: HTMLElement): void {
     this.container = container;
-    this.view = new EditorView({
-      parent: container,
-      state: this.createState(''),
-      extensions: this.baseExtensions(),
-    });
-    container.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        void this.save();
-      }
-    });
+    this.subscribeSettings();
   }
 
-  private baseExtensions(): Extension[] {
-    return [
-      lineNumbers(),
-      highlightActiveLineGutter(),
-      highlightActiveLine(),
-      foldGutter(),
-      history(),
-      drawSelection(),
-      dropCursor(),
-      rectangularSelection(),
-      crosshairCursor(),
-      indentOnInput(),
-      bracketMatching(),
-      closeBrackets(),
-      autocompletion(),
-      highlightSelectionMatches(),
-      search({ top: true }),
-      keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...searchKeymap, ...historyKeymap, ...foldKeymap, ...completionKeymap, indentWithTab]),
-      EditorView.updateListener.of((update) => {
-        if (update.docChanged) this.onDocChanged(update);
-        if (update.selectionSet || update.docChanged) {
-          const pos = update.state.selection.main.head;
-          const line = update.state.doc.lineAt(pos);
-          bus.emit('editor:cursor', { line: line.number, col: pos - line.from + 1 });
-        }
-        if (update.focusChanged && update.view.hasFocus) bus.emit('editor:focus');
-      }),
-    ];
+  get activeEditor(): Editor | null {
+    return this.active;
   }
 
-  createState(content: string, filePath = 'untitled.txt'): EditorState {
-    return EditorState.create({
-      doc: content,
-      extensions: [
-        ...this.baseExtensions(),
-        languageCompartment.of([]),
-        themeCompartment.of(themeExtensions((settings.get('theme') as ThemeName) ?? 'dark')),
-        wrapCompartment.of(settings.get('wordWrap') ? EditorView.lineWrapping : []),
-        tabCompartment.of([
-          indentUnit.of(' '.repeat(settings.get('tabSize') ?? 4)),
-          EditorState.tabSize.of(settings.get('tabSize') ?? 4),
-        ]),
-      ],
-    });
+  get all(): readonly Editor[] {
+    return this.editors;
   }
 
-  // ---- sessions ----------------------------------------------------------------
+  getByUrl(url: string): Editor | undefined {
+    return this.editors.find((e) => e.url === url);
+  }
 
-  async open(filePath: string, content?: string): Promise<EditorSession> {
-    const existing = [...this.sessions.values()].find((s) => s.path === filePath);
+  async openFile(
+    url: string,
+    opts: { line?: number; column?: number } = {}
+  ): Promise<Editor> {
+    if (!this.container) throw new Error('[editorManager] not mounted');
+
+    const existing = this.getByUrl(url);
     if (existing) {
-      this.setActive(existing.id);
+      this.activate(existing);
+      if (opts.line) existing.setCursor(opts.line, opts.column);
       return existing;
     }
-    let text = content;
-    if (text === undefined) {
-      try {
-        text = (await fs.readText(filePath)) as string;
-      } catch (err) {
-        bus.emit('editor:open-failed', { path: filePath, reason: (err as Error).message });
-        throw err;
-      }
-    }
-    const state = this.createState(text, filePath);
-    const session: EditorSession = {
-      id: `ses-${this.order.length + 1}-${Date.now().toString(36)}`,
-      path: filePath,
-      state,
-      dirty: false,
-      savedAt: Date.now(),
-    };
-    this.sessions.set(session.id, session);
-    this.order.push(session.id);
-    this.setActive(session.id);
-    void this.applyLanguage(session);
-    bus.emit('editor:open', session);
-    return session;
-  }
 
-  private async applyLanguage(session: EditorSession): Promise<void> {
-    const lang = await loadLanguage(session.path);
-    if (this.activeId === session.id && this.view) {
-      this.view.dispatch({ effects: languageCompartment.reconfigure(lang ? [lang] : []) });
-    }
-    session.state = session.state.update({ effects: languageCompartment.reconfigure(lang ? [lang] : []) }).state;
-  }
-
-  setActive(id: string | null): void {
-    if (!this.sessions.has(id ?? '')) id = null;
-    this.activeId = id;
-    const session = id ? this.sessions.get(id)! : null;
-    if (this.view && session) {
-      this.view.setState(session.state);
-      void this.applyLanguage(session);
-    }
-    bus.emit('editor:active', session);
-    void this.persistSession();
-  }
-
-  get active(): EditorSession | null {
-    return this.activeId ? this.sessions.get(this.activeId) ?? null : null;
-  }
-
-  activePath(): string | null {
-    return this.active?.path ?? null;
-  }
-
-  close(id: string): void {
-    const session = this.sessions.get(id);
-    if (!session) return;
-    this.sessions.delete(id);
-    this.order = this.order.filter((x) => x !== id);
-    if (this.activeId === id) this.setActive(this.order[this.order.length - 1] ?? null);
-    bus.emit('editor:close', session);
-    void this.persistSession();
-  }
-
-  closeAll(): void {
-    for (const id of [...this.order]) this.close(id);
-  }
-
-  private onDocChanged(update: { state: EditorState }): void {
-    const session = this.active;
-    if (!session) return;
-    session.state = update.state;
-    session.dirty = true;
-    bus.emit('editor:change', session);
-    this.scheduleAutoSave();
-  }
-
-  private scheduleAutoSave(): void {
-    if (!settings.get('autoSave')) return;
-    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
-    const delay = settings.get('autoSaveDelay') ?? 2000;
-    this.autoSaveTimer = setTimeout(() => void this.save(), delay);
-  }
-
-  async save(targetPath?: string, contentOverride?: string): Promise<boolean> {
-    const session = this.active;
-    const filePath = targetPath ?? session?.path;
-    if (!filePath) return false;
-    let content = contentOverride;
-    if (content === undefined && session && session.path === filePath) {
-      content = this.view ? this.view.state.doc.toString() : session.state.doc.toString();
-    }
-    if (content === undefined && session) content = session.state.doc.toString();
+    let content: string;
     try {
-      await fs.writeFile(filePath, content ?? '');
-      if (session && session.path === filePath) {
-        session.dirty = false;
-        session.savedAt = Date.now();
-      }
-      bus.emit('editor:save', { path: filePath });
-      return true;
+      content = await fs.read(url);
     } catch (err) {
-      bus.emit('editor:save-failed', { path: filePath, reason: (err as Error).message });
-      return false;
+      toast.error(i18n.t('editor.cannotOpen', { url }));
+      throw err;
     }
-  }
 
-  async renameSession(id: string, newPath: string): Promise<void> {
-    const session = this.sessions.get(id);
-    if (!session) return;
-    session.path = newPath;
-    void this.applyLanguage(session);
-    bus.emit('editor:rename', { id, path: newPath });
-  }
-
-  // ---- theme / settings reactions ------------------------------------------------
-
-  applyTheme(name: ThemeName): void {
-    this.view?.dispatch({ effects: themeCompartment.reconfigure(themeExtensions(name)) });
-  }
-
-  applySettings(): void {
-    this.view?.dispatch({
-      effects: [
-        wrapCompartment.reconfigure(settings.get('wordWrap') ? EditorView.lineWrapping : []),
-        tabCompartment.reconfigure([
-          indentUnit.of(' '.repeat(settings.get('tabSize') ?? 4)),
-          EditorState.tabSize.of(settings.get('tabSize') ?? 4),
-        ]),
-      ],
+    const theme = getTheme(settings.get('theme'));
+    const editor = new EditorClass({
+      url,
+      content,
+      themeExtension: [theme.cmTheme, theme.highlight],
+      languageExtension: supportFor(url) ?? []
     });
+
+    this.editors.push(editor);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'editor-pane';
+    wrapper.dataset.editorId = editor.id;
+    wrapper.append(editor.dom);
+    this.container.append(wrapper);
+
+    this.activate(editor);
+    events.emit('editor:open', { url });
+    if (opts.line) editor.setCursor(opts.line, opts.column);
+    void this.persistSession();
+    return editor;
   }
 
-  // ---- restore -------------------------------------------------------------------
+  activate(editor: Editor): void {
+    if (this.active === editor) return;
+    this.active = editor;
+    for (const e of this.editors) {
+      const wrapper = e.dom.parentElement;
+      if (wrapper) wrapper.classList.toggle('active', e === editor);
+    }
+    editor.focus();
+    events.emit('editor:switch', { url: editor.url });
+  }
 
-  private async persistSession(): Promise<void> {
-    const snapshot: SessionRestore = {
-      paths: this.order.map((id) => this.sessions.get(id)!.path),
-      active: this.active?.path ?? null,
-    };
-    const { storage } = await import('../../lib/storage');
-    await storage.set('editor:sessions', snapshot);
+  async closeEditor(editorOrUrl: Editor | string): Promise<boolean> {
+    const editor =
+      typeof editorOrUrl === 'string'
+        ? this.getByUrl(editorOrUrl)
+        : editorOrUrl;
+    if (!editor) return false;
+
+    if (editor.isDirty) {
+      const ok = await dialog.confirm(
+        i18n.t('dialog.unsavedTitle'),
+        i18n.t('dialog.unsavedMessage', { file: editor.title })
+      );
+      if (!ok) return false;
+    }
+
+    const idx = this.editors.indexOf(editor);
+    this.editors.splice(idx, 1);
+    editor.destroy();
+    events.emit('editor:close', { url: editor.url });
+
+    if (this.active === editor) {
+      this.active = null;
+      const next = this.editors[Math.min(idx, this.editors.length - 1)];
+      if (next) this.activate(next);
+    }
+    void this.persistSession();
+    return true;
+  }
+
+  async saveActive(): Promise<void> {
+    if (this.active) await this.active.save();
+  }
+
+  async saveAll(): Promise<void> {
+    for (const e of this.editors) await e.save();
+  }
+
+  // -- session ---------------------------------------------------------------
+
+  async persistSession(): Promise<void> {
+    await session.set('openTabs', this.editors.map((e) => e.url));
+    await session.set('activeTab', this.active?.url ?? null);
   }
 
   async restoreSession(): Promise<void> {
-    const { storage } = await import('../../lib/storage');
-    const snap = await storage.get<SessionRestore>('editor:sessions');
-    if (!snap?.paths?.length) return;
-    for (const p of snap.paths) {
+    const urls = (await session.get<string[]>('openTabs')) ?? [];
+    const activeUrl = await session.get<string | null>('activeTab');
+    for (const url of urls) {
       try {
-        if (await fs.exists(p)) await this.open(p);
+        await this.openFile(url);
       } catch {
         /* file vanished — skip */
       }
     }
-    if (snap.active) {
-      const ses = [...this.sessions.values()].find((s) => s.path === snap.active);
-      if (ses) this.setActive(ses.id);
+    if (activeUrl) {
+      const target = this.getByUrl(activeUrl);
+      if (target) this.activate(target);
     }
   }
 
-  // ---- formatting (prettier, lazily imported) -------------------------------------
+  // -- settings reactions -----------------------------------------------------
 
-  static readonly FORMATTERS: Record<string, string> = {
-    js: 'babel', jsx: 'babel', mjs: 'babel', cjs: 'babel',
-    ts: 'typescript', tsx: 'typescript', mts: 'typescript',
-    json: 'json', jsonc: 'json',
-    css: 'css', scss: 'scss', less: 'less',
-    html: 'html', vue: 'vue', svelte: 'html',
-    md: 'markdown', markdown: 'markdown',
-    yaml: 'yaml', yml: 'yaml',
-  };
-
-  /** Format a document with prettier. Throws when no parser exists. */
-  static readonly PLUGIN_LOADERS: Record<string, () => Promise<unknown>> = {
-    babel: () => import('prettier/plugins/babel'),
-    estree: () => import('prettier/plugins/estree'),
-    typescript: () => import('prettier/plugins/typescript'),
-    postcss: () => import('prettier/plugins/postcss'),
-    html: () => import('prettier/plugins/html'),
-    markdown: () => import('prettier/plugins/markdown'),
-    yaml: () => import('prettier/plugins/yaml'),
-  };
-
-  static async format(filePath: string, code: string): Promise<string> {
-    const ext = path.extname(filePath).replace('.', '');
-    const parser = EditorManager.FORMATTERS[ext];
-    if (!parser) throw new Error(`no formatter for .${ext}`);
-    const prettier = await import('prettier/standalone');
-    const need = new Set<string>();
-    if (parser === 'babel' || parser === 'json') need.add('babel');
-    if (parser === 'typescript') need.add('typescript');
-    if (parser === 'css' || parser === 'scss' || parser === 'less') need.add('postcss');
-    if (parser === 'html' || parser === 'vue') need.add('html');
-    if (parser === 'markdown') need.add('markdown');
-    if (parser === 'yaml') need.add('yaml');
-    if (need.has('babel') || need.has('typescript')) need.add('estree');
-    const plugins: unknown[] = [];
-    for (const name of need) {
-      const loader = EditorManager.PLUGIN_LOADERS[name];
-      if (loader) plugins.push(await loader());
-    }
-    const formatted = await (prettier as unknown as {
-      format: (src: string, opts: Record<string, unknown>) => Promise<string>;
-    }).format(code, {
-      parser,
-      plugins,
-      tabWidth: settings.get('tabSize') ?? 4,
-      printWidth: 100,
-      semi: true,
-      singleQuote: false,
+  private subscribeSettings(): void {
+    events.on('settings:change', ({ key }) => {
+      if (key === 'theme') this.retheme();
+      if (key === 'fontSize' || key === 'tabSize' || key === 'wordWrap') {
+        this.reformatAll();
+      }
     });
-    return formatted;
+    events.on('editor:dirty', ({ url, isDirty }) => {
+      if (!isDirty || !settings.get('autoSave')) return;
+      const prev = this.autoSaveTimers.get(url);
+      if (prev) clearTimeout(prev);
+      this.autoSaveTimers.set(
+        url,
+        setTimeout(() => {
+          this.autoSaveTimers.delete(url);
+          void this.getByUrl(url)?.save();
+        }, 1600)
+      );
+    });
   }
 
-  /** Format the active session (or a given path) in place. */
-  async formatActive(): Promise<boolean> {
-    const session = this.active;
-    if (!session || !this.view) return false;
-    const code = this.view.state.doc.toString();
-    try {
-      const formatted = await EditorManager.format(session.path, code);
-      if (formatted === code) return true;
-      const sel = this.view.state.selection.main;
-      this.view.dispatch({
-        changes: { from: 0, to: this.view.state.doc.length, insert: formatted },
-        selection: {
-          anchor: Math.min(sel.anchor, formatted.length),
-          head: Math.min(sel.head, formatted.length),
-        },
-      });
-      session.dirty = true;
-      if (settings.get('autoSave')) await this.save();
-      return true;
-    } catch (err) {
-      bus.emit('editor:format-failed', { path: session.path, reason: (err as Error).message });
-      return false;
-    }
+  private retheme(): void {
+    const theme = getTheme(settings.get('theme'));
+    const ext = [theme.cmTheme, theme.highlight];
+    for (const e of this.editors) e.reconfigureTheme(ext);
   }
 
-  /** Set explicit syntax for active file (palette command). */
-  async setSyntax(langName: string): Promise<boolean> {
-    const lang = findLanguage(langName) ??
-      (await Promise.resolve(
-        (await import('@codemirror/language-data')).languages.find(
-          (l) => l.name.toLowerCase() === langName.toLowerCase(),
-        ) ?? null,
-      ));
-    if (!lang || !this.view) return false;
-    const support = await lang.load();
-    this.view.dispatch({ effects: languageCompartment.reconfigure(support ? [support] : []) });
-    return true;
+  private reformatAll(): void {
+    const opts = {
+      tabSize: settings.get('tabSize'),
+      wordWrap: settings.get('wordWrap'),
+      fontSize: settings.get('fontSize')
+    };
+    for (const e of this.editors) e.reconfigureFormatting(opts);
   }
 }
 
-export const editorManager = new EditorManager();
+export const editorManager = new EditorManagerImpl();
+// re-export the class type for consumers
+export { Editor };

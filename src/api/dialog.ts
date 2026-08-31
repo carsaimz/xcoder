@@ -1,139 +1,213 @@
-/** Promise-based dialogs (alert / confirm / prompt / select / multi-button). */
+/**
+ * Promise-based dialogs (alert / confirm / prompt / select).
+ * Rendered into #dialog-root; keyboard + theme aware.
+ */
+import { el, $maybe } from '@lib/dom';
+import { i18n } from '@lib/i18n';
 
-import { el } from '../lib/dom';
-import { t } from '../lib/i18n';
-
-interface DialogOptions {
-  title?: string;
-  message?: string;
+interface PromptOptions {
+  value?: string;
   placeholder?: string;
-  defaultValue?: string;
-  buttons?: Array<{ label: string; value: string; variant?: 'primary' | 'danger' }>;
-  okLabel?: string;
-  cancelLabel?: string;
+  type?: string;
+  required?: boolean;
 }
 
-function open(contents: HTMLElement, buttons: Array<{ label: string; value: string; variant?: string }>): Promise<string> {
+let root: HTMLElement | null = null;
+
+function ensureRoot(): HTMLElement {
+  root = $maybe('#dialog-root');
+  if (!root) {
+    root = el('div', { id: 'dialog-root' });
+    document.body.append(root);
+  }
+  return root;
+}
+
+/**
+ * Opens a modal. `actions` are resolved in order; each action's handler
+ * decides the resolution value (null = dismiss / cancel).
+ */
+function showModal<T>(
+  title: string,
+  buildBody: HTMLElement,
+  actions: Array<{ label: string; kind: 'primary' | 'secondary'; handler?: () => T | null }>
+): Promise<T | null> {
   return new Promise((resolve) => {
     const overlay = el('div', { class: 'dialog-overlay' });
-    const box = el('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true' }, contents);
-    const bar = el('div', { class: 'dialog-buttons' });
-    // capture the live input value at click time (close() removes the node)
-    const valueEl = box.querySelector<HTMLInputElement | HTMLSelectElement>('input.dialog-input, select.dialog-input');
-    const close = () => overlay.remove();
-    for (const b of buttons) {
-      bar.appendChild(
+    let done = false;
+    const close = (v: T | null) => {
+      if (done) return;
+      done = true;
+      overlay.classList.add('dialog-closing');
+      setTimeout(() => overlay.remove(), 120);
+      document.removeEventListener('keydown', onKey, true);
+      resolve(v);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        close(null);
+      }
+    };
+    document.addEventListener('keydown', onKey, true);
+
+    const btnRow = el('div', { class: 'dialog-actions' });
+    for (const a of actions) {
+      btnRow.append(
         el(
           'button',
           {
-            class: `btn ${b.variant === 'danger' ? 'btn-danger' : b.variant === 'primary' ? 'btn-primary' : 'btn-ghost'}`,
-            onclick: () => {
-              const result = b.value === '__ok' && valueEl ? valueEl.value : b.value;
-              close();
-              resolve(result);
-            },
+            class: `btn btn-${a.kind}`,
+            type: 'button',
+            onclick: () => close(a.handler ? a.handler() : null)
           },
-          b.label,
-        ),
+          a.label
+        )
       );
     }
-    box.appendChild(bar);
-    overlay.appendChild(box);
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        close();
-        resolve('');
-      }
-    });
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') {
-        document.removeEventListener('keydown', onKey);
-        close();
-        resolve('');
-      }
-      if (e.key === 'Enter' && valueEl && document.activeElement === valueEl) {
-        const okBtn = bar.querySelector<HTMLButtonElement>('.btn-primary');
-        okBtn?.click();
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.appendChild(overlay);
-    if (valueEl) {
-      valueEl.focus();
-      if (valueEl instanceof HTMLInputElement) valueEl.select();
-    }
+
+    overlay.append(
+      el(
+        'div',
+        { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+        el('h3', { class: 'dialog-title' }, title),
+        buildBody,
+        btnRow
+      )
+    );
+    ensureRoot().append(overlay);
+    overlay.querySelector<HTMLElement>('input, .btn-primary')?.focus();
   });
 }
 
-export async function alert(message: string, title?: string): Promise<void> {
-  await open(
-    el('div', {}, el('h3', { class: 'dialog-title' }, title ?? t('dialog.alertTitle')), el('p', { class: 'dialog-body' }, message)),
-    [{ label: t('ok'), value: 'ok', variant: 'primary' }],
-  );
+export function alert(title: string, message: string): Promise<void> {
+  return showModal<void>(
+    title,
+    el('p', { class: 'dialog-message' }, message),
+    [{ label: i18n.t('dialog.ok'), kind: 'primary', handler: () => undefined }]
+  ).then(() => undefined);
 }
 
-export async function confirm(message: string, title?: string): Promise<boolean> {
-  const res = await open(
-    el('div', {}, el('h3', { class: 'dialog-title' }, title ?? t('dialog.confirmTitle')), el('p', { class: 'dialog-body' }, message)),
+export function confirm(title: string, message: string): Promise<boolean> {
+  return showModal<boolean>(
+    title,
+    el('p', { class: 'dialog-message' }, message),
     [
-      { label: t('cancel'), value: 'cancel' },
-      { label: t('ok'), value: 'ok', variant: 'primary' },
-    ],
-  );
-  return res === 'ok';
+      { label: i18n.t('dialog.ok'), kind: 'primary', handler: () => true },
+      { label: i18n.t('dialog.cancel'), kind: 'secondary', handler: () => false }
+    ]
+  ).then((v) => v === true);
 }
 
-export async function prompt(message: string, defaultValue = '', title?: string): Promise<string | null> {
-  const res = await open(
-    el(
-      'div',
-      {},
-      el('h3', { class: 'dialog-title' }, title ?? t('dialog.promptTitle')),
-      el('p', { class: 'dialog-body' }, message),
-      el('input', { class: 'dialog-input', type: 'text', value: defaultValue, placeholder: '' }),
-    ),
-    [
-      { label: t('cancel'), value: '' },
-      { label: t('ok'), value: '__ok', variant: 'primary' },
-    ],
-  );
-  // '' can be a legitimate empty input only when the user cleared it and hit OK;
-  // distinguishing cancel: cancel resolves with the cancel button value ''
-  // while OK resolves with the live input value — same '' means we treat it
-  // as cancelled unless the input itself had focus on Enter. For simplicity,
-  // an empty OK result is treated as cancellation.
-  return res === '' ? null : res;
-}
-
-export async function select(message: string, options: Array<{ value: string; label: string }>, title?: string): Promise<string | null> {
-  const res = await open(
-    el(
-      'div',
-      {},
-      el('h3', { class: 'dialog-title' }, title ?? t('dialog.selectTitle')),
-      el('p', { class: 'dialog-body' }, message),
-      el(
-        'select',
-        { class: 'dialog-input' },
-        ...options.map((o) => el('option', { value: o.value }, o.label)),
-      ),
-    ),
-    [
-      { label: t('cancel'), value: '' },
-      { label: t('ok'), value: '__ok', variant: 'primary' },
-    ],
-  );
-  return res === '' ? null : res;
-}
-
-/** Generic multi-button dialog (used by permission prompts). */
-export function action(
+export function prompt(
   title: string,
   message: string,
-  buttons: Array<{ label: string; value: string; variant?: 'primary' | 'danger' }>,
-): Promise<string> {
-  return open(
-    el('div', {}, el('h3', { class: 'dialog-title' }, title), el('p', { class: 'dialog-body' }, message)),
-    buttons,
+  opts: PromptOptions = {}
+): Promise<string | null> {
+  const input = el('input', {
+    class: 'dialog-input',
+    type: opts.type ?? 'text',
+    value: opts.value ?? '',
+    placeholder: opts.placeholder ?? ''
+  }) as HTMLInputElement;
+
+  const submit = (): string | null => {
+    if (opts.required && !input.value.trim()) {
+      input.classList.add('dialog-input-invalid');
+      return null; // keep dialog open
+    }
+    return input.value;
+  };
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const v = submit();
+      if (v !== null) {
+        // emulate OK click resolution
+        (input.closest('.dialog-overlay')?.querySelector('.btn-primary') as HTMLButtonElement | null)
+          ?.click();
+      }
+    }
+  });
+
+  return showModal<string>(
+    title,
+    el(
+      'div',
+      { class: 'dialog-body' },
+      el('p', { class: 'dialog-message' }, message),
+      input
+    ),
+    [
+      { label: i18n.t('dialog.ok'), kind: 'primary', handler: submit },
+      { label: i18n.t('dialog.cancel'), kind: 'secondary' }
+    ]
   );
 }
+
+export function select(
+  title: string,
+  message: string,
+  options: string[],
+  selectedIndex = -1
+): Promise<number | null> {
+  const list = el('div', { class: 'dialog-select', role: 'listbox' });
+  let chosen: number | null = null;
+  options.forEach((label, idx) => {
+    const item = el(
+      'div',
+      {
+        class: `dialog-select-item${idx === selectedIndex ? ' selected' : ''}`,
+        role: 'option',
+        'aria-selected': String(idx === selectedIndex),
+        tabindex: '0',
+        onclick: () => {
+          chosen = idx;
+          (list.closest('.dialog-overlay')?.querySelector('.btn-primary') as HTMLButtonElement | null)
+            ?.click();
+        }
+      },
+      label
+    );
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') item.click();
+    });
+    list.append(item);
+  });
+
+  return showModal<number>(
+    title,
+    el('div', { class: 'dialog-body' }, el('p', { class: 'dialog-message' }, message), list),
+    [
+      {
+        label: i18n.t('dialog.ok'),
+        kind: 'primary',
+        handler: () => chosen
+      },
+      { label: i18n.t('dialog.cancel'), kind: 'secondary' }
+    ]
+  );
+}
+
+/** Key/value properties dialog (file info). */
+export function info(title: string, rows: Array<[string, string]>): Promise<void> {
+  const body = el('div', { class: 'dialog-body dialog-info' });
+  for (const [k, v] of rows) {
+    body.append(
+      el(
+        'div',
+        { class: 'info-row' },
+        el('span', { class: 'info-key' }, k),
+        el('span', { class: 'info-value' }, v)
+      )
+    );
+  }
+  return showModal<void>(title, body, [
+    { label: i18n.t('dialog.ok'), kind: 'primary', handler: () => undefined }
+  ]).then(() => undefined);
+}
+
+/** Named API object (consumers: `import { dialog } from '@api/dialog'`). */
+export const dialog = { alert, confirm, prompt, select, info };

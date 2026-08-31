@@ -1,75 +1,92 @@
 /**
- * i18n runtime. Locales register dictionaries; `t()` resolves a key with
- * `{var}` interpolation and falls back to English when missing.
+ * i18n runtime.
+ *
+ * Locale files live in `src/lang/<code>.json` (copied to `www/lang/` at build
+ * time) as flat maps:  { "key": "value with {vars}" }.
+ *
+ * Lookup chain: requested locale → pt → en → the key itself.
+ * Missing locales silently fall back, so the 40+ skeleton files work from day one.
  */
 
-import en from '../lang/en';
-import pt from '../lang/pt';
-import es from '../lang/es';
-import { bus } from './events';
+export type Dict = Record<string, string>;
 
-type Dict = Record<string, string>;
+export class I18n {
+  private dicts = new Map<string, Dict>();
+  private locale = 'en';
+  private chain: string[] = ['en'];
 
-const dicts: Record<string, Dict> = {
-  en: en as unknown as Dict,
-  pt: pt as unknown as Dict,
-  es: es as unknown as Dict,
-};
-
-export const LOCALE_NAMES: Record<string, string> = {
-  en: 'English',
-  pt: 'Português',
-  es: 'Español',
-};
-
-let current = 'en';
-
-/** Register (or replace) a locale dictionary. Missing keys fall back to en. */
-export function registerLocale(code: string, dict: Dict, name?: string): void {
-  dicts[code] = dict;
-  if (name) LOCALE_NAMES[code] = name;
-}
-
-export function listLocales(): Array<{ code: string; name: string }> {
-  return Object.keys(dicts)
-    .sort()
-    .map((code) => ({ code, name: LOCALE_NAMES[code] ?? code }));
-}
-
-export function getLocale(): string {
-  return current;
-}
-
-export function setLocale(code: string): void {
-  current = dicts[code] ? code : 'en';
-  bus.emit('locale:changed', current);
-}
-
-/** Translate `key` with optional `{var}` interpolation. */
-export function t(key: string, vars?: Record<string, string | number>): string {
-  const raw = dicts[current]?.[key] ?? dicts.en[key] ?? key;
-  if (!vars) return raw;
-  return raw.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? `{${name}}`));
-}
-
-/** Detect best locale from navigator languages. */
-export function detectLocale(): string {
-  if (typeof navigator === 'undefined') return 'en';
-  for (const lang of navigator.languages ?? [navigator.language]) {
-    const code = lang.toLowerCase();
-    if (dicts[code]) return code;
-    const base = code.split('-')[0];
-    if (dicts[base]) return base;
+  /** Register a dictionary (already parsed JSON). */
+  register(locale: string, dict: Dict): void {
+    this.dicts.set(locale, dict);
+    this.rebuildChain();
   }
-  return 'en';
-}
 
-// Lazy-but-static registration for the generated locale stubs (43 locales).
-import { generated } from '../lang/gen';
+  /** Fetch a locale JSON from a base URL (e.g. `lang/` in www). Resolves false on failure. */
+  async loadFromUrl(locale: string, baseUrl: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${baseUrl}${locale}.json`);
+      if (!res.ok) return false;
+      this.register(locale, (await res.json()) as Dict);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
-/** Register every generated locale (missing keys fall back to en). */
-export function registerGeneratedLocales(): void {
-  for (const [code, dict] of Object.entries(generated)) {
-    if (!dicts[code]) registerLocale(code, dict);
+  /** Set active locale. Falls back to `en` when never registered. */
+  setLocale(locale: string): void {
+    this.locale = locale;
+    this.rebuildChain();
+  }
+
+  get current(): string {
+    return this.locale;
+  }
+
+  /** Locales with at least one registered key. */
+  available(): string[] {
+    return [...this.dicts.keys()];
+  }
+
+  private rebuildChain(): void {
+    const chain: string[] = [];
+    if (this.dicts.has(this.locale)) chain.push(this.locale);
+    for (const fb of ['pt', 'en']) {
+      if (!chain.includes(fb) && this.dicts.has(fb)) chain.push(fb);
+    }
+    this.chain = chain;
+  }
+
+  /**
+   * Translate. `{var}` placeholders are replaced from `vars`.
+   * Unknown keys return the key itself (never undefined), so UI never blanks out.
+   */
+  t(key: string, vars?: Record<string, string | number>): string {
+    let text: string | undefined;
+    for (const locale of this.chain) {
+      const dict = this.dicts.get(locale);
+      const value = dict?.[key];
+      if (value !== undefined) {
+        text = value;
+        break;
+      }
+    }
+    if (text === undefined) text = key;
+    if (vars) {
+      for (const [k, v] of Object.entries(vars)) {
+        text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
+      }
+    }
+    return text;
+  }
+
+  /** Keys defined in `reference` but missing from `locale` (lang CLI helper). */
+  missingKeys(locale: string, reference: Dict): string[] {
+    const dict = this.dicts.get(locale);
+    if (!dict) return Object.keys(reference);
+    return Object.keys(reference).filter((k) => !(k in dict));
   }
 }
+
+/** App-wide instance. Tests create fresh I18n() objects. */
+export const i18n = new I18n();

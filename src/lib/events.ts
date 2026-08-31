@@ -1,50 +1,55 @@
-/** Typed-ish event bus with on/off/once/emit. */
+/**
+ * Minimal typed emitter used by the app event bus and by individual modules.
+ * DOM-free (Node-safe).
+ */
 
-export type Listener<T = unknown> = (data: T) => void;
-export type Unsubscribe = () => void;
+export type Handler<P> = (payload: P) => void;
 
-export class EventBus {
-  private handlers = new Map<string, Set<Listener>>();
+export class Emitter<Events extends Record<string, unknown>> {
+  private listeners = new Map<keyof Events, Set<Handler<never>>>();
 
-  on<T = unknown>(event: string, fn: Listener<T>): Unsubscribe {
-    let set = this.handlers.get(event);
+  /** Subscribe. Returns an unsubscribe function. */
+  on<K extends keyof Events>(event: K, handler: Handler<Events[K]>): () => void {
+    let set = this.listeners.get(event);
     if (!set) {
       set = new Set();
-      this.handlers.set(event, set);
+      this.listeners.set(event, set);
     }
-    set.add(fn as Listener);
-    return () => this.off(event, fn);
+    set.add(handler as Handler<never>);
+    return () => this.off(event, handler);
   }
 
-  once<T = unknown>(event: string, fn: Listener<T>): Unsubscribe {
-    const wrapped: Listener<T> = (data) => {
-      this.off(event, wrapped);
-      fn(data);
-    };
-    return this.on(event, wrapped);
+  /** Subscribe for a single emission. */
+  once<K extends keyof Events>(event: K, handler: Handler<Events[K]>): () => void {
+    const off = this.on(event, (payload) => {
+      off();
+      handler(payload);
+    });
+    return off;
   }
 
-  off<T = unknown>(event: string, fn: Listener<T>): void {
-    this.handlers.get(event)?.delete(fn as Listener);
+  /** Unsubscribe. Safe to call even if never subscribed. */
+  off<K extends keyof Events>(event: K, handler: Handler<Events[K]>): void {
+    this.listeners.get(event)?.delete(handler as Handler<never>);
   }
 
-  emit<T = unknown>(event: string, data?: T): void {
-    const set = this.handlers.get(event);
+  /** Emit. Exceptions in handlers are captured and logged, never thrown back. */
+  emit<K extends keyof Events>(event: K, payload: Events[K]): void {
+    const set = this.listeners.get(event);
     if (!set) return;
-    for (const fn of [...set]) {
+    for (const handler of [...set]) {
       try {
-        fn(data as T);
+        (handler as unknown as Handler<Events[K]>)(payload);
       } catch (err) {
-        console.error(`[bus] handler for "${event}" failed:`, err);
+        // One broken subscriber must not break the chain.
+        console.error(`[xcoder] event handler error (${String(event)})`, err);
       }
     }
   }
 
-  clear(event?: string): void {
-    if (event) this.handlers.delete(event);
-    else this.handlers.clear();
+  /** Remove every listener for an event (or all events). */
+  clear(event?: keyof Events): void {
+    if (event === undefined) this.listeners.clear();
+    else this.listeners.delete(event);
   }
 }
-
-/** Application-wide bus. Events use `domain:action` names, e.g. `editor:open`. */
-export const bus = new EventBus();

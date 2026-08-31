@@ -1,177 +1,90 @@
 /**
- * XCoder path library — POSIX path operations with URL-scheme support.
+ * Path & URL utilities.
  *
- * Paths inside XCoder frequently carry a scheme, e.g. `file:///project/main.ts`,
- * `mem://notes/todo.md` or `webdav://server/dav/file.txt`. Every helper in this
- * module understands schemes and treats `scheme://...` as an absolute URL.
+ * XCoder files are identified by URLs: `<scheme>://<path>`, e.g.
+ *   file:///sdcard/Projects/site/index.html
+ *   browser:///home/welcome.md
+ *   memory:///home/user/main.py
+ *
+ * These helpers are DOM-free so they run in Node (Vitest) too.
  */
 
-const SCHEME_RE = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\//;
-
-export interface ParsedPath {
-  /** scheme without `://`, or null when the path has no scheme */
-  scheme: string | null;
-  /** path portion, always starting with `/` when a scheme is present */
+export interface UrlParts {
+  scheme: string;
   path: string;
 }
 
-/** Split `scheme://rest` into `{ scheme, path }`. */
-export function parse(url: string): ParsedPath {
-  const m = SCHEME_RE.exec(url);
-  if (!m) return { scheme: null, path: url };
-  return { scheme: m[1], path: url.slice(m[0].length) };
+/** Split `scheme://path` into parts. A bare path gets scheme ''. */
+export function parseUrl(url: string): UrlParts {
+  const m = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/(.*)$/.exec(url);
+  if (!m) return { scheme: '', path: url };
+  return { scheme: m[1].toLowerCase(), path: m[2] };
 }
 
-/** Build a url from scheme + path. */
-export function format(scheme: string | null, path: string): string {
-  if (!scheme) return path;
-  return `${scheme}://${path.startsWith('/') ? path : `/${path}`}`;
+/** Build `scheme://path`. */
+export function buildUrl(scheme: string, path: string): string {
+  return scheme ? `${scheme}://${path}` : path;
 }
 
-/** True for `/a/b` and `file:///a/b`; false for `a/b`. */
-export function isAbsolute(url: string): boolean {
-  return url.startsWith('/') || SCHEME_RE.test(url);
-}
-
-/** Remove the scheme portion, if any. */
-export function stripScheme(url: string): string {
-  return parse(url).path;
-}
-
-/** Collapse `.`/`..` segments and duplicate slashes. */
+/** Normalize `/a/./b/../c` → `/a/c`. Does NOT touch the scheme. */
 export function normalize(p: string): string {
-  const { scheme, path } = parse(p);
-  const isDir = path.endsWith('/');
-  const parts: string[] = [];
-  for (const seg of path.split('/')) {
+  const leading = p.startsWith('/');
+  const out: string[] = [];
+  for (const seg of p.split('/')) {
     if (!seg || seg === '.') continue;
     if (seg === '..') {
-      if (parts.length > 0 && parts[parts.length - 1] !== '..') parts.pop();
-      else if (!scheme) parts.push('..');
-    } else {
-      parts.push(seg);
+      if (out.length > 0) out.pop();
+      continue;
     }
+    out.push(seg);
   }
-  let out = `/${parts.join('/')}`;
-  if (isDir && out !== '/' && !out.endsWith('/')) out += '/';
-  return format(scheme, out === '/' && scheme ? '/' : out);
+  return (leading ? '/' : '') + out.join('/') + (p.endsWith('/') ? '/' : '');
 }
 
-/**
- * Join path fragments. If a fragment carries a scheme it replaces the
- * accumulated base (URL-style resolution), matching `join('file:///a', 'b')`
- * → `file:///a/b` and `join('file:///a', 'mem://x', 'y')` → `mem://y`.
- */
-export function join(...parts: string[]): string {
-  let base = '';
-  for (const part of parts) {
-    if (!part) continue;
-    const { scheme } = parse(part);
-    if (scheme) {
-      base = part;
-      continue;
-    }
-    if (!base) {
-      base = part;
-      continue;
-    }
-    const sep = base.endsWith('/') || part.startsWith('/') ? '' : '/';
-    base = `${base}${sep}${part}`;
-  }
-  return normalize(base);
+/** Join URL segments onto a base URL (scheme-aware). */
+export function joinUrl(base: string, ...parts: string[]): string {
+  const { scheme, path } = parseUrl(base);
+  let result = normalize(path.replace(/\/+$/, '') + '/' + parts.join('/'));
+  if (result.length > 1 && result.endsWith('/')) result = result.slice(0, -1);
+  return buildUrl(scheme, result);
 }
 
-/**
- * Resolve a sequence of paths to an absolute path (like node's `path.resolve`).
- * A fragment with a scheme restarts resolution under that scheme; a fragment
- * starting with `/` restarts the path but *keeps* the active scheme (it is
- * device-relative); relative fragments join the accumulator.
- *
- *   resolve('file:///a/b', 'c')     → 'file:///a/b/c'
- *   resolve('file:///a/b', '/c')    → 'file:///c'
- *   resolve('file:///a', 'mem:///x') → 'mem:///x'
- *   resolve('a', 'b')               → '/a/b'
- */
-export function resolve(...parts: string[]): string {
-  let scheme: string | null = null;
-  let acc = '';
-  for (const part of parts) {
-    if (!part) continue;
-    const parsed = parse(part);
-    if (parsed.scheme) {
-      scheme = parsed.scheme;
-      acc = parsed.path;
-      continue;
-    }
-    if (part.startsWith('/')) {
-      acc = part;
-      continue;
-    }
-    acc = acc ? `${acc.replace(/\/+$/, '')}/${part}` : part;
-  }
-  return normalize(format(scheme, acc || '/'));
+/** Resolve `rel` (may contain ..) against absolute `base`. */
+export function resolve(base: string, rel: string): string {
+  if (!rel) return base;
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(rel)) return rel;
+  return joinUrl(base, rel);
 }
 
+/** Parent directory of a URL path ('/' if root). */
 export function dirname(url: string): string {
-  const { scheme, path } = parse(url);
-  const idx = path.lastIndexOf('/');
-  if (idx <= 0) return format(scheme, '/');
-  return format(scheme, path.slice(0, idx));
+  const { scheme, path } = parseUrl(url);
+  const idx = path.replace(/\/+$/, '').lastIndexOf('/');
+  const dir = idx <= 0 ? '/' : path.slice(0, idx);
+  return buildUrl(scheme, dir || '/');
 }
 
+/** Final segment of a URL path. */
 export function basename(url: string): string {
-  const { path } = parse(url);
-  return path.slice(path.lastIndexOf('/') + 1) || '/';
+  const { path } = parseUrl(url);
+  const clean = path.replace(/\/+$/, '');
+  const idx = clean.lastIndexOf('/');
+  return idx === -1 ? clean : clean.slice(idx + 1);
 }
 
+/** Lowercase extension without the dot ('' if none). */
 export function extname(url: string): string {
-  const base = basename(url);
-  const idx = base.lastIndexOf('.');
+  const name = basename(url);
+  const idx = name.lastIndexOf('.');
   if (idx <= 0) return '';
-  return base.slice(idx).toLowerCase();
+  return name.slice(idx + 1).toLowerCase();
 }
 
-/** Posix `relative`. When schemes differ the target is returned unchanged. */
-export function relative(from: string, to: string): string {
-  const a = parse(from);
-  const b = parse(to);
-  if (a.scheme !== b.scheme) return to;
-  const fromParts = a.path.split('/').filter(Boolean);
-  const toParts = b.path.split('/').filter(Boolean);
-  let i = 0;
-  while (i < fromParts.length && i < toParts.length && fromParts[i] === toParts[i]) i++;
-  const up = fromParts.length - i;
-  const rel = [...Array(up).fill('..'), ...toParts.slice(i)].join('/');
-  return rel || '.';
-}
-
-/** True when `child` lies inside `parent` (both may carry schemes). */
-export function contains(parent: string, child: string): boolean {
-  const a = parse(parent);
-  const b = parse(child);
+/** True when `parent` is an ancestor-or-self of `child` (same scheme). */
+export function isInside(parent: string, child: string): boolean {
+  const a = parseUrl(parent);
+  const b = parseUrl(child);
   if (a.scheme !== b.scheme) return false;
-  const p = a.path.endsWith('/') ? a.path : `${a.path}/`;
-  return b.path.startsWith(p) || b.path === a.path;
-}
-
-/** Minimal fuzzy score for Quick Open / palettes. Returns -1 when rejected. */
-export function fuzzyMatch(query: string, target: string): number {
-  if (!query) return 0;
-  const q = query.toLowerCase();
-  const t = target.toLowerCase();
-  const direct = t.indexOf(q);
-  if (direct >= 0) return 1000 - direct - t.length * 0.1;
-  let qi = 0;
-  let score = 0;
-  let streak = 0;
-  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
-    if (t[ti] === q[qi]) {
-      streak++;
-      score += 1 + streak * 0.5 + (ti === 0 || '/-_. '.includes(t[ti - 1]) ? 2 : 0);
-      qi++;
-    } else {
-      streak = 0;
-    }
-  }
-  return qi === q.length ? score : -1;
+  const p = a.path.replace(/\/+$/, '');
+  return b.path.startsWith(p + '/') || b.path === p;
 }

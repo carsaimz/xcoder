@@ -1,88 +1,158 @@
-# Building XCoder
+# Building & Contributing to XCoder
 
-## Web
+Everything you need to compile, test, package and ship the app.
+
+---
+
+## 1. Prerequisites
+
+| Tool | Version | Used for |
+|---|---|---|
+| Node.js | ≥ 20 | build tooling, tests |
+| pnpm | ≥ 9 (npm works too) | dependency management |
+| JDK | 17 | Android build |
+| Android SDK | API 34 | `cordova build android` |
+| Gradle | (bundled with Cordova) | Android build |
+
+Check your Android setup with `cordova requirements` after adding the platform.
+
+---
+
+## 2. Project scripts
 
 ```bash
-npm install
-npm run build        # NODE_ENV=production rspack build → www/
-npm run build:dev    # development build with sourcemaps
-npm run dev          # dev server + HMR (port 8080)
-npm run serve        # static-serve the www/ folder
+pnpm install            # install dependencies
+
+pnpm run build:dev      # bundle to www/ (development, readable, sourcemaps)
+pnpm run build:prod     # bundle to www/ (minified)
+pnpm run watch          # rebuild on change
+
+pnpm run typecheck      # tsc --noEmit (strict)
+pnpm run test           # vitest, single run
+pnpm run test:watch     # vitest, watch mode
+pnpm run lint           # biome check (src + utils)
+pnpm run lint:fix       # biome check --write
+pnpm run format         # biome format --write
+
+pnpm run lang -- <cmd>  # i18n CLI (see docs/i18n.md)
+pnpm run plugin -- <cmd># plugin CLI (new | pack | validate)
+
+pnpm run cordova:android  # cordova build android
+pnpm run cordova:run      # cordova run android (device/emulator)
 ```
 
-Output layout: `www/index.html` (committed), `www/bundle.js` + `www/bundle.css`
-(generated) and lazy chunks (`NNNN.bundle.js`) for CodeMirror grammars and Prettier
-parsers, fetched on first use.
+---
 
-Quality gates:
+## 3. Running in a browser (no Android needed)
+
+The bundle is a plain IIFE — the whole IDE runs in any modern browser with
+the `browser://` storage backend:
 
 ```bash
-npm run typecheck    # strict tsc, zero errors
-npm test             # vitest, 88 cases
-node utils/lang-cli.mjs --check
+pnpm run build:dev
+npx serve www            # or: python3 -m http.server -d www 8080
+# open http://localhost:8080
 ```
 
-## Android (Cordova)
+Use this loop for day-to-day development; Android specifics only matter for
+native filesystem, Proot and permissions.
 
-Requirements: JDK 17, Android SDK (API 34), Gradle (wrapper via cordova-android 13).
+---
+
+## 4. Android build
 
 ```bash
-npm run build                                        # web assets first
-npx cordova platform add android@13
-npx cordova build android                            # debug APK
-npx cordova build android --release -- --packageType=bundle   # signed AAB
+cordova platform add android
+pnpm run build:prod
+cordova build android
+# → platforms/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Artifacts land in `platforms/android/app/build/outputs/{apk,bundle}/…`.
-
-> You normally don't run these by hand — CI builds every APK/AAB (below).
-
-## CI/CD pipelines
-
-| Workflow | Trigger | What it does |
-| --- | --- | --- |
-| `ci.yml` | push / PR to `main` | typecheck + tests + locale parity, then production build with artifact upload |
-| `release.yml` | push tag `v*` **or** manual dispatch with a version | gates on tests → generates changelog from conventional commits → creates the GitHub release → dispatches the Android release build |
-| `android-debug.yml` | push to `main` (src/www changes) | debug APK → rolling `dev-build` pre-release + artifact |
-| `android-release.yml` | called by `release.yml` (or manually with a tag) | release APK + AAB, signed when secrets exist, attached to the tag's release |
-
-Supporting bots: **Dependabot** (npm grouped updates + Actions versions), **labeler**
-(path-based PR labels), **greetings** (first issue/PR welcome), **stale** (60/14 days).
-
-### Release checklist (maintainer)
+### Release (signed)
 
 ```bash
-# option A — automatic
-gh workflow run release.yml -f version=1.2.0
-# option B — manual
-npm version minor           # or patch/major
-git push origin main --tags
-```
-
-The release workflow bumps `package.json`/`config.xml`/`src/version.ts`, prepends the new
-section to `CHANGELOG.md`, commits `chore(release): vX.Y.Z`, tags and pushes.
-
-### Android signing secrets
-
-| Secret | Value |
-| --- | --- |
-| `KEYSTORE_BASE64` | `base64 -w0 my-release.keystore` |
-| `KEYSTORE_PASSWORD` | keystore store password |
-| `KEY_ALIAS` | signing key alias |
-| `KEY_PASSWORD` | key password |
-
-Generate a keystore locally:
-
-```bash
-keytool -genkey -v -keystore my-release.keystore -alias xcoder \
+keytool -genkey -v -keystore xcoder.keystore -alias xcoder \
         -keyalg RSA -keysize 2048 -validity 10000
-base64 -w0 my-release.keystore > keystore.b64   # paste into the secret
+
+cordova build android --release -- \
+  --keystore=xcoder.keystore \
+  --alias=xcoder \
+  --storePassword=*** \
+  --password=***
+# → .../outputs/apk/release/app-release.apk
 ```
 
-Keep `my-release.keystore` **out of git** (already in `.gitignore`). Without the secrets
-the release job still publishes unsigned artifacts and notes it in the job summary.
+Keep the keystore out of git. On first launch the app asks for storage
+permissions (required by `cordova-plugin-android-permissions`).
 
-### Changing the Android target
+---
 
-`config.xml` pins `android@^13` (SDK 34, minSdk 24). Bump the engine spec and the workflows
-(`cordova platform add android@X`) together.
+## 5. Development workflow
+
+1. **Branch** from `main`: `feat/<topic>` or `fix/<topic>`.
+2. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/):
+   `feat(terminal): add path completion`, `fix(fs): EEXIST on webdav MKCOL`.
+3. **Before pushing**:
+   ```bash
+   pnpm run typecheck && pnpm run test && pnpm run lint
+   ```
+   CI runs exactly these three.
+4. **PR checklist**: description + steps to test; screenshots for UI changes;
+   docs updated when APIs change (`docs/api-reference.md` is the contract).
+
+### Code style
+
+- **Biome** owns formatting/linting — do not fight it, run `pnpm run format`.
+- TypeScript strict; `any` is allowed only with a comment explaining why.
+- No legacy editor prefixes — the public surface is `xcoder.*` only.
+- Core modules never import from `src/ui/`.
+
+### Adding a feature — where things go
+
+| Feature | Touch |
+|---|---|
+| New shell command | `src/core/terminal/shell.ts` (`registerBuiltins`) |
+| New command palette entry | `src/ui/builtin.ts` or a plugin |
+| New theme | `src/core/editor/themes.ts` + `styles/themes.css` |
+| New FS backend | implement `FileSystemBackend`, register in `src/main.ts` |
+| New language | already bundled? else `editorLanguages.register` |
+| New setting | `src/api/settings.ts` (`DEFAULTS`, `validate`) + settings UI |
+
+---
+
+## 6. Testing
+
+```
+tests/
+├── path.test.ts       # lib/path — URL math
+├── shell.test.ts      # virtual shell + git/npm mocks over MemoryBackend
+├── commands.test.ts   # command registry + keybinding matching
+└── i18n.test.ts       # fallback chain, emitter, helpers
+```
+
+Rules of thumb:
+
+- FS-dependent code is tested against `MemoryBackend` — no mocks, no browser.
+- Every bug fix lands with a regression test.
+- UI behavior (DOM) is smoke-tested manually in the browser build (§3);
+  keep components thin so logic stays testable.
+
+---
+
+## 7. Releasing
+
+1. Bump version in `package.json`, `plugin.json`, `config.xml` (keep in sync).
+2. Update `CHANGELOG.md`.
+3. Tag: `git tag v1.x.y && git push --tags`.
+4. CI attaches the APK and the plugin-template zip to the release.
+
+---
+
+## 8. Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `cordova: command not found` | `pnpm install` (cordova is a devDependency) or `npm i -g cordova` |
+| Gradle/SDK errors | `cordova requirements`; install platform 34 via sdkmanager |
+| Blank page after build | serve `www/` over HTTP and check the console — `file://` blocks `fetch` of lang JSON in desktop browsers |
+| Tests fail on IndexedDB | they shouldn't — suites run against the memory backend; check you didn't import a UI module in a core test |

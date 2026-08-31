@@ -1,34 +1,44 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="app.xcoder.editor" version="1.2.0" xmlns="http://www.w3.org/ns/widgets"
+<widget id="com.xcoder.app"
+        version="1.1.0"
+        xmlns="http://www.w3.org/ns/widgets"
         xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>XCoder</name>
     <description>
-        XCoder — a mobile-first code editor &amp; IDE for the web and Android.
-        Built on CodeMirror 6. Community fork of Acode.
+        XCoder — a mobile-first code editor and IDE for Android.
+        CodeMirror 6 powered, plugin extensible, with integrated terminal and LSP support.
     </description>
-    <author email="carsaimz@users.noreply.github.com" href="https://github.com/carsaimz">
-        carsaimz &amp; XCoder contributors
+    <author email="dev@xcoder.app" href="https://github.com/xcoder-app/xcoder">
+        XCoder Contributors
     </author>
 
     <content src="index.html" />
     <access origin="*" />
+    <allow-navigation href="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
-    <allow-navigation href="*" />
 
+    <preference name="BackgroundColor" value="0xff0d1117" />
+    <preference name="Orientation" value="all" />
     <preference name="Fullscreen" value="false" />
-    <preference name="Orientation" value="default" />
     <preference name="SplashMaintainAspectRatio" value="true" />
-    <preference name="BackgroundColor" value="#1e1e2e" />
-    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon.png" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="AndroidWindowSplashScreenBackground" value="#0d1117" />
+    <preference name="AndroidXEnabled" value="true" />
+
+    <!-- Filesystem access (sdcard, app-private storage) -->
+    <plugin name="cordova-plugin-file" spec="^8.0.0" />
+    <!-- Runtime permission prompts (READ/WRITE_EXTERNAL_STORAGE) -->
+    <plugin name="cordova-plugin-android-permissions" spec="^1.1.5" />
+    <!-- Safe-area / viewport handling on notch devices -->
+    <plugin name="cordova-plugin-fullscreen" spec="^2.0.0" />
 
     <platform name="android">
-        <preference name="AndroidPackageName" value="app.xcoder.editor" />
+        <preference name="AndroidMinimumSdkVersion" value="24" />
+        <preference name="AndroidTargetSdkVersion" value="34" />
         <preference name="android-minSdkVersion" value="24" />
-        <preference name="android-targetSdkVersion" value="34" />
         <allow-intent href="market:*" />
         <icon src="res/icon.png" />
+        <splash src="res/splash.png" />
     </platform>
-
-    <engine name="android" spec="^13.0.0" />
 </widget>

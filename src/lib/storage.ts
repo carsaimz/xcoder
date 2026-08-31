@@ -1,183 +1,141 @@
 /**
- * Persistent key/value storage.
- * Primary: IndexedDB. Fallback: in-memory Map (Node tests, private mode, errors).
+ * Tiny IndexedDB wrapper + graceful in-memory fallback (Node/tests).
+ * All app persistence (settings, cache, browser FS, plugins) goes through here.
  */
 
-export interface KVStore {
-  get<T = unknown>(key: string): Promise<T | undefined>;
-  set<T = unknown>(key: string, value: T): Promise<void>;
-  delete(key: string): Promise<void>;
-  keys(): Promise<string[]>;
-  clear(): Promise<void>;
-}
-
-class MemoryStore implements KVStore {
-  readonly persistent = false;
-  private map = new Map<string, unknown>();
-
-  async get<T>(key: string): Promise<T | undefined> {
-    return this.map.get(key) as T | undefined;
-  }
-  async set<T>(key: string, value: T): Promise<void> {
-    this.map.set(key, value);
-  }
-  async delete(key: string): Promise<void> {
-    this.map.delete(key);
-  }
-  async keys(): Promise<string[]> {
-    return [...this.map.keys()].sort();
-  }
-  async clear(): Promise<void> {
-    this.map.clear();
-  }
-}
-
 const DB_NAME = 'xcoder';
-const STORE_NAME = 'kv';
+const DB_VERSION = 1;
 
-class IndexedDBStore implements KVStore {
-  readonly persistent = true;
-  private db: IDBDatabase | null = null;
-  private opening: Promise<IDBDatabase | null> | null = null;
+export type StoreName = 'kv' | 'fs-nodes' | 'fs-content' | 'plugins';
 
-  private open(): Promise<IDBDatabase | null> {
-    if (this.db) return Promise.resolve(this.db);
-    if (this.opening) return this.opening;
-    const attempt = new Promise<IDBDatabase | null>((resolve) => {
-      if (typeof indexedDB === 'undefined') {
+const memoryFallback = new Map<string, Map<string, unknown>>();
+function memStore(store: string): Map<string, unknown> {
+  let m = memoryFallback.get(store);
+  if (!m) {
+    m = new Map();
+    memoryFallback.set(store, m);
+  }
+  return m;
+}
+
+let dbPromise: Promise<IDBDatabase | null> | null = null;
+
+function openDb(): Promise<IDBDatabase | null> {
+  if (typeof indexedDB === 'undefined') return Promise.resolve(null);
+  if (!dbPromise) {
+    dbPromise = new Promise((resolve) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        for (const store of ['kv', 'fs-nodes', 'fs-content', 'plugins'] as StoreName[]) {
+          if (!db.objectStoreNames.contains(store)) {
+            db.createObjectStore(store);
+          }
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => {
+        console.warn('[xcoder] IndexedDB unavailable, using memory fallback');
         resolve(null);
-        return;
-      }
-      try {
-        const req = indexedDB.open(DB_NAME, 1);
-        req.onupgradeneeded = () => {
-          req.result.createObjectStore(STORE_NAME);
-        };
+      };
+    });
+  }
+  return dbPromise;
+}
+
+function tx<T>(
+  store: StoreName,
+  mode: IDBTransactionMode,
+  fn: (os: IDBObjectStore) => IDBRequest<T>
+): Promise<T> {
+  return openDb().then(
+    (db) =>
+      new Promise<T>((resolve, reject) => {
+        if (!db) {
+          reject(new Error('no-idb'));
+          return;
+        }
+        const t = db.transaction(store, mode);
+        const req = fn(t.objectStore(store));
         req.onsuccess = () => resolve(req.result);
-        req.onerror = () => resolve(null);
-        req.onblocked = () => resolve(null);
-      } catch {
-        resolve(null);
-      }
-    });
-    this.opening = attempt.then((db) => {
-      this.db = db;
-      this.opening = null;
-      return db;
-    });
-    return this.opening;
+        req.onerror = () => reject(req.error ?? new Error('idb-error'));
+      })
+  );
+}
+
+async function fallbackGet<T>(store: StoreName, key: string): Promise<T | undefined> {
+  return memStore(store).get(key) as T | undefined;
+}
+async function fallbackSet(store: StoreName, key: string, value: unknown): Promise<void> {
+  memStore(store).set(key, value);
+}
+async function fallbackDel(store: StoreName, key: string): Promise<void> {
+  memStore(store).delete(key);
+}
+async function fallbackKeys(store: StoreName): Promise<string[]> {
+  return [...memStore(store).keys()];
+}
+
+export async function idbGet<T>(store: StoreName, key: string): Promise<T | undefined> {
+  try {
+    const v = await tx<T>(store, 'readonly', (os) => os.get(key));
+    return v;
+  } catch {
+    return fallbackGet<T>(store, key);
+  }
+}
+
+export async function idbSet(store: StoreName, key: string, value: unknown): Promise<void> {
+  try {
+    await tx(store, 'readwrite', (os) => os.put(value, key));
+  } catch {
+    await fallbackSet(store, key, value);
+  }
+}
+
+export async function idbDel(store: StoreName, key: string): Promise<void> {
+  try {
+    await tx(store, 'readwrite', (os) => os.delete(key));
+  } catch {
+    await fallbackDel(store, key);
+  }
+}
+
+export async function idbKeys(store: StoreName): Promise<string[]> {
+  try {
+    const keys = await tx<IDBValidKey[]>(store, 'readonly', (os) => os.getAllKeys());
+    return keys.map(String);
+  } catch {
+    return fallbackKeys(store);
+  }
+}
+
+/** Namespaced key-value store (settings, plugin data, session state). */
+export class KVStore {
+  constructor(private store: StoreName, private prefix = '') {}
+
+  async get<T>(key: string, fallback?: T): Promise<T> {
+    const raw = await idbGet<T>(this.store, this.prefix + key);
+    return raw === undefined ? (fallback as T) : raw;
   }
 
-  private async tx<T>(mode: IDBTransactionMode, fn: (store: IDBObjectStore) => IDBRequest<T>): Promise<T | undefined> {
-    const db = await this.open();
-    if (!db) return undefined;
-    return new Promise((resolve, reject) => {
-      try {
-        const t = db.transaction(STORE_NAME, mode);
-        const req = fn(t.objectStore(STORE_NAME));
-        req.onsuccess = () => resolve(req.result as T);
-        req.onerror = () => reject(req.error ?? new Error('IndexedDB error'));
-      } catch (err) {
-        reject(err instanceof Error ? err : new Error(String(err)));
-      }
-    });
+  async set(key: string, value: unknown): Promise<void> {
+    await idbSet(this.store, this.prefix + key, value);
   }
 
-  async get<T>(key: string): Promise<T | undefined> {
-    try {
-      return await this.tx<T>('readonly', (s) => s.get(key) as IDBRequest<T>);
-    } catch {
-      return undefined;
-    }
-  }
-
-  async set<T>(key: string, value: T): Promise<void> {
-    try {
-      await this.tx('readwrite', (s) => s.put(value as never, key) as IDBRequest<unknown>);
-    } catch (err) {
-      console.warn('[storage] write failed, falling back to memory', err);
-      memoryFallback.set(key, value);
-    }
-  }
-
-  async delete(key: string): Promise<void> {
-    try {
-      await this.tx('readwrite', (s) => s.delete(key));
-    } catch {
-      /* ignore */
-    }
+  async remove(key: string): Promise<void> {
+    await idbDel(this.store, this.prefix + key);
   }
 
   async keys(): Promise<string[]> {
-    try {
-      const keys = await this.tx<IDBValidKey[]>('readonly', (s) => s.getAllKeys());
-      return (keys ?? []).map(String).sort();
-    } catch {
-      return [];
-    }
+    const all = await idbKeys(this.store);
+    return all
+      .filter((k) => k.startsWith(this.prefix))
+      .map((k) => k.slice(this.prefix.length));
   }
 
+  /** Delete every entry with the prefix (or everything when no prefix). */
   async clear(): Promise<void> {
-    try {
-      await this.tx('readwrite', (s) => s.clear());
-    } catch {
-      /* ignore */
-    }
+    for (const k of await this.keys()) await idbDel(this.store, this.prefix + k);
   }
 }
-
-const memoryFallback = new Map<string, unknown>();
-const idb = new IndexedDBStore();
-
-/** Combined store: IndexedDB first, memory fallback on any failure. */
-class HybridStore implements KVStore {
-  async get<T>(key: string): Promise<T | undefined> {
-    if (memoryFallback.has(key)) return memoryFallback.get(key) as T;
-    const v = await idb.get<T>(key);
-    if (v !== undefined) return v;
-    return undefined;
-  }
-  async set<T>(key: string, value: T): Promise<void> {
-    memoryFallback.set(key, value);
-    await idb.set(key, value);
-  }
-  async delete(key: string): Promise<void> {
-    memoryFallback.delete(key);
-    await idb.delete(key);
-  }
-  async keys(): Promise<string[]> {
-    const a = await idb.keys();
-    const set = new Set([...a, ...memoryFallback.keys()]);
-    return [...set].sort();
-  }
-  async clear(): Promise<void> {
-    memoryFallback.clear();
-    await idb.clear();
-  }
-}
-
-/** Named store factory (each plugin / subsystem can own a namespace). */
-export function createStore(namespace: string): KVStore {
-  const prefix = `${namespace}::`;
-  return {
-    async get<T>(key: string): Promise<T | undefined> {
-      return storage.get<T>(prefix + key);
-    },
-    async set<T>(key: string, value: T): Promise<void> {
-      return storage.set(prefix + key, value);
-    },
-    async delete(key: string): Promise<void> {
-      return storage.delete(prefix + key);
-    },
-    async keys(): Promise<string[]> {
-      return (await storage.keys()).filter((k) => k.startsWith(prefix)).map((k) => k.slice(prefix.length));
-    },
-    async clear(): Promise<void> {
-      for (const key of await this.keys()) await storage.delete(prefix + key);
-    },
-  };
-}
-
-/** Global store used for settings, sessions, git state, plugins… */
-export const storage: KVStore = new HybridStore();
-export const memoryStore: KVStore = new MemoryStore();

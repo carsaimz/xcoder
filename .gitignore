@@ -1,27 +1,35 @@
-# dependencies
+# Dependencies
 node_modules/
+.pnpm-store/
 
-# build output (www/index.html is committed; bundles are generated)
-www/bundle.js
-www/bundle.js.map
-www/bundle.css
-www/bundle.css.map
+# Build output
+www/js/
+www/css/
+www/lang/
+www/icons/
+www/index.html
 
-# cordova
+# Cordova
 platforms/
 plugins/
-config.json
+res/**/*.png
 
-# secrets & keys
-*.keystore
-*.jks
-build.json
-.env
-.env.*
-
-# misc
+# IDE / OS
+.vscode/
+.idea/
 .DS_Store
+Thumbs.db
+
+# Logs & caches
 *.log
 coverage/
-.venv/
-dist/
+.vitest-cache/
+.rspack-cache/
+dist-cache/
+
+# Local env
+.env
+.env.local
+
+# UI reference material (never ship)
+reference/

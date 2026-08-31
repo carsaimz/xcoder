@@ -1,0 +1,20 @@
+{
+  "$schema": "./docs/schemas/xcoder-app.schema.json",
+  "id": "app.xcoder",
+  "name": "XCoder",
+  "version": "1.0.0",
+  "description": "Mobile-first code editor and IDE for Android",
+  "main": "www/index.html",
+  "app": {
+    "engine": "codemirror6",
+    "framework": "cordova",
+    "minPlatform": {
+      "android": 24
+    }
+  },
+  "license": "MIT",
+  "attribution": {
+    "license": "MIT",
+    "notice": "XCoder is an original project. All code is written for XCoder."
+  }
+}

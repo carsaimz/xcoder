@@ -1,83 +1,105 @@
-/** JSON-RPC 2.0 message encoding/decoding (Content-Length framing + raw JSON). */
+/**
+ * JSON-RPC 2.0 codec used by the LSP client.
+ * Transport-agnostic: whatever `send` does (WebSocket, Worker, pipe).
+ */
 
-export interface RpcMessage {
+export interface JsonRpcRequest {
   jsonrpc: '2.0';
-  id?: number | string | null;
-  method?: string;
+  id?: number | string;
+  method: string;
   params?: unknown;
+}
+
+export interface JsonRpcError {
+  code: number;
+  message: string;
+  data?: unknown;
+}
+
+export interface JsonRpcResponse {
+  jsonrpc: '2.0';
+  id: number | string | null;
   result?: unknown;
-  error?: { code: number; message: string; data?: unknown };
+  error?: JsonRpcError;
 }
 
-export class RpcError extends Error {
-  constructor(
-    readonly code: number,
-    message: string,
-    readonly data?: unknown,
-  ) {
-    super(message);
-    this.name = 'RpcError';
+type MethodHandler = (params: unknown) => unknown | Promise<unknown>;
+
+export class JsonRpcConnection {
+  private nextId = 1;
+  private pending = new Map<number | string, { resolve: (v: unknown) => void; reject: (e: JsonRpcError) => void }>();
+  private handlers = new Map<string, MethodHandler>();
+  private closed = false;
+
+  constructor(private send: (data: string) => void) {}
+
+  /** Register a handler for server→client requests/notifications. */
+  on(method: string, handler: MethodHandler): void {
+    this.handlers.set(method, handler);
   }
-}
 
-export const ErrorCodes = {
-  ParseError: -32700,
-  InvalidRequest: -32600,
-  MethodNotFound: -32601,
-  InvalidParams: -32602,
-  InternalError: -32603,
-  ServerError: -32000,
-  RequestCancelled: -32800,
-} as const;
-
-/** Frame a message with Content-Length headers (byte length, UTF-8). */
-export function encodeMessage(msg: RpcMessage): string {
-  const json = JSON.stringify(msg);
-  return `Content-Length: ${new TextEncoder().encode(json).length}\r\n\r\n${json}`;
-}
-
-/** Incremental parser for Content-Length framed streams. */
-export class MessageDecoder {
-  private buffer = '';
-
-  push(chunk: string): RpcMessage[] {
-    this.buffer += chunk;
-    const messages: RpcMessage[] = [];
-    for (;;) {
-      const headerEnd = this.buffer.indexOf('\r\n\r\n');
-      if (headerEnd < 0) break;
-      const header = this.buffer.slice(0, headerEnd);
-      const match = header.match(/Content-Length:\s*(\d+)/i);
-      if (!match) {
-        this.buffer = this.buffer.slice(headerEnd + 4);
-        continue;
-      }
-      const length = Number(match[1]);
-      const body = this.buffer.slice(headerEnd + 4);
-      // JSON is ASCII-safe here (LSP requires ASCII headers; body escapes non-ASCII)
-      if (body.length < length) break;
-      try {
-        messages.push(JSON.parse(body.slice(0, length)) as RpcMessage);
-      } catch {
-        /* skip malformed frame */
-      }
-      this.buffer = body.slice(length);
+  /** Feed one raw JSON message (from the transport). */
+  handleMessage(raw: string): void {
+    let msg: JsonRpcRequest & JsonRpcResponse;
+    try {
+      msg = JSON.parse(raw);
+    } catch {
+      return;
     }
-    return messages;
+    if ('id' in msg && ('result' in msg || 'error' in msg)) {
+      // response
+      const pending = this.pending.get(msg.id as number | string);
+      if (!pending) return;
+      this.pending.delete(msg.id as number | string);
+      if (msg.error) pending.reject(msg.error);
+      else pending.resolve(msg.result);
+      return;
+    }
+    if ('method' in msg) {
+      // request or notification from server
+      const handler = this.handlers.get(msg.method);
+      if (!handler) return;
+      Promise.resolve()
+        .then(() => handler(msg.params))
+        .then((result) => {
+          if (msg.id !== undefined && msg.id !== null) {
+            this.send(JSON.stringify({ jsonrpc: '2.0', id: msg.id, result: result ?? null }));
+          }
+        })
+        .catch((err: JsonRpcError) => {
+          if (msg.id !== undefined && msg.id !== null) {
+            this.send(
+              JSON.stringify({
+                jsonrpc: '2.0',
+                id: msg.id,
+                error: { code: err.code ?? -32603, message: err.message ?? 'internal error' }
+              })
+            );
+          }
+        });
+    }
   }
-}
 
-/** Decode newline-delimited JSON (used by worker transport). */
-export function decodeLines(chunk: string): RpcMessage[] {
-  return chunk
-    .split('\n')
-    .filter((l) => l.trim())
-    .map((l) => {
-      try {
-        return JSON.parse(l) as RpcMessage;
-      } catch {
-        return null;
-      }
-    })
-    .filter((m): m is RpcMessage => m !== null);
+  sendRequest<T = unknown>(method: string, params?: unknown): Promise<T> {
+    if (this.closed) return Promise.reject({ code: -32000, message: 'connection closed' });
+    const id = this.nextId++;
+    return new Promise<T>((resolve, reject) => {
+      this.pending.set(id, { resolve: resolve as (v: unknown) => void, reject });
+      this.send(JSON.stringify({ jsonrpc: '2.0', id, method, params }));
+    });
+  }
+
+  sendNotification(method: string, params?: unknown): void {
+    if (this.closed) return;
+    this.send(JSON.stringify({ jsonrpc: '2.0', method, params }));
+  }
+
+  /** Reject all pending requests (transport died). */
+  close(): void {
+    this.closed = true;
+    for (const [, p] of this.pending) {
+      p.reject({ code: -32000, message: 'connection closed' });
+    }
+    this.pending.clear();
+  }
 }

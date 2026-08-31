@@ -1,66 +1,109 @@
-/** Global command registry feeding the command palette. */
-
-import { bus } from '../lib/events';
-import { t } from '../lib/i18n';
+/**
+ * Command registry — the backbone of the Command Palette, keybindings and
+ * context menus. See docs/api-reference.md for the public contract.
+ */
 
 export interface Command {
-  id: string;
-  /** i18n key or literal; resolved at render time */
-  label: string;
+  name: string; // namespaced: 'file.save', 'meu-plugin.ping'
+  description: string;
   icon?: string;
-  keybinding?: string;
-  /** hide from palette when false */
-  when?: () => boolean;
-  run: (...args: unknown[]) => void | Promise<void>;
+  bindKey?: { win?: string; mac?: string };
+  exec(...args: unknown[]): unknown | Promise<unknown>;
 }
 
-export class CommandRegistry {
-  private map = new Map<string, Command>();
+const registry = new Map<string, Command>();
 
-  register(cmd: Command): () => void {
-    if (this.map.has(cmd.id)) {
-      console.warn(`[commands] duplicate id "${cmd.id}" overwritten`);
-    }
-    this.map.set(cmd.id, cmd);
-    bus.emit('commands:changed', cmd);
-    return () => this.unregister(cmd.id);
+export function addCommand(cmd: Command): void {
+  if (!cmd.name || !cmd.name.includes('.') || /\s/.test(cmd.name)) {
+    throw new Error(`[commands] invalid name "${cmd.name}" — use 'namespace.action'`);
   }
-
-  registerMany(cmds: Command[]): void {
-    cmds.forEach((c) => this.register(c));
+  if (typeof cmd.exec !== 'function') {
+    throw new Error(`[commands] "${cmd.name}" must provide exec()`);
   }
-
-  unregister(id: string): void {
-    this.map.delete(id);
-    bus.emit('commands:changed', null);
-  }
-
-  has(id: string): boolean {
-    return this.map.has(id);
-  }
-
-  get(id: string): Command | undefined {
-    return this.map.get(id);
-  }
-
-  async execute(id: string, ...args: unknown[]): Promise<void> {
-    const cmd = this.map.get(id);
-    if (!cmd) throw new Error(`command not found: ${id}`);
-    await cmd.run(...args);
-  }
-
-  list(): Command[] {
-    return [...this.map.values()].filter((c) => !c.when || c.when());
-  }
-
-  /** Resolve the human label for palette rendering. */
-  labelOf(cmd: Command): string {
-    if (cmd.label.includes('.')) {
-      const translated = t(cmd.label);
-      if (translated !== cmd.label) return translated;
-    }
-    return cmd.label;
-  }
+  registry.set(cmd.name, { ...cmd });
 }
 
-export const commands = new CommandRegistry();
+export function removeCommand(name: string): void {
+  registry.delete(name);
+}
+
+export function has(name: string): boolean {
+  return registry.has(name);
+}
+
+export function list(): Command[] {
+  return [...registry.values()];
+}
+
+export async function exec(name: string, ...args: unknown[]): Promise<unknown> {
+  const cmd = registry.get(name);
+  if (!cmd) throw new Error(`[commands] not found: ${name}`);
+  return cmd.exec(...args);
+}
+
+// ---------------------------------------------------------------------------
+// Keybinding matching (CodeMirror chord syntax: 'Ctrl-Shift-P', 'Command-Alt-M')
+// ---------------------------------------------------------------------------
+
+const KEY_ALIASES: Record<string, string> = {
+  esc: 'escape',
+  return: 'enter',
+  del: 'delete',
+  up: 'arrowup',
+  down: 'arrowdown',
+  left: 'arrowleft',
+  right: 'arrowright'
+};
+
+export function parseChord(chord: string): {
+  ctrl: boolean;
+  meta: boolean;
+  alt: boolean;
+  shift: boolean;
+  key: string;
+} {
+  let ctrl = false;
+  let meta = false;
+  let alt = false;
+  let shift = false;
+  let key = '';
+  for (const partRaw of chord.split('-')) {
+    const part = partRaw.toLowerCase();
+    if (part === 'ctrl' || part === 'control') ctrl = true;
+    else if (part === 'cmd' || part === 'command' || part === 'meta') meta = true;
+    else if (part === 'alt' || part === 'option') alt = true;
+    else if (part === 'shift') shift = true;
+    else key = part;
+  }
+  return { ctrl, meta, alt, shift, key: KEY_ALIASES[key] ?? key };
+}
+
+/** Resolve a KeyboardEvent to a registered command with a matching bindKey. */
+export function matchKeybinding(e: KeyboardEvent): Command | undefined {
+  const key = KEY_ALIASES[e.key.toLowerCase()] ?? e.key.toLowerCase();
+  for (const cmd of registry.values()) {
+    if (!cmd.bindKey) continue;
+    const chords = [cmd.bindKey.win, cmd.bindKey.mac].filter(Boolean) as string[];
+    for (const chord of chords) {
+      const p = parseChord(chord);
+      if (
+        p.key === key &&
+        p.ctrl === e.ctrlKey &&
+        p.meta === e.metaKey &&
+        p.alt === e.altKey &&
+        p.shift === e.shiftKey
+      ) {
+        return cmd;
+      }
+    }
+  }
+  return undefined;
+}
+
+/** Test-only: drop all commands. */
+export function reset(): void {
+  registry.clear();
+}
+
+/** Named API object (consumers: `import { commands } from '@api/commands'`). */
+export const commands = { addCommand, removeCommand, exec, list, has };

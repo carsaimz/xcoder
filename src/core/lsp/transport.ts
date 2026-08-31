@@ -1,111 +1,108 @@
-/** Transport layer: WebSocket, Worker, and in-memory loopback for tests. */
-
-import { RpcMessage, encodeMessage, MessageDecoder, decodeLines } from './jsonrpc';
+/**
+ * LSP transports. The client is transport-agnostic; servers can be reached
+ * over a WebSocket (external host process) or inside a Web Worker
+ * (bundled server, e.g. a wasm build).
+ */
+import { JsonRpcConnection } from './jsonrpc';
 
 export interface Transport {
   start(): Promise<void>;
-  send(msg: RpcMessage): void;
-  onData(cb: (msg: RpcMessage) => void): void;
+  send(data: string): void;
+  onData(cb: (data: string) => void): void;
   onClose(cb: () => void): void;
-  stop(): void;
+  dispose(): void;
 }
 
 export class WebSocketTransport implements Transport {
   private ws: WebSocket | null = null;
-  private dataCb: ((msg: RpcMessage) => void) | null = null;
-  private decoder = new MessageDecoder();
+  private dataCb: ((data: string) => void) | null = null;
+  private closeCb: (() => void) | null = null;
 
   constructor(private url: string) {}
 
-  async start(): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
+  start(): Promise<void> {
+    return new Promise((resolve, reject) => {
       this.ws = new WebSocket(this.url);
-      this.ws.binaryType = 'arraybuffer';
       this.ws.onopen = () => resolve();
-      this.ws.onerror = () => reject(new Error(`LSP websocket failed: ${this.url}`));
-      this.ws.onmessage = (ev) => {
-        const text = typeof ev.data === 'string' ? ev.data : new TextDecoder().decode(ev.data);
-        for (const msg of this.decoder.push(text)) this.dataCb?.(msg);
-      };
+      this.ws.onerror = () => reject(new Error(`lsp: websocket error (${this.url})`));
+      this.ws.onmessage = (ev) => this.dataCb?.(String(ev.data));
+      this.ws.onclose = () => this.closeCb?.();
     });
   }
 
-  send(msg: RpcMessage): void {
-    this.ws?.send(encodeMessage(msg));
+  send(data: string): void {
+    this.ws?.send(data);
   }
 
-  onData(cb: (msg: RpcMessage) => void): void {
+  onData(cb: (data: string) => void): void {
     this.dataCb = cb;
   }
 
   onClose(cb: () => void): void {
-    if (this.ws) this.ws.onclose = cb;
+    this.closeCb = cb;
   }
 
-  stop(): void {
+  dispose(): void {
     this.ws?.close();
     this.ws = null;
   }
 }
 
 export class WorkerTransport implements Transport {
-  private dataCb: ((msg: RpcMessage) => void) | null = null;
-  private decoder = new MessageDecoder();
+  private worker: Worker | null = null;
+  private dataCb: ((data: string) => void) | null = null;
+  private closeCb: (() => void) | null = null;
 
-  constructor(private worker: Worker) {}
+  constructor(private workerUrl: string) {}
 
-  async start(): Promise<void> {
-    this.worker.onmessage = (ev) => {
-      const text = typeof ev.data === 'string' ? ev.data : JSON.stringify(ev.data);
-      // accept both framed and newline-delimited JSON from workers
-      for (const msg of [...this.decoder.push(text), ...decodeLines(text)]) this.dataCb?.(msg);
-    };
+  start(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.worker = new Worker(this.workerUrl);
+      } catch (err) {
+        reject(err instanceof Error ? err : new Error('lsp: worker creation failed'));
+        return;
+      }
+      this.worker.onmessage = (ev) => this.dataCb?.(String(ev.data));
+      this.worker.onerror = () => reject(new Error(`lsp: worker error (${this.workerUrl})`));
+      this.worker.onmessageerror = () => this.closeCb?.();
+      // worker script signals readiness with its first ping
+      const ready = (ev: MessageEvent) => {
+        if (ev.data === '__ready__') {
+          this.worker?.removeEventListener('message', ready);
+          resolve();
+        }
+      };
+      this.worker.addEventListener('message', ready);
+    });
   }
 
-  send(msg: RpcMessage): void {
-    this.worker.postMessage(JSON.stringify(msg));
+  send(data: string): void {
+    this.worker?.postMessage(data);
   }
 
-  onData(cb: (msg: RpcMessage) => void): void {
+  onData(cb: (data: string) => void): void {
     this.dataCb = cb;
   }
 
   onClose(cb: () => void): void {
-    this.worker.onmessage = (ev) => {
-      if (ev.data === '__lsp_closed__') cb();
-    };
+    this.closeCb = cb;
   }
 
-  stop(): void {
-    this.worker.terminate();
+  dispose(): void {
+    this.worker?.terminate();
+    this.worker = null;
   }
 }
 
-/** In-memory pipe pair — useful for tests and embedded servers. */
-export function createLoopbackPair(): [Transport, Transport] {
-  let cbA: ((m: RpcMessage) => void) | null = null;
-  let cbB: ((m: RpcMessage) => void) | null = null;
-  const tA: Transport = {
-    async start() {},
-    send(msg) {
-      queueMicrotask(() => cbB?.(msg));
-    },
-    onData(cb) {
-      cbA = cb;
-    },
-    onClose() {},
-    stop() {},
-  };
-  const tB: Transport = {
-    async start() {},
-    send(msg) {
-      queueMicrotask(() => cbA?.(msg));
-    },
-    onData(cb) {
-      cbB = cb;
-    },
-    onClose() {},
-    stop() {},
-  };
-  return [tA, tB];
+/** Wire a transport to a JsonRpcConnection. */
+export function connect(transport: Transport): JsonRpcConnection {
+  const conn = new JsonRpcConnection((data) => transport.send(data));
+  transport.onData((data) => conn.handleMessage(data));
+  transport.onClose(() => conn.close());
+  void transport.start().catch((err) => {
+    conn.close();
+    throw err;
+  });
+  return conn;
 }
