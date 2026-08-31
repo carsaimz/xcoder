@@ -82,6 +82,7 @@ jobs:
 
   github-release:
     needs: [test]
+    if: always() && needs.test.result == 'success'
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
@@ -119,6 +120,7 @@ jobs:
 
   android-release:
     needs: [github-release]
+    if: always() && needs.github-release.result == 'success'
     uses: ./.github/workflows/android-release.yml
     with:
       tag: ${{ needs.github-release.outputs.tag }}
