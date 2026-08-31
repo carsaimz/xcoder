@@ -32,7 +32,7 @@ jobs:
         run: npm test
 
       - name: Locale key parity check
-        run: node utils/lang-cli.mjs --check
+        run: node utils/lang-cli.js check
 
   build:
     name: Production build

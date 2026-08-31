@@ -96,6 +96,26 @@ function cmdStats() {
   }
 }
 
+/** Verify that the complete locales keep key parity with the en.json base. */
+function cmdCheck() {
+  const en = readJson(path.join(LANG_DIR, 'en.json'));
+  const enKeys = flatEntries(en).map(([k]) => k);
+  const complete = ['en', 'pt', 'es'];
+  const problems = [];
+  for (const code of complete) {
+    const dict = readJson(path.join(LANG_DIR, `${code}.json`));
+    const keys = new Set(flatEntries(dict).map(([k]) => k));
+    for (const k of enKeys) if (!keys.has(k)) problems.push(`${code}: missing "${k}"`);
+    for (const k of keys) if (!(k in en)) problems.push(`${code}: unknown key "${k}" (not in en.json)`);
+  }
+  if (problems.length) {
+    for (const p of problems) console.error(p);
+    console.error(`\nlocale check FAILED — ${problems.length} problem(s)`);
+    process.exit(1);
+  }
+  console.log(`locale check OK — ${enKeys.length} keys × ${complete.length} locales in parity`);
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 switch (cmd) {
   case 'add': cmdAdd(args[0], args[1]); break;
@@ -103,6 +123,7 @@ switch (cmd) {
   case 'search': cmdSearch(args[0]); break;
   case 'update': cmdUpdate(); break;
   case 'stats': cmdStats(); break;
+  case 'check': cmdCheck(); break;
   default:
-    console.log('usage: pnpm run lang -- <add|remove|search|update|stats> [args]');
+    console.log('usage: pnpm run lang -- <add|remove|search|update|stats|check> [args]');
 }

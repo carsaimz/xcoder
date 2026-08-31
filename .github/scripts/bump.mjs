@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * bump.mjs — set the project version in package.json, config.xml and src/version.ts.
+ * bump.mjs — set the project version in package.json and config.xml.
  *
  *   node bump.mjs 1.2.0
  */
@@ -27,8 +27,5 @@ writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 const cfgPath = join(root, 'config.xml');
 const cfg = readFileSync(cfgPath, 'utf8');
 writeFileSync(cfgPath, cfg.replace(/(<widget[^>]*version=")[^"]+/i, `$1${version}`));
-
-// src/version.ts
-writeFileSync(join(root, 'src', 'version.ts'), `/** Central version constant. */\nexport const VERSION = '${version}';\n`);
 
 console.log(`version → ${version}`);
