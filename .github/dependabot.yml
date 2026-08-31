@@ -11,6 +11,10 @@ updates:
       # TS APIs are pinned in src/cm/lsp workers; major bumps need code changes
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # LSP type packages must stay in lockstep (nested copy under
+      # vscode-languageserver-protocol causes TS2322 dual-type errors)
+      - dependency-name: "vscode-languageserver-types"
+      - dependency-name: "vscode-languageserver-protocol"
     groups:
       codemirror:
         patterns:
