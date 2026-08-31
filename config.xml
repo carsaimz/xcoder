@@ -31,7 +31,7 @@
     <!-- Runtime permission prompts (READ/WRITE_EXTERNAL_STORAGE) -->
     <plugin name="cordova-plugin-android-permissions" spec="^1.1.5" />
     <!-- Safe-area / viewport handling on notch devices -->
-    <plugin name="cordova-plugin-fullscreen" spec="^2.0.0" />
+    <plugin name="cordova-plugin-fullscreen" spec="^1.0.8" />
 
     <platform name="android">
         <preference name="AndroidMinimumSdkVersion" value="24" />
