@@ -898,5 +898,21 @@
   "ai welcome": "Hi! I can read and edit your project, run code and use the shell. Open a folder first for the best results.",
   "ai subagent running": "Subagent working...",
   "thinking": "Thinking...",
-  "registry unavailable": "Remote registry is disabled in XCoder. Install plugins from a URL or a local zip file."
+  "registry unavailable": "Remote registry is disabled in XCoder. Install plugins from a URL or a local zip file.",
+  "ai chat": "AI chat",
+  "ai explain": "AI: explain",
+  "ai fix": "AI: fix",
+  "ai refactor": "AI: refactor",
+  "ai add comments": "AI: add comments",
+  "ai ask about selection": "AI: ask about selection",
+  "ai no file open": "Open a file first",
+  "ai sent to chat": "Sent to AI chat",
+  "ai busy": "AI is still working — wait or stop it first",
+  "ai code actions": "Code actions",
+  "insert at cursor": "Insert at cursor",
+  "replace selection": "Replace selection",
+  "save code to file": "Save code to file",
+  "code copied": "Code copied",
+  "code inserted": "Code inserted",
+  "code replaced": "Selection replaced"
 }

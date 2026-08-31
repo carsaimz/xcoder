@@ -898,5 +898,21 @@
   "ai welcome": "Olá! Posso ler e editar seu projeto, executar código e usar o shell. Abra uma pasta para melhores resultados.",
   "ai subagent running": "Subagente trabalhando...",
   "thinking": "Pensando...",
-  "registry unavailable": "Registro remoto desativado no XCoder. Instale plugins por URL ou arquivo zip local."
+  "registry unavailable": "Registro remoto desativado no XCoder. Instale plugins por URL ou arquivo zip local.",
+  "ai chat": "Chat de IA",
+  "ai explain": "IA: explicar",
+  "ai fix": "IA: corrigir",
+  "ai refactor": "IA: refatorar",
+  "ai add comments": "IA: adicionar comentários",
+  "ai ask about selection": "IA: perguntar sobre a seleção",
+  "ai no file open": "Abra um arquivo primeiro",
+  "ai sent to chat": "Enviado ao chat de IA",
+  "ai busy": "A IA ainda está trabalhando — aguarde ou pare primeiro",
+  "ai code actions": "Ações de código",
+  "insert at cursor": "Inserir no cursor",
+  "replace selection": "Substituir seleção",
+  "save code to file": "Salvar código em arquivo",
+  "code copied": "Código copiado",
+  "code inserted": "Código inserido",
+  "code replaced": "Seleção substituída"
 }

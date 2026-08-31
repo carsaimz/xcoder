@@ -23,22 +23,22 @@ const apps = [];
  * @returns {void}
  */
 function add(
-	icon,
-	id,
-	title,
-	initFunction,
-	prepend = false,
-	onSelected = () => {},
+        icon,
+        id,
+        title,
+        initFunction,
+        prepend = false,
+        onSelected = () => {},
 ) {
-	currentSection ??= id;
+        currentSection ??= id;
 
-	const app = new SidebarApp(icon, id, title, initFunction, onSelected);
-	apps.push(app);
-	app.install(prepend);
+        const app = new SidebarApp(icon, id, title, initFunction, onSelected);
+        apps.push(app);
+        app.install(prepend);
 
-	if (currentSection === id) {
-		setActiveApp(id);
-	}
+        if (currentSection === id) {
+                setActiveApp(id);
+        }
 }
 
 /**
@@ -47,21 +47,21 @@ function add(
  * @returns {void}
  */
 function remove(id) {
-	const app = apps.find((app) => app.id === id);
-	if (!app) return;
-	const wasActive = app.active;
-	app.remove();
-	apps.splice(apps.indexOf(app), 1);
-	if (wasActive && apps.length > 0) {
-		const preferredApp = apps.find((app) => app.id === currentSection);
-		setActiveApp(preferredApp?.id || apps[0].id);
-		return;
-	}
+        const app = apps.find((app) => app.id === id);
+        if (!app) return;
+        const wasActive = app.active;
+        app.remove();
+        apps.splice(apps.indexOf(app), 1);
+        if (wasActive && apps.length > 0) {
+                const preferredApp = apps.find((app) => app.id === currentSection);
+                setActiveApp(preferredApp?.id || apps[0].id);
+                return;
+        }
 
-	if (!apps.length) {
-		currentSection = null;
-		localStorage.removeItem(SIDEBAR_APPS_LAST_SECTION);
-	}
+        if (!apps.length) {
+                currentSection = null;
+                localStorage.removeItem(SIDEBAR_APPS_LAST_SECTION);
+        }
 }
 
 /**
@@ -69,21 +69,21 @@ function remove(id) {
  * @param {HTMLElement} $el
  */
 function init($el) {
-	$sidebar = $el;
-	$apps = $sidebar.get(".app-icons-container");
-	$apps.addEventListener("click", onclick);
-	SidebarApp.init($el, $apps);
+        $sidebar = $el;
+        $apps = $sidebar.get(".app-icons-container");
+        $apps.addEventListener("click", onclick);
+        SidebarApp.init($el, $apps);
 }
 
 /**
  * Loads all sidebar apps.
  */
 async function loadApps() {
-	add(...(await import("./files")).default);
-	add(...(await import("./searchInFiles")).default);
-	add(...(await import("./extensions")).default);
-	add(...(await import("./ai")).default);
-	add(...(await import("./notification")).default);
+        add(...(await import("./files")).default);
+        add(...(await import("./searchInFiles")).default);
+        add(...(await import("./extensions")).default);
+        add(...(await import("./ai")).default);
+        add(...(await import("./notification")).default);
 }
 
 /**
@@ -93,21 +93,21 @@ async function loadApps() {
  * @returns {void}
  */
 function ensureActiveApp() {
-	const activeApps = apps.filter((app) => app.active);
-	if (activeApps.length === 1) return;
+        const activeApps = apps.filter((app) => app.active);
+        if (activeApps.length === 1) return;
 
-	if (activeApps.length > 1) {
-		const preferredActiveApp = activeApps.find(
-			(app) => app.id === currentSection,
-		);
-		setActiveApp(preferredActiveApp?.id || activeApps[0].id);
-		return;
-	}
+        if (activeApps.length > 1) {
+                const preferredActiveApp = activeApps.find(
+                        (app) => app.id === currentSection,
+                );
+                setActiveApp(preferredActiveApp?.id || activeApps[0].id);
+                return;
+        }
 
-	if (apps.length > 0) {
-		const preferredApp = apps.find((app) => app.id === currentSection);
-		setActiveApp(preferredApp?.id || apps[0].id);
-	}
+        if (apps.length > 0) {
+                const preferredApp = apps.find((app) => app.id === currentSection);
+                setActiveApp(preferredApp?.id || apps[0].id);
+        }
 }
 
 /**
@@ -116,8 +116,8 @@ function ensureActiveApp() {
  * @returns
  */
 function get(id) {
-	const app = apps.find((app) => app.id === id);
-	return app.container;
+        const app = apps.find((app) => app.id === id);
+        return app.container;
 }
 
 /**
@@ -125,12 +125,12 @@ function get(id) {
  * @param {MouseEvent} e
  */
 function onclick(e) {
-	const target = e.target;
-	const { action, id } = target.dataset;
+        const target = e.target;
+        const { action, id } = target.dataset;
 
-	if (action !== "sidebar-app") return;
+        if (action !== "sidebar-app") return;
 
-	setActiveApp(id);
+        setActiveApp(id);
 }
 
 /**
@@ -139,22 +139,23 @@ function onclick(e) {
  * @returns {void}
  */
 function setActiveApp(id) {
-	const app = apps.find((app) => app.id === id);
-	if (!app) return;
+        const app = apps.find((app) => app.id === id);
+        if (!app) return;
 
-	currentSection = id;
-	localStorage.setItem(SIDEBAR_APPS_LAST_SECTION, id);
+        currentSection = id;
+        localStorage.setItem(SIDEBAR_APPS_LAST_SECTION, id);
 
-	for (const currentApp of apps) {
-		currentApp.active = currentApp.id === id;
-	}
+        for (const currentApp of apps) {
+                currentApp.active = currentApp.id === id;
+        }
 }
 
 export default {
-	init,
-	add,
-	get,
-	remove,
-	loadApps,
-	ensureActiveApp,
+        init,
+        add,
+        get,
+        remove,
+        loadApps,
+        ensureActiveApp,
+        setActiveApp,
 };

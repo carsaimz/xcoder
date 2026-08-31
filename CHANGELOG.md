@@ -3,6 +3,19 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-09-01
+
+### Added
+- **AI code actions on selection**: from the file tab menu or main menu, run *AI: explain / fix / refactor / add comments / ask about selection* on the current selection (or whole file). Fix/refactor/comments route through the full agent, so it can actually patch the file with its editing tools under the configured permission mode.
+- **Code block actions in the AI chat**: tap any code block returned by the model to *copy*, *insert at cursor*, *replace selection* or *save it to a workspace file*.
+- **`open <file>` command in the virtual shell** (also available to the agent): opens a workspace file directly in the editor.
+- **AI chat command**: open the assistant instantly via the main menu (`ai-chat`).
+
+### Improved
+- AI selection prompts now carry the file name, start line and a truncation notice, giving the model precise context.
+- Sidebar registry exposes `setActiveApp`, letting commands jump straight to the AI section.
+- 16 new localized strings across all 40+ locales (full parity, pt-br translated).
+
 ## [1.0.0] - 2026-08-31
 
 ### Highlights

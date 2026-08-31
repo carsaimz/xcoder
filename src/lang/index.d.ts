@@ -902,6 +902,22 @@ declare type LangStrings = {
   "ai subagent running": string;
   "thinking": string;
   "registry unavailable": string;
+  "ai chat": string;
+  "ai explain": string;
+  "ai fix": string;
+  "ai refactor": string;
+  "ai add comments": string;
+  "ai ask about selection": string;
+  "ai no file open": string;
+  "ai sent to chat": string;
+  "ai busy": string;
+  "ai code actions": string;
+  "insert at cursor": string;
+  "replace selection": string;
+  "save code to file": string;
+  "code copied": string;
+  "code inserted": string;
+  "code replaced": string;
 };
 
 declare var strings: LangStrings;
