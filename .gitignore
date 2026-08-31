@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build output (www/index.html is committed; bundles are generated)
+www/bundle.js
+www/bundle.js.map
+www/bundle.css
+www/bundle.css.map
+
+# cordova
+platforms/
+plugins/
+config.json
+
+# secrets & keys
+*.keystore
+*.jks
+build.json
+.env
+.env.*
+
+# misc
+.DS_Store
+*.log
+coverage/
+.venv/
+dist/

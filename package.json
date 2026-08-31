@@ -1,0 +1,55 @@
+{
+  "name": "xcoder",
+  "version": "1.1.0",
+  "description": "XCoder — a mobile-first code editor & IDE for the web and Android, built on CodeMirror 6. Community fork of Acode.",
+  "main": "www/bundle.js",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carsaimz/xcoder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/carsaimz/xcoder/issues"
+  },
+  "keywords": [
+    "code-editor",
+    "ide",
+    "codemirror",
+    "mobile",
+    "cordova",
+    "web",
+    "acode"
+  ],
+  "scripts": {
+    "build": "tsc --noEmit && rspack build",
+    "build:dev": "NODE_ENV=development rspack build",
+    "dev": "rspack serve",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "gen:locales": "node utils/lang-cli.mjs",
+    "gen:plugin": "node utils/plugin-cli.mjs",
+    "serve": "npx serve www"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/language": "^6.10.8",
+    "@codemirror/language-data": "^6.5.1",
+    "@codemirror/search": "^6.5.11",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.8",
+    "jszip": "^3.10.1",
+    "prettier": "^3.5.3"
+  },
+  "devDependencies": {
+    "@rspack/cli": "^1.3.11",
+    "@rspack/core": "^1.3.11",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
