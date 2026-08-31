@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+    open-pull-requests-limit: 10
+    groups:
+      codemirror:
+        patterns:
+          - '@codemirror/*'
+      dev-dependencies:
+        dependency-type: development
+    labels:
+      - dependencies
+      - javascript
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - ci

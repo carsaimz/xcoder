@@ -1,0 +1,108 @@
+name: Android release build
+
+# Builds the signed release APK + AAB and attaches them to the given tag's
+# GitHub release. Without the KEYSTORE_* secrets it still produces unsigned
+# artifacts so the release is never blocked.
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to attach artifacts to'
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag (e.g. v1.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: APK + AAB
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web assets (www/)
+        run: npm run build
+
+      - name: Add Android platform
+        run: npx cordova platform add android@13 --no-update-notifier
+
+      - name: Configure signing
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$GITHUB_WORKSPACE/xcoder-release.keystore"
+          cat > build.json <<JSON
+          {
+            "android": {
+              "debug": {},
+              "release": {
+                "keystore": "$GITHUB_WORKSPACE/xcoder-release.keystore",
+                "storePassword": "$KEYSTORE_PASSWORD",
+                "alias": "$KEY_ALIAS",
+                "password": "$KEY_PASSWORD",
+                "keystoreType": ""
+              }
+            }
+          }
+          JSON
+
+      - name: Build release APK
+        run: npx cordova build android --release --no-telemetry
+
+      - name: Build release AAB
+        run: npx cordova build android --release -- --packageType=bundle --no-telemetry
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist
+          find platforms/android/app/build/outputs -name '*.apk' -exec cp {} dist/ \; || true
+          find platforms/android/app/build/outputs -name '*.aab' -exec cp {} dist/ \; || true
+          ls -la dist/
+          if [ "${HAS_KEYSTORE}" != "true" ]; then
+            echo "⚠ No KEYSTORE_BASE64 secret configured — artifacts are UNSIGNED." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: |
+            dist/*.apk
+            dist/*.aab
+          fail_on_unmatched_files: false
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: dist/
+          retention-days: 14

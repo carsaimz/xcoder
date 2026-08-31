@@ -1,0 +1,68 @@
+# actions/labeler v5 configuration
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/ui/**'
+          - 'src/style.css'
+          - 'www/**'
+
+editor:
+  - changed-files:
+      - any-glob-to-any-file: 'src/core/editor/**'
+
+filesystem:
+  - changed-files:
+      - any-glob-to-any-file: 'src/core/file/**'
+
+terminal:
+  - changed-files:
+      - any-glob-to-any-file: 'src/core/terminal/**'
+
+ai-agent:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/core/agent/**'
+          - 'src/core/ai/**'
+
+lsp:
+  - changed-files:
+      - any-glob-to-any-file: 'src/core/lsp/**'
+
+i18n:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/lang/**'
+          - 'utils/lang-cli.mjs'
+
+plugins:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/api/plugins.ts'
+          - 'utils/plugin-template/**'
+          - 'utils/plugin-cli.mjs'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '**/*.md'
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: 'package-lock.json'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.github/dependabot.yml'
+
+android:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'config.xml'
+          - '.github/workflows/android-*.yml'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: 'tests/**'

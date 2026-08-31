@@ -1,0 +1,125 @@
+name: Release
+
+# Two ways to release:
+#   1. push a tag v*            → changelog from conventional commits + GitHub release
+#   2. workflow_dispatch        → bump version, tag, then the same pipeline runs
+#
+# The android-* jobs attach signed APK + AAB to the same release when the
+# KEYSTORE_* secrets are configured (see android-release.yml / docs/build.md).
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.2.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version-bump:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Bump version files
+        run: node .github/scripts/bump.mjs "${{ inputs.version }}"
+
+      - name: Update CHANGELOG.md
+        run: |
+          PREV=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$PREV" ]; then
+            NOTES=$(node .github/scripts/changelog.mjs "$PREV" HEAD)
+          else
+            NOTES=$(node .github/scripts/changelog.mjs "$(git rev-list --max-parents=0 HEAD)" HEAD)
+          fi
+          { echo "# Changelog"; echo ""; echo "## v${{ inputs.version }} ($(date +%Y-%m-%d))"; echo ""; echo "$NOTES"; echo ""; cat CHANGELOG.md 2>/dev/null | tail -n +2; } > CHANGELOG.md.new
+          mv CHANGELOG.md.new CHANGELOG.md
+
+      - name: Commit, tag and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(release): v${{ inputs.version }}" || true
+          git tag "v${{ inputs.version }}"
+          git push origin HEAD --tags
+
+  test:
+    needs: [version-bump]
+    if: always() && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/v{0}', inputs.version) || github.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  github-release:
+    needs: [test]
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/v{0}', inputs.version) || github.ref }}
+          fetch-depth: 0
+
+      - id: tag
+        run: echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog notes
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          PREV=$(git tag --sort=-creatordate | grep -A1 -x "$TAG" | tail -1 || true)
+          if [ -z "$PREV" ] || [ "$PREV" = "$TAG" ]; then
+            PREV=$(git tag --sort=creatordate | grep -B1 -x "$TAG" | head -1 || true)
+          fi
+          if [ -n "$PREV" ] && [ "$PREV" != "$TAG" ]; then
+            node .github/scripts/changelog.mjs "$PREV" "$TAG" > notes.md
+          else
+            node .github/scripts/changelog.mjs "$(git rev-list --max-parents=0 HEAD)" "$TAG" > notes.md
+          fi
+          cat notes.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
+          name: XCoder ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+          body_path: notes.md
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+
+  android-release:
+    needs: [github-release]
+    uses: ./.github/workflows/android-release.yml
+    with:
+      tag: ${{ needs.github-release.outputs.tag }}
+    secrets: inherit

@@ -1,0 +1,80 @@
+name: Android debug build
+
+# Runs on every push to main (and on demand): builds the debug APK and keeps
+# a rolling "dev-build" pre-release up to date, so testers always have the
+# latest installable build without waiting for a versioned release.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'www/**'
+      - 'config.xml'
+      - 'package.json'
+      - '.github/workflows/android-debug.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-debug
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: Debug APK → dev-build pre-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web assets (www/)
+        run: npm run build
+
+      - name: Add Android platform
+        run: npx cordova platform add android@13 --no-update-notifier
+
+      - name: Build debug APK
+        run: npx cordova build android --debug --no-telemetry
+
+      - name: Collect APK
+        run: |
+          mkdir -p dist
+          cp platforms/android/app/build/outputs/apk/debug/*.apk dist/xcoder-debug.apk
+          ls -la dist/
+
+      - name: Update dev-build pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete dev-build --yes --cleanup-tag 2>/dev/null || true
+          gh release create dev-build \
+            --title "Development build ($(date +'%Y-%m-%d %H:%M' UTC))" \
+            --notes "Automated debug APK from commit ${{ github.sha }}.
+
+          ⚠ This is an unsigned/unstable development build. For stable builds see the [latest release](https://github.com/${GITHUB_REPOSITORY}/releases/latest)." \
+            --prerelease \
+            dist/xcoder-debug.apk
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcoder-debug-apk
+          path: dist/xcoder-debug.apk
+          retention-days: 14
