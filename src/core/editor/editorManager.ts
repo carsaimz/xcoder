@@ -107,6 +107,11 @@ export class EditorManager {
       keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...searchKeymap, ...historyKeymap, ...foldKeymap, ...completionKeymap, indentWithTab]),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) this.onDocChanged(update);
+        if (update.selectionSet || update.docChanged) {
+          const pos = update.state.selection.main.head;
+          const line = update.state.doc.lineAt(pos);
+          bus.emit('editor:cursor', { line: line.number, col: pos - line.from + 1 });
+        }
         if (update.focusChanged && update.view.hasFocus) bus.emit('editor:focus');
       }),
     ];

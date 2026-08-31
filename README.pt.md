@@ -35,6 +35,16 @@ sistema de agente de IA, um terminal virtual com git e uma plataforma de plugins
   gerados para mais 40 idiomas (`npm run gen:locales`).
 - **⚡ Paleta de comandos & Quick Open** — `Ctrl+K` comandos, `Ctrl+P` busca difusa de arquivos.
 - **📐 Formatação sob demanda** — Prettier (carregado sob demanda) para JS/TS/JSON/CSS/HTML/Markdown/YAML.
+- **🔍 Pesquisa global & substituição** — busca em todo o projeto com opções de regex, maiúsculas
+  e palavra inteira, resultados agrupados por ficheiro, abrir na linha com um clique e
+  substituição em massa com confirmação (`Ctrl+Shift+F`).
+- **🌿 Painel Git visual** — branch, ficheiros staged/não rastreados, preparação, commit,
+  push/pull e histórico de commits sem tocar no terminal.
+- **📖 Pré-visualização Markdown ao vivo** — painel dividido renderizado (sobreposição em
+  telemóveis) com renderizador sem dependências e seguro contra XSS: tabelas, task lists e
+  blocos de código.
+- **📊 Barra de estado** — branch atual, posição do cursor (Ln/Col), tipo de ficheiro e
+  estado de alterações pendentes.
 
 ## 🚀 Início rápido (web)
 

@@ -147,4 +147,53 @@ export default {
 
   // git
   'git.notRepo': '{dir} no es un repositorio git — ejecuta git init primero',
+  'git.title': 'Git',
+  'git.log': 'Mostrar/ocultar historial',
+  'git.commitPlaceholder': 'Mensaje de commit (Conventional Commits recomendado)…',
+  'git.commit': 'Commit',
+  'git.stageAll': 'Añadir todo al stage',
+  'git.push': 'Enviar al remoto',
+  'git.pull': 'Traer del remoto',
+  'git.init': 'git init',
+  'git.ahead': '{remote} · por publicar',
+  'git.noRemote': 'sin remoto configurado',
+  'git.commitCount': '{n} commit(s)',
+  'git.staged': 'Cambios preparados (staged)',
+  'git.unstaged': 'No preparados & no rastreados',
+  'git.nothingStaged': 'Nada preparado todavía',
+  'git.clean': 'Árbol de trabajo limpio',
+  'git.open': 'Abrir archivo',
+  'git.stage': 'Preparar archivo',
+  'git.stagedOk': '{path} preparado',
+  'git.commitNeedsMessage': 'Escribe primero el mensaje de commit',
+  'git.commitOk': 'Commit creado',
+  'git.noCommits': 'Aún sin commits',
+  'git.noRepoShort': 'sin repo',
+
+  // búsqueda global y reemplazo
+  'search.title': 'Buscar en el proyecto',
+  'search.placeholder': 'Buscar en todo el workspace…',
+  'search.toggleReplace': 'Alternar modo de reemplazo',
+  'search.replacePlaceholder': 'Reemplazar por…',
+  'search.replaceAll': 'Reemplazar todo',
+  'search.caseSensitive': 'Aa',
+  'search.wholeWord': 'Palabra',
+  'search.regex': '.*',
+  'search.invalidRegex': 'Expresión regular inválida',
+  'search.searching': 'Buscando…',
+  'search.progress': '{files} archivos analizados, {hits} coincidencias…',
+  'search.done': '{hits} coincidencia(s) en {files} archivo(s) · {ms} ms',
+  'search.more': '+{n} en este archivo',
+  'search.noHits': 'Ejecuta primero una búsqueda',
+  'search.confirmReplaceTitle': 'Reemplazar en varios archivos',
+  'search.confirmReplaceMsg': '¿Aplicar {n} reemplazo(s) en el workspace?',
+  'search.replaced': 'Reemplazado en {files} archivo(s)',
+
+  // vista previa markdown
+  'preview.title': 'Vista previa Markdown',
+  'preview.notMarkdown': 'La vista previa solo está disponible para archivos Markdown',
+
+  // barra de estado
+  'status.cursor': 'Ln {line}, Col {col}',
+  'status.plainText': 'texto plano',
 } as const;

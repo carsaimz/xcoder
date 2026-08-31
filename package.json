@@ -1,6 +1,6 @@
 {
   "name": "xcoder",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "XCoder \u2014 a mobile-first code editor & IDE for the web and Android, built on CodeMirror 6. Community fork of Acode.",
   "main": "www/bundle.js",
   "license": "MIT",

@@ -6,6 +6,7 @@
  */
 
 import { storage } from '../../lib/storage';
+import { bus } from '../../lib/events';
 import * as path from '../../lib/path';
 import { FsError } from '../file/types';
 import { Workspace } from '../file';
@@ -66,7 +67,10 @@ export class GitStore {
   }
 
   private async save(): Promise<void> {
-    if (this.state) await storage.set(this.key, this.state);
+    if (this.state) {
+      await storage.set(this.key, this.state);
+      bus.emit('git:changed', this.state.root);
+    }
   }
 
   async isRepo(): Promise<boolean> {
@@ -182,6 +186,66 @@ export class GitStore {
     }
     await this.save();
     return OK(lines.join('\n'));
+  }
+
+  /** Structured status for the visual git panel (file lists, not text). */
+  async summary(): Promise<{
+    isRepo: boolean;
+    branch: string;
+    remote: { name: string; url: string } | null;
+    pushed: boolean;
+    ahead: boolean;
+    staged: Array<{ path: string; kind: 'modified' | 'added' | 'deleted' }>;
+    unstaged: Array<{ path: string; kind: 'modified' | 'deleted' }>;
+    untracked: string[];
+    commits: number;
+  }> {
+    const st = await this.load();
+    if (!st) {
+      return { isRepo: false, branch: '', remote: null, pushed: false, ahead: false, staged: [], unstaged: [], untracked: [], commits: 0 };
+    }
+    const head = st.branches[st.branch]?.head;
+    const headTree = head ? st.commits[head]?.tree ?? {} : {};
+    const files = await this.worktreeFiles();
+    const staged: Array<{ path: string; kind: 'modified' | 'added' | 'deleted' }> = [];
+    const unstaged: Array<{ path: string; kind: 'modified' | 'deleted' }> = [];
+    const untracked: string[] = [];
+
+    for (const [p, content] of Object.entries(st.staged)) {
+      if (content === DELETED) staged.push({ path: p, kind: 'deleted' });
+      else if (!(p in headTree)) staged.push({ path: p, kind: 'added' });
+      else if (hash(headTree[p]) !== hash(content)) staged.push({ path: p, kind: 'modified' });
+    }
+    const indexed = new Set([...Object.keys(headTree), ...Object.keys(st.staged).filter((k) => st.staged[k] !== DELETED)]);
+    for (const p of indexed) {
+      if (staged.some((s) => s.path === p && s.kind === 'deleted')) continue;
+      const stagedContent = st.staged[p] ?? (p in headTree ? headTree[p] : undefined);
+      let workContent: string | undefined;
+      try {
+        workContent = (await this.workspace.readText(path.join(this.root, p))) as string;
+      } catch {
+        workContent = undefined;
+      }
+      if (workContent === undefined) {
+        if (st.staged[p] === undefined) unstaged.push({ path: p, kind: 'deleted' });
+      } else if (stagedContent !== undefined && hash(stagedContent) !== hash(workContent)) {
+        unstaged.push({ path: p, kind: 'modified' });
+      }
+    }
+    for (const p of files) {
+      if (!(p in headTree) && !(p in st.staged)) untracked.push(p);
+    }
+    return {
+      isRepo: true,
+      branch: st.branch,
+      remote: st.remote ? { ...st.remote } : null,
+      pushed: st.pushed,
+      ahead: Boolean(st.remote && !st.pushed),
+      staged,
+      unstaged,
+      untracked,
+      commits: Object.keys(st.commits).length,
+    };
   }
 
   async add(args: string[]): Promise<ShellOutput> {

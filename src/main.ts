@@ -25,6 +25,10 @@ import { providers } from './core/ai';
 import { FileTree } from './ui/tree';
 import { TerminalPanel } from './ui/terminalPanel';
 import { AgentPanel } from './ui/agentPanel';
+import { SearchPanel } from './ui/searchPanel';
+import { GitPanel } from './ui/gitPanel';
+import { MarkdownPreview, isMarkdownPath } from './ui/markdownPreview';
+import { StatusBar } from './ui/statusBar';
 import { openPalette, openQuickOpen, installShortcuts } from './ui/palette';
 import { openSettings, initSettingsSync } from './ui/settingsPage';
 import { openPlugins } from './ui/pluginsPage';
@@ -92,6 +96,8 @@ async function boot(): Promise<void> {
     el('span', { class: 'brand' }, 'XCoder'),
     menuBtn('menu', t('header.menu'), () => sidebar.classList.toggle('collapsed')),
     menuBtn('search', t('header.quickOpen'), () => void openQuickOpen()),
+    menuBtn('search', t('search.title'), () => searchPanel.toggle()),
+    menuBtn('git', t('git.title'), () => gitPanel.toggle()),
     menuBtn('terminal', t('header.terminal'), () => terminal.toggle()),
     menuBtn('robot', t('header.agent'), () => agentPanel.open()),
     el('span', { class: 'spacer' }),
@@ -104,8 +110,13 @@ async function boot(): Promise<void> {
   void tree;
   editorManager.attach(editorHost);
   new TabsRenderer(tabsList, editorHost);
+  const searchPanel = new SearchPanel(body);
+  const gitPanel = new GitPanel(body, shell);
   const terminal = new TerminalPanel(body, shell);
   const agentPanel = new AgentPanel(document.body);
+  const markdownPreview = new MarkdownPreview(editorHost);
+  new StatusBar(body, shell);
+  void markdownPreview;
 
   // ---- commands ---------------------------------------------------------------
   commands.registerMany([
@@ -114,6 +125,15 @@ async function boot(): Promise<void> {
     { id: 'view.palette', label: 'header.palette', keybinding: 'Ctrl+K', run: openPalette },
     { id: 'view.terminal', label: 'header.terminal', icon: 'terminal', run: () => terminal.toggle() },
     { id: 'view.toggleSidebar', label: 'header.menu', run: () => { sidebar.classList.toggle('collapsed'); } },
+    { id: 'search.project', label: 'search.title', icon: 'search', keybinding: 'Ctrl+Shift+F', run: () => searchPanel.toggle() },
+    { id: 'git.panel', label: 'git.title', icon: 'git', run: () => gitPanel.toggle() },
+    { id: 'editor.preview', label: 'preview.title', icon: 'file', run: () => {
+      if (!isMarkdownPath(editorManager.activePath())) {
+        toast(t('preview.notMarkdown'), 'warn');
+        return;
+      }
+      markdownPreview.toggle();
+    } },
     { id: 'editor.format', label: 'editor.format', icon: 'wand', run: async () => {
       const active = editorManager.activePath();
       const ok = await editorManager.formatActive();

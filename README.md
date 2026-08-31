@@ -35,6 +35,14 @@ AI agent system, a virtual terminal with git, and a plugin platform.
   stubs for 40 more languages (`npm run gen:locales`).
 - **⚡ Command palette & Quick Open** — `Ctrl+K` commands, `Ctrl+P` fuzzy file switcher.
 - **📐 Format on demand** — Prettier (lazy-loaded) for JS/TS/JSON/CSS/HTML/Markdown/YAML.
+- **🔍 Global search & replace** — project-wide search with regex, case and whole-word
+  options, results grouped by file, click-to-open at line, and bulk replace with
+  confirmation (`Ctrl+Shift+F`).
+- **🌿 Visual Git panel** — branch, staged/unstaged/untracked files, staging, commit,
+  push/pull and commit log without touching the terminal.
+- **📖 Markdown live preview** — split-pane rendered preview (overlay on phones) with a
+  zero-dependency, XSS-safe renderer supporting tables, task lists and fenced code.
+- **📊 Status bar** — current branch, cursor position (Ln/Col), file type and dirty state.
 
 ## 🚀 Quick start (web)
 

@@ -147,4 +147,53 @@ export default {
 
   // git
   'git.notRepo': '{dir} não é um repositório git — execute git init primeiro',
+  'git.title': 'Git',
+  'git.log': 'Mostrar/ocultar histórico',
+  'git.commitPlaceholder': 'Mensagem de commit (Conventional Commits recomendado)…',
+  'git.commit': 'Commit',
+  'git.stageAll': 'Adicionar tudo ao stage',
+  'git.push': 'Enviar para o remoto',
+  'git.pull': 'Trazer do remoto',
+  'git.init': 'git init',
+  'git.ahead': '{remote} · por publicar',
+  'git.noRemote': 'sem remoto configurado',
+  'git.commitCount': '{n} commit(s)',
+  'git.staged': 'Alterações preparadas (staged)',
+  'git.unstaged': 'Não preparadas & não rastreadas',
+  'git.nothingStaged': 'Nada preparado ainda',
+  'git.clean': 'Árvore de trabalho limpa',
+  'git.open': 'Abrir ficheiro',
+  'git.stage': 'Preparar ficheiro',
+  'git.stagedOk': '{path} preparado',
+  'git.commitNeedsMessage': 'Escreva primeiro a mensagem de commit',
+  'git.commitOk': 'Commit criado',
+  'git.noCommits': 'Ainda sem commits',
+  'git.noRepoShort': 'sem repo',
+
+  // pesquisa global e substituição
+  'search.title': 'Pesquisar no projeto',
+  'search.placeholder': 'Pesquisar em todo o workspace…',
+  'search.toggleReplace': 'Alternar modo de substituição',
+  'search.replacePlaceholder': 'Substituir por…',
+  'search.replaceAll': 'Substituir tudo',
+  'search.caseSensitive': 'Aa',
+  'search.wholeWord': 'Palavra',
+  'search.regex': '.*',
+  'search.invalidRegex': 'Expressão regular inválida',
+  'search.searching': 'A pesquisar…',
+  'search.progress': '{files} ficheiros analisados, {hits} ocorrências…',
+  'search.done': '{hits} ocorrência(s) em {files} ficheiro(s) · {ms} ms',
+  'search.more': '+{n} neste ficheiro',
+  'search.noHits': 'Execute primeiro uma pesquisa',
+  'search.confirmReplaceTitle': 'Substituir em vários ficheiros',
+  'search.confirmReplaceMsg': 'Aplicar {n} substituição(ões) no workspace?',
+  'search.replaced': 'Substituído em {files} ficheiro(s)',
+
+  // pré-visualização markdown
+  'preview.title': 'Pré-visualização Markdown',
+  'preview.notMarkdown': 'A pré-visualização só está disponível para ficheiros Markdown',
+
+  // barra de estado
+  'status.cursor': 'Ln {line}, Col {col}',
+  'status.plainText': 'texto simples',
 } as const;

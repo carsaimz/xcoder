@@ -147,6 +147,55 @@ export default {
 
   // git
   'git.notRepo': '{dir} is not a git repository — run git init first',
+  'git.title': 'Git',
+  'git.log': 'Toggle commit log',
+  'git.commitPlaceholder': 'Commit message (Conventional Commits recommended)…',
+  'git.commit': 'Commit',
+  'git.stageAll': 'Stage all changes',
+  'git.push': 'Push to remote',
+  'git.pull': 'Pull from remote',
+  'git.init': 'git init',
+  'git.ahead': '{remote} · ahead',
+  'git.noRemote': 'no remote configured',
+  'git.commitCount': '{n} commit(s)',
+  'git.staged': 'Staged changes',
+  'git.unstaged': 'Unstaged & untracked',
+  'git.nothingStaged': 'Nothing staged yet',
+  'git.clean': 'Working tree clean',
+  'git.open': 'Open file',
+  'git.stage': 'Stage file',
+  'git.stagedOk': 'Staged {path}',
+  'git.commitNeedsMessage': 'Type a commit message first',
+  'git.commitOk': 'Commit created',
+  'git.noCommits': 'No commits yet',
+  'git.noRepoShort': 'no repo',
+
+  // global search & replace
+  'search.title': 'Search in project',
+  'search.placeholder': 'Search across the workspace…',
+  'search.toggleReplace': 'Toggle replace mode',
+  'search.replacePlaceholder': 'Replace with…',
+  'search.replaceAll': 'Replace all',
+  'search.caseSensitive': 'Aa',
+  'search.wholeWord': 'Word',
+  'search.regex': '.*',
+  'search.invalidRegex': 'Invalid regular expression',
+  'search.searching': 'Searching…',
+  'search.progress': '{files} files scanned, {hits} matches…',
+  'search.done': '{hits} match(es) in {files} file(s) · {ms} ms',
+  'search.more': '+{n} more in this file',
+  'search.noHits': 'Run a search first',
+  'search.confirmReplaceTitle': 'Replace across files',
+  'search.confirmReplaceMsg': 'Apply {n} replacement(s) across the workspace?',
+  'search.replaced': 'Replaced in {files} file(s)',
+
+  // markdown preview
+  'preview.title': 'Markdown preview',
+  'preview.notMarkdown': 'Preview is only available for Markdown files',
+
+  // status bar
+  'status.cursor': 'Ln {line}, Col {col}',
+  'status.plainText': 'plain text',
 } as const;
 
 export type LocaleKey = keyof typeof import('./en').default;
