@@ -19,7 +19,7 @@
     <preference name="Fullscreen" value="false" />
     <preference name="Orientation" value="default" />
     <preference name="SplashMaintainAspectRatio" value="true" />
-    <preference name="BackgroundColor" value="0xff1e1e2e" />
+    <preference name="BackgroundColor" value="#1e1e2e" />
     <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon.png" />
 
     <platform name="android">
