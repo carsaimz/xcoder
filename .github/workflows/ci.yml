@@ -32,6 +32,9 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Validate plugin references
+        run: node utils/check-plugin-refs.js
+
       - name: Build web bundle (production)
         run: |
           node utils/config.js p
