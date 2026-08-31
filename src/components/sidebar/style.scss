@@ -55,6 +55,7 @@ body.no-animation {
     min-width: 52px;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.15);
+    border-right: solid 1px var(--border-color);
     padding: 0;
     display: flex;
     flex-direction: column;
@@ -112,8 +113,8 @@ body.no-animation {
       }
 
       .icon {
-        height: 40px;
-        width: 40px;
+        height: 44px;
+        width: 44px;
         color: currentColor;
         font-size: 2.8em;
         border-radius: 10px;
@@ -122,7 +123,7 @@ body.no-animation {
         margin: 0 auto;
         cursor: pointer;
         text-align: center;
-        line-height: 40px;
+        line-height: 44px;
 
         &:hover {
           opacity: 0.9;
@@ -147,9 +148,9 @@ body.no-animation {
     }
 
     .icon {
-      height: 40px;
-      width: 40px;
-      min-height: 40px;
+      height: 44px;
+      width: 44px;
+      min-height: 44px;
       color: currentColor;
       font-size: 1.3em;
       border-radius: 10px;
@@ -160,18 +161,19 @@ body.no-animation {
       position: relative;
       box-sizing: border-box;
       text-align: center;
-      line-height: 40px;
+      line-height: 44px;
 
       // Active indicator bar using ::after to not interfere with font icon's ::before
       &::after {
         content: '';
         position: absolute;
-        left: -6px;
+        left: -4px;
         top: 50%;
         transform: translateY(-50%) scaleY(0);
         width: 3px;
-        height: 20px;
+        height: 22px;
         background-color: currentColor;
+        background-color: var(--active-color);
         border-radius: 0 2px 2px 0;
         transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
         opacity: 0;
@@ -398,6 +400,7 @@ body.no-animation {
       align-items: center;
       justify-content: center;
       font-weight: 600;
+      letter-spacing: 0.4px;
     }
   }
 }

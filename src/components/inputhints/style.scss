@@ -4,15 +4,15 @@
   position: fixed;
   top: 0;
   left: 0;
-  padding: 0;
+  padding: 4px 0;
   margin: 0;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 6px 6px;
   background-color: rgb(255, 255, 255);
   background-color: var(--secondary-color);
   color: rgb(37, 37, 37);
   color: var(--secondary-text-color);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 0 4px var(--box-shadow-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 8px 24px var(--box-shadow-color);
   border: solid 1px transparent;
   border: solid 1px var(--popup-border-color);
   height: fit-content;
@@ -22,22 +22,22 @@
   overflow-y: scroll;
 
   &.bottom {
-    border-radius: 4px 4px 0 0;
+    border-radius: 6px 6px 0 0;
   }
 
   &.all {
-    border-radius: 4px;
+    border-radius: 6px;
   }
 
   [data-action="hint"],
   [action="hint"] {
     font-size: 0.9rem;
-    min-height: 30px;
+    min-height: 32px;
     height: fit-content;
     display: flex;
     align-items: center;
     box-sizing: border-box;
-    padding: 5px;
+    padding: 5px 10px;
     overflow-x: hidden;
     text-overflow: ellipsis;
 
@@ -56,26 +56,27 @@
       margin-left: auto;
       color: rgb(51, 153, 255);
       color: var(--active-color);
-      padding: 2px;
-      border-radius: 2px;
+      padding: 1px 6px;
+      border-radius: 4px;
       font-size: 0.6rem;
+      background-color: color-mix(in srgb, var(--active-color) 12%, transparent);
     }
 
     &.active {
       background-color: rgb(51, 153, 255);
-      background-color: var(--active-color);
+      background-color: color-mix(in srgb, var(--active-color) 15%, transparent);
       color: rgb(27, 26, 26);
-      color: var(--primary-text-color);
+      color: var(--secondary-text-color);
 
       small {
         color: rgb(255, 215, 0);
-        color: var(--active-text-color);
+        color: var(--active-color);
       }
     }
 
     &:hover {
       background-color: rgb(107, 168, 229);
-      background-color: var(--primary-color);
+      background-color: color-mix(in srgb, var(--active-color) 8%, transparent);
       color: rgb(27, 26, 26);
       color: var(--secondary-text-color);
     }

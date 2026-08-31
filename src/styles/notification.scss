@@ -2,7 +2,7 @@
 
 .notification-item {
   position: relative;
-  border-radius: 6px;
+  border-radius: 10px;
   background: var(--popup-background-color);
   display: flex;
   flex-direction: column;
@@ -11,6 +11,18 @@
   border: 1px solid var(--popup-border-color);
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;
+
+  // Accent left bar (info / default)
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: var(--accent-color, #4f6ef7);
+    pointer-events: none;
+  }
 
   &.loading {
     @include mixins.bar-loader(30%, 2px);
@@ -121,21 +133,39 @@
 
 
 
-  &.success {
+  &.info {
     .notification-icon {
-      color: #48c158;
+      color: var(--accent-color, #4f6ef7);
+    }
+  }
+
+  &.success {
+    &::before {
+      background-color: #2ea86b;
+    }
+
+    .notification-icon {
+      color: #2ea86b;
     }
   }
 
   &.warning {
+    &::before {
+      background-color: #d08b2c;
+    }
+
     .notification-icon {
-      color: var(--danger-color);
+      color: #d08b2c;
     }
   }
 
   &.error {
+    &::before {
+      background-color: #d05050;
+    }
+
     .notification-icon {
-      color: var(--error-color);
+      color: #d05050;
     }
   }
 }

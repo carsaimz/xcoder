@@ -129,6 +129,8 @@ a {
     min-width: var(--file-tab-width);
     max-width: $width;
     max-width: var(--file-tab-width);
+    border-right: solid 1px var(--border-color);
+    transition: background-color 150ms ease;
 
     .text {
       display: inline-block;
@@ -140,6 +142,9 @@ a {
       margin: 0;
       padding: 0;
       color: inherit;
+      font-family: var(--app-font-family);
+      font-style: normal;
+      font-weight: 400;
     }
 
     &.notice {
@@ -152,9 +157,15 @@ a {
       }
     }
 
+    &:not(.active):hover {
+      background-color: rgba(0, 0, 0, 0.2);
+      background-color: color-mix(in srgb, var(--secondary-color) 22%, transparent);
+    }
+
     &.active {
       border-top: solid 2px var(--active-color);
       background-color: rgba(0, 0, 0, 0.2);
+      background-color: color-mix(in srgb, var(--secondary-color) 55%, transparent);
     }
 
     .file,
@@ -165,6 +176,18 @@ a {
       background-size: 22px;
       background-position: center;
       color: inherit;
+    }
+
+    .icon.cancel {
+      font-size: 1.2em;
+      opacity: 0.55;
+      transition: opacity 150ms ease;
+    }
+
+    &:hover .icon.cancel,
+    &:active .icon.cancel,
+    &.active .icon.cancel {
+      opacity: 1;
     }
   }
 }
@@ -828,6 +851,20 @@ input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration {
   -webkit-appearance: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .open-file-list li.tile,
+  .open-file-list li.tile .icon,
+  #sidebar .apps .icon,
+  .context-menu,
+  .context-menu li,
+  #hints [data-action="hint"],
+  #hints [action="hint"],
+  .notification-item,
+  #toast {
+    transition: none !important;
+  }
 }
 
 .tab-page-container {

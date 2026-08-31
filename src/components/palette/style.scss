@@ -11,7 +11,15 @@
   display: flex;
   align-items: center;
   background-color: inherit;
-  box-shadow: 0 0 4px black;
+  background-color: var(--popup-background-color);
+  color: var(--popup-text-color);
+  border: solid 1px transparent;
+  border: solid 1px var(--popup-border-color);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 8px 24px var(--box-shadow-color);
+  box-sizing: border-box;
   z-index: 999;
 
   &~#hints {
@@ -29,6 +37,6 @@
   input {
     width: 100%;
     border: none;
-    color: var(--primary-text-color);
+    color: var(--popup-text-color);
   }
 }
