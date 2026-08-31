@@ -19,7 +19,7 @@
       "*": ["./src/*"]
     },
     "jsx": "preserve",
-    "types": ["node"]
+    "types": ["node", "cordova"]
   },
   "include": ["src/**/*"],
   "exclude": [
@@ -27,8 +27,6 @@
     "platforms",
     "www",
     "www/js/ace/**/*",
-    "src/plugins/admob/esm",
-    "src/plugins/admob/lib",
-    "src/plugins/admob/www"
+
   ]
 }

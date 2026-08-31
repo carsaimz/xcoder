@@ -1,0 +1,25 @@
+name: Greetings
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  greeting:
+    name: Welcome first-time contributors
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            Thanks for opening your first issue in **XCoder**! 🎉
+            Please add as much detail as possible (device, Android version, steps to reproduce).
+          pr-message: |
+            Thanks for your first contribution to **XCoder**! 🎉
+            Make sure `npm test` and `npm run typecheck` pass locally before requesting a review.
