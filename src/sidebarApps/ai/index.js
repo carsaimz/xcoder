@@ -6,7 +6,7 @@ import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import { Agent } from "lib/ai/agent";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
-import { GROUPS, PROVIDER_MAP } from "lib/ai/providers";
+import { badgeLabel, PROVIDER_MAP } from "lib/ai/providers";
 import {
 	deriveTitle,
 	formatSessionTime,
@@ -23,27 +23,10 @@ import {
 	SLASH_COMMANDS,
 } from "lib/ai/slashCommands";
 import vshell from "lib/ai/vshell";
-import EditorFile from "lib/editorFile";
 import settings from "lib/settings";
 import Url from "utils/Url";
 
 const LEGACY_CHAT_KEY = "xcoder.ai.chat";
-const AI_TAB_ID = "ai-chat-tab";
-
-// Keep the open chat tab translated when the user changes the language.
-document.addEventListener("langchange", () => {
-	const manager = window.editorManager;
-	if (!manager) return;
-	const file = manager.files.find((f) => f.id === AI_TAB_ID);
-	const title = strings["ai assistant"] || "AI";
-	if (file && file.filename !== title) {
-		try {
-			file.filename = title;
-		} catch {
-			/* tab already gone */
-		}
-	}
-});
 
 /** @type {Array<{type: string, payload?: any, name?: string, toolCallId?: string, toolCalls?: any[]}>} */
 let events = [];
@@ -84,18 +67,20 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ tabbed: true, titleKey: "ai assistant" },
+	{ titleKey: "ai assistant" },
 ];
 
 /**
- * Opens the AI chat as an editor tab (like the terminal) without sending
- * anything.
+ * Opens the AI chat in the sidebar (activates the app and shows the
+ * sidebar if it was closed) without sending anything.
  * @returns {Promise<void>}
  */
 export async function openAiChat() {
 	try {
 		const { default: sidebarApps } = await import("sidebarApps");
 		sidebarApps.pulseApp?.("ai");
+		const { default: Sidebar } = await import("components/sidebar");
+		Sidebar?.show?.();
 	} catch (error) {
 		window.log?.("error", "openAiChat failed:", error);
 	}
@@ -138,51 +123,11 @@ export async function askAI(text) {
 }
 
 function onSelected(el) {
-	// host the chat UI in an editor tab (like the terminal) and focus it
-	openChatTab(el);
+	// live in the sidebar panel again; scroll to the latest message and focus
+	scrollToEnd();
 	setTimeout(() => {
 		el?.querySelector("textarea.ai-input")?.focus();
 	}, 100);
-}
-
-/**
- * Hosts the AI chat container in a persistent editor tab.
- * @param {HTMLElement} [el] container provided by the sidebar app
- */
-function openChatTab(el) {
-	const containerEl = el || container;
-	const manager = window.editorManager;
-	if (!containerEl || !manager) return;
-
-	const existing = manager.files.find((file) => file.id === AI_TAB_ID);
-	if (existing) {
-		existing.makeActive?.();
-		hideSidebarPanel();
-		return;
-	}
-
-	new EditorFile(strings["ai assistant"] || "AI", {
-		id: AI_TAB_ID,
-		render: true,
-		type: "page",
-		content: containerEl,
-		tabIcon: "icon brain",
-		hideQuickTools: true,
-	});
-	hideSidebarPanel();
-}
-
-/**
- * Closes the sidebar overlay on phones (tab width > 750 keeps the panel).
- */
-async function hideSidebarPanel() {
-	try {
-		if (window.innerWidth > 750) return;
-		const { default: Sidebar } = await import("components/sidebar");
-		Sidebar?.hide?.();
-	} catch {
-		/* sidebar optional */
-	}
 }
 
 /**
@@ -207,6 +152,7 @@ function buildUi() {
 	const providerId = settings.value.aiProvider || "groq";
 	const provider = PROVIDER_MAP[providerId];
 	const model = settings.value.aiModel || provider?.models?.[0] || "—";
+	const badge = provider ? badgeLabel(provider.group) : null;
 
 	$sessionTitle = <span className="ai-session-title" title=""></span>;
 
@@ -218,8 +164,17 @@ function buildUi() {
 				<span className="icon brain"></span>
 				<div className="ai-title-text">
 					{$sessionTitle}
-					<span className="ai-model" title={model}>
-						{model}
+					<span className="ai-meta">
+						{badge && (
+							<span
+								className={`ai-provider-badge tone-${provider?.group || "neutral"}`}
+							>
+								{badge}
+							</span>
+						)}
+						<span className="ai-model" title={model}>
+							{model}
+						</span>
 					</span>
 				</div>
 				{$modeChip}

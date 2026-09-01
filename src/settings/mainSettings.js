@@ -100,6 +100,19 @@ export default function mainSettings() {
 			category: categories.customizationTools,
 		},
 		{
+			key: "backendUrl",
+			text: strings["backend url"] || "Backend URL",
+			value: appSettings.value.backendUrl || "",
+			valueText: (value) => value || "Off",
+			prompt: strings["backend url"] || "Backend URL",
+			promptType: "url",
+			promptOptions: { required: false },
+			info:
+				strings["settings-info-backend-url"] ||
+				"Companion backend (xcoder-backend) for remote config: managed marketplace, announcements and Firebase credentials. Leave empty to disable.",
+			category: categories.customizationTools,
+		},
+		{
 			key: "lsp-settings",
 			text:
 				strings?.lsp_settings ||
@@ -192,6 +205,10 @@ export default function mainSettings() {
 
 			case "marketplaceUrl":
 				await appSettings.update({ marketplaceUrl: value ?? "" });
+				break;
+
+			case "backendUrl":
+				await appSettings.update({ backendUrl: value ?? "" });
 				break;
 
 			case "theme":

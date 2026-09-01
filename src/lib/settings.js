@@ -205,6 +205,7 @@ class Settings {
 			indentGuides: false,
 			rainbowBrackets: true,
 			marketplaceUrl: "", // custom plugin marketplace registry URL (empty = default)
+			backendUrl: "", // companion backend (xcoder-backend) providing remote config (empty = off)
 			pluginsDisabled: {}, // pluginId: true/false
 			aiProvider: "groq",
 			aiBaseUrl: "",
@@ -292,6 +293,10 @@ class Settings {
 			// Ensure marketplaceUrl is a string
 			if (typeof this.value.marketplaceUrl !== "string") {
 				this.value.marketplaceUrl = "";
+			}
+			// Ensure backendUrl is a string
+			if (typeof this.value.backendUrl !== "string") {
+				this.value.backendUrl = "";
 			}
 
 			return;

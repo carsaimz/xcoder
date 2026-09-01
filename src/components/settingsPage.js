@@ -1,4 +1,6 @@
 import "./settingsPage.scss";
+import toast from "components/toast";
+import alert from "dialogs/alert";
 import colorPicker from "dialogs/color";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
@@ -35,6 +37,7 @@ import searchBar from "./searchbar";
  * @property {boolean} [valueInTail] - Render item.value as a trailing control/value instead of subtitle
  * @property {boolean} [groupByDefault] - Wrap uncategorized settings in a grouped section shell
  * @property {"top"|"bottom"} [notePosition] - Render note before or after the settings list
+ * @property {"icon"|"subtitle"} [infoMode] - Render item.info as a touchable "?" icon (default) or keep it as subtitle text
  */
 
 /**
@@ -229,6 +232,10 @@ export default function settingsPage(
  * @property {string} [prompt]
  * @property {string} [promptType]
  * @property {import('dialogs/prompt').PromptOptions} [promptOptions]
+ * @property {Array<[string, string, string?]>} [segment] - segmented control: [value, label, tone?]
+ * @property {{min: number, max: number, step: number}} [slider] - range slider + number input control
+ * @property {boolean|string} [button] - render the item as a full-width button ("primary" or true)
+ * @property {(value: any) => ({label: string, tone: string}|null)} [valueBadge] - small badge rendered before the trailing value
  */
 
 /**
@@ -254,7 +261,12 @@ function listItems($list, items, callback, options = {}) {
 		});
 	}
 	items.forEach((item) => {
-		const $item = createListItemElement(item, options, useInfoAsDescription);
+		const $item = createListItemElement(
+			item,
+			options,
+			useInfoAsDescription,
+			callback,
+		);
 		insertRenderedItem(renderedItems, item, $item);
 		$item.addEventListener("click", onclick);
 		$searchItems.push($item);
@@ -283,6 +295,19 @@ function listItems($list, items, callback, options = {}) {
 
 		const item = itemByKey.get(key);
 		if (!item) return;
+
+		// full-width button items: run the action with a loading spinner
+		if (isButtonSetting(item)) {
+			if ($target.classList.contains("loading")) return;
+			$target.classList.add("loading");
+			try {
+				await callback.call($target, key, item.value);
+			} finally {
+				$target.classList.remove("loading");
+			}
+			return;
+		}
+
 		if (isBooleanSetting(item)) e.preventDefault();
 		const result = await resolveItemInteraction(item, $target);
 		if (result.shouldCallCallback === false) {
@@ -381,11 +406,15 @@ function createNote(note) {
 	);
 }
 
-function createListItemElement(item, options, useInfoAsDescription) {
+function createListItemElement(item, options, useInfoAsDescription, callback) {
+	if (isButtonSetting(item)) {
+		return createButtonItem(item, options, callback);
+	}
+
 	const $setting = Ref();
 	const $tail = Ref();
 	const isCheckboxItem = isBooleanSetting(item);
-	const state = getItemDisplayState(item, useInfoAsDescription);
+	const state = getItemDisplayState(item, useInfoAsDescription, options);
 	/**@type {HTMLDivElement} */
 	const $item = (
 		<div
@@ -426,6 +455,11 @@ function createListItemElement(item, options, useInfoAsDescription) {
 		$item.dataset.searchGroup = searchGroup;
 	}
 
+	// rows with inline controls use the 30% label / 70% control grid
+	if (hasControlZone(item, options)) {
+		$item.classList.add("grid-item");
+	}
+
 	if (isCheckboxItem) {
 		const $checkbox = Checkbox(
 			"",
@@ -460,16 +494,85 @@ function createListItemElement(item, options, useInfoAsDescription) {
 		$tail.el.append(createTrailingValueDisplay(item));
 	}
 
+	if (item.segment) {
+		$item.classList.add("has-segment");
+		$tail.el.append(createSegmentControl(item, callback, $item));
+	}
+
+	if (item.slider) {
+		$item.classList.add("has-slider");
+		$tail.el.append(createSliderControl(item, callback, $item));
+	}
+
 	if (shouldShowTailChevron(item)) {
 		$tail.el.append(
 			<span className="icon keyboard_arrow_right settings-chevron"></span>,
 		);
 	}
 
+	if (useInfoIcon(item, options)) {
+		$tail.el.append(createInfoButton(item));
+	}
+
 	if (!$tail.el.children.length) {
 		$tail.el.remove();
 	}
 
+	registerItemFeedback($item);
+
+	return $item;
+}
+
+/**
+ * Creates a full-width button row (e.g. "Fetch models") with loading
+ * spinner support and an optional "?" info button at the right edge.
+ * @param {ListItem} item
+ * @param {SettingsPageOptions} options
+ * @param {(key: string, value: any) => void} callback
+ * @returns {HTMLDivElement}
+ */
+function createButtonItem(item, options, callback) {
+	const $item = (
+		<div
+			tabIndex={1}
+			className={`list-item button-item${item.button === "primary" ? " is-primary" : ""}`}
+			data-key={item.key}
+			data-action="list-item"
+		>
+			<button
+				type="button"
+				className={`xcoder-btn-primary${item.button === "primary" ? " primary" : ""}`}
+			>
+				<span className="btn-label">
+					{item.text?.capitalize?.(0) ?? item.text}
+				</span>
+				<span className="btn-spinner"></span>
+			</button>
+		</div>
+	);
+	const searchGroup =
+		item.searchGroup || item.category || options.defaultSearchGroup;
+	$item.hidden = item.hidden === true;
+	$item.setAttribute("aria-hidden", String($item.hidden));
+
+	if (searchGroup) {
+		$item.dataset.searchGroup = searchGroup;
+	}
+
+	if (useInfoIcon(item, options)) {
+		$item.append(createInfoButton(item));
+	}
+
+	registerItemFeedback($item);
+	return $item;
+}
+
+/**
+ * Registers press/hover feedback on a settings row.
+ * @param {HTMLDivElement} $item
+ * @returns {void}
+ */
+function registerItemFeedback($item) {
 	// Register high-performance press transitions
 	press($item, (element) => {
 		if (document.body.classList.contains("no-animation")) return;
@@ -513,8 +616,6 @@ function createListItemElement(item, options, useInfoAsDescription) {
 			};
 		});
 	}
-
-	return $item;
 }
 
 function supportsPrimaryHoverInput() {
@@ -525,15 +626,235 @@ function isBooleanSetting(item) {
 	return item.checkbox !== undefined || typeof item.value === "boolean";
 }
 
-function getItemDisplayState(item, useInfoAsDescription) {
+function isButtonSetting(item) {
+	return Boolean(item.button);
+}
+
+/**
+ * Whether the item renders an inline control in the tail zone — those rows
+ * use the 30% label / 70% control grid.
+ * @param {ListItem} item
+ * @param {SettingsPageOptions} options
+ * @returns {boolean}
+ */
+function hasControlZone(item, options) {
+	return (
+		shouldShowTrailingValue(item, options) ||
+		isBooleanSetting(item) ||
+		Boolean(item.segment) ||
+		Boolean(item.slider)
+	);
+}
+
+/**
+ * Whether item.info should become a touchable "?" icon instead of subtitle
+ * text (default for every page — keeps rows compact and frees input width).
+ * @param {ListItem} item
+ * @param {SettingsPageOptions} options
+ * @returns {boolean}
+ */
+function useInfoIcon(item, options) {
+	return options.infoMode !== "subtitle" && Boolean(item.info);
+}
+
+/**
+ * Shows a setting's info as a toast (short text) or a lightweight dialog
+ * (long text).
+ * @param {string} info
+ * @returns {void}
+ */
+function showInfoTip(info) {
+	const text = String(info || "").trim();
+	if (!text) return;
+
+	if (text.length > 90) {
+		alert(strings.info || "Info", text);
+		return;
+	}
+
+	toast(text, 4000);
+}
+
+/**
+ * Creates the touchable "?" info button (44x44 minimum touch target).
+ * @param {ListItem} item
+ * @returns {HTMLButtonElement}
+ */
+function createInfoButton(item) {
+	const $btn = (
+		<button
+			type="button"
+			className="setting-info-btn"
+			aria-label={strings.info || "Info"}
+			title={item.info}
+		>
+			<span className="icon info_outline"></span>
+		</button>
+	);
+	$btn.onclick = (e) => {
+		e.stopPropagation();
+		showInfoTip(item.info);
+	};
+	return $btn;
+}
+
+/**
+ * Creates a segmented control (e.g. Baixo | Médio | Alto).
+ * @param {ListItem} item
+ * @param {(key: string, value: any) => void} callback
+ * @param {HTMLDivElement} $item row element
+ * @returns {HTMLDivElement}
+ */
+function createSegmentControl(item, callback, $item) {
+	const $control = <div className="segmented" role="radiogroup"></div>;
+
+	for (const [value, label, tone] of item.segment) {
+		const active = item.value === value;
+		const $seg = (
+			<button
+				type="button"
+				className={`segment${tone ? ` tone-${tone}` : ""}${active ? " active" : ""}`}
+				role="radio"
+				aria-checked={active ? "true" : "false"}
+				data-segment-value={value}
+			>
+				{label}
+			</button>
+		);
+		$seg.onclick = (e) => {
+			e.stopPropagation();
+			if (item.value === value) return;
+
+			item.value = value;
+			for (const $el of $control.children) {
+				const isActive = $el.dataset.segmentValue === value;
+				$el.classList.toggle("active", isActive);
+				$el.setAttribute("aria-checked", String(isActive));
+			}
+			callback?.call($item, item.key, value);
+		};
+		$control.append($seg);
+	}
+
+	return $control;
+}
+
+/**
+ * Creates a range slider + editable number control (44px touch height).
+ * @param {ListItem} item
+ * @param {(key: string, value: any) => void} callback
+ * @param {HTMLDivElement} $item row element
+ * @returns {HTMLDivElement}
+ */
+function createSliderControl(item, callback, $item) {
+	const config = item.slider || {};
+	const min = Number(config.min ?? 0);
+	const max = Number(config.max ?? 100);
+	const step = Number(config.step ?? 1) || 1;
+	const current = clampNumber(Number(item.value), min, max);
+
+	const $range = (
+		<input
+			type="range"
+			min={min}
+			max={max}
+			step={step}
+			value={current}
+			aria-label={item.text}
+		/>
+	);
+	const $number = (
+		<input
+			type="number"
+			className="slider-number"
+			min={min}
+			max={max}
+			step={step}
+			value={current}
+			inputMode="numeric"
+			aria-label={item.text}
+		/>
+	);
+	const $control = (
+		<div className="slider-control">
+			{$range}
+			{$number}
+		</div>
+	);
+	// keep row taps from triggering the generic item interaction
+	$control.onclick = (e) => e.stopPropagation();
+
+	const snap = (value) => {
+		const raw = Number(value);
+		if (!Number.isFinite(raw)) return min;
+		const snapped = Math.round((raw - min) / step) * step + min;
+		return clampNumber(Math.round(snapped), min, max);
+	};
+
+	function commit(value) {
+		$range.value = value;
+		$number.value = value;
+		if (value === Number(item.value)) return;
+
+		item.value = value;
+		callback?.call($item, item.key, value);
+	}
+
+	$range.oninput = () => {
+		$number.value = $range.value;
+	};
+	$range.onchange = () => {
+		commit(snap($range.value));
+	};
+	$number.onchange = () => {
+		commit(snap($number.value));
+	};
+
+	return $control;
+}
+
+function clampNumber(value, min, max) {
+	if (!Number.isFinite(value)) return min;
+	return Math.min(max, Math.max(min, value));
+}
+
+/**
+ * Creates the small badge (e.g. Grátis / Premium) shown before the value.
+ * @param {ListItem} item
+ * @param {any} value
+ * @returns {HTMLElement|null}
+ */
+function createBadgeElement(item, value) {
+	if (typeof item.valueBadge !== "function") return null;
+
+	let badge = null;
+	try {
+		badge = item.valueBadge(value);
+	} catch (error) {
+		window.log("error", "valueBadge failed:", error);
+	}
+	if (!badge?.label) return null;
+
+	return (
+		<span className={`setting-badge tone-${badge.tone || "neutral"}`}>
+			{badge.label}
+		</span>
+	);
+}
+
+function getItemDisplayState(item, useInfoAsDescription, options = {}) {
+	const asIcon = useInfoIcon(item, options);
 	const isCheckboxItem = isBooleanSetting(item);
 	const subtitle = isCheckboxItem
-		? item.info
-		: getSubtitleText(item, useInfoAsDescription);
+		? asIcon
+			? undefined
+			: item.info
+		: getSubtitleText(item, useInfoAsDescription, asIcon);
 	const showInfoAsSubtitle =
-		isCheckboxItem ||
-		useInfoAsDescription ||
-		(item.value === undefined && item.info);
+		!asIcon &&
+		(isCheckboxItem ||
+			useInfoAsDescription ||
+			(item.value === undefined && item.info));
 
 	return {
 		subtitle,
@@ -558,6 +879,7 @@ function createSubtitleElement(item, state) {
 }
 
 function shouldShowTrailingValue(item, options) {
+	if (isButtonSetting(item) || item.segment || item.slider) return false;
 	return (
 		options.valueInTail &&
 		item.value !== undefined &&
@@ -576,6 +898,7 @@ function createTrailingValueDisplay(item) {
 
 	return (
 		<div className={`setting-value-display ${item.select ? "is-select" : ""}`}>
+			{createBadgeElement(item, item.value)}
 			{$trailingValueText}
 			{item.select ? (
 				<span className="icon keyboard_arrow_down setting-value-icon"></span>
@@ -585,6 +908,7 @@ function createTrailingValueDisplay(item) {
 }
 
 function shouldShowTailChevron(item) {
+	if (item.segment || item.slider) return false;
 	return (
 		item.chevron ||
 		(!item.select &&
@@ -786,6 +1110,11 @@ function syncTrailingValueDisplay($target, item, options) {
 
 	const $trailingValueText = $valueDisplay.get(".setting-trailing-value");
 	setValueText($trailingValueText, item.value, item.valueText?.bind(item));
+	$valueDisplay.get(".setting-badge")?.remove();
+	const $badge = createBadgeElement(item, item.value);
+	if ($badge) {
+		$valueDisplay.insertBefore($badge, $trailingValueText);
+	}
 	$target.classList.add("has-tail-value");
 	$target.classList.toggle("has-tail-select", Boolean(item.select));
 }
@@ -825,10 +1154,12 @@ function syncInlineValueDisplay($target, item, useInfoAsDescription) {
 	$target.classList.remove("compact");
 }
 
-function getSubtitleText(item, useInfoAsDescription) {
+function getSubtitleText(item, useInfoAsDescription, asIcon) {
 	if (useInfoAsDescription) {
-		return item.info;
+		return asIcon ? undefined : item.info;
 	}
+
+	if (asIcon) return item.value;
 
 	return item.value ?? item.info;
 }

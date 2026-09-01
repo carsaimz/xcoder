@@ -1,3 +1,4 @@
+import { backendConfig } from "lib/backend";
 import settings from "lib/settings";
 
 /**
@@ -19,11 +20,25 @@ const FIRESTORE_ROOT = "https://firestore.googleapis.com/v1/projects";
  * @returns {{enabled: boolean, projectId: string, apiKey: string}}
  */
 export function firebaseConfig() {
-        return {
-                enabled: Boolean(settings.value.firebaseEnabled),
-                projectId: String(settings.value.firebaseProjectId || "").trim(),
-                apiKey: String(settings.value.firebaseApiKey || "").trim(),
-        };
+	let projectId = String(settings.value.firebaseProjectId || "").trim();
+	let apiKey = String(settings.value.firebaseApiKey || "").trim();
+
+	// Task 9.3 externalization: when no local credentials are set, fall
+	// back to the ones provisioned on the companion backend (served via
+	// /api/config). Local settings always take priority.
+	if (!projectId || !apiKey) {
+		const remote = backendConfig()?.firebase || null;
+		if (remote?.projectId && remote?.apiKey) {
+			projectId = String(remote.projectId);
+			apiKey = String(remote.apiKey);
+		}
+	}
+
+	return {
+		enabled: Boolean(settings.value.firebaseEnabled),
+		projectId,
+		apiKey,
+	};
 }
 
 /**
@@ -31,8 +46,8 @@ export function firebaseConfig() {
  * @returns {boolean}
  */
 export function isReady() {
-        const config = firebaseConfig();
-        return config.enabled && Boolean(config.projectId && config.apiKey);
+	const config = firebaseConfig();
+	return config.enabled && Boolean(config.projectId && config.apiKey);
 }
 
 /**
@@ -43,35 +58,35 @@ export function isReady() {
  * @returns {Promise<boolean>}
  */
 export async function logEvent(name, fields = {}) {
-        if (!isReady()) return false;
+	if (!isReady()) return false;
 
-        const config = firebaseConfig();
-        const document = {
-                fields: {
-                        name: { stringValue: String(name).slice(0, 120) },
-                        at: { integerValue: String(Date.now()) },
-                        platform: {
-                                stringValue:
-                                        typeof window !== "undefined" && window.cordova ? "android" : "web",
-                        },
-                        ...toFirestoreFields(fields),
-                },
-        };
+	const config = firebaseConfig();
+	const document = {
+		fields: {
+			name: { stringValue: String(name).slice(0, 120) },
+			at: { integerValue: String(Date.now()) },
+			platform: {
+				stringValue:
+					typeof window !== "undefined" && window.cordova ? "android" : "web",
+			},
+			...toFirestoreFields(fields),
+		},
+	};
 
-        try {
-                const docId = `e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-                const response = await fetch(
-                        `${FIRESTORE_ROOT}/${config.projectId}/databases/(default)/documents/xcoder_events?documentId=${encodeURIComponent(docId)}&key=${encodeURIComponent(config.apiKey)}`,
-                        {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify(document),
-                        },
-                );
-                return response.ok;
-        } catch {
-                return false;
-        }
+	try {
+		const docId = `e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+		const response = await fetch(
+			`${FIRESTORE_ROOT}/${config.projectId}/databases/(default)/documents/xcoder_events?documentId=${encodeURIComponent(docId)}&key=${encodeURIComponent(config.apiKey)}`,
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(document),
+			},
+		);
+		return response.ok;
+	} catch {
+		return false;
+	}
 }
 
 /**
@@ -81,19 +96,19 @@ export async function logEvent(name, fields = {}) {
  * @returns {Promise<Record<string, any> | null>} plain JS object or null
  */
 export async function getDocument(collectionPath, docId) {
-        const config = firebaseConfig();
-        if (!config.enabled || !config.projectId || !config.apiKey) return null;
+	const config = firebaseConfig();
+	if (!config.enabled || !config.projectId || !config.apiKey) return null;
 
-        try {
-                const response = await fetch(
-                        `${FIRESTORE_ROOT}/${config.projectId}/databases/(default)/documents/${collectionPath}/${docId}?key=${encodeURIComponent(config.apiKey)}`,
-                );
-                if (!response.ok) return null;
-                const data = await response.json();
-                return fromFirestoreFields(data?.fields || {});
-        } catch {
-                return null;
-        }
+	try {
+		const response = await fetch(
+			`${FIRESTORE_ROOT}/${config.projectId}/databases/(default)/documents/${collectionPath}/${docId}?key=${encodeURIComponent(config.apiKey)}`,
+		);
+		if (!response.ok) return null;
+		const data = await response.json();
+		return fromFirestoreFields(data?.fields || {});
+	} catch {
+		return null;
+	}
 }
 
 /**
@@ -101,25 +116,25 @@ export async function getDocument(collectionPath, docId) {
  * @param {Record<string, any>} fields
  */
 export function toFirestoreFields(fields) {
-        const result = {};
-        for (const [key, value] of Object.entries(fields || {})) {
-                if (value === null || value === undefined) continue;
-                switch (typeof value) {
-                        case "boolean":
-                                result[key] = { booleanValue: value };
-                                break;
-                        case "number":
-                                if (Number.isInteger(value)) {
-                                        result[key] = { integerValue: String(value) };
-                                } else {
-                                        result[key] = { doubleValue: value };
-                                }
-                                break;
-                        default:
-                                result[key] = { stringValue: String(value).slice(0, 500) };
-                }
-        }
-        return result;
+	const result = {};
+	for (const [key, value] of Object.entries(fields || {})) {
+		if (value === null || value === undefined) continue;
+		switch (typeof value) {
+			case "boolean":
+				result[key] = { booleanValue: value };
+				break;
+			case "number":
+				if (Number.isInteger(value)) {
+					result[key] = { integerValue: String(value) };
+				} else {
+					result[key] = { doubleValue: value };
+				}
+				break;
+			default:
+				result[key] = { stringValue: String(value).slice(0, 500) };
+		}
+	}
+	return result;
 }
 
 /**
@@ -127,14 +142,14 @@ export function toFirestoreFields(fields) {
  * @param {Record<string, any>} fields
  */
 export function fromFirestoreFields(fields) {
-        const result = {};
-        for (const [key, typed] of Object.entries(fields || {})) {
-                if ("stringValue" in typed) result[key] = typed.stringValue;
-                else if ("booleanValue" in typed) result[key] = typed.booleanValue;
-                else if ("integerValue" in typed) result[key] = Number(typed.integerValue);
-                else if ("doubleValue" in typed) result[key] = Number(typed.doubleValue);
-                else if ("timestampValue" in typed) result[key] = typed.timestampValue;
-                else if ("nullValue" in typed) result[key] = null;
-        }
-        return result;
+	const result = {};
+	for (const [key, typed] of Object.entries(fields || {})) {
+		if ("stringValue" in typed) result[key] = typed.stringValue;
+		else if ("booleanValue" in typed) result[key] = typed.booleanValue;
+		else if ("integerValue" in typed) result[key] = Number(typed.integerValue);
+		else if ("doubleValue" in typed) result[key] = Number(typed.doubleValue);
+		else if ("timestampValue" in typed) result[key] = typed.timestampValue;
+		else if ("nullValue" in typed) result[key] = null;
+	}
+	return result;
 }

@@ -2,10 +2,10 @@ import settingsPage from "components/settingsPage";
 import toast from "components/toast";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
+import { listModels } from "lib/ai/client";
+import { badgeLabel, byGroup, PROVIDER_MAP, PROVIDERS } from "lib/ai/providers";
 import settings from "lib/settings";
 import helpers from "utils/helpers";
-import { listModels } from "lib/ai/client";
-import { PROVIDER_MAP, PROVIDERS, GROUPS, byGroup } from "lib/ai/providers";
 
 /**
  * XCoder AI assistant settings page.
@@ -15,9 +15,18 @@ export default function aiSettings() {
 	const values = settings.value;
 
 	const providerOptions = [
-		...byGroup("free").map((provider) => [`group:free:${provider.id}`, `${GROUPS.free} — ${provider.name}`]),
-		...byGroup("freetier").map((provider) => [`group:freetier:${provider.id}`, `${GROUPS.freetier} — ${provider.name}`]),
-		...byGroup("premium").map((provider) => [`group:premium:${provider.id}`, `${GROUPS.premium} — ${provider.name}`]),
+		...byGroup("free").map((provider) => [
+			`group:free:${provider.id}`,
+			`${provider.name} · ${badgeLabel("free")}`,
+		]),
+		...byGroup("freetier").map((provider) => [
+			`group:freetier:${provider.id}`,
+			`${provider.name} · ${badgeLabel("freetier")}`,
+		]),
+		...byGroup("premium").map((provider) => [
+			`group:premium:${provider.id}`,
+			`${provider.name} · ${badgeLabel("premium")}`,
+		]),
 	];
 
 	const currentProviderId = values.aiProvider || "groq";
@@ -34,9 +43,12 @@ export default function aiSettings() {
 			value: `group:${PROVIDER_MAP[currentProviderId]?.group || "free"}:${currentProviderId}`,
 			valueText: (value) => {
 				const provider = PROVIDER_MAP[providerIdFromValue(value)];
-				return provider
-					? `${GROUPS[provider.group]} — ${provider.name}`
-					: value;
+				return provider ? provider.name : value;
+			},
+			valueBadge: (value) => {
+				const provider = PROVIDER_MAP[providerIdFromValue(value)];
+				if (!provider) return null;
+				return { label: badgeLabel(provider.group), tone: provider.group };
 			},
 			select: providerOptions,
 			info:
@@ -79,7 +91,7 @@ export default function aiSettings() {
 		{
 			key: "fetchModels",
 			text: strings["ai fetch models"] || "Fetch available models",
-			icon: "refresh",
+			button: "primary",
 			info:
 				strings["settings-info-ai-fetch-models"] ||
 				"Query /models at the endpoint and pick one.",
@@ -99,26 +111,18 @@ export default function aiSettings() {
 			key: "aiMaxTokens",
 			text: "Max tokens",
 			value: values.aiMaxTokens ?? 4096,
-			prompt: "Max tokens",
-			promptType: "number",
+			slider: { min: 256, max: 8192, step: 128 },
 			info:
-				strings["settings-info-ai-max-tokens"] ||
-				"Maximum response length.",
+				strings["settings-info-ai-max-tokens"] || "Maximum response length.",
 		},
 		{
 			key: "aiAutonomy",
 			text: strings["ai autonomy"] || "Autonomy",
 			value: values.aiAutonomy || "safe",
-			valueText: (value) =>
-				({
-					ask: strings["ai autonomy ask"] || "Ask for every action",
-					safe: strings["ai autonomy safe"] || "Safe (ask before changes)",
-					auto: strings["ai autonomy auto"] || "Auto (only destructive asks)",
-				})[value] || value,
-			select: [
-				["ask", strings["ai autonomy ask"] || "Ask for every action"],
-				["safe", strings["ai autonomy safe"] || "Safe (ask before changes)"],
-				["auto", strings["ai autonomy auto"] || "Auto (only destructive asks)"],
+			segment: [
+				["ask", strings["ai autonomy low"] || "Baixo", "low"],
+				["safe", strings["ai autonomy medium"] || "Médio", "medium"],
+				["auto", strings["ai autonomy high"] || "Alto", "high"],
 			],
 			info:
 				strings["settings-info-ai-autonomy"] ||
@@ -158,10 +162,7 @@ export default function aiSettings() {
 				if (key === "aiProvider") {
 					const providerId = providerIdFromValue(value);
 					await settings.update({ aiProvider: providerId, aiModel: "" });
-					toast(
-						`${PROVIDER_MAP[providerId]?.name || providerId}`,
-						2000,
-					);
+					toast(`${PROVIDER_MAP[providerId]?.name || providerId}`, 2000);
 					return;
 				}
 				if (key === "aiApiKey") {
@@ -182,7 +183,7 @@ export default function aiSettings() {
 					await settings.update({
 						aiMaxTokens: Math.max(
 							256,
-							Math.min(128000, parseInt(value, 10) || 4096),
+							Math.min(8192, Number.parseInt(value, 10) || 4096),
 						),
 					});
 					return;
@@ -217,7 +218,8 @@ export default function aiSettings() {
 			});
 			if (!models.length) {
 				toast(
-					strings["ai no models"] || "No models found — set the model manually.",
+					strings["ai no models"] ||
+						"No models found — set the model manually.",
 					4000,
 				);
 				return;
@@ -233,7 +235,8 @@ export default function aiSettings() {
 		} catch (error) {
 			helpers.error(error);
 		} finally {
-			/* done */ }
+			/* done */
+		}
 	}
 
 	page.show();

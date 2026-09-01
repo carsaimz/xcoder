@@ -1,3 +1,4 @@
+import { backendConfig, ensureBackendConfig } from "lib/backend";
 import settings from "lib/settings";
 import registryJson from "res/plugin-registry.json";
 
@@ -9,7 +10,9 @@ import registryJson from "res/plugin-registry.json";
  * raw.githubusercontent.com fallback), cached locally so the marketplace
  * keeps working offline, and merged with the bundled fallback registry
  * (`src/res/plugin-registry.json`). A custom marketplace URL can be set in
- * the app settings (`marketplaceUrl`) to point at a self-hosted registry.
+ * the app settings (`marketplaceUrl`) to point at a self-hosted registry;
+ * when unset, a `marketplaceUrl` provided by the companion backend
+ * (lib/backend.js remote config) is used as a managed fallback.
  *
  * Plugins can also always be installed from any direct URL (http/https)
  * or from a local `.zip` file via the "Add source" button.
@@ -158,8 +161,22 @@ function customRegistryUrl() {
 	}
 }
 
+/**
+ * Marketplace URL remotely provisioned by the companion backend.
+ * Only used when the user has not set a custom marketplace URL.
+ * @returns {string | null}
+ */
+function backendRegistryUrl() {
+	try {
+		const url = String(backendConfig()?.marketplaceUrl || "").trim();
+		return /^https?:\/\//.test(url) ? url : null;
+	} catch (error) {
+		return null;
+	}
+}
+
 function loadCustomRegistry() {
-	const url = customRegistryUrl();
+	const url = customRegistryUrl() || backendRegistryUrl();
 	if (!url) {
 		customPlugins = null;
 		return;
@@ -201,7 +218,19 @@ function mergeLists() {
 	return merged;
 }
 
+// Re-evaluate the custom registry when a backend config lands (it may
+// provision a marketplaceUrl at runtime).
+document.addEventListener("backendconfigchange", () => {
+	if (customRegistryUrl()) return;
+	customUrlInFlight = null;
+	loadCustomRegistry();
+});
+
 function ensureRemote() {
+	// Prime the backend config so a remotely managed marketplace URL is
+	// picked up without waiting for the boot timer inside lib/backend.js.
+	ensureBackendConfig().catch(() => {});
+
 	if (remotePlugins) return;
 	const cache = readCache(CACHE_KEY, CACHE_TTL);
 	if (cache) {

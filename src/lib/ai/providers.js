@@ -73,7 +73,10 @@ export const PROVIDERS = [
 		name: "Hugging Face Inference",
 		group: "free",
 		baseURL: "https://router.huggingface.co/v1",
-		models: ["meta-llama/Llama-3.3-70B-Instruct", "Qwen/Qwen2.5-Coder-32B-Instruct"],
+		models: [
+			"meta-llama/Llama-3.3-70B-Instruct",
+			"Qwen/Qwen2.5-Coder-32B-Instruct",
+		],
 		docs: "https://huggingface.co/settings/tokens",
 		note: "Free monthly inference credits.",
 	},
@@ -82,7 +85,10 @@ export const PROVIDERS = [
 		name: "Cloudflare Workers AI",
 		group: "free",
 		baseURL: "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1",
-		models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/qwen/qwen2.5-coder-32b-instruct"],
+		models: [
+			"@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+			"@cf/qwen/qwen2.5-coder-32b-instruct",
+		],
 		docs: "https://developers.cloudflare.com/workers-ai/",
 		note: "Replace {account_id} in the base URL with your Cloudflare account id.",
 	},
@@ -109,7 +115,11 @@ export const PROVIDERS = [
 		name: "Mistral AI",
 		group: "freetier",
 		baseURL: "https://api.mistral.ai/v1",
-		models: ["mistral-large-latest", "codestral-latest", "mistral-small-latest"],
+		models: [
+			"mistral-large-latest",
+			"codestral-latest",
+			"mistral-small-latest",
+		],
 		docs: "https://console.mistral.ai/api-keys",
 		note: "Free experiment tier available.",
 	},
@@ -204,7 +214,10 @@ export const PROVIDERS = [
 		name: "NVIDIA NIM",
 		group: "premium",
 		baseURL: "https://integrate.api.nvidia.com/v1",
-		models: ["meta/llama-3.3-70b-instruct", "nvidia/llama-3.3-nemotron-super-49b-v1"],
+		models: [
+			"meta/llama-3.3-70b-instruct",
+			"nvidia/llama-3.3-nemotron-super-49b-v1",
+		],
 		docs: "https://build.nvidia.com",
 	},
 	{
@@ -241,4 +254,21 @@ export const PROVIDER_MAP = Object.fromEntries(
  */
 export function byGroup(group) {
 	return PROVIDERS.filter((provider) => provider.group === group);
+}
+
+const BADGE_FALLBACKS = /** @type {const} */ ({
+	free: "Free",
+	freetier: "Free tier",
+	premium: "Premium",
+});
+
+/**
+ * Localized short badge label for a provider group (e.g. Grátis / Premium).
+ * @param {keyof typeof GROUPS} group
+ * @returns {string}
+ */
+export function badgeLabel(group) {
+	return (
+		window.strings?.[`ai badge ${group}`] || BADGE_FALLBACKS[group] || group
+	);
 }

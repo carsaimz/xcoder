@@ -4,7 +4,6 @@ import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import vshell from "lib/ai/vshell";
-import EditorFile from "lib/editorFile";
 import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
 import {
 	commit,
@@ -26,22 +25,6 @@ const COMMIT_PREFIXES = [
 	"test",
 	"ci",
 ];
-const GIT_TAB_ID = "git-panel-tab";
-
-// Keep the open panel tab translated when the user changes the language.
-document.addEventListener("langchange", () => {
-	const manager = window.editorManager;
-	if (!manager) return;
-	const file = manager.files.find((f) => f.id === GIT_TAB_ID);
-	const title = strings["git panel"] || "Git";
-	if (file && file.filename !== title) {
-		try {
-			file.filename = title;
-		} catch {
-			/* tab already gone */
-		}
-	}
-});
 
 /** @type {HTMLElement} */
 let container = null;
@@ -64,66 +47,29 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ tabbed: true, titleKey: "git panel" },
+	{ titleKey: "git panel" },
 ];
 
 /**
- * Opens the Git panel as an editor tab (like the terminal).
+ * Opens the Git panel in the sidebar (activates the app and shows the
+ * sidebar if it was closed).
  * @returns {Promise<void>}
  */
 export async function openGitPanel() {
 	try {
 		const { default: sidebarApps } = await import("sidebarApps");
 		sidebarApps.pulseApp?.("git");
+		const { default: Sidebar } = await import("components/sidebar");
+		Sidebar?.show?.();
 	} catch (error) {
 		window.log?.("error", "openGitPanel failed:", error);
 	}
 }
 
 function onSelected(el) {
-	// host the git panel UI in an editor tab (like the terminal)
-	openGitTab(el);
+	// live in the sidebar panel again; refresh on every open
 	refresh();
-}
-
-/**
- * Hosts the Git panel container in a persistent editor tab.
- * @param {HTMLElement} [el] container provided by the sidebar app
- */
-function openGitTab(el) {
-	const containerEl = el || container;
-	const manager = window.editorManager;
-	if (!containerEl || !manager) return;
-
-	const existing = manager.files.find((file) => file.id === GIT_TAB_ID);
-	if (existing) {
-		existing.makeActive?.();
-		hideSidebarPanel();
-		return;
-	}
-
-	new EditorFile(strings["git panel"] || "Git", {
-		id: GIT_TAB_ID,
-		render: true,
-		type: "page",
-		content: containerEl,
-		tabIcon: "icon git",
-		hideQuickTools: true,
-	});
-	hideSidebarPanel();
-}
-
-/**
- * Closes the sidebar overlay on phones (tab width > 750 keeps the panel).
- */
-async function hideSidebarPanel() {
-	try {
-		if (window.innerWidth > 750) return;
-		const { default: Sidebar } = await import("components/sidebar");
-		Sidebar?.hide?.();
-	} catch {
-		/* sidebar optional */
-	}
+	el?.querySelector("input.git-message")?.focus?.();
 }
 
 /**
