@@ -863,6 +863,8 @@
 	"settings-info-main-formatter": "Choose a formatter for each supported language.",
 	"settings-info-main-lsp-settings": "Configure language servers and editor intelligence.",
 	"settings-info-main-plugins": "Manage installed plugins and their available actions.",
+	"marketplace url": "Plugin marketplace URL",
+	"settings-info-marketplace-url": "Fetch the plugin list from your own marketplace (JSON). Leave empty to use the default Xcoder marketplace.",
 	"settings-info-main-preview-settings": "Preview mode, server ports, and browser behavior.",
 	"settings-info-main-rateapp": "Rate XCoder on Google Play.",
 	"settings-info-main-remove-ads": "Unlock permanent ad-free access.",

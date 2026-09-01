@@ -204,6 +204,7 @@ class Settings {
 			lintGutter: true,
 			indentGuides: false,
 			rainbowBrackets: true,
+			marketplaceUrl: "", // custom plugin marketplace registry URL (empty = default)
 			pluginsDisabled: {}, // pluginId: true/false
 			aiProvider: "groq",
 			aiBaseUrl: "",
@@ -288,6 +289,10 @@ class Settings {
 
 			// Ensure pluginsDisabled exists
 			if (!this.value.pluginsDisabled) this.value.pluginsDisabled = {};
+			// Ensure marketplaceUrl is a string
+			if (typeof this.value.marketplaceUrl !== "string") {
+				this.value.marketplaceUrl = "";
+			}
 
 			return;
 		}

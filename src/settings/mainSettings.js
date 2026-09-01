@@ -87,6 +87,19 @@ export default function mainSettings() {
 			chevron: true,
 		},
 		{
+			key: "marketplaceUrl",
+			text: strings["marketplace url"] || "Plugin marketplace URL",
+			value: appSettings.value.marketplaceUrl || "",
+			valueText: (value) => value || "Default",
+			prompt: strings["marketplace url"] || "Plugin marketplace URL",
+			promptType: "url",
+			promptOptions: { required: false },
+			info:
+				strings["settings-info-marketplace-url"] ||
+				"Fetch the plugin list from your own marketplace (JSON). Leave empty to use the default Xcoder marketplace.",
+			category: categories.customizationTools,
+		},
+		{
 			key: "lsp-settings",
 			text:
 				strings?.lsp_settings ||
@@ -164,7 +177,7 @@ export default function mainSettings() {
 	 * @this {HTMLElement}
 	 * @param {string} key
 	 */
-	async function callback(key) {
+	async function callback(key, value) {
 		switch (key) {
 			case "app-settings":
 			case "backup-restore":
@@ -175,6 +188,10 @@ export default function mainSettings() {
 			case "ai-settings":
 			case "cloud-settings":
 				appSettings.uiSettings[key].show();
+				break;
+
+			case "marketplaceUrl":
+				await appSettings.update({ marketplaceUrl: value ?? "" });
 				break;
 
 			case "theme":

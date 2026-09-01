@@ -3,6 +3,7 @@ import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
 import JSZip from "jszip";
+import pluginRegistry from "lib/pluginRegistry";
 import helpers from "utils/helpers";
 import Url from "utils/Url";
 import { isVersionGreater } from "utils/version";
@@ -47,50 +48,38 @@ export default async function installPlugin(
 		window.log("error", error);
 	}
 
+	let sourceFallback = null;
 	if (!/^(https?|file|content):/.test(id)) {
-		// XCoder: remote plugin registry was removed (offline-first).
-		throw new Error(
-			strings["registry unavailable"] ||
-				"Remote registry is disabled in XCoder. Install plugins from a URL or a local zip file.",
-		);
+		// Marketplace id — resolve it to a downloadable source.
+		const entry = await pluginRegistry.get(id);
+		if (!entry?.source) {
+			throw new Error(
+				strings["registry unavailable"] ||
+					"Plugin not found in the marketplace. Install plugins from a URL or a local zip file.",
+			);
+		}
+		pluginUrl = entry.source;
+		sourceFallback = entry.source_fallback || null;
+	} else {
+		pluginUrl = id;
 	}
-	pluginUrl = id;
 
 	try {
 		if (!isDependency) loaderDialog.show();
 
 		let plugin;
-		if (
-			pluginUrl.startsWith("file:") ||
-			pluginUrl.startsWith("content:")
-		) {
-			// Use fsOperation for local files
-			plugin = await fsOperation(pluginUrl).readFile(
-				undefined,
-				(loaded, total) => {
-					loaderDialog.setMessage(
-						`${strings.loading} ${((loaded / total) * 100).toFixed(2)}%`,
-					);
-				},
-			);
-		} else {
-			// cordova http plugin for others
-			plugin = await new Promise((resolve, reject) => {
-				cordova.plugin.http.sendRequest(
-					pluginUrl,
-					{
-						method: "GET",
-						responseType: "arraybuffer",
-					},
-					(response) => {
-						resolve(response.data);
-						loaderDialog.setMessage(`${strings.loading} 100%`);
-					},
-					(error) => {
-						reject(error);
-					},
+		try {
+			plugin = await downloadPlugin(pluginUrl, loaderDialog);
+		} catch (error) {
+			if (sourceFallback && sourceFallback !== pluginUrl) {
+				console.warn(
+					`Primary plugin source failed (${pluginUrl}), trying fallback`,
+					error,
 				);
-			});
+				plugin = await downloadPlugin(sourceFallback, loaderDialog);
+			} else {
+				throw error;
+			}
 		}
 
 		if (plugin) {
@@ -383,25 +372,67 @@ function isUnsafeAbsolutePath(p) {
 
 /**
  * Resolves Dependencies Manifest with given sources.
- * XCoder: only direct URL/file dependencies are supported (registry offline).
+ * Dependencies may be direct URL/file sources or marketplace plugin ids.
  * @param {string[]} deps dependencies
  */
 async function resolveDepsManifest(deps) {
 	const resolved = [];
 	for (const dependency of deps) {
-		if (!/^(https?|file|content):/.test(dependency)) {
-			throw new Error(
-				`Unknown plugin dependency: ${dependency} (registry offline)`,
-			);
+		if (/^(https?|file|content):/.test(dependency)) {
+			resolved.push({
+				id: dependency,
+				name: dependency,
+				url: dependency,
+				source: dependency,
+			});
+			continue;
+		}
+		const entry = await pluginRegistry.get(dependency);
+		if (!entry?.source) {
+			throw new Error(`Unknown plugin dependency: ${dependency}`);
 		}
 		resolved.push({
-			id: dependency,
-			name: dependency,
-			url: dependency,
-			source: dependency,
+			id: entry.id,
+			name: entry.name || entry.id,
+			url: entry.source,
+			source: entry.source,
 		});
 	}
 	return resolved;
+}
+
+/**
+ * Downloads a plugin package over http(s) or reads it from local storage.
+ * @param {string} url plugin source url
+ * @param {import("dialogs/loader").Loader} loaderDialog
+ * @returns {Promise<ArrayBuffer>}
+ */
+function downloadPlugin(url, loaderDialog) {
+	if (url.startsWith("file:") || url.startsWith("content:")) {
+		// Use fsOperation for local files
+		return fsOperation(url).readFile(undefined, (loaded, total) => {
+			loaderDialog.setMessage(
+				`${strings.loading} ${((loaded / total) * 100).toFixed(2)}%`,
+			);
+		});
+	}
+	// cordova http plugin for others
+	return new Promise((resolve, reject) => {
+		cordova.plugin.http.sendRequest(
+			url,
+			{
+				method: "GET",
+				responseType: "arraybuffer",
+			},
+			(response) => {
+				resolve(response.data);
+				loaderDialog.setMessage(`${strings.loading} 100%`);
+			},
+			(error) => {
+				reject(error);
+			},
+		);
+	});
 }
 
 /**

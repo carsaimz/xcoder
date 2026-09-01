@@ -79,6 +79,14 @@ document.addEventListener("langchange", () => {
 	}
 });
 
+// Reload the explore list whenever the marketplace registry refreshes in
+// the background (remote/custom fetch completed).
+document.addEventListener("pluginregistryupdate", () => {
+	if ($explore && !$explore.collapsed) {
+		loadExplore.call($explore);
+	}
+});
+
 const $style = <style></style>;
 /** @type {Set<HTMLElement>} */
 const $scrollableLists = new Set();

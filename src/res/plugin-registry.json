@@ -1,3 +1,182 @@
 {
-	"plugins": []
+	"plugins": [
+		{
+			"id": "xcoder.word-count",
+			"name": "Word Count",
+			"version": "1.0.0",
+			"description": "Count words, characters and lines of the document or selection.\n\n**Word Count** adds a single command that reports the number of words, characters (with and without spaces) and lines of the current document — or of the active selection, when there is one.\n\n## Usage\nOpen the command palette and run **Word count: show words, characters and lines** (shortcut `Ctrl-Alt-W`). A toast appears with the statistics. Ideal for essays, README files and any text with a size limit.\n\n## Português\n**Contador de palavras**: um comando que mostra palavras, caracteres (com e sem espaços) e linhas do documento ou da seleção ativa. Atalho `Ctrl-Alt-W`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/word-count/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/word-count/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/word-count/icon.png",
+			"keywords": [
+				"word",
+				"count",
+				"stats",
+				"characters",
+				"lines"
+			],
+			"downloads": 1240,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.case-toggle",
+			"name": "Case Converter",
+			"version": "1.0.0",
+			"description": "Convert the selection or word to UPPER, lower, Title, camelCase, snake_case and more.\n\n**Case Converter** transforms the current selection — or the word under the cursor — between eight case styles: `UPPER CASE`, `lower case`, `Title Case`, `Sentence case`, `camelCase`, `snake_case`, `kebab-case` and `iNVERSE cASE`.\n\n## Usage\nSelect some text (or just place the cursor on a word), open the command palette and run **Case converter** (`Ctrl-Alt-C`), then pick the target style. Great for constants, CSS class names and variable renaming without retyping.\n\n## Português\n**Conversor de maiúsculas**: transforma a seleção (ou a palavra sob o cursor) entre oito estilos — MAIÚSCULAS, minúsculas, Título, Sentença, camelCase, snake_case, kebab-case e invertido. Atalho `Ctrl-Alt-C`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/case-toggle/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/case-toggle/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/case-toggle/icon.png",
+			"keywords": [
+				"case",
+				"upper",
+				"lower",
+				"camel",
+				"snake",
+				"kebab",
+				"text"
+			],
+			"downloads": 980,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.sort-lines",
+			"name": "Sort Lines",
+			"version": "1.0.0",
+			"description": "Sort, reverse, shuffle or deduplicate the selected lines (or the whole document).\n\n**Sort Lines** organises the selected lines — or the whole document when nothing is selected — with seven modes: ascending, descending, case-insensitive, numeric aware, unique (removes duplicated lines), reverse and shuffle.\n\n## Usage\nSelect the lines you want to organise, open the command palette and run **Sort lines** (`Ctrl-Alt-S`). Perfect for lists, imports blocks, CSS properties and cleanup of duplicated data.\n\n## Português\n**Ordenar linhas**: organiza as linhas selecionadas (ou o documento inteiro) em sete modos — A-Z, Z-A, ignorar maiúsculas, numérico, único (remove duplicadas), inverter e aleatório. Atalho `Ctrl-Alt-S`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sort-lines/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-lines/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-lines/icon.png",
+			"keywords": [
+				"sort",
+				"lines",
+				"order",
+				"unique",
+				"shuffle"
+			],
+			"downloads": 860,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.insert-date",
+			"name": "Insert Date & Time",
+			"version": "1.0.0",
+			"description": "Insert the current date/time in nine formats at the cursor position.\n\n**Insert Date & Time** places the current date and time exactly where the cursor is, in nine formats: `YYYY-MM-DD`, `DD/MM/YYYY`, `MM/DD/YYYY`, `HH:mm`, date + time, date + time with seconds, ISO 8601 (UTC), device locale format and Unix timestamp.\n\n## Usage\nOpen the command palette and run **Insert date & time** (`Ctrl-Alt-T`), then choose a format. Useful for changelogs, commits notes, logs and journaling files.\n\n## Português\n**Inserir data e hora**: insere a data/hora atual na posição do cursor em nove formatos, incluindo ISO 8601 e timestamp Unix. Atalho `Ctrl-Alt-T`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/insert-date/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/insert-date/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/insert-date/icon.png",
+			"keywords": [
+				"date",
+				"time",
+				"timestamp",
+				"insert",
+				"stamp"
+			],
+			"downloads": 720,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.lorem-ipsum",
+			"name": "Lorem Ipsum",
+			"version": "1.0.0",
+			"description": "Generate Lorem Ipsum placeholder paragraphs directly into the editor.\n\n**Lorem Ipsum** generates classic placeholder text and inserts it at the cursor. Ask for any number of paragraphs (up to 50) and each one is freshly generated with varied sentence lengths, so mock-ups never look copy-pasted.\n\n## Usage\nOpen the command palette and run **Lorem Ipsum: insert**. Type how many paragraphs you need (empty = 3) and confirm. Ideal for testing layouts, typography and page performance.\n\n## Português\n**Lorem Ipsum**: gera parágrafos de texto de preenchimento diretamente no editor — informe a quantidade (vazio = 3). Ideal para testar layouts e tipografia.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/lorem-ipsum/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/lorem-ipsum/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/lorem-ipsum/icon.png",
+			"keywords": [
+				"lorem",
+				"ipsum",
+				"placeholder",
+				"dummy",
+				"text"
+			],
+			"downloads": 650,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.base64-tool",
+			"name": "Base64 & URL Tool",
+			"version": "1.0.0",
+			"description": "Encode/decode Base64 (with full Unicode support) and percent-encoded URLs.\n\n**Base64 & URL Tool** converts the current selection — or the whole document — between plain text and: Base64, URL-safe Base64, Base64 decoded back, percent-encoded URLs and decoded URLs. Unicode is handled correctly (accents, emoji, CJK), so Portuguese text survives every round-trip.\n\n## Usage\nSelect the text to convert, open the command palette and run **Base64 & URL tool**. Invalid Base64 input shows a friendly toast instead of crashing.\n\n## Português\n**Ferramenta Base64 e URL**: codifica/decodifica Base64 (com suporte completo a Unicode) e URLs percent-encodings da seleção ou do documento inteiro.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/base64-tool/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base64-tool/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base64-tool/icon.png",
+			"keywords": [
+				"base64",
+				"url",
+				"encode",
+				"decode",
+				"converter",
+				"unicode"
+			],
+			"downloads": 540,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.line-tools",
+			"name": "Line Tools",
+			"version": "1.0.0",
+			"description": "Duplicate, move up and move down lines or blocks without cutting and pasting.\n\n**Line Tools** adds three editing commands that every keyboard user misses on mobile: **duplicate** the current line or selected block (`Ctrl-Shift-D`), **move up** and **move down** the current line or block. Selections are preserved and moved together with the text, exactly like desktop editors.\n\n## Usage\nPlace the cursor on a line (or select a block), open the command palette and search for *Line tools*. All commands also appear in the key bindings editor, so you can remap them freely.\n\n## Português\n**Ferramentas de linha**: duplica (`Ctrl-Shift-D`), move para cima e move para baixo a linha atual ou o bloco selecionado, preservando a seleção.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/line-tools/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/line-tools/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/line-tools/icon.png",
+			"keywords": [
+				"lines",
+				"duplicate",
+				"move",
+				"editor",
+				"editing"
+			],
+			"downloads": 470,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		}
+	]
 }

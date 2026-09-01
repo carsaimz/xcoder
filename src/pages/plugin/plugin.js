@@ -7,8 +7,8 @@ import actionStack from "lib/actionStack";
 import config from "lib/config";
 import installPlugin from "lib/installPlugin";
 import InstallState from "lib/installState";
-import settings from "lib/settings";
 import pluginRegistry from "lib/pluginRegistry";
+import settings from "lib/settings";
 import markdownIt from "markdown-it";
 import anchor from "markdown-it-anchor";
 import markdownItFootnote from "markdown-it-footnote";
@@ -199,7 +199,16 @@ export default async function PluginInclude(
 
 	async function install() {
 		try {
-			await installPlugin(plugin.source || id, plugin.name);
+			try {
+				await installPlugin(plugin.source || id, plugin.name);
+			} catch (error) {
+				if (plugin.source && plugin.source_fallback) {
+					console.warn("Primary plugin source failed, trying fallback", error);
+					await installPlugin(plugin.source_fallback, plugin.name);
+				} else {
+					throw error;
+				}
+			}
 			if (onInstall) onInstall(plugin);
 			installed = true;
 			update = false;
@@ -229,15 +238,13 @@ export default async function PluginInclude(
 
 	async function buy() {
 		helpers.error(
-			strings["registry unavailable"] ||
-				"Purchases are disabled in XCoder.",
+			strings["registry unavailable"] || "Purchases are disabled in XCoder.",
 		);
 	}
 
 	async function refund() {
 		helpers.error(
-			strings["registry unavailable"] ||
-				"Purchases are disabled in XCoder.",
+			strings["registry unavailable"] || "Purchases are disabled in XCoder.",
 		);
 	}
 
@@ -396,7 +403,6 @@ export default async function PluginInclude(
 			}
 		}
 	}
-
 }
 
 function isValidSource(source) {
