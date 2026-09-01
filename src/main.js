@@ -346,66 +346,28 @@ async function onDeviceReady() {
 		settings.value.checkForAppUpdates &&
 		navigator.onLine
 	) {
-		cordova.plugin.http.sendRequest(
-			"https://api.github.com/repos/carsaimz/xcoder/releases/latest",
-			{
-				method: "GET",
-				responseType: "json",
-			},
-			(response) => {
-				const release = response.data;
-				// assuming version is in format v1.2.3
-				const versionFormat = /^v?(\d+(?:\.\d+)*)/;
-				const latestVersion = release.tag_name
-					.match(versionFormat)?.[1]
-					.split(".")
-					.map(Number);
-				const currentVersion = BuildInfo.version
-					.match(versionFormat)?.[1]
-					.split(".")
-					.map(Number);
-				if (!(latestVersion && currentVersion)) {
-					window.log(
-						"error",
-						"Failed to parse version while checking for updates.",
-					);
-					return;
-				}
-
-				let hasUpdate = false;
-				for (let i = 0; i < latestVersion.length; i++) {
-					const latest = latestVersion[i];
-					const current = currentVersion[i] || 0;
-					if (latest > current) {
-						hasUpdate = true;
-						break;
-					} else if (latest < current) {
-						break;
-					}
-				}
-
-				if (hasUpdate) {
-					xcoder.pushNotification(
-						strings["update available"],
-						strings["update available info"].replace(
-							/\{version\}/,
-							release.tag_name,
-						),
-						{
-							icon: "update",
-							type: "warning",
-							action: () => {
-								system.openInBrowser(release.html_url);
-							},
-						},
-					);
-				}
-			},
-			(err) => {
-				window.log("error", "Failed to check for updates");
-				window.log("error", err);
-			},
+		const { checkAppUpdate } = await import(
+			/* webpackChunkName: "checkAppUpdate" */ "lib/checkAppUpdate"
 		);
+		checkAppUpdate()
+			.then((update) => {
+				if (!update?.hasUpdate) return;
+				xcoder.pushNotification(
+					strings["update available"],
+					strings["update available info"].replace(/\{version\}/, update.tag),
+					{
+						icon: "update",
+						type: "warning",
+						action: () => {
+							system.openInBrowser(update.url);
+						},
+					},
+				);
+			})
+			.catch((error) => {
+				window.log("error", "Failed to check for updates");
+				window.log("error", error);
+			});
 	}
 	const { default: checkPluginsUpdate } = await import(
 		/* webpackChunkName: "checkPluginsUpdate" */ "lib/checkPluginsUpdate"

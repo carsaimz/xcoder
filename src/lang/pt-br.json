@@ -962,8 +962,8 @@
 	"unsaved selected tabs warning": "Some selected tabs are not saved. Choose what to do.",
 	"unsupported device": "Seu dispositivo não oferece suporte ao tema.",
 	"update": "Atualizar",
-	"update available": "Update Available",
-	"update available info": "XCoder {version} is now available! Click here to check out.",
+	"update available": "Atualização disponível",
+	"update available info": "XCoder {version} disponível! Toque aqui para conferir.",
 	"uptime": "Uptime",
 	"use branch": "Usar branch",
 	"use emmet": "usar emmet",
@@ -993,5 +993,9 @@
 	"wrap method": "Método de quebra",
 	"xcoder main process": "XCoder main process",
 	"xcoder service": "XCoder Service",
-	"yes": "Sim"
+	"yes": "Sim",
+	"check for updates": "Verificar atualizações",
+	"check for updates desc": "Procurar uma versão mais nova no GitHub",
+	"up to date": "Você já está na versão mais recente",
+	"update check failed": "Não foi possível verificar atualizações"
 }

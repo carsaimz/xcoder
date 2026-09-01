@@ -1,10 +1,40 @@
 import "./about.scss";
 import Logo from "components/logo";
 import Page from "components/page";
+import toast from "components/toast";
+import confirm from "dialogs/confirm";
+import loader from "dialogs/loader";
 import Reactive from "html-tag-js/reactive";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
 import helpers from "utils/helpers";
+
+async function checkForUpdates() {
+	const hide = await loader.show();
+	try {
+		const { checkAppUpdate } = await import("lib/checkAppUpdate");
+		const update = await checkAppUpdate();
+		if (!update) {
+			toast(strings["update check failed"]);
+			return;
+		}
+		if (!update.hasUpdate) {
+			toast(strings["up to date"]);
+			return;
+		}
+		const open = await confirm(
+			strings["update available"],
+			strings["update available info"].replace(/\{version\}/, update.tag),
+		);
+		if (open) system.openInBrowser(update.url);
+	} catch (error) {
+		window.log("error", "Manual update check failed");
+		window.log("error", error);
+		toast(strings["update check failed"]);
+	} finally {
+		hide();
+	}
+}
 
 export default function AboutInclude() {
 	const $page = Page(strings.about.capitalize());
@@ -24,6 +54,17 @@ export default function AboutInclude() {
 			</div>
 
 			<div className="info-section">
+				<div className="info-item" id="check-updates-item" role="button">
+					<div className="info-item-icon">
+						<span className="icon update"></span>
+					</div>
+					<div className="info-item-text">
+						{strings["check for updates"]}
+						<div className="info-item-subtext">
+							{strings["check for updates desc"]}
+						</div>
+					</div>
+				</div>
 				<div className="info-item">
 					<div className="info-item-icon">
 						<span className="icon offline"></span>
@@ -85,6 +126,10 @@ export default function AboutInclude() {
 			</div>
 		</main>
 	);
+
+	$page.body
+		.querySelector("#check-updates-item")
+		?.addEventListener("click", checkForUpdates);
 
 	system.getWebviewInfo((res) => {
 		webviewPackageName.value = res?.packageName || "N/A";

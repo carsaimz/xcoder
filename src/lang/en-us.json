@@ -993,5 +993,9 @@
 	"wrap method": "Wrap Method",
 	"xcoder main process": "XCoder main process",
 	"xcoder service": "XCoder Service",
-	"yes": "Yes"
+	"yes": "Yes",
+	"check for updates": "Check for updates",
+	"check for updates desc": "Look for a newer release on GitHub",
+	"up to date": "You are on the latest version",
+	"update check failed": "Could not check for updates"
 }

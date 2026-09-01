@@ -195,6 +195,46 @@ const intlLocaleOverrides = {
 };
 const rtlLanguages = new Set(["ar", "fa", "he"]);
 
+// Device language subtags that do not match the first subtag of a lang code
+// (e.g. navigator.language "fa-IR" maps to "ir-fa").
+const languageSubtagFallbacks = {
+	pt: "pt-br",
+	fa: "ir-fa",
+	tl: "tl-ph",
+	fil: "tl-ph",
+	my: "mm-unicode",
+	pa: "pu-in",
+};
+
+const DEFAULT_LANGUAGE = "pt-br";
+
+/**
+ * Picks the initial UI language: the device language when it maps to an
+ * available translation, Portuguese (pt-br) otherwise.
+ * @returns {string} a language code present in langMap
+ */
+export function detectDefaultLanguage() {
+	try {
+		const device = globalThis.navigator?.language?.toLowerCase?.();
+		if (!device) return DEFAULT_LANGUAGE;
+		if (device in langMap) return device;
+		if (device.startsWith("pt")) return "pt-br";
+		if (device.startsWith("zh")) {
+			return /(^|[_-])(hant|hk|mo|tw)($|[_-])/.test(device)
+				? "zh-hant"
+				: "zh-cn";
+		}
+		const base = device.split("-")[0];
+		if (languageSubtagFallbacks[base]) return languageSubtagFallbacks[base];
+		const match = Object.keys(langMap).find(
+			(code) => code.split("-")[0] === base,
+		);
+		return match || DEFAULT_LANGUAGE;
+	} catch {
+		return DEFAULT_LANGUAGE;
+	}
+}
+
 export function getIntlLocale(code) {
 	const normalizedCode = code?.toLowerCase();
 	const locale =
