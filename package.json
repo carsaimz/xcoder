@@ -1,7 +1,7 @@
 {
   "name": "com.carsaimz.xcoder",
   "displayName": "XCoder",
-  "version": "1.4.0-beta.2",
+  "version": "1.4.0-beta.3",
   "description": "XCoder is a fast, offline-first code editor and web IDE for Android",
   "scripts": {
     "lang": "node ./utils/lang.js",
