@@ -15,7 +15,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 48px;
+    margin-bottom: 32px;
 
     .logo {
       width: 48px;
@@ -36,7 +36,23 @@
       .tagline {
         font-size: 13px;
         color: color-mix(in srgb, var(--secondary-text-color) 60%, transparent);
-        margin: 0;
+        margin: 0 0 6px 0;
+      }
+
+      .version-chip {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-family: "Roboto Mono", monospace;
+        letter-spacing: 0.5px;
+        color: color-mix(in srgb, var(--secondary-text-color) 80%, transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--popup-background-color) 35%,
+          transparent
+        );
+        border: 1px solid color-mix(in srgb, var(--border-color) 25%, transparent);
       }
     }
   }
@@ -45,7 +61,7 @@
   .welcome-section {
     width: 100%;
     max-width: 400px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 
     .section-label {
       font-size: 11px;
@@ -54,6 +70,94 @@
       color: color-mix(in srgb, var(--secondary-text-color) 50%, transparent);
       margin: 0 0 12px 0;
       padding-left: 4px;
+    }
+  }
+
+  // Feature Cards (What's New / AI / Git)
+  .feature-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: color-mix(
+      in srgb,
+      var(--popup-background-color) 30%,
+      transparent
+    );
+    border: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent);
+    transition: background-color 0.15s ease, border-color 0.15s ease,
+      transform 0.15s ease;
+
+    &:hover,
+    &:active {
+      background-color: color-mix(
+        in srgb,
+        var(--popup-background-color) 55%,
+        transparent
+      );
+      border-color: color-mix(in srgb, var(--border-color) 50%, transparent);
+      transform: translateY(-1px);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    > .icon {
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+      color: color-mix(in srgb, var(--secondary-text-color) 80%, transparent);
+
+      &.accent {
+        color: color-mix(
+          in srgb,
+          var(--accent-color, #4f6ef7) 85%,
+          var(--primary-text-color)
+        );
+      }
+    }
+
+    .feature-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+
+      .feature-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--secondary-text-color);
+      }
+
+      .feature-desc {
+        font-size: 12px;
+        line-height: 1.35;
+        color: color-mix(in srgb, var(--secondary-text-color) 60%, transparent);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+    }
+
+    .arrow {
+      font-size: 16px;
+      width: auto;
+      color: color-mix(in srgb, var(--secondary-text-color) 40%, transparent);
+    }
+
+    // Highlight the What's New entry with an accent left bar
+    &.whats-new {
+      border-left: 3px solid
+        color-mix(in srgb, var(--accent-color, #4f6ef7) 70%, transparent);
     }
   }
 
@@ -103,9 +207,70 @@
     }
   }
 
+  // Recent rows: two lines (name + dimmed location)
+  .recent-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover,
+    &:active {
+      background-color: color-mix(
+        in srgb,
+        var(--popup-background-color) 40%,
+        transparent
+      );
+    }
+
+    .icon {
+      font-size: 16px;
+      color: color-mix(in srgb, var(--secondary-text-color) 70%, transparent);
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .recent-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+
+      .recent-name {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--secondary-text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .recent-path {
+        font-size: 11.5px;
+        color: color-mix(in srgb, var(--secondary-text-color) 45%, transparent);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .empty-recents {
+    margin: 4px 0 0 0;
+    padding: 8px 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: color-mix(in srgb, var(--secondary-text-color) 45%, transparent);
+  }
+
   // Links Section
   .welcome-links {
-    margin-top: 16px;
+    margin-top: 8px;
 
     .link-row {
       display: flex;
@@ -161,6 +326,12 @@
   .action-row > * + * {
     margin-left: 12px;
   }
+  .recent-row > * + * {
+    margin-left: 12px;
+  }
+  .feature-card > * + * {
+    margin-left: 12px;
+  }
   .link-row > * {
     margin-right: 8px;
     margin-bottom: 8px;
@@ -178,7 +349,7 @@
     .welcome-header {
       flex-direction: column;
       text-align: center;
-      margin-bottom: 36px;
+      margin-bottom: 28px;
 
       .logo {
         width: 40px;
@@ -191,7 +362,7 @@
     }
 
     .welcome-section {
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .action-row {
@@ -204,6 +375,10 @@
       .action-shortcut {
         font-size: 11px;
       }
+    }
+
+    .feature-card {
+      padding: 10px 12px;
     }
 
     .welcome-links .link-row {
@@ -222,6 +397,25 @@
     .action-row {
       padding: 12px 16px;
     }
+
+    .feature-card {
+      padding: 14px 18px;
+    }
   }
 }
 
+// Respect reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  #welcome-tab {
+    .action-row,
+    .recent-row,
+    .feature-card,
+    .link-item {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}

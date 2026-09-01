@@ -33,7 +33,6 @@ import intentHandler, { processPendingIntents } from "handlers/intent";
 import keyboardHandler, { keydownState } from "handlers/keyboard";
 import quickToolsInit from "handlers/quickToolsInit";
 import windowResize from "handlers/windowResize";
-import xcoder from "lib/xcoder";
 import actionStack from "lib/actionStack";
 import ajax from "lib/ajax";
 import applySettings from "lib/applySettings";
@@ -53,6 +52,7 @@ import { registerPrettierFormatter } from "lib/registerPrettierFormatter";
 import restoreFiles from "lib/restoreFiles";
 import settings from "lib/settings";
 import { migrateLegacySftpProfiles } from "lib/sftpProfiles";
+import xcoder from "lib/xcoder";
 import mustache from "mustache";
 import themes from "theme/list";
 import { initHighlighting } from "utils/codeHighlight";
@@ -335,7 +335,6 @@ async function onDeviceReady() {
 				toast("Failed to load plugins!");
 			}
 			applySettings.afterRender();
-
 		}, 500);
 	}
 
@@ -430,7 +429,6 @@ async function onDeviceReady() {
 		})
 		.catch(console.error);
 }
-
 
 async function setDebugInfo() {
 	const { version, versionCode } = BuildInfo;
@@ -673,6 +671,29 @@ async function loadApp() {
 	xcoder.exec("save-state");
 	initFileList();
 
+	// Re-open the Welcome tab once per app version so returning users
+	// see the What's New section. Session restore stays untouched: this
+	// runs AFTER files/folders are restored and only opens a tab.
+	try {
+		const WELCOME_VERSION_KEY = "welcome.versionSeen";
+		if (
+			localStorage.getItem(WELCOME_VERSION_KEY) !== BuildInfo.version &&
+			Array.isArray(files) &&
+			files.length
+		) {
+			const { default: openWelcomeTab } = await import(
+				/* webpackChunkName: "welcome" */ "pages/welcome"
+			);
+			openWelcomeTab();
+		}
+		if (BuildInfo.version) {
+			localStorage.setItem(WELCOME_VERSION_KEY, BuildInfo.version);
+		}
+	} catch (error) {
+		window.log("error", "Welcome version check failed");
+		window.log("error", error);
+	}
+
 	import(/* webpackChunkName: "terminal" */ "components/terminal").then(
 		({ TerminalManager }) => {
 			TerminalManager.restorePersistedSessions().catch((error) => {
@@ -703,7 +724,7 @@ async function loadApp() {
 		const { activeFile } = editorManager;
 
 		// if (!$editMenuToggler.isConnected) {
-		// 	$header.insertBefore($editMenuToggler, $header.lastChild);
+		//      $header.insertBefore($editMenuToggler, $header.lastChild);
 		// }
 		if (
 			activeFile &&
