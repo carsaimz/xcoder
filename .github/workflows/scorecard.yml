@@ -27,7 +27,9 @@ jobs:
           persist-credentials: false
 
       - name: Run analysis
-        uses: ossf/scorecard-action@v2
+        # NOTE: ossf/scorecard-action does NOT publish moving major tags (no `v2`).
+        # Pin the exact version — bump manually or via Renovate when new releases come out.
+        uses: ossf/scorecard-action@v2.4.4
         with:
           results_file: results.sarif
           results_format: sarif
