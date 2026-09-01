@@ -1,0 +1,56 @@
+# CodeRabbit configuration — https://docs.coderabbit.ai/reference/configuration
+#
+# Automatic AI review on every opened/updated PR targeting main.
+# The repo is a Cordova/CodeMirror editor (no React/Next.js today), so the
+# hooks rules below only kick in if React patterns ever appear.
+
+language: "pt-BR"
+early_access: false
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ["main"]
+
+  # Skip build output, vendored Cordova plugins and lockfiles
+  path_filters:
+    - "!**/www/**"
+    - "!**/platforms/**"
+    - "!**/src/plugins/**"
+    - "!**/package-lock.json"
+
+  path_instructions:
+    - path: "src/**/*.js"
+      instructions: >-
+        Review with focus on: (1) error handling — every async/fetch call must
+        be wrapped in try/catch with the error surfaced to the user (toast,
+        helpers.error or window.log); flag silent failures that are not
+        deliberate no-ops; (2) avoid leaking promise rejections; (3) DOM/XSS
+        safety (innerHTML with untrusted data); (4) if any React/Next.js
+        pattern is present, verify React Hooks best practices: exhaustive
+        deps, no hooks inside conditions/loops, stable useCallback/useMemo.
+    - path: "src/**/*.ts"
+      instructions: >-
+        TypeScript strictness: forbid unjustified `any` and unsafe casts of
+        `unknown`; prefer narrowing, generics or JSDoc typing; keep the
+        public plugin API types (src/types/xcoder.d.ts) backward compatible.
+        Also apply the error-handling rules (try/catch on async flows).
+    - path: "tests/**/*.js"
+      instructions: >-
+        Tests must be deterministic and not hit the network — flag tests
+        calling fetch/localStorage without stubs; suggest covering error
+        paths, not only happy paths.
+    - path: ".github/workflows/*.yml"
+      instructions: >-
+        Security review: avoid untrusted input injected into run: blocks
+        (use env: instead of direct ${{ }} interpolation); pin third-party
+        actions to major versions; keep permissions minimal.
+
+chat:
+  auto_reply: true

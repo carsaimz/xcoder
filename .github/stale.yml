@@ -1,0 +1,30 @@
+# Configuration for the "Stale" GitHub App (https://github.com/apps/stale).
+#
+# NOTE: pick ONE mechanism so stale marking doesn't run twice:
+#   a) install the Stale app -> this file is used;
+#   b) keep .github/workflows/stale.yml (actions/stale) and delete this file.
+# Both carry the same policy: stale after 30 days, closed 7 days later,
+# issues labeled "bug" or "enhancement" are never marked (planned work).
+
+daysUntilStale: 30
+daysUntilClose: 7
+
+staleLabel: "stale"
+
+exemptLabels:
+  - bug
+  - enhancement
+
+markComment: >
+  This issue/PR has been automatically marked as stale because it has had no
+  activity for 30 days. It will be closed in 7 days if nothing happens.
+  Add a comment, a commit or remove the `stale` label to keep it open.
+
+unmarkComment: >
+  Not stale anymore — thanks for the update.
+
+closeComment: >
+  Closed after 30 days of inactivity + 7 days stale (Stale bot).
+  Feel free to reopen if this is still relevant.
+
+limitPerRun: 100

@@ -1,0 +1,50 @@
+name: Stale
+
+# Marks issues and PRs as stale after 30 days without activity and closes
+# them 7 days later. Issues labeled "bug" or "enhancement" are never marked
+# (planned work must not be closed automatically).
+#
+# Works out of the box with no Marketplace app. If you prefer the "Stale"
+# GitHub App instead, keep .github/stale.yml and DELETE this workflow so
+# the same policy doesn't run twice.
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # daily 05:00 UTC = 07:00 Africa/Maputo
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Mark and close stale items
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          exempt-issue-labels: "bug,enhancement"
+          remove-stale-when-updated: true
+          operations-per-run: 200
+
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has
+            had no activity for 30 days. It will be closed in 7 days if
+            nothing happens. Add a comment or remove the `stale` label to
+            keep it open.
+          stale-pr-message: |
+            This PR has been automatically marked as stale because it has had
+            no activity for 30 days. It will be closed in 7 days if nothing
+            happens. Rebase, comment or remove the `stale` label to keep it.
+          close-issue-message: |
+            Closed after 30 days of inactivity + 7 days stale.
+            Feel free to reopen if this is still relevant.
+          close-pr-message: |
+            Closed after 30 days of inactivity + 7 days stale.
+            Feel free to reopen or send a fresh PR.

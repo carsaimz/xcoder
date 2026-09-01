@@ -1,0 +1,72 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		":dependencyDashboard",
+		":semanticPrefixFixDepsChoreOthers"
+	],
+	"description": "Renovate replaces Dependabot: one weekly grouped PR (Mondays ~08:00 Africa/Maputo), distinct labels per update type and auto-merge for patch/minor only when CI passes.",
+	"timezone": "Africa/Maputo",
+	"schedule": ["on monday", "after 8am", "before 11am"],
+	"labels": ["dependencies"],
+	"rangeStrategy": "bump-only",
+	"prConcurrentLimit": 5,
+	"lockFileMaintenance": {
+		"enabled": true,
+		"schedule": ["on monday", "after 8am", "before 11am"]
+	},
+	"automergeType": "pr",
+	"platformAutomerge": true,
+	"packageRules": [
+		{
+			"description": "Group every dependency update into a single weekly PR",
+			"groupName": "all dependencies (weekly)",
+			"groupSlug": "all-dependencies-weekly",
+			"matchUpdateTypes": [
+				"major",
+				"minor",
+				"patch",
+				"pin",
+				"digest",
+				"lockFileMaintenance"
+			]
+		},
+		{
+			"description": "Patch/pin/digest: auto-merge when CI passes",
+			"matchUpdateTypes": ["patch", "pin", "digest"],
+			"addLabels": ["dependencies-patch"],
+			"automerge": true
+		},
+		{
+			"description": "Minor: auto-merge when CI passes",
+			"matchUpdateTypes": ["minor"],
+			"addLabels": ["dependencies-minor"],
+			"automerge": true
+		},
+		{
+			"description": "Major: never auto-merge, needs review",
+			"matchUpdateTypes": ["major"],
+			"addLabels": ["dependencies-major"],
+			"automerge": false
+		},
+		{
+			"description": "TypeScript majors are pinned by the LSP worker APIs — require approval on the dependency dashboard",
+			"matchPackageNames": ["typescript"],
+			"matchUpdateTypes": ["major"],
+			"dependencyDashboardApproval": true
+		},
+		{
+			"description": "LSP type packages must stay in lockstep (nested copies cause TS2322 dual-type errors)",
+			"matchPackageNames": [
+				"vscode-languageserver-types",
+				"vscode-languageserver-protocol"
+			],
+			"enabled": false
+		},
+		{
+			"description": "GitHub Actions bumps carry the ci label too",
+			"matchManagers": ["github-actions"],
+			"addLabels": ["ci"]
+		}
+	]
+}
