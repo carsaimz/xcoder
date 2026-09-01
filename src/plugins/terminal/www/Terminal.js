@@ -210,8 +210,8 @@ const Terminal = {
                     "org"
                 ],
 
-                xcoderFoundation: [
-                    "XCoder",
+                acodeFoundation: [
+                    "Acode",
                     "-",
                     "Foundation"
                 ],
@@ -226,8 +226,8 @@ const Terminal = {
                     "Coder"
                 ],
 
-                xcoderxServer: [
-                    "xcoderx",
+                acodexServer: [
+                    "acodex",
                     "_",
                     "server"
                 ],
@@ -244,7 +244,7 @@ const Terminal = {
                 ...strings.protocol,
                 ...strings.rawGithubDomain,
                 "/",
-                ...strings.xcoderFoundation,
+                ...strings.acodeFoundation,
                 "/",
                 ...strings.xcoderRepo,
                 "/main/src/plugins/proot/libs/"
@@ -256,7 +256,7 @@ const Terminal = {
                 "/",
                 ...strings.bajrangCoder,
                 "/",
-                ...strings.xcoderxServer,
+                ...strings.acodexServer,
                 "/releases/latest/download/"
             );
 
