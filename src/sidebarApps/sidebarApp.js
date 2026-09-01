@@ -24,6 +24,8 @@ export default class SidebarApp {
 	#container;
 	/**@type {boolean} tabbed apps host their UI in an editor tab instead of the sidebar panel */
 	#tabbed;
+	/**@type {boolean} launcher apps run an action on tap without ever owning the sidebar panel */
+	#launcher;
 	/**@type {string|null} strings key used to retranslate the icon tooltip on language change */
 	#titleKey = null;
 
@@ -34,7 +36,7 @@ export default class SidebarApp {
 	 * @param {string} title
 	 * @param {(el:HTMLElement)=>(void|Function)} init
 	 * @param {(el:HTMLElement)=>void} onselect
-	 * @param {{tabbed?: boolean, titleKey?: string}} [opts]
+	 * @param {{tabbed?: boolean, launcher?: boolean, titleKey?: string}} [opts]
 	 */
 	constructor(icon, id, title, init, onselect, opts = {}) {
 		const emptyFunc = () => {};
@@ -46,6 +48,7 @@ export default class SidebarApp {
 		this.#init = init || emptyFunc;
 		this.#onselect = onselect || emptyFunc;
 		this.#tabbed = !!opts.tabbed;
+		this.#launcher = !!opts.launcher;
 		const cleanup = this.#init(this.#container);
 		if (typeof cleanup === "function") {
 			this.#cleanup = cleanup;
@@ -150,6 +153,11 @@ export default class SidebarApp {
 		return this.#tabbed;
 	}
 
+	/**@type {boolean} launcher apps fire onselect on tap and never own the sidebar panel */
+	get launcher() {
+		return this.#launcher;
+	}
+
 	/**
 	 * Re-triggers the onselect callback for tabbed apps (opens/focuses
 	 * their editor tab) without touching the sidebar panel.
@@ -161,6 +169,16 @@ export default class SidebarApp {
 			this.#active = true;
 			this.#icon.classList.add("active");
 		}
+		this.#onselect(this.#container);
+	}
+
+	/**
+	 * Fires the onselect callback for launcher apps without changing the
+	 * active state or the sidebar panel (e.g. opens a full page).
+	 * @returns {void}
+	 */
+	launch() {
+		if (!this.#launcher) return;
 		this.#onselect(this.#container);
 	}
 

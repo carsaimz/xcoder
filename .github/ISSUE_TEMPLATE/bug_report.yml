@@ -1,0 +1,75 @@
+name: 🐞 Bug report / Relatório de erro
+description: Report a problem with XCoder / Informe um problema no XCoder
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **English:** Thanks for taking the time to fill out this bug report!
+        **Português:** Obrigado por dedicar tempo para relatar este erro!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description / Descrição
+      description: What happened? / O que aconteceu?
+      placeholder: A clear and concise description / Uma descrição clara e concisa
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce / Passos para reproduzir
+      placeholder: |
+        1. Open '...'
+        2. Tap '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / Comportamento esperado
+
+  - type: input
+    id: version
+    attributes:
+      label: XCoder version / Versão do XCoder
+      placeholder: "e.g. 1.4.2 (Settings → About)"
+    validations:
+      required: true
+
+  - type: input
+    id: android
+    attributes:
+      label: Android version / Versão do Android
+      placeholder: "e.g. Android 14"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area / Área afetada
+      options:
+        - Editor
+        - AI assistant / Assistente de IA
+        - Terminal
+        - Git
+        - Files / Arquivos
+        - Plugins
+        - Settings / Configurações
+        - UI/UX
+        - Other / Outro
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots / Capturas
+      description: |
+        Paste logs or drag screenshots here.
+        Cole logs ou arraste capturas de tela aqui.

@@ -18,9 +18,13 @@ export default async function commandPalette() {
 
 		registeredCommands.forEach(({ name, description, key }) => {
 			const keyLabel = key ? key.split("|")[0] : "";
+			// Command descriptions are translatable through the "cmd:<name>"
+			// keys (pt-br.json ships them); other languages fall back to the
+			// English description registered with the command.
+			const title = strings[`cmd:${name}`] ?? description ?? name;
 			const item = (recentlyUsed) => ({
 				value: name,
-				text: `<span ${recentlyUsed ? `data-str='${strings["recently used"]}'` : ""}>${description ?? name}</span><small>${keyLabel}</small>`,
+				text: `<span ${recentlyUsed ? `data-str='${strings["recently used"]}'` : ""}>${title}</span><small>${keyLabel}</small>`,
 			});
 			if (recentCommands.commands.includes(name)) {
 				hints.unshift(item(true));

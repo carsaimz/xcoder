@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Ask Questions
+  - name: 💬 Ask Questions / Perguntas
     url: https://github.com/carsaimz/xcoder/discussions
-    about: Ask any questions regarding XCoder and its plugins
+    about: Ask any questions regarding XCoder and its plugins / Tire dúvidas sobre o XCoder e seus plugins
+  - name: 📖 Documentation / Documentação
+    url: https://github.com/carsaimz/xcoder/wiki
+    about: Guides, FAQ and plugin docs / Guias, FAQ e documentação de plugins
+  - name: 🤖 Plugin marketplace
+    url: https://github.com/carsaimz/xcoder-plugins
+    about: Browse and submit plugins / Explore e envie plugins

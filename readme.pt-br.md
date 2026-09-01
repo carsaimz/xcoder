@@ -92,6 +92,15 @@ escolha a execução mais recente e baixe o artefato.
 
 <!-- TODO: adicionar capturas de tela reais do app quando forem capturadas -->
 
+## 📸 Capturas de tela
+
+| Editor + IA | Terminal | Git |
+| :---: | :---: | :---: |
+| ![Editor](docs/screenshots/editor.png) | ![Terminal](docs/screenshots/terminal.png) | ![Git](docs/screenshots/git.png) |
+
+> As capturas ficam em [`docs/screenshots/`](docs/screenshots) — PRs com
+> capturas novas são bem-vindos!
+
 ## 🛠️ Build
 
 Requisitos: Node 18+, Java 17, Android SDK (API 36).
@@ -171,6 +180,19 @@ Issues, pull requests e traduções são bem-vindas! Leia o
 [![Contribuidores](https://contrib.rocks/image?repo=carsaimz/xcoder)](https://github.com/carsaimz/xcoder/graphs/contributors)
 
 [![Gráfico de estrelas](https://api.star-history.com/svg?repos=carsaimz/xcoder&type=Date)](https://star-history.com/#carsaimz/xcoder&Date)
+
+## 🙏 Agradecimentos
+
+O XCoder se apoia em gigantes:
+
+- **[Acode](https://github.com/deewarz/acodeapp)** (© Foxdebug / Ajit Kumar) —
+  o incrível editor do qual este projeto é fork.
+- **Bibliotecas open-source** — CodeMirror 6, xterm.js, markdown-it, KaTeX,
+  Mermaid, DOMPurify, Emmet, motion, html-tag-js, JSZip e todas as
+  dependências do [`package.json`](package.json).
+- **[Contribuintes](https://github.com/carsaimz/xcoder/graphs/contributors)** —
+  todos que contribuem com código, documentação e traduções.
+- **Comunidade** — testadores, tradutores e quem reporta erros. Obrigado!
 
 ## 📄 Licença
 

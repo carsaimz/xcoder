@@ -1,7 +1,32 @@
-const cordovaExec = cordova.exec.bind(cordova);
+// ⚠️ Do NOT call cordova.exec.bind() at module evaluation time. The Cordova
+// bridge is only available after cordova.js initializes, and in some
+// environments (web build, late bridge attach, plugin load order) `cordova`
+// exists but `cordova.exec` is undefined — which used to throw
+// "Cannot read properties of undefined (reading 'bind')" and break startup.
+// Instead, resolve the bridge lazily and never throw from module scope.
+function getCordovaExec() {
+	try {
+		const bridge =
+			typeof cordova !== "undefined"
+				? cordova
+				: (globalThis && globalThis.cordova) || null;
+		if (bridge && typeof bridge.exec === "function") {
+			return bridge.exec.bind(bridge);
+		}
+	} catch {
+		// ignore — bridge not ready yet
+	}
+	return null;
+}
 
-const exec = (resolve, reject, action, args) =>
-	cordovaExec(resolve, reject, "Tee", action, args);
+const exec = (resolve, reject, action, args) => {
+	const run = getCordovaExec();
+	if (!run) {
+		reject(new Error("Cordova bridge is not available"));
+		return;
+	}
+	run(resolve, reject, "Tee", action, args);
+};
 
 let bridgeHardened = false;
 
@@ -107,7 +132,13 @@ class TrustedSession {
 
 		if (!this.#sessionPromise) {
 			this.#sessionPromise = new Promise((resolve) => {
-				cordovaExec(
+				const run = getCordovaExec();
+				if (!run) {
+					console.warn("PluginContext: cordova bridge unavailable");
+					resolve(false);
+					return;
+				}
+				run(
 					(session) => {
 						this.#session = session;
 						resolve(true);
@@ -134,7 +165,12 @@ class TrustedSession {
 
 			//requesting a token with our session since we are in a privileged context
 			const uuid = await new Promise((resolve, reject) => {
-				cordovaExec(resolve, reject, "Tee", "requestToken", [
+				const run = getCordovaExec();
+				if (!run) {
+					reject(new Error("Cordova bridge is not available"));
+					return;
+				}
+				run(resolve, reject, "Tee", "requestToken", [
 					this.#session,
 					pluginId,
 					pluginJson,

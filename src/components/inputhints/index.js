@@ -1,5 +1,6 @@
 import "./style.scss";
 import DOMPurify from "dompurify";
+import fuzzyMatch from "utils/fuzzy";
 
 /**
  * @typedef {Object} HintObj
@@ -171,12 +172,34 @@ export default function inputhints($input, hints, onSelect, options = {}) {
 
 		const matched = [];
 		const regexp = new RegExp(escapeRegExp(toTest), "i");
+		const fuzzyCandidates = [];
 		hints.forEach((hint) => {
 			const { value, text } = hint;
 			if (regexp.test(value) || regexp.test(text)) {
 				matched.push(hint);
+				return;
+			}
+			// Fuzzy fallback: tolerate typos / skipped characters. Only tried
+			// on plain text (hint text is HTML, so tags are stripped first)
+			// and only while substring matches are still scarce, to keep
+			// typing cheap on large lists.
+			if (matched.length < 20 && toTest) {
+				const plain =
+					typeof text === "string"
+						? text.replace(/<[^>]*>/g, "")
+						: String(text || "");
+				const result = fuzzyMatch(toTest, `${value} ${plain}`);
+				if (result) {
+					fuzzyCandidates.push({ hint, score: result.score });
+				}
 			}
 		});
+		if (matched.length < 20 && fuzzyCandidates.length) {
+			fuzzyCandidates.sort((a, b) => b.score - a.score);
+			for (const { hint } of fuzzyCandidates.slice(0, 50)) {
+				matched.push(hint);
+			}
+		}
 		updateUl(matched);
 	}
 

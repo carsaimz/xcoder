@@ -60,6 +60,7 @@ import { getEncoding, initEncodings } from "utils/encodings";
 import helpers from "utils/helpers";
 import { INSTALL_SOURCE_PLAY, isPlayStoreInstall } from "utils/installSource";
 import loadPolyFill from "utils/polyfill";
+import initRippleFeedback from "utils/ripple";
 import Url from "utils/Url";
 import $_fileMenu from "views/file-menu.hbs";
 import $_menu from "views/menu.hbs";
@@ -109,6 +110,8 @@ async function ensurePermission(permission) {
 
 async function onDeviceReady() {
 	await initEncodings(); // important to load encodings before anything else
+
+	initRippleFeedback();
 
 	const oldResolveURL = window.resolveLocalFileSystemURL;
 	const {

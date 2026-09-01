@@ -5,6 +5,7 @@
   "description": "XCoder is a fast, offline-first code editor and web IDE for Android",
   "scripts": {
     "lang": "node ./utils/lang.js",
+    "lang:check": "node scripts/check_translations.mjs",
     "build": "sh utils/scripts/build.sh",
     "start": "sh utils/scripts/start.sh",
     "dev": "node utils/scripts/dev.js",

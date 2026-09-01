@@ -1,0 +1,46 @@
+name: 💡 Feature request / Sugestão de funcionalidade
+description: Suggest an idea for XCoder / Sugira uma ideia para o XCoder
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **English:** Describe the problem and the solution you'd like.
+        **Português:** Descreva o problema e a solução que você gostaria.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Problema
+      description: What is it you want to do? / O que você quer fazer?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution / Solução proposta
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives / Alternativas consideradas
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / Área
+      options:
+        - Editor
+        - AI assistant / Assistente de IA
+        - Terminal
+        - Git
+        - Files / Arquivos
+        - Plugins / Marketplace
+        - Settings / Configurações
+        - UI/UX
+        - Other / Outro
+    validations:
+      required: true

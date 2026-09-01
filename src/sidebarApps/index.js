@@ -38,8 +38,8 @@ function add(
 	apps.push(app);
 	app.install(prepend);
 
-	// tabbed apps never own the sidebar panel on restore
-	if (currentSection === id && !opts.tabbed) {
+	// tabbed and launcher apps never own the sidebar panel on restore
+	if (currentSection === id && !opts.tabbed && !opts.launcher) {
 		setActiveApp(id);
 	}
 }
@@ -88,6 +88,7 @@ async function loadApps() {
 	add(...(await import("./ai")).default);
 	add(...(await import("./git")).default);
 	add(...(await import("./notification")).default);
+	add(...(await import("./settings")).default);
 }
 
 /**
@@ -166,6 +167,10 @@ function pulseApp(id) {
 	const app = apps.find((app) => app.id === id);
 	if (!app) return;
 
+	if (app.launcher) {
+		app.launch();
+		return;
+	}
 	if (app.tabbed) {
 		app.pulse();
 		return;

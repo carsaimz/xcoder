@@ -149,14 +149,42 @@ export default async function Changelog() {
 			if (currentRelease?.body) {
 				return renderChangelog(currentRelease.body);
 			}
+			// No release notes for this version — try the raw CHANGELOG.md
+			// section before falling back to the latest release.
+			const rawSection = await loadRawChangelogSection(currentVersion);
+			if (rawSection) return renderChangelog(rawSection);
 			return loadLatestRelease();
 		} catch (error) {
-			// Offline, rate limited or slow network: keep showing the
-			// bundled changelog silently instead of an error toast.
+			// Offline, rate limited or slow network: try the raw CHANGELOG.md,
+			// then keep the bundled changelog silently instead of an error toast.
 			window.log("warn", "Failed to load version changelog:", error);
+			const rawSection = await loadRawChangelogSection(currentVersion);
 			updateVersionSelector();
-			return renderChangelog(localChangelogMd);
+			return renderChangelog(rawSection || localChangelogMd);
 		}
+	}
+
+	/**
+	 * Fetches CHANGELOG.md from the repo and extracts the section of the
+	 * given version (## [v1.2.3] / ## v1.2.3 / ### v1.2.3 style headers).
+	 * @param {string} version
+	 * @returns {Promise<string|null>}
+	 */
+	async function loadRawChangelogSection(version) {
+		try {
+			const text = await fsOperation(CHANGELOG_FILE_URL).readFile("utf8");
+			const escaped = version.replace(/\./g, "\\.");
+			const pattern = new RegExp(
+				`(^|\\n)#{2,3}\\s*\\[?v?${escaped}\\]?[^\\n]*\\n([\\s\\S]*?)(?=\\n#{2,3}\\s|$)`,
+			);
+			const match = text.match(pattern);
+			if (match?.[2]?.trim()) {
+				return `## v${version}\n${match[2].trim()}`;
+			}
+		} catch (error) {
+			window.log("warn", "Raw changelog fallback failed:", error);
+		}
+		return null;
 	}
 
 	function renderChangelog(text) {

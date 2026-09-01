@@ -19,6 +19,41 @@
     .version-number {
       color: color-mix(in srgb, var(--primary-text-color) 60%, transparent);
       font-size: 14px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .about-description {
+      margin-top: 8px;
+      padding: 0 12px;
+      color: color-mix(in srgb, var(--primary-text-color) 70%, transparent);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  }
+
+  .credits-section {
+    width: 100%;
+    max-width: 400px;
+
+    .credits-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: color-mix(in srgb, var(--primary-text-color) 55%, transparent);
+      margin: 0 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border-color);
+      }
     }
   }
 

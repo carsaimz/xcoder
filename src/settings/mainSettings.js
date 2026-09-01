@@ -26,7 +26,12 @@ export default function mainSettings() {
 	const categories = {
 		core: strings["settings-category-core"],
 		customizationTools: strings["settings-category-customization-tools"],
-		maintenance: strings["settings-category-maintenance"],
+		// "Maintenance" was renamed to "Data & backup" to keep dev-ish wording
+		// out of the user-facing UI (dev actions live in the hidden developer
+		// menu, opened by tapping the version number in About).
+		maintenance:
+			strings["settings-category-data"] ||
+			strings["settings-category-maintenance"],
 		aboutXCoder: strings["settings-category-about-xcoder"],
 	};
 	const items = [

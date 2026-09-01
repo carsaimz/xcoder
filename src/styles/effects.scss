@@ -1,0 +1,70 @@
+/* ============================================================
+   XCoder motion & touch feedback
+   - Ripple ink (created by utils/ripple.js)
+   - Page / palette / sidebar panel entry transitions
+   - Honors prefers-reduced-motion
+   ============================================================ */
+
+// --- Ripple -------------------------------------------------
+.ripple-host {
+	position: relative;
+	overflow: hidden;
+}
+
+.ripple-ink {
+	position: absolute;
+	border-radius: 50%;
+	pointer-events: none;
+	background: currentColor;
+	opacity: 0.16;
+	transform: scale(0);
+	animation: xc-ripple 450ms ease-out forwards;
+}
+
+@keyframes xc-ripple {
+	to {
+		transform: scale(2.6);
+		opacity: 0;
+	}
+}
+
+// --- Page entry ---------------------------------------------
+// wc-page slides up subtly when shown (unless motion is disabled)
+wc-page:not(.no-animation) {
+	animation: page-transition 0.18s ease-out;
+}
+
+// --- Command palette drop-in --------------------------------
+#palette {
+	animation: xc-drop-in 0.16s ease-out;
+}
+
+@keyframes xc-drop-in {
+	from {
+		opacity: 0;
+		transform: translateY(-14px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+// --- Sidebar panel switch -----------------------------------
+#sidebar .container {
+	animation: slow-appear 0.16s ease;
+}
+
+// --- Reduced motion -----------------------------------------
+@media (prefers-reduced-motion: reduce) {
+	.ripple-ink {
+		display: none;
+	}
+
+	wc-page:not(.no-animation),
+	#palette,
+	#sidebar .container {
+		animation: none;
+	}
+}
