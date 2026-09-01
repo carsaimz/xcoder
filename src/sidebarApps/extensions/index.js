@@ -462,13 +462,13 @@ async function loadExplore() {
 		}
 
 		installedPlugins = await listInstalledPlugins();
-		$explore.$ul.content = plugins.length
-			? plugins.map(ListItem)
-			: (
-					<span className="error empty">
-						{strings["no plugins found"] || strings.empty || "No plugins found"}
-					</span>
-				);
+		$explore.$ul.content = plugins.length ? (
+			plugins.map(ListItem)
+		) : (
+			<span className="error empty">
+				{strings["no plugins found"] || strings.empty || "No plugins found"}
+			</span>
+		);
 		currentPage++;
 		updateHeight($explore);
 	} catch (error) {
@@ -529,7 +529,9 @@ async function getFilteredPlugins(filterState) {
 		all.push(plugin);
 	}
 
-	const items = all.filter((plugin) => doesPluginMatchFilter(plugin, filterState));
+	const items = all.filter((plugin) =>
+		doesPluginMatchFilter(plugin, filterState),
+	);
 	return { items, hasMore: false };
 }
 
@@ -826,8 +828,7 @@ async function uninstall(id) {
 				$installed.expand();
 			}
 		}
-
-			} catch (err) {
+	} catch (err) {
 		helpers.error(err);
 	}
 }

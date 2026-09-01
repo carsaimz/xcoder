@@ -45,6 +45,17 @@ export default function cloudSettings() {
 				"Fine-grained PAT with Contents read/write on the backend repo only. Stored on this device.",
 		},
 		{
+			key: "ghOAuthClientId",
+			text: strings["github client id"] || "GitHub OAuth client id",
+			value: values.ghOAuthClientId || "",
+			prompt: strings["github client id"] || "GitHub OAuth client id",
+			promptType: "text",
+			promptOptions: { required: false },
+			info:
+				strings["settings-info-gh-oauth-client-id"] ||
+				"Client id of your own GitHub OAuth App with Device Flow enabled — used by 'Sign in with GitHub' in the Git panel.",
+		},
+		{
 			key: "ghBranch",
 			text: strings["gh branch"] || "Backend branch",
 			value: values.ghBranch || "main",

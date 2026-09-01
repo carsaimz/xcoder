@@ -59,7 +59,9 @@ export function b64decodeUtf8(base64) {
 
 /** @returns {boolean} true when repo + token are configured */
 export function isConfigured() {
-	return Boolean(parseRepoInput(settings.value.ghRepo) && settings.value.ghToken);
+	return Boolean(
+		parseRepoInput(settings.value.ghRepo) && settings.value.ghToken,
+	);
 }
 
 /**
@@ -192,6 +194,9 @@ export async function restoreAll() {
 		const safe = { ...payload.settings };
 		// never restore secrets blindly
 		delete safe.ghToken;
+		delete safe.ghUserLogin;
+		delete safe.ghUserName;
+		delete safe.ghUserAvatar;
 		for (const [key, value] of Object.entries(safe)) {
 			if (key in settings.value) settings.value[key] = value;
 		}

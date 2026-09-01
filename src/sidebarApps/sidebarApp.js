@@ -22,6 +22,8 @@ export default class SidebarApp {
 	#cleanup = null;
 	/**@type {HTMLElement} */
 	#container;
+	/**@type {boolean} tabbed apps host their UI in an editor tab instead of the sidebar panel */
+	#tabbed;
 
 	/**
 	 * Creates a new sidebar app.
@@ -30,8 +32,9 @@ export default class SidebarApp {
 	 * @param {string} title
 	 * @param {(el:HTMLElement)=>(void|Function)} init
 	 * @param {(el:HTMLElement)=>void} onselect
+	 * @param {{tabbed?: boolean}} [opts]
 	 */
-	constructor(icon, id, title, init, onselect) {
+	constructor(icon, id, title, init, onselect, opts = {}) {
 		const emptyFunc = () => {};
 		this.#container = <div className="container"></div>;
 		this.#icon = <Icon icon={icon} id={id} title={title} />;
@@ -39,6 +42,7 @@ export default class SidebarApp {
 		this.#title = title;
 		this.#init = init || emptyFunc;
 		this.#onselect = onselect || emptyFunc;
+		this.#tabbed = !!opts.tabbed;
 		const cleanup = this.#init(this.#container);
 		if (typeof cleanup === "function") {
 			this.#cleanup = cleanup;
@@ -96,7 +100,7 @@ export default class SidebarApp {
 
 		this.#active = nextValue;
 		this.#icon.classList.toggle("active", this.#active);
-		if (this.#active) {
+		if (this.#active && !this.#tabbed) {
 			const oldContainer = getContainer(this.#container);
 			// Try to replace the old container, or append if it's not in the DOM
 			try {
@@ -127,6 +131,25 @@ export default class SidebarApp {
 	/**@type {HTMLElement} */
 	get container() {
 		return this.#container;
+	}
+
+	/**@type {boolean} tabbed apps open their UI in an editor tab (like the terminal) */
+	get tabbed() {
+		return this.#tabbed;
+	}
+
+	/**
+	 * Re-triggers the onselect callback for tabbed apps (opens/focuses
+	 * their editor tab) without touching the sidebar panel.
+	 * @returns {void}
+	 */
+	pulse() {
+		if (!this.#tabbed) return;
+		if (!this.#active) {
+			this.#active = true;
+			this.#icon.classList.add("active");
+		}
+		this.#onselect(this.#container);
 	}
 
 	/**@type {(el:HTMLElement)=>void} */

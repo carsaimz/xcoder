@@ -1,5 +1,7 @@
 .git-app {
 	padding: 0;
+	height: 100%;
+	overflow-y: auto;
 
 	.git-panel {
 		padding: 10px;
@@ -216,6 +218,79 @@
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+		}
+	}
+}
+
+// GitHub account card
+.git-app {
+	.git-account-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.git-avatar {
+		width: 34px;
+		height: 34px;
+		border-radius: 50%;
+		object-fit: cover;
+		flex-shrink: 0;
+	}
+
+	.git-avatar-fallback {
+		width: 34px;
+		height: 34px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 26px;
+		opacity: 0.7;
+		flex-shrink: 0;
+	}
+
+	.git-account-info {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		flex: 1;
+
+		.git-account-login {
+			font-size: 14px;
+			font-weight: 700;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.git-account-name {
+			font-size: 11px;
+			opacity: 0.7;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+
+	.git-account-hint {
+		font-size: 12px;
+		opacity: 0.75;
+		line-height: 1.45;
+		flex: 1;
+	}
+
+	.git-ghost-btn {
+		padding: 7px 12px;
+		border-radius: 8px;
+		border: 1px solid var(--border-color);
+		background: transparent;
+		color: inherit;
+		font-size: 12px;
+		font-weight: 600;
+		cursor: pointer;
+
+		&:active {
+			opacity: 0.7;
 		}
 	}
 }

@@ -1,19 +1,31 @@
 import "./style.scss";
-import select from "dialogs/select";
-import prompt from "dialogs/prompt";
 import toast from "components/toast";
+import loader from "dialogs/loader";
+import prompt from "dialogs/prompt";
+import select from "dialogs/select";
+import vshell from "lib/ai/vshell";
+import EditorFile from "lib/editorFile";
+import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
+import {
+	commit,
+	getStatus,
+	preparedCommands,
+	readVcsDb,
+	restore,
+} from "lib/gitPanel";
 import settings from "lib/settings";
 import Url from "utils/Url";
-import vshell from "lib/ai/vshell";
-import {
-        getStatus,
-        commit,
-        restore,
-        preparedCommands,
-        readVcsDb,
-} from "lib/gitPanel";
 
-const COMMIT_PREFIXES = ["feat", "fix", "chore", "docs", "refactor", "test", "ci"];
+const COMMIT_PREFIXES = [
+	"feat",
+	"fix",
+	"chore",
+	"docs",
+	"refactor",
+	"test",
+	"ci",
+];
+const GIT_TAB_ID = "git-panel-tab";
 
 /** @type {HTMLElement} */
 let container = null;
@@ -30,163 +42,372 @@ let refreshTimer = 0;
  * @returns {Array} sidebar app descriptor
  */
 export default [
-        "account_tree",
-        "git",
-        strings["git panel"] || "Git",
-        initApp,
-        false,
-        onSelected,
+	"git",
+	"git",
+	strings["git panel"] || "Git",
+	initApp,
+	false,
+	onSelected,
+	{ tabbed: true },
 ];
 
-function onSelected() {
-        refresh();
+/**
+ * Opens the Git panel as an editor tab (like the terminal).
+ * @returns {Promise<void>}
+ */
+export async function openGitPanel() {
+	try {
+		const { default: sidebarApps } = await import("sidebarApps");
+		sidebarApps.pulseApp?.("git");
+	} catch (error) {
+		window.log?.("error", "openGitPanel failed:", error);
+	}
+}
+
+function onSelected(el) {
+	// host the git panel UI in an editor tab (like the terminal)
+	openGitTab(el);
+	refresh();
+}
+
+/**
+ * Hosts the Git panel container in a persistent editor tab.
+ * @param {HTMLElement} [el] container provided by the sidebar app
+ */
+function openGitTab(el) {
+	const containerEl = el || container;
+	const manager = window.editorManager;
+	if (!containerEl || !manager) return;
+
+	const existing = manager.files.find((file) => file.id === GIT_TAB_ID);
+	if (existing) {
+		existing.makeActive?.();
+		hideSidebarPanel();
+		return;
+	}
+
+	new EditorFile(strings["git panel"] || "Git", {
+		id: GIT_TAB_ID,
+		render: true,
+		type: "page",
+		content: containerEl,
+		tabIcon: "icon git",
+		hideQuickTools: true,
+	});
+	hideSidebarPanel();
+}
+
+/**
+ * Closes the sidebar overlay on phones (tab width > 750 keeps the panel).
+ */
+async function hideSidebarPanel() {
+	try {
+		if (window.innerWidth > 750) return;
+		const { default: Sidebar } = await import("components/sidebar");
+		Sidebar?.hide?.();
+	} catch {
+		/* sidebar optional */
+	}
 }
 
 /**
  * @param {HTMLElement} el
  */
 function initApp(el) {
-        container = el;
-        el.classList.add("git-app");
-        el.content = buildUi();
-        refresh();
+	container = el;
+	el.classList.add("git-app");
+	el.content = buildUi();
+	refresh();
 
-        // refresh when files change (debounced)
-        clearInterval(refreshTimer);
-        refreshTimer = setInterval(() => {
-                if (el.isConnected) refresh();
-        }, 4000);
+	// refresh when files change (debounced)
+	clearInterval(refreshTimer);
+	refreshTimer = setInterval(() => {
+		if (el.isConnected) refresh();
+	}, 4000);
 
-        return () => {
-                container = null;
-                clearInterval(refreshTimer);
-        };
+	return () => {
+		container = null;
+		clearInterval(refreshTimer);
+	};
 }
 
 function buildUi() {
-        const $refresh = (
-                <span className="icon sync" title={strings.refresh || "Refresh"} onclick={refresh}></span>
-        );
+	const $refresh = (
+		<span
+			className="icon refresh"
+			title={strings.refresh || "Refresh"}
+			onclick={refresh}
+		></span>
+	);
 
-        const $remoteEdit = (
-                <span
-                        className="icon public"
-                        title={strings["git remote url"] || "Remote URL"}
-                        onclick={editRemote}
-                ></span>
-        );
+	const $account = (
+		<div className="git-card git-account">
+			<div className="git-card-header">
+				<span className="git-card-title">
+					{strings["github account"] || "GitHub account"}
+				</span>
+				<span className="icon github"></span>
+			</div>
+			<div className="git-account-body" ref={setAccountBody}></div>
+		</div>
+	);
 
-        const $status = (
-                <div className="git-card">
-                        <div className="git-card-header">
-                                <span className="git-card-title">
-                                        {strings["git status"] || "Status"}
-                                </span>
-                                {$refresh}
-                        </div>
-                        <div className="git-status" ref={setStatusBody}></div>
-                </div>
-        );
+	const $remoteEdit = (
+		<span
+			className="icon public"
+			title={strings["git remote url"] || "Remote URL"}
+			onclick={editRemote}
+		></span>
+	);
 
-        $message = (
-                <input
-                        type="text"
-                        className="git-message"
-                        placeholder={
-                                strings["git msg hint"] || "feat: describe your change"
-                        }
-                />
-        );
+	const $status = (
+		<div className="git-card">
+			<div className="git-card-header">
+				<span className="git-card-title">
+					{strings["git status"] || "Status"}
+				</span>
+				{$refresh}
+			</div>
+			<div className="git-status" ref={setStatusBody}></div>
+		</div>
+	);
 
-        const $composer = (
-                <div className="git-card">
-                        <div className="git-card-header">
-                                <span className="git-card-title">
-                                        {strings["git commit"] || "Commit"}
-                                </span>
-                        </div>
-                        <div className="git-composer">
-                                {$message}
-                                <button className="git-commit-btn" onclick={onCommit}>
-                                        {strings["git commit"] || "Commit"}
-                                </button>
-                        </div>
-                        <div className="git-prefixes">
-                                {COMMIT_PREFIXES.map((prefix) => (
-                                        <span
-                                                className="git-prefix"
-                                                onclick={() => {
-                                                        $message.value = `${prefix}: ${$message.value.replace(/^\w+:\s*/, "")}`;
-                                                        $message.focus();
-                                                }}
-                                        >
-                                                {prefix}
-                                        </span>
-                                ))}
-                        </div>
-                </div>
-        );
+	$message = (
+		<input
+			type="text"
+			className="git-message"
+			placeholder={strings["git msg hint"] || "feat: describe your change"}
+		/>
+	);
 
-        const $commits = (
-                <div className="git-card">
-                        <div className="git-card-header">
-                                <span className="git-card-title">
-                                        {strings["git commits"] || "Snapshots"}
-                                </span>
-                        </div>
-                        <div className="git-commits" ref={setCommitsBody}></div>
-                </div>
-        );
+	const $composer = (
+		<div className="git-card">
+			<div className="git-card-header">
+				<span className="git-card-title">
+					{strings["git commit"] || "Commit"}
+				</span>
+			</div>
+			<div className="git-composer">
+				{$message}
+				<button className="git-commit-btn" onclick={onCommit}>
+					{strings["git commit"] || "Commit"}
+				</button>
+			</div>
+			<div className="git-prefixes">
+				{COMMIT_PREFIXES.map((prefix) => (
+					<span
+						className="git-prefix"
+						onclick={() => {
+							$message.value = `${prefix}: ${$message.value.replace(/^\w+:\s*/, "")}`;
+							$message.focus();
+						}}
+					>
+						{prefix}
+					</span>
+				))}
+			</div>
+		</div>
+	);
 
-        const $gh = (
-                <div className="git-card">
-                        <div className="git-card-header">
-                                <span className="git-card-title">
-                                        {strings["git github"] || "GitHub — prepared commands"}
-                                </span>
-                                {$remoteEdit}
-                        </div>
-                        <div className="git-gh" ref={setGhBody}></div>
-                </div>
-        );
+	const $commits = (
+		<div className="git-card">
+			<div className="git-card-header">
+				<span className="git-card-title">
+					{strings["git commits"] || "Snapshots"}
+				</span>
+			</div>
+			<div className="git-commits" ref={setCommitsBody}></div>
+		</div>
+	);
 
-        return (
-                <div className="git-panel">
-                        {$status}
-                        {$composer}
-                        {$commits}
-                        {$gh}
-                </div>
-        );
+	const $gh = (
+		<div className="git-card">
+			<div className="git-card-header">
+				<span className="git-card-title">
+					{strings["git github"] || "GitHub — prepared commands"}
+				</span>
+				{$remoteEdit}
+			</div>
+			<div className="git-gh" ref={setGhBody}></div>
+		</div>
+	);
+
+	return (
+		<div className="git-panel">
+			{$account}
+			{$status}
+			{$composer}
+			{$commits}
+			{$gh}
+		</div>
+	);
 }
 
 function setStatusBody(el) {
-        $statusBody = el;
+	$statusBody = el;
 }
 
 function setCommitsBody(el) {
-        $commitsBody = el;
+	$commitsBody = el;
 }
 
 function setGhBody(el) {
-        container._$ghBody = el;
-        renderGh();
+	container._$ghBody = el;
+	renderGh();
+}
+
+function setAccountBody(el) {
+	container._$accountBody = el;
+	renderAccount();
 }
 
 async function refresh() {
-        if (!container || !$statusBody?.isConnected) return;
+	if (!container || !$statusBody?.isConnected) return;
 
-        let status;
-        try {
-                status = await getStatus();
-        } catch (error) {
-                renderError($statusBody, error);
-                return;
-        }
+	let status;
+	try {
+		status = await getStatus();
+	} catch (error) {
+		renderError($statusBody, error);
+		return;
+	}
 
-        renderStatus(status);
-        renderCommits();
-        renderGh();
+	renderStatus(status);
+	renderCommits();
+	renderGh();
+	renderAccount();
+}
+
+/**
+ * Renders the GitHub account card: signed-in profile or sign-in button.
+ */
+function renderAccount() {
+	const $body = container?._$accountBody;
+	if (!$body?.isConnected) return;
+	const values = settings.value;
+
+	if (values.ghUserLogin) {
+		$body.content = (
+			<div className="git-account-row">
+				{values.ghUserAvatar ? (
+					<img className="git-avatar" src={values.ghUserAvatar} alt="" />
+				) : (
+					<span className="icon account_circle git-avatar-fallback"></span>
+				)}
+				<div className="git-account-info">
+					<span className="git-account-login">{values.ghUserLogin}</span>
+					{values.ghUserName ? (
+						<span className="git-account-name">{values.ghUserName}</span>
+					) : null}
+				</div>
+				<button className="git-ghost-btn" onclick={signOutGitHub}>
+					{strings.logout || "Logout"}
+				</button>
+			</div>
+		);
+		return;
+	}
+
+	$body.content = (
+		<div className="git-account-row">
+			<span className="git-account-hint">
+				{values.ghToken
+					? strings["github pat active"] ||
+						"Using a personal access token (PAT)."
+					: strings["github sign in desc"] ||
+						"Sign in to access your GitHub repositories."}
+			</span>
+			<button className="git-commit-btn" onclick={signInGitHub}>
+				{strings["sign in with github"] || "Sign in with GitHub"}
+			</button>
+		</div>
+	);
+}
+
+/**
+ * GitHub OAuth Device Flow sign-in (see lib/ghAuth.js).
+ */
+async function signInGitHub() {
+	try {
+		let clientId = String(settings.value.ghOAuthClientId || "").trim();
+
+		if (!clientId) {
+			const ok = await confirmDialog(
+				strings["sign in with github"] || "Sign in with GitHub",
+				strings["github sign in steps"] ||
+					"Create an OAuth App at github.com/settings/developers, enable 'Device Flow', then paste its client id here. No client secret or backend is needed.",
+			);
+			if (!ok) return;
+
+			const input = await prompt(
+				strings["github client id"] || "OAuth App client id",
+				"",
+				"text",
+			);
+			if (!input || !input.trim()) return;
+
+			clientId = input.trim();
+			settings.value.ghOAuthClientId = clientId;
+			await settings.update();
+		}
+
+		const code = await requestDeviceCode(clientId);
+		const proceed = await confirm(
+			strings["sign in with github"] || "Sign in with GitHub",
+			`${strings["device code"] || "Code"}: ${code.userCode}\n\n${
+				strings["github device steps"] ||
+				"Open the verification page in your browser and enter the code above."
+			}`,
+		);
+		if (!proceed) return;
+
+		system.openInBrowser(code.verificationUri);
+
+		const hide = await loader.show();
+		try {
+			const { token, user } = await pollForToken(
+				clientId,
+				code.deviceCode,
+				code.interval,
+				{ maxMs: code.expiresIn * 1000 },
+			);
+
+			settings.value.ghToken = token;
+			settings.value.ghUserLogin = user?.login || "";
+			settings.value.ghUserName = user?.name || "";
+			settings.value.ghUserAvatar = user?.avatarUrl || "";
+			await settings.update();
+
+			toast(
+				`${strings["signed in as"] || "Signed in as"} ${user?.login || "?"}`,
+			);
+		} finally {
+			hide();
+		}
+
+		renderAccount();
+		renderGh();
+	} catch (error) {
+		toast(
+			`${strings["sign in failed"] || "Sign in failed"}: ${
+				error.message || error
+			}`,
+		);
+	}
+}
+
+/**
+ * Removes the stored token and profile.
+ */
+async function signOutGitHub() {
+	settings.value.ghToken = "";
+	settings.value.ghUserLogin = "";
+	settings.value.ghUserName = "";
+	settings.value.ghUserAvatar = "";
+	await settings.update();
+	toast(strings.logout || "Logout");
+	renderAccount();
+	renderGh();
 }
 
 /**
@@ -194,64 +415,64 @@ async function refresh() {
  * @param {Error} error
  */
 function renderError(el, error) {
-        el.content = (
-                <div className="git-empty">{`git: ${error.message || error}`}</div>
-        );
+	el.content = (
+		<div className="git-empty">{`git: ${error.message || error}`}</div>
+	);
 }
 
 function renderStatus(status) {
-        const { changes } = status;
+	const { changes } = status;
 
-        if (!status.hasRepo && !countChanges(status.changes)) {
-                $statusBody.content = (
-                        <div className="git-empty">
-                                {strings["git no repo"] ||
-                                        "No snapshots yet — create your first commit to start tracking changes."}
-                        </div>
-                );
-                return;
-        }
+	if (!status.hasRepo && !countChanges(status.changes)) {
+		$statusBody.content = (
+			<div className="git-empty">
+				{strings["git no repo"] ||
+					"No snapshots yet — create your first commit to start tracking changes."}
+			</div>
+		);
+		return;
+	}
 
-        if (!countChanges(changes)) {
-                $statusBody.content = (
-                        <div className="git-empty">
-                                {strings["git no changes"] ||
-                                        "No changes — everything matches the last snapshot."}
-                        </div>
-                );
-                return;
-        }
+	if (!countChanges(changes)) {
+		$statusBody.content = (
+			<div className="git-empty">
+				{strings["git no changes"] ||
+					"No changes — everything matches the last snapshot."}
+			</div>
+		);
+		return;
+	}
 
-        const rows = [
-                ...changes.modified.map(rowFactory("M", "git-modified")),
-                ...changes.added.map(rowFactory("A", "git-added")),
-                ...changes.deleted.map(rowFactory("D", "git-deleted")),
-        ];
+	const rows = [
+		...changes.modified.map(rowFactory("M", "git-modified")),
+		...changes.added.map(rowFactory("A", "git-added")),
+		...changes.deleted.map(rowFactory("D", "git-deleted")),
+	];
 
-        $statusBody.content = <div className="git-file-list">{rows}</div>;
+	$statusBody.content = <div className="git-file-list">{rows}</div>;
 
-        function rowFactory(letter, cls) {
-                /**
-                 * @param {string} path
-                 */
-                return (path) => (
-                        <div
-                                className="git-file"
-                                data-path={path}
-                                onclick={() => openChangedFile(path)}
-                        >
-                                <span className={`git-letter ${cls}`}>{letter}</span>
-                                <span className="git-file-name">{path}</span>
-                        </div>
-                );
-        }
+	function rowFactory(letter, cls) {
+		/**
+		 * @param {string} path
+		 */
+		return (path) => (
+			<div
+				className="git-file"
+				data-path={path}
+				onclick={() => openChangedFile(path)}
+			>
+				<span className={`git-letter ${cls}`}>{letter}</span>
+				<span className="git-file-name">{path}</span>
+			</div>
+		);
+	}
 }
 
 /** @param {{modified: string[], added: string[], deleted: string[]}} changes */
 function countChanges(changes) {
-        return (
-                changes.modified.length + changes.added.length + changes.deleted.length
-        );
+	return (
+		changes.modified.length + changes.added.length + changes.deleted.length
+	);
 }
 
 /**
@@ -259,154 +480,148 @@ function countChanges(changes) {
  * @param {string} relativePath
  */
 async function openChangedFile(relativePath) {
-        try {
-                const { default: openFile } = await import("lib/openFile");
-                await openFile(Url.join(vshell.getRoot(), relativePath));
-        } catch (error) {
-                toast(`open: ${error.message || error}`);
-        }
+	try {
+		const { default: openFile } = await import("lib/openFile");
+		await openFile(Url.join(vshell.getRoot(), relativePath));
+	} catch (error) {
+		toast(`open: ${error.message || error}`);
+	}
 }
 
 async function onCommit() {
-        const message = ($message?.value || "").trim();
-        if (!message) {
-                toast(strings["git commit msg"] || "Commit message");
-                return;
-        }
-        try {
-                const result = await commit(message);
-                if (result?.error) {
-                        toast(result.output);
-                        return;
-                }
-                $message.value = "";
-                toast(result?.output || strings["git committed"] || "Snapshot created");
-                refresh();
-        } catch (error) {
-                toast(`commit: ${error.message || error}`);
-        }
+	const message = ($message?.value || "").trim();
+	if (!message) {
+		toast(strings["git commit msg"] || "Commit message");
+		return;
+	}
+	try {
+		const result = await commit(message);
+		if (result?.error) {
+			toast(result.output);
+			return;
+		}
+		$message.value = "";
+		toast(result?.output || strings["git committed"] || "Snapshot created");
+		refresh();
+	} catch (error) {
+		toast(`commit: ${error.message || error}`);
+	}
 }
 
 async function renderCommits() {
-        if (!$commitsBody?.isConnected) return;
-        const { commits } = await readVcsDb();
+	if (!$commitsBody?.isConnected) return;
+	const { commits } = await readVcsDb();
 
-        if (!commits.length) {
-                $commitsBody.content = (
-                        <div className="git-empty">{strings["git no commits"] || "No snapshots yet."}</div>
-                );
-                return;
-        }
+	if (!commits.length) {
+		$commitsBody.content = (
+			<div className="git-empty">
+				{strings["git no commits"] || "No snapshots yet."}
+			</div>
+		);
+		return;
+	}
 
-        $commitsBody.content = (
-                <div className="git-commit-list">
-                        {commits
-                                .slice()
-                                .reverse()
-                                .map((item) => (
-                                        <div
-                                                className="git-commit"
-                                                onclick={() => commitActions(item)}
-                                        >
-                                                <span className="git-commit-id">{item.id}</span>
-                                                <span className="git-commit-msg">{item.message}</span>
-                                                <span className="git-commit-time">
-                                                        {relativeTime(item.at)}
-                                                </span>
-                                        </div>
-                                ))}
-                </div>
-        );
+	$commitsBody.content = (
+		<div className="git-commit-list">
+			{commits
+				.slice()
+				.reverse()
+				.map((item) => (
+					<div className="git-commit" onclick={() => commitActions(item)}>
+						<span className="git-commit-id">{item.id}</span>
+						<span className="git-commit-msg">{item.message}</span>
+						<span className="git-commit-time">{relativeTime(item.at)}</span>
+					</div>
+				))}
+		</div>
+	);
 }
 
 /**
  * @param {{id: string, message: string, at: number}} item
  */
 async function commitActions(item) {
-        const choice = await select(item.message, [
-                {
-                        value: "restore",
-                        text: strings["git restore"] || "Restore files",
-                        icon: "settings_backup_restore",
-                },
-                { value: "copy", text: strings.copy || "Copy id", icon: "copy" },
-        ]);
-        if (choice === "restore") {
-                const ok = await confirmDialog(
-                        strings["git restore"] || "Restore files",
-                        (
-                                strings["git confirm restore"] ||
-                                "Restore all files from snapshot {id}? Current files with the same name will be overwritten."
-                        ).replace("{id}", item.id),
-                );
-                if (!ok) return;
-                try {
-                        const result = await restore(item.id);
-                        toast(result?.output || strings["git restored"] || "Files restored");
-                        refresh();
-                } catch (error) {
-                        toast(`restore: ${error.message || error}`);
-                }
-        } else if (choice === "copy") {
-                await copy(item.id);
-                toast(strings["git copied"] || "Copied");
-        }
+	const choice = await select(item.message, [
+		{
+			value: "restore",
+			text: strings["git restore"] || "Restore files",
+			icon: "historyrestore",
+		},
+		{ value: "copy", text: strings.copy || "Copy id", icon: "copy" },
+	]);
+	if (choice === "restore") {
+		const ok = await confirmDialog(
+			strings["git restore"] || "Restore files",
+			(
+				strings["git confirm restore"] ||
+				"Restore all files from snapshot {id}? Current files with the same name will be overwritten."
+			).replace("{id}", item.id),
+		);
+		if (!ok) return;
+		try {
+			const result = await restore(item.id);
+			toast(result?.output || strings["git restored"] || "Files restored");
+			refresh();
+		} catch (error) {
+			toast(`restore: ${error.message || error}`);
+		}
+	} else if (choice === "copy") {
+		await copy(item.id);
+		toast(strings["git copied"] || "Copied");
+	}
 }
 
 function renderGh() {
-        const $body = container?._$ghBody;
-        if (!$body?.isConnected) return;
-        const remote = settings.value.gitRemoteUrl || "";
-        const commands = preparedCommands(remote, "update");
+	const $body = container?._$ghBody;
+	if (!$body?.isConnected) return;
+	const remote = settings.value.gitRemoteUrl || "";
+	const commands = preparedCommands(remote, "update");
 
-        $body.content = (
-                <div className="git-gh-list">
-                        {commands.map((entry) => (
-                                <div
-                                        className="git-gh-cmd"
-                                        onclick={() => copyCommand(entry.command)}
-                                >
-                                        <span className="git-gh-label">{entry.label}</span>
-                                        <code className="git-gh-text">{entry.command}</code>
-                                </div>
-                        ))}
-                </div>
-        );
+	$body.content = (
+		<div className="git-gh-list">
+			{commands.map((entry) => (
+				<div className="git-gh-cmd" onclick={() => copyCommand(entry.command)}>
+					<span className="git-gh-label">{entry.label}</span>
+					<code className="git-gh-text">{entry.command}</code>
+				</div>
+			))}
+		</div>
+	);
 }
 
 async function editRemote() {
-        const value = await prompt(
-                strings["git remote url"] || "Remote URL",
-                settings.value.gitRemoteUrl || "",
-                "text",
-        );
-        if (value === null) return;
-        settings.value.gitRemoteUrl = String(value || "").trim();
-        settings.update();
-        renderGh();
+	const value = await prompt(
+		strings["git remote url"] || "Remote URL",
+		settings.value.gitRemoteUrl || "",
+		"text",
+	);
+	if (value === null) return;
+	settings.value.gitRemoteUrl = String(value || "").trim();
+	settings.update();
+	renderGh();
 }
 
 /**
  * @param {string} command
  */
 async function copyCommand(command) {
-        await copy(command);
-        toast(strings["git copied"] || "Command copied");
+	await copy(command);
+	toast(strings["git copied"] || "Command copied");
 }
 
 /**
  * @param {string} text
  */
 async function copy(text) {
-        try {
-                if (cordova?.plugins?.clipboard) {
-                        cordova.plugins.clipboard.copy(text);
-                        return;
-                }
-                await navigator.clipboard.writeText(text);
-        } catch (error) {
-                toast(`clipboard: ${error.message || error}`);
-        }
+	try {
+		if (cordova?.plugins?.clipboard) {
+			cordova.plugins.clipboard.copy(text);
+			return;
+		}
+		await navigator.clipboard.writeText(text);
+	} catch (error) {
+		toast(`clipboard: ${error.message || error}`);
+	}
 }
 
 /**
@@ -416,21 +631,21 @@ async function copy(text) {
  * @returns {Promise<boolean>}
  */
 async function confirmDialog(title, message) {
-        const { default: confirm } = await import("dialogs/confirm");
-        return confirm(title, message);
+	const { default: confirm } = await import("dialogs/confirm");
+	return confirm(title, message);
 }
 
 /**
  * @param {number} timestamp
  */
 function relativeTime(timestamp) {
-        if (!timestamp) return "";
-        const diff = Date.now() - timestamp;
-        const minutes = Math.floor(diff / 60000);
-        if (minutes < 1) return "now";
-        if (minutes < 60) return `${minutes}m`;
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours}h`;
-        const days = Math.floor(hours / 24);
-        return `${days}d`;
+	if (!timestamp) return "";
+	const diff = Date.now() - timestamp;
+	const minutes = Math.floor(diff / 60000);
+	if (minutes < 1) return "now";
+	if (minutes < 60) return `${minutes}m`;
+	const hours = Math.floor(minutes / 60);
+	if (hours < 24) return `${hours}h`;
+	const days = Math.floor(hours / 24);
+	return `${days}d`;
 }

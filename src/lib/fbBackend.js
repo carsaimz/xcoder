@@ -286,6 +286,9 @@ export async function pullAll() {
 		const safe = { ...payload.settings };
 		// never restore secrets blindly
 		delete safe.ghToken;
+		delete safe.ghUserLogin;
+		delete safe.ghUserName;
+		delete safe.ghUserAvatar;
 		for (const [key, value] of Object.entries(safe)) {
 			if (key in settings.value) settings.value[key] = value;
 		}
