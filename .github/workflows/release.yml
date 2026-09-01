@@ -1,9 +1,14 @@
 name: Release (signed APK + AAB)
 
-# Stable release on tags like v1.2.3:
-# 1. generates a conventional-commits changelog
-# 2. builds a signed APK and a signed AAB (keystore from repository secrets)
-# 3. publishes the GitHub release with the artifacts
+# Stable release on tags like v1.2.3 (only when the tag is a higher
+# version than every previous tag), or triggered manually:
+#
+# Manual run with a version (e.g. 1.4.0):
+#   1. bumps package.json + config.xml (versionCode) to that version
+#   2. commits "chore(release): vX.Y.Z" and creates the vX.Y.Z tag
+#   3. builds a signed APK and a signed AAB (keystore from secrets)
+#   4. publishes the GitHub release with a categorized changelog
+#      (feat/fix/perf/refactor sections) plus GitHub's auto notes
 #
 # Required secrets:
 #   KEYSTORE_BASE64    - base64 of the release keystore (.jks)
@@ -17,6 +22,12 @@ on:
       - "v*"
       - "!v*-beta*"
       - "!v*-rc*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 1.4.0)"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -47,6 +58,39 @@ jobs:
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" >/dev/null
+
+      - name: Prepare version (manual runs bump + tag, tag push validates)
+        id: version
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          REF: ${{ github.ref_name }}
+        run: |
+          set -e
+          # latest existing tag (version-sorted); empty for the first release
+          PREV=$(git tag --sort=-v:refname | grep -vx "$REF" | head -n 1 || true)
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            # refuse to release a version that does not move forward
+            if [ -n "$PREV" ]; then
+              node utils/scripts/bump-version.mjs "$INPUT_VERSION" --check-only --greater-than "$PREV"
+            fi
+            OUT=$(node utils/scripts/bump-version.mjs "$INPUT_VERSION")
+            VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package.json config.xml
+            git commit -m "chore(release): v${VERSION}"
+            git tag -a "v${VERSION}" -m "XCoder v${VERSION}"
+            git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
+          else
+            # tag push: the new tag must compare greater than previous tags
+            if [ -n "$PREV" ]; then
+              node utils/scripts/bump-version.mjs "$REF" --check-only --greater-than "$PREV"
+            fi
+            VERSION=$(node -p "require('./package.json').version")
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
@@ -91,38 +135,52 @@ jobs:
       - name: Collect artifacts
         id: artifacts
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=${{ steps.version.outputs.version }}
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           cp platforms/android/app/build/outputs/apk/release/app-release.apk "XCoder-v${VERSION}.apk"
           cp platforms/android/app/build/outputs/bundle/release/app-release.aab "XCoder-v${VERSION}.aab"
 
-      - name: Generate changelog (conventional commits)
-        id: changelog
+      - name: Generate changelog (categorized conventional commits)
+        id: notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
         run: |
-          npx --yes conventional-changelog-cli@5 -p angular -o /tmp/changelog.md
+          PREV=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)
+          BODY=""
+          if [ -n "$PREV" ]; then
+            BODY=$(GITHUB_TOKEN="$GITHUB_TOKEN" node utils/scripts/generate-release-notes.js \
+              "${GITHUB_REPOSITORY%%/*}" "${GITHUB_REPOSITORY##*/}" "$TAG" \
+              --from-tag "$PREV" --important-only --quiet || true)
+          fi
+          if [ -z "$BODY" ]; then
+            BODY="Initial stable release."
+          fi
           {
-            echo "body<<CHANGELOG_EOF"
-            head -n 400 /tmp/changelog.md
-            echo "CHANGELOG_EOF"
+            echo "body<<NOTES_EOF"
+            printf '%s\n' "$BODY"
+            echo "NOTES_EOF"
           } >> "$GITHUB_OUTPUT"
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
           prerelease: false
+          generate_release_notes: true
           files: |
-            ${{ steps.artifacts.outputs.version && format('XCoder-v{0}.apk', steps.artifacts.outputs.version) || '' }}
-            ${{ steps.artifacts.outputs.version && format('XCoder-v{0}.aab', steps.artifacts.outputs.version) || '' }}
+            XCoder-v${{ steps.version.outputs.version }}.apk
+            XCoder-v${{ steps.version.outputs.version }}.aab
           body: |
-            ### XCoder ${{ steps.artifacts.outputs.version }}
+            ### XCoder ${{ steps.version.outputs.version }}
 
-            ${{ steps.changelog.outputs.body }}
+            ${{ steps.notes.outputs.body }}
 
             ---
 
             **Install (Android 8+):**
-            - `XCoder-v${{ steps.artifacts.outputs.version }}.apk` — install directly
-            - `XCoder-v${{ steps.artifacts.outputs.version }}.aab` — for Play Store distribution
+            - `XCoder-v${{ steps.version.outputs.version }}.apk` — install directly
+            - `XCoder-v${{ steps.version.outputs.version }}.aab` — for Play Store distribution
 
             Both artifacts are signed with the release key.
 

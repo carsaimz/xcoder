@@ -1,0 +1,76 @@
+name: Debug APK
+
+# Debug APK on every push so any commit can be installed and tested.
+# The app version is stamped as `1.2.3-debug` in config.xml (versionName),
+# e.g. XCoder-v1.3.0-debug.apk.
+#
+# Signed releases are NOT built here: they run automatically when a new
+# higher version tag is pushed (release.yml) or via workflow_dispatch.
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+concurrency:
+  group: debug-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  debug-apk:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" >/dev/null
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Add Android platform
+        run: npx cordova platform add android@15 || true
+
+      - name: Stamp app version as -debug
+        run: node utils/scripts/bump-version.mjs --suffix debug
+
+      - name: Build web bundle + debug APK
+        run: |
+          node utils/config.js d
+          npx rspack --mode development
+          npx cordova build android -- --packageType=apk
+
+      - name: Rename APK
+        id: apk
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          SRC=platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          DEST="XCoder-v${VERSION}-debug.apk"
+          cp "$SRC" "$DEST"
+          echo "file=$DEST" >> "$GITHUB_OUTPUT"
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.apk.outputs.file }}
+          path: ${{ steps.apk.outputs.file }}
+          retention-days: 14
