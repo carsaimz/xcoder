@@ -67,7 +67,7 @@ export default function AboutInclude() {
 				</div>
 				<div className="info-item">
 					<div className="info-item-icon">
-						<span className="icon offline"></span>
+						<span className="icon phone_android"></span>
 					</div>
 					<div className="info-item-text">
 						Offline-first
@@ -78,7 +78,7 @@ export default function AboutInclude() {
 				</div>
 				<a href={config.GITHUB_URL} className="info-item">
 					<div className="info-item-icon">
-						<span className="icon xcoder"></span>
+						<span className="icon github"></span>
 					</div>
 					<div className="info-item-text">
 						Project homepage
@@ -87,7 +87,7 @@ export default function AboutInclude() {
 				</a>
 				<a href={`${config.GITHUB_URL}/issues`} className="info-item">
 					<div className="info-item-icon">
-						<span className="icon bug_report"></span>
+						<span className="icon error_outline"></span>
 					</div>
 					<div className="info-item-text">
 						Report an issue
@@ -113,13 +113,13 @@ export default function AboutInclude() {
 			<div className="social-links">
 				<a href={config.GITHUB_URL} className="social-link">
 					<div className="social-icon">
-						<span className="icon xcoder"></span>
+						<span className="icon github"></span>
 					</div>
 					GitHub
 				</a>
 				<a href={`${config.GITHUB_URL}/wiki`} className="social-link">
 					<div className="social-icon">
-						<span className="icon find"></span>
+						<span className="icon search"></span>
 					</div>
 					Docs
 				</a>

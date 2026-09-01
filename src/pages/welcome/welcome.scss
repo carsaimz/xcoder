@@ -419,3 +419,12 @@
     }
   }
 }
+
+// App logo image inside link items (e.g. the Website button)
+.link-item .link-logo {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-block;
+  object-fit: contain;
+}

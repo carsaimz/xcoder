@@ -23,7 +23,7 @@ export default function openWelcomeTab() {
 		render: true,
 		type: "page",
 		content: welcomeContent,
-		tabIcon: "icon xcoder",
+		tabIcon: "icon house",
 		hideQuickTools: true,
 	});
 
@@ -109,8 +109,8 @@ function createWelcomeContent() {
 			{/* Tools Section: AI + Git */}
 			<section className="welcome-section">
 				<h2 className="section-label">{section("welcome tools", "Tools")}</h2>
-				<div className="feature-card" onclick={() => showSidebarApp("ai")}>
-					<span className="icon psychology accent"></span>
+				<div className="feature-card" onclick={() => openAppTab("ai")}>
+					<span className="icon brain accent"></span>
 					<div className="feature-text">
 						<span className="feature-title">
 							{strings["welcome ask ai"] || "Ask AI"}
@@ -122,7 +122,7 @@ function createWelcomeContent() {
 					</div>
 					<span className="icon arrow_forward arrow"></span>
 				</div>
-				<div className="feature-card" onclick={() => showSidebarApp("git")}>
+				<div className="feature-card" onclick={() => openAppTab("git")}>
 					<span className="icon git accent"></span>
 					<div className="feature-text">
 						<span className="feature-title">
@@ -228,10 +228,10 @@ function createWelcomeContent() {
 					{section("welcome connect", "Connect")}
 				</h2>
 				<div className="link-row">
-					<LinkItem icon="xcoder" label="Website" url={config.BASE_URL} />
+					<LinkItem icon="logo" label="Website" url={config.BASE_URL} />
 					<LinkItem icon="github" label="GitHub" url={config.GITHUB_URL} />
 					<LinkItem
-						icon="bug_report"
+						icon="error_outline"
 						label="Issues"
 						url={`${config.GITHUB_URL}/issues`}
 					/>
@@ -270,17 +270,20 @@ async function openRecentFolder(folder) {
 }
 
 /**
- * Activates a sidebar app (ai, git, ...) and shows the sidebar
- * @param {string} id
+ * Opens the AI chat or Git panel as an editor tab (like the terminal).
+ * @param {"ai"|"git"} id
  */
-async function showSidebarApp(id) {
+async function openAppTab(id) {
 	try {
-		const [{ default: sidebarApps }, { default: Sidebar }] = await Promise.all([
-			import("sidebarApps"),
-			import("components/sidebar"),
-		]);
-		sidebarApps.setActiveApp(id);
-		Sidebar.show();
+		if (id === "ai") {
+			const { openAiChat } = await import("sidebarApps/ai");
+			await openAiChat();
+			return;
+		}
+		if (id === "git") {
+			const { openGitPanel } = await import("sidebarApps/git");
+			await openGitPanel();
+		}
 	} catch (error) {
 		window.log("error", error);
 	}
@@ -340,7 +343,17 @@ function LinkItem({ icon, label, url }) {
 
 	return (
 		<a href={url} className="link-item" onclick={handleClick}>
-			<span className={`icon ${icon}`}></span>
+			{icon === "logo" ? (
+				<img
+					className="link-logo"
+					src={logoSrc}
+					width="16"
+					height="16"
+					alt=""
+				/>
+			) : (
+				<span className={`icon ${icon}`}></span>
+			)}
 			<span>{label}</span>
 		</a>
 	);
