@@ -24,6 +24,8 @@ export default class SidebarApp {
 	#container;
 	/**@type {boolean} tabbed apps host their UI in an editor tab instead of the sidebar panel */
 	#tabbed;
+	/**@type {string|null} strings key used to retranslate the icon tooltip on language change */
+	#titleKey = null;
 
 	/**
 	 * Creates a new sidebar app.
@@ -32,11 +34,12 @@ export default class SidebarApp {
 	 * @param {string} title
 	 * @param {(el:HTMLElement)=>(void|Function)} init
 	 * @param {(el:HTMLElement)=>void} onselect
-	 * @param {{tabbed?: boolean}} [opts]
+	 * @param {{tabbed?: boolean, titleKey?: string}} [opts]
 	 */
 	constructor(icon, id, title, init, onselect, opts = {}) {
 		const emptyFunc = () => {};
 		this.#container = <div className="container"></div>;
+		this.#titleKey = opts.titleKey || null;
 		this.#icon = <Icon icon={icon} id={id} title={title} />;
 		this.#id = id;
 		this.#title = title;
@@ -47,7 +50,16 @@ export default class SidebarApp {
 		if (typeof cleanup === "function") {
 			this.#cleanup = cleanup;
 		}
+		document.addEventListener("langchange", this.#onLangChange);
 	}
+
+	#onLangChange = () => {
+		if (!this.#titleKey || !this.#icon) return;
+		const text = window.strings?.[this.#titleKey];
+		if (!text) return;
+		this.#title = text;
+		this.#icon.title = text;
+	};
 
 	/**
 	 * Installs the app in the sidebar.
@@ -163,6 +175,7 @@ export default class SidebarApp {
 	}
 
 	remove() {
+		document.removeEventListener("langchange", this.#onLangChange);
 		this.#cleanup?.();
 		this.#cleanup = null;
 		if (this.#icon) {

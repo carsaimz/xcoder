@@ -107,6 +107,7 @@ let showReplace = false;
 let showExtras = !!(store.exclude || store.include);
 let useIncludeAndExclude = showExtras;
 const $headerEl = Ref();
+const $titleText = Ref();
 let searchResult = null; // CM6 wrapper from createSearchResultView
 let currentSearchRegex = null;
 let resultScrollTop = 0;
@@ -127,6 +128,25 @@ let activeSearchTasks = 0;
 let activeReplaceTasks = 0;
 
 addEventListener($regExp, "change", onInput);
+
+// Retranslate the panel header the moment the language changes.
+document.addEventListener("langchange", () => {
+	if ($titleText.el?.isConnected) {
+		$titleText.el.textContent = strings["search in files"];
+	}
+	if ($search.el?.isConnected) {
+		$search.el.placeholder = strings["search"];
+	}
+	if ($replace.el?.isConnected) {
+		$replace.el.placeholder = strings["replace"];
+	}
+	if ($exclude.el?.isConnected) {
+		$exclude.el.placeholder = strings["exclude files"];
+	}
+	if ($include.el?.isConnected) {
+		$include.el.placeholder = strings["include files"];
+	}
+});
 addEventListener($wholeWord, "change", onInput);
 addEventListener($caseSensitive, "change", onInput);
 addEventListener($useIndex, "change", onInput);
@@ -195,7 +215,9 @@ export default [
 					className={`header${showReplace ? " show-replace" : ""}${showExtras ? " show-extras" : ""}`}
 				>
 					<div className="title-container">
-						<span className="title-text">{strings["search in files"]}</span>
+						<span className="title-text" ref={$titleText}>
+							{strings["search in files"]}
+						</span>
 						<div className="actions">
 							<button
 								type="button"
@@ -299,6 +321,7 @@ export default [
 	},
 	false, // show as first item
 	() => {},
+	{ titleKey: "search in files" },
 ];
 
 /**

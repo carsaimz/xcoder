@@ -49,7 +49,8 @@ export default function AboutInclude() {
 			<div className="version-info">
 				<h1 className="version-title">XCoder</h1>
 				<div className="version-number">
-					Version {BuildInfo.version} ({BuildInfo.versionCode})
+					{strings.version || "Version"} {BuildInfo.version} (
+					{BuildInfo.versionCode})
 				</div>
 			</div>
 
@@ -70,9 +71,10 @@ export default function AboutInclude() {
 						<span className="icon phone_android"></span>
 					</div>
 					<div className="info-item-text">
-						Offline-first
+						{strings["about offline"] || "Offline-first"}
 						<div className="info-item-subtext">
-							No account, no ads, no tracking
+							{strings["about offline desc"] ||
+								"No account, no ads, no tracking"}
 						</div>
 					</div>
 				</div>
@@ -81,7 +83,7 @@ export default function AboutInclude() {
 						<span className="icon github"></span>
 					</div>
 					<div className="info-item-text">
-						Project homepage
+						{strings["about homepage"] || "Project homepage"}
 						<div className="info-item-subtext">{config.GITHUB_URL}</div>
 					</div>
 				</a>
@@ -90,7 +92,7 @@ export default function AboutInclude() {
 						<span className="icon error_outline"></span>
 					</div>
 					<div className="info-item-text">
-						Report an issue
+						{strings["about report issue"] || "Report an issue"}
 						<div className="info-item-subtext">
 							{`${config.GITHUB_URL}/issues`}
 						</div>
@@ -104,7 +106,7 @@ export default function AboutInclude() {
 						<span className="icon historyrestore"></span>
 					</div>
 					<div className="info-item-text">
-						License
+						{strings.license || "License"}
 						<div className="info-item-subtext">MIT</div>
 					</div>
 				</a>
@@ -121,7 +123,7 @@ export default function AboutInclude() {
 					<div className="social-icon">
 						<span className="icon search"></span>
 					</div>
-					Docs
+					{strings.documentation || "Docs"}
 				</a>
 			</div>
 		</main>

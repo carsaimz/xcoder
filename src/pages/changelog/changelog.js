@@ -2,21 +2,23 @@ import "./style.scss";
 import fsOperation from "fileSystem";
 import Contextmenu from "components/contextmenu";
 import Page from "components/page";
-import toast from "components/toast";
 import DOMPurify from "dompurify";
 import Ref from "html-tag-js/ref";
 import actionStack from "lib/actionStack";
+import config from "lib/config";
 import markdownIt from "markdown-it";
 import markdownItFootnote from "markdown-it-footnote";
 import markdownItTaskLists from "markdown-it-task-lists";
 import helpers from "utils/helpers";
 
 export default async function Changelog() {
-	const GITHUB_API_URL =
-		"https://api.github.com/repos/XCoder-Foundation/XCoder/releases";
-	const CHANGELOG_FILE_URL =
-		"https://raw.githubusercontent.com/carsaimz/xcoder/main/CHANGELOG.md";
+	const GITHUB_API_URL = `${config.GITHUB_URL.replace(
+		"https://github.com",
+		"https://api.github.com",
+	)}/releases`;
+	const CHANGELOG_FILE_URL = `${config.GITHUB_URL}/raw/main/CHANGELOG.md`;
 	const currentVersion = BuildInfo.version;
+	const localChangelogMd = (await import("../../../CHANGELOG.md")).default;
 
 	let selectedVersion = currentVersion;
 	let selectedStatus = "current";
@@ -47,26 +49,24 @@ export default async function Changelog() {
 		innerHTML: () => {
 			return `
         <li action="current">
-          <span class="text">Current Version (${currentVersion})</span>
+          <span class="text">${strings["changelog current version"] || "Current Version"} (${currentVersion})</span>
         </li>
         <li action="latest">
-          <span class="text">Latest Release</span>
+          <span class="text">${strings["changelog latest release"] || "Latest Release"}</span>
         </li>
         <li action="beta">
-          <span class="text">Beta Version</span>
+          <span class="text">${strings["changelog beta version"] || "Beta Version"}</span>
         </li>
         <li action="full">
-          <span class="text">Full Changelog</span>
+          <span class="text">${strings["changelog full"] || "Full Changelog"}</span>
         </li>
       `;
 		},
 	});
 
-	const changelogMd = await import("../../../CHANGELOG.md");
-
-	toast("Loading changelog...");
-	loadVersionChangelog();
-	body.onref = () => renderChangelog(changelogMd.default);
+	// Render the bundled changelog immediately — remote sources are
+	// enhancements, never a requirement.
+	body.onref = () => renderChangelog(localChangelogMd);
 	$page.body = <div className="md" id="changelog" ref={body} />;
 	app.append($page);
 	helpers.showAd();
@@ -80,6 +80,8 @@ export default async function Changelog() {
 		action: $page.hide,
 	});
 
+	loadVersionChangelog();
+
 	async function loadLatestRelease() {
 		try {
 			const releases = await fsOperation(`${GITHUB_API_URL}/latest`).readFile(
@@ -88,10 +90,11 @@ export default async function Changelog() {
 			selectedVersion = releases.tag_name.replace("v", "");
 			selectedStatus = "latest";
 			updateVersionSelector();
-			return renderChangelog(releases.body);
+			return renderChangelog(releases.body || localChangelogMd);
 		} catch (error) {
-			toast("Failed to load latest release notes");
-			renderChangelog(changelogMd.default);
+			window.log("error", "Failed to load latest release notes:", error);
+			updateVersionSelector();
+			return renderChangelog(localChangelogMd);
 		}
 	}
 
@@ -100,16 +103,21 @@ export default async function Changelog() {
 			const releases = await fsOperation(GITHUB_API_URL).readFile("json");
 			const betaRelease = releases.find((r) => r.prerelease);
 			if (!betaRelease) {
-				body.content = <div className="error">No beta release found</div>;
+				body.content = (
+					<div className="error">
+						{strings["changelog no beta"] || "No beta release found"}
+					</div>
+				);
 				return;
 			}
 			selectedVersion = betaRelease.tag_name.replace("v", "");
 			selectedStatus = "prerelease";
 			updateVersionSelector();
-			return renderChangelog(betaRelease.body);
+			return renderChangelog(betaRelease.body || localChangelogMd);
 		} catch (error) {
-			toast("Failed to load beta release notes");
-			renderChangelog(changelogMd.default);
+			window.log("error", "Failed to load beta release notes:", error);
+			updateVersionSelector();
+			return renderChangelog(localChangelogMd);
 		}
 	}
 
@@ -118,13 +126,14 @@ export default async function Changelog() {
 			const changeLogText =
 				await fsOperation(CHANGELOG_FILE_URL).readFile("utf8");
 			const cleanedText = changeLogText.replace(/^#\s*Change\s*Log\s*\n*/i, "");
-			selectedVersion = "Changelogs.md";
+			selectedVersion = "CHANGELOG.md";
 			selectedStatus = "current";
 			updateVersionSelector();
-			return renderChangelog(cleanedText);
+			return renderChangelog(cleanedText || localChangelogMd);
 		} catch (error) {
-			toast("Failed to load full changelog");
-			renderChangelog(changelogMd.default);
+			window.log("error", "Failed to load full changelog:", error);
+			updateVersionSelector();
+			return renderChangelog(localChangelogMd);
 		}
 	}
 
@@ -137,24 +146,30 @@ export default async function Changelog() {
 			selectedVersion = currentVersion;
 			selectedStatus = "current";
 			updateVersionSelector();
-			if (currentRelease) {
+			if (currentRelease?.body) {
 				return renderChangelog(currentRelease.body);
-			} else {
-				return loadLatestRelease();
 			}
+			return loadLatestRelease();
 		} catch (error) {
-			toast("Failed to load version changelog");
-			renderChangelog(changelogMd.default);
+			// Offline, rate limited or slow network: keep showing the
+			// bundled changelog silently instead of an error toast.
+			window.log("warn", "Failed to load version changelog:", error);
+			updateVersionSelector();
+			return renderChangelog(localChangelogMd);
 		}
 	}
 
 	function renderChangelog(text) {
 		const md = markdownIt({ html: true, linkify: true });
-		const REPO_URL = "https://github.com/carsaimz/xcoder";
+		const REPO_URL = config.GITHUB_URL;
+		const ownerRepo = REPO_URL.replace("https://github.com/", "");
 		let processedText = text
-			// Convert full PR URLs to #number format with links preserved in markdown
+			// Convert full PR URLs (any repo spelling) to short linked #numbers
 			.replace(
-				/https:\/\/github\.com\/XCoder-Foundation\/XCoder\/pull\/(\d+)/g,
+				new RegExp(
+					`https:\\/\\/github\\.com\\/(?:${ownerRepo.replace("/", "\\/")}|XCoder-Foundation\\/XCoder)\\/pull\\/(\\d+)`,
+					"g",
+				),
 				`[#$1](${REPO_URL}/pull/$1)`,
 			)
 			// Convert existing #number references to links if they aren't already

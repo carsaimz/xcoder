@@ -13,6 +13,7 @@ import {
 	readVcsDb,
 	restore,
 } from "lib/gitPanel";
+import lang, { getIntlLocale } from "lib/lang";
 import settings from "lib/settings";
 import Url from "utils/Url";
 
@@ -26,6 +27,21 @@ const COMMIT_PREFIXES = [
 	"ci",
 ];
 const GIT_TAB_ID = "git-panel-tab";
+
+// Keep the open panel tab translated when the user changes the language.
+document.addEventListener("langchange", () => {
+	const manager = window.editorManager;
+	if (!manager) return;
+	const file = manager.files.find((f) => f.id === GIT_TAB_ID);
+	const title = strings["git panel"] || "Git";
+	if (file && file.filename !== title) {
+		try {
+			file.filename = title;
+		} catch {
+			/* tab already gone */
+		}
+	}
+});
 
 /** @type {HTMLElement} */
 let container = null;
@@ -48,7 +64,7 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ tabbed: true },
+	{ tabbed: true, titleKey: "git panel" },
 ];
 
 /**
@@ -456,13 +472,16 @@ function renderStatus(status) {
 		 * @param {string} path
 		 */
 		return (path) => (
-			<div
-				className="git-file"
-				data-path={path}
-				onclick={() => openChangedFile(path)}
-			>
+			<div className="git-file" data-path={path}>
 				<span className={`git-letter ${cls}`}>{letter}</span>
-				<span className="git-file-name">{path}</span>
+				<span className="git-file-name" onclick={() => openChangedFile(path)}>
+					{path}
+				</span>
+				<span
+					className="icon copy git-file-copy"
+					title={strings.copy || "Copy path"}
+					onclick={() => copyPath(path)}
+				></span>
 			</div>
 		);
 	}
@@ -486,6 +505,15 @@ async function openChangedFile(relativePath) {
 	} catch (error) {
 		toast(`open: ${error.message || error}`);
 	}
+}
+
+/**
+ * Copies a changed file path to the clipboard.
+ * @param {string} relativePath
+ */
+async function copyPath(relativePath) {
+	await copy(relativePath);
+	toast(strings["git copied"] || "Copied");
 }
 
 async function onCommit() {
@@ -530,7 +558,9 @@ async function renderCommits() {
 					<div className="git-commit" onclick={() => commitActions(item)}>
 						<span className="git-commit-id">{item.id}</span>
 						<span className="git-commit-msg">{item.message}</span>
-						<span className="git-commit-time">{relativeTime(item.at)}</span>
+						<span className="git-commit-time">
+							{shortDate(item.at)} · {relativeTime(item.at)}
+						</span>
 					</div>
 				))}
 		</div>
@@ -636,16 +666,33 @@ async function confirmDialog(title, message) {
 }
 
 /**
+ * Locale-aware relative time ("agora", "5 min", "3 h", "2 d"...).
  * @param {number} timestamp
  */
 function relativeTime(timestamp) {
 	if (!timestamp) return "";
 	const diff = Date.now() - timestamp;
 	const minutes = Math.floor(diff / 60000);
-	if (minutes < 1) return "now";
-	if (minutes < 60) return `${minutes}m`;
+	if (minutes < 1) return strings["git time now"] || "now";
+	if (minutes < 60) return `${minutes} ${strings["git time min"] || "min"}`;
 	const hours = Math.floor(minutes / 60);
-	if (hours < 24) return `${hours}h`;
+	if (hours < 24) return `${hours} ${strings["git time hour"] || "h"}`;
 	const days = Math.floor(hours / 24);
-	return `${days}d`;
+	return `${days} ${strings["git time day"] || "d"}`;
+}
+
+/**
+ * Locale-aware short date for commit rows.
+ * @param {number} timestamp
+ */
+function shortDate(timestamp) {
+	if (!timestamp) return "";
+	try {
+		return new Intl.DateTimeFormat(getIntlLocale(lang?.code), {
+			day: "2-digit",
+			month: "short",
+		}).format(new Date(timestamp));
+	} catch {
+		return "";
+	}
 }

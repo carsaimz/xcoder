@@ -340,3 +340,98 @@
     margin-left: 0 !important;
   }
 }
+
+/* ---- Xcoder panel polish (accent dot header, focus rings, sticky header) ---- */
+.container.search-in-files {
+  .header {
+    background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+    position: relative;
+
+    /* thin gradient line under the header — panel signature */
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        var(--active-color),
+        color-mix(in srgb, var(--active-color) 10%, transparent)
+      );
+      opacity: 0.5;
+    }
+
+    .title-container .title-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--secondary-text-color);
+
+      /* small gradient dot marking the section */
+      &::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--active-color);
+        box-shadow: 0 0 6px color-mix(in srgb, var(--active-color) 60%, transparent);
+      }
+    }
+
+    .search-row,
+    .replace-row {
+      input,
+      textarea {
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--primary-color) 78%, transparent);
+        color: var(--primary-text-color);
+        padding: 7px 10px;
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+        &:focus {
+          border-color: var(--active-color);
+          box-shadow: 0 0 0 2px color-mix(in srgb, var(--active-color) 16%, transparent);
+        }
+      }
+    }
+
+    .extras-row input {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--primary-color) 78%, transparent);
+      color: var(--primary-text-color);
+      padding: 7px 10px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+      &:focus {
+        border-color: var(--active-color);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--active-color) 16%, transparent);
+      }
+    }
+
+    .options .input-checkbox {
+      border-radius: 8px;
+      transition: background-color 0.15s ease;
+
+      &:active {
+        background: color-mix(in srgb, var(--active-color) 12%, transparent);
+      }
+    }
+  }
+
+  .search-result-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-weight: 600;
+  }
+}

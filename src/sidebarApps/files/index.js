@@ -12,6 +12,7 @@ export default [
 	initApp, // init function
 	false, // prepend
 	onSelected, // onSelected function
+	{ titleKey: "files" },
 ];
 
 /**

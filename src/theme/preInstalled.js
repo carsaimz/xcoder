@@ -549,11 +549,157 @@ blossom.preferredTerminalTheme = "light";
 const custom = createBuiltInTheme("Custom");
 custom.autoDarkened = true;
 
+// ---- Xcoder brand theme: the icon palette (deep plum + violet/blue) ----
+const xcoder = createBuiltInTheme("Xcoder", "dark");
+xcoder.darkenedPrimaryColor = "rgb(23, 21, 34)";
+xcoder.primaryColor = "rgb(35, 33, 51)";
+xcoder.primaryTextColor = "rgb(235, 232, 248)";
+xcoder.secondaryColor = "rgb(44, 42, 62)";
+xcoder.secondaryTextColor = "rgb(178, 173, 205)";
+xcoder.activeColor = "rgb(133, 108, 250)";
+xcoder.linkTextColor = "rgb(155, 140, 250)";
+xcoder.borderColor = "rgba(154, 107, 252, 0.22)";
+xcoder.popupIconColor = "rgb(235, 232, 248)";
+xcoder.popupBackgroundColor = "rgb(38, 36, 54)";
+xcoder.popupTextColor = "rgb(235, 232, 248)";
+xcoder.popupActiveColor = "rgb(133, 108, 250)";
+xcoder.buttonBackgroundColor = "rgb(122, 116, 252)";
+xcoder.buttonTextColor = "rgb(255, 255, 255)";
+xcoder.buttonActiveColor = "rgb(95, 100, 248)";
+xcoder.boxShadowColor = "rgba(0, 0, 0, 0.5)";
+xcoder.activeTextColor = "rgb(255, 255, 255)";
+xcoder.errorTextColor = "rgb(255, 160, 120)";
+xcoder.dangerColor = "rgb(225, 80, 90)";
+xcoder.scrollbarColor = "rgba(201, 190, 242, 0.16)";
+xcoder.preferredEditorTheme = "tokyoNight";
+xcoder.preferredTerminalTheme = "dark";
+
+const aurora = createBuiltInTheme("Aurora", "dark");
+aurora.darkenedPrimaryColor = "rgb(8, 20, 26)";
+aurora.primaryColor = "rgb(12, 30, 38)";
+aurora.primaryTextColor = "rgb(222, 240, 238)";
+aurora.secondaryColor = "rgb(17, 40, 50)";
+aurora.secondaryTextColor = "rgb(150, 190, 185)";
+aurora.activeColor = "rgb(45, 220, 180)";
+aurora.linkTextColor = "rgb(90, 235, 200)";
+aurora.borderColor = "rgba(45, 220, 180, 0.18)";
+aurora.popupIconColor = "rgb(222, 240, 238)";
+aurora.popupBackgroundColor = "rgb(14, 34, 43)";
+aurora.popupTextColor = "rgb(222, 240, 238)";
+aurora.popupActiveColor = "rgb(45, 220, 180)";
+aurora.buttonBackgroundColor = "rgb(45, 220, 180)";
+aurora.buttonTextColor = "rgb(8, 20, 26)";
+aurora.buttonActiveColor = "rgb(28, 180, 148)";
+aurora.boxShadowColor = "rgba(0, 0, 0, 0.45)";
+aurora.activeTextColor = "rgb(8, 20, 26)";
+aurora.errorTextColor = "rgb(255, 175, 120)";
+aurora.dangerColor = "rgb(235, 75, 75)";
+aurora.scrollbarColor = "rgba(222, 240, 238, 0.12)";
+aurora.preferredEditorTheme = "tokyoNight";
+aurora.preferredTerminalTheme = "nord";
+
+const nord = createBuiltInTheme("Nord", "dark");
+nord.darkenedPrimaryColor = "rgb(38, 44, 54)";
+nord.primaryColor = "rgb(46, 52, 64)";
+nord.primaryTextColor = "rgb(216, 222, 233)";
+nord.secondaryColor = "rgb(59, 66, 82)";
+nord.secondaryTextColor = "rgb(180, 188, 203)";
+nord.activeColor = "rgb(136, 192, 208)";
+nord.linkTextColor = "rgb(129, 161, 193)";
+nord.borderColor = "rgba(136, 192, 208, 0.2)";
+nord.popupIconColor = "rgb(216, 222, 233)";
+nord.popupBackgroundColor = "rgb(52, 58, 72)";
+nord.popupTextColor = "rgb(216, 222, 233)";
+nord.popupActiveColor = "rgb(136, 192, 208)";
+nord.buttonBackgroundColor = "rgb(94, 129, 172)";
+nord.buttonTextColor = "rgb(236, 239, 244)";
+nord.buttonActiveColor = "rgb(76, 106, 144)";
+nord.boxShadowColor = "rgba(0, 0, 0, 0.4)";
+nord.activeTextColor = "rgb(46, 52, 64)";
+nord.errorTextColor = "rgb(191, 97, 106)";
+nord.dangerColor = "rgb(191, 97, 106)";
+nord.scrollbarColor = "rgba(216, 222, 233, 0.14)";
+nord.preferredEditorTheme = "tokyoNight";
+nord.preferredTerminalTheme = "nord";
+
+const matcha = createBuiltInTheme("Matcha", "dark");
+matcha.darkenedPrimaryColor = "rgb(15, 24, 20)";
+matcha.primaryColor = "rgb(22, 34, 29)";
+matcha.primaryTextColor = "rgb(224, 238, 228)";
+matcha.secondaryColor = "rgb(29, 45, 38)";
+matcha.secondaryTextColor = "rgb(160, 190, 168)";
+matcha.activeColor = "rgb(140, 200, 100)";
+matcha.linkTextColor = "rgb(170, 220, 130)";
+matcha.borderColor = "rgba(140, 200, 100, 0.2)";
+matcha.popupIconColor = "rgb(224, 238, 228)";
+matcha.popupBackgroundColor = "rgb(26, 40, 34)";
+matcha.popupTextColor = "rgb(224, 238, 228)";
+matcha.popupActiveColor = "rgb(140, 200, 100)";
+matcha.buttonBackgroundColor = "rgb(140, 200, 100)";
+matcha.buttonTextColor = "rgb(15, 24, 20)";
+matcha.buttonActiveColor = "rgb(112, 170, 78)";
+matcha.boxShadowColor = "rgba(0, 0, 0, 0.4)";
+matcha.activeTextColor = "rgb(15, 24, 20)";
+matcha.errorTextColor = "rgb(255, 170, 110)";
+matcha.dangerColor = "rgb(225, 80, 70)";
+matcha.scrollbarColor = "rgba(224, 238, 228, 0.12)";
+matcha.preferredEditorTheme = "monokai";
+matcha.preferredTerminalTheme = "gruvbox";
+
+const mocha = createBuiltInTheme("Mocha", "dark");
+mocha.darkenedPrimaryColor = "rgb(30, 22, 18)";
+mocha.primaryColor = "rgb(43, 32, 26)";
+mocha.primaryTextColor = "rgb(240, 226, 214)";
+mocha.secondaryColor = "rgb(56, 42, 34)";
+mocha.secondaryTextColor = "rgb(200, 180, 162)";
+mocha.activeColor = "rgb(230, 150, 90)";
+mocha.linkTextColor = "rgb(240, 175, 120)";
+mocha.borderColor = "rgba(230, 150, 90, 0.2)";
+mocha.popupIconColor = "rgb(240, 226, 214)";
+mocha.popupBackgroundColor = "rgb(50, 38, 30)";
+mocha.popupTextColor = "rgb(240, 226, 214)";
+mocha.popupActiveColor = "rgb(230, 150, 90)";
+mocha.buttonBackgroundColor = "rgb(230, 150, 90)";
+mocha.buttonTextColor = "rgb(30, 22, 18)";
+mocha.buttonActiveColor = "rgb(198, 122, 66)";
+mocha.boxShadowColor = "rgba(0, 0, 0, 0.45)";
+mocha.activeTextColor = "rgb(30, 22, 18)";
+mocha.errorTextColor = "rgb(255, 165, 110)";
+mocha.dangerColor = "rgb(220, 85, 70)";
+mocha.scrollbarColor = "rgba(240, 226, 214, 0.12)";
+mocha.preferredEditorTheme = "one_dark";
+mocha.preferredTerminalTheme = "gruvbox";
+
+const sakura = createBuiltInTheme("Sakura", "light");
+sakura.darkenedPrimaryColor = "rgb(240, 226, 232)";
+sakura.primaryColor = "rgb(253, 246, 249)";
+sakura.primaryTextColor = "rgb(58, 42, 50)";
+sakura.secondaryColor = "rgb(248, 234, 240)";
+sakura.secondaryTextColor = "rgb(120, 90, 104)";
+sakura.activeColor = "rgb(215, 80, 130)";
+sakura.linkTextColor = "rgb(190, 60, 110)";
+sakura.borderColor = "rgb(238, 214, 224)";
+sakura.popupIconColor = "rgb(58, 42, 50)";
+sakura.popupBackgroundColor = "rgb(253, 246, 249)";
+sakura.popupTextColor = "rgb(58, 42, 50)";
+sakura.popupActiveColor = "rgb(215, 80, 130)";
+sakura.buttonBackgroundColor = "rgb(215, 80, 130)";
+sakura.buttonTextColor = "rgb(255, 255, 255)";
+sakura.buttonActiveColor = "rgb(185, 60, 108)";
+sakura.boxShadowColor = "rgba(0, 0, 0, 0.06)";
+sakura.activeTextColor = "rgb(255, 255, 255)";
+sakura.errorTextColor = "rgb(190, 40, 40)";
+sakura.dangerColor = "rgb(210, 50, 45)";
+sakura.scrollbarColor = "rgba(58, 42, 50, 0.12)";
+sakura.preferredEditorTheme = "noctisLilac";
+sakura.preferredTerminalTheme = "light";
+
 export default [
 	system,
 	createBuiltInTheme("Legacy", "dark", "free"),
 	dark,
 	light,
+	xcoder,
 	glass,
 	glassDark,
 	neon,
@@ -570,8 +716,13 @@ export default [
 	ember,
 	dusk,
 	carbon,
+	aurora,
+	nord,
+	matcha,
+	mocha,
 	mint,
 	sandstone,
 	blossom,
+	sakura,
 	custom,
 ];

@@ -205,3 +205,44 @@
     background-position: center !important;
   }
 }
+/* ---- Xcoder panel polish ---- */
+.container.extensions {
+  .header {
+    background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+    position: relative;
+
+    /* thin gradient line under the header — panel signature */
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        var(--active-color),
+        color-mix(in srgb, var(--active-color) 10%, transparent)
+      );
+      opacity: 0.5;
+    }
+  }
+
+  .tile {
+    border-radius: 10px;
+    margin: 0 4px;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: color-mix(in srgb, var(--active-color) 7%, transparent);
+    }
+
+    &:active {
+      background: color-mix(in srgb, var(--active-color) 13%, transparent);
+    }
+
+    .install-btn {
+      color: var(--active-color);
+    }
+  }
+}

@@ -29,6 +29,22 @@ import Url from "utils/Url";
 
 const LEGACY_CHAT_KEY = "xcoder.ai.chat";
 const AI_TAB_ID = "ai-chat-tab";
+
+// Keep the open chat tab translated when the user changes the language.
+document.addEventListener("langchange", () => {
+	const manager = window.editorManager;
+	if (!manager) return;
+	const file = manager.files.find((f) => f.id === AI_TAB_ID);
+	const title = strings["ai assistant"] || "AI";
+	if (file && file.filename !== title) {
+		try {
+			file.filename = title;
+		} catch {
+			/* tab already gone */
+		}
+	}
+});
+
 /** @type {Array<{type: string, payload?: any, name?: string, toolCallId?: string, toolCalls?: any[]}>} */
 let events = [];
 /** @type {Array<object>} sessions from lib/ai/sessions */
@@ -68,7 +84,7 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ tabbed: true },
+	{ tabbed: true, titleKey: "ai assistant" },
 ];
 
 /**
@@ -865,6 +881,7 @@ function renderRichText(text) {
 					className="ai-code tappable"
 					onclick={() => codeBlockActions(clean)}
 					title={strings["ai code actions"] || "Tap for code actions"}
+					data-hint={strings["ai tap hint"] || "tap for actions"}
 				>
 					{clean}
 				</pre>,

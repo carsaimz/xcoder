@@ -5,6 +5,7 @@ import Sidebar from "components/sidebar";
 import alert from "dialogs/alert";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
+import Ref from "html-tag-js/ref";
 import config from "lib/config";
 import InstallState from "lib/installState";
 import loadPlugin from "lib/loadPlugin";
@@ -38,10 +39,13 @@ function withSupportedEditor(url) {
 	return `${url}${separator}supported_editor=${config.SUPPORTED_EDITOR}`;
 }
 
+const $titleText = Ref();
+const $searchInput = Ref();
+
 const $header = (
 	<div className="header">
 		<div className="title">
-			<span>{strings.plugins}</span>
+			<span ref={$titleText}>{strings.plugins}</span>
 			<div className="actions">
 				<button type="button" className="icon-button" onclick={filterPlugins}>
 					<span className="icon tune" />
@@ -56,13 +60,24 @@ const $header = (
 			</div>
 		</div>
 		<input
+			ref={$searchInput}
 			oninput={searchPlugin}
 			type="search"
 			name="search-ext"
-			placeholder="Search"
+			placeholder={strings.search || "Search"}
 		/>
 	</div>
 );
+
+// Retranslate the plugins panel header the moment the language changes.
+document.addEventListener("langchange", () => {
+	if ($titleText.el?.isConnected) {
+		$titleText.el.textContent = strings.plugins;
+	}
+	if ($searchInput.el?.isConnected) {
+		$searchInput.el.placeholder = strings.search || "Search";
+	}
+});
 
 const $style = <style></style>;
 /** @type {Set<HTMLElement>} */
@@ -78,6 +93,7 @@ export default [
 	initApp, // init function
 	false, // prepend
 	onSelected, // onSelected function
+	{ titleKey: "plugins" },
 ];
 
 /**
@@ -654,10 +670,10 @@ function updateStyle() {
 
 	$scrollableLists.forEach(($el) => {
 		style += `
-			.list.collapsible[data-id="${$el.dataset.id}"] {
-				max-height: ${$el.dataset.height} !important;
-			}
-		`;
+                        .list.collapsible[data-id="${$el.dataset.id}"] {
+                                max-height: ${$el.dataset.height} !important;
+                        }
+                `;
 	});
 
 	$style.innerHTML = style;
@@ -897,14 +913,14 @@ async function more_plugin_action(id, pluginName) {
 			);
 
 			// if (choice === "reload_plugins") {
-			// 	// Unmount all currently loaded plugins before reloading
-			// 	if (window.xcoder && typeof window.xcoder.getLoadedPluginIds === "function") {
-			// 		for (const pluginId of window.xcoder.getLoadedPluginIds()) {
-			// 			window.xcoder.unmountPlugin(pluginId);
-			// 		}
-			// 	}
-			// 	await window.loadPlugins?.();
-			// 	window.toast(strings.success);
+			//      // Unmount all currently loaded plugins before reloading
+			//      if (window.xcoder && typeof window.xcoder.getLoadedPluginIds === "function") {
+			//              for (const pluginId of window.xcoder.getLoadedPluginIds()) {
+			//                      window.xcoder.unmountPlugin(pluginId);
+			//              }
+			//      }
+			//      await window.loadPlugins?.();
+			//      window.toast(strings.success);
 			// }
 			if (choice === "restart_app") {
 				location.reload();

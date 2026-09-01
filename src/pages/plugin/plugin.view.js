@@ -290,16 +290,16 @@ export default (props) => {
 						innerHTML={
 							DOMPurify.sanitize(changelogs, { FORBID_TAGS: ["style"] }) ||
 							`
-							<div class="no-changelog">
-								<i class="icon historyrestore"></i>
-								<p style="font-size: 1.1rem;">
-									No changelog is available for this plugin yet.
-								</p>
-								<p style="font-size: 0.9rem; font-style: italic;">
-									Check back later for updates!
-								</p>
-							</div>
-					`
+                                                        <div class="no-changelog">
+                                                                <i class="icon historyrestore"></i>
+                                                                <p style="font-size: 1.1rem;">
+                                                                        ${strings["plugin no changelog"] || "No changelog is available for this plugin yet."}
+                                                                </p>
+                                                                <p style="font-size: 0.9rem; font-style: italic;">
+                                                                        ${strings["plugin no changelog desc"] || "Check back later for updates!"}
+                                                                </p>
+                                                        </div>
+                                        `
 						}
 					></div>
 				</div>
@@ -857,7 +857,7 @@ async function showReviews({ pluginId, author, stats, onStatsChange }) {
 		renderReviews();
 	}
 
-		async function signIn() {
+	async function signIn() {
 		if (state.busy) return;
 		state.editorError =
 			strings["plugin-review:offline"] || "Reviews are offline in XCoder.";

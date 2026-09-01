@@ -255,12 +255,35 @@ export function getLocaleDirection(locale) {
 	return rtlLanguages.has(language) ? "rtl" : "ltr";
 }
 
+let currentLang = "en-us";
+
 export default {
 	async set(code) {
 		code = code?.toLowerCase();
-		const lang = langMap[code] || langMap["en-us"];
+		// Unknown codes fall back to the device-appropriate language
+		// (Portuguese when nothing matches), then to English.
+		const resolved =
+			code in langMap
+				? code
+				: detectDefaultLanguage() in langMap
+					? detectDefaultLanguage()
+					: "en-us";
+		const lang = langMap[resolved];
 		const strings = await lang.strings();
 		window.strings = strings.default;
+		currentLang = resolved;
+		document.documentElement.lang = getIntlLocale(resolved);
+		document.documentElement.dir = getLocaleDirection(resolved);
+
+		// Let every mounted view retranslate itself immediately
+		// instead of waiting for an app restart.
+		document.dispatchEvent(
+			new CustomEvent("langchange", { detail: { code: resolved } }),
+		);
+	},
+	/** @returns {string} currently active language code */
+	get code() {
+		return currentLang;
 	},
 	list: Object.keys(langMap).map((code) => [code, langMap[code].name]),
 	getName(code) {

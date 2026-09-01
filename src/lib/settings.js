@@ -259,7 +259,9 @@ class Settings {
 			await this.#save();
 			this.value = structuredClone(this.#defaultSettings);
 			this.#oldSettings = structuredClone(this.#defaultSettings);
-			this.value.lang = navigator.language || "en-us";
+			// First run: pick the device language when translatable,
+			// Portuguese (pt-br) otherwise.
+			this.value.lang = detectDefaultLanguage();
 			return;
 		}
 
@@ -491,7 +493,7 @@ class Settings {
 
 	async applyLangSetting() {
 		const value = this.value.lang;
-		lang.set(value);
+		await lang.set(value);
 	}
 }
 

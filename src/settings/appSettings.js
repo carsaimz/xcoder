@@ -350,7 +350,7 @@ export default function otherSettings() {
 		},
 	];
 
-	return settingsPage(title, items, callback, undefined, {
+	const page = settingsPage(title, items, callback, undefined, {
 		preserveOrder: true,
 		pageClassName: "detail-settings-page",
 		listClassName: "detail-settings-list",
@@ -358,8 +358,24 @@ export default function otherSettings() {
 		valueInTail: true,
 	});
 
+	return page;
+
 	async function callback(key, value) {
 		switch (key) {
+			case "lang": {
+				await appSettings.update({ [key]: value });
+				// Make sure the new strings are loaded, then rebuild this
+				// settings page so every label switches language at once.
+				await lang.set(value);
+				try {
+					page?.hide?.();
+				} catch {
+					/* page already closed */
+				}
+				otherSettings();
+				return;
+			}
+
 			case "keybindings": {
 				value = await select(strings["key bindings"], [
 					["edit", strings.edit],
