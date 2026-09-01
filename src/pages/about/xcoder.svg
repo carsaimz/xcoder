@@ -5,7 +5,7 @@
     <linearGradient id="gx" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
       <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9bef2"/>
     </linearGradient>
-    <linearGradient id="gb" x1="0" y1="294" x2="0" y2="418" gradientUnits="userSpaceOnUse">
+    <linearGradient id="gb" x1="0" y1="150" x2="0" y2="362" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#9a6bfc"/><stop offset="1" stop-color="#4b7ef8"/>
     </linearGradient>
-  </defs><rect width="512" height="512" rx="104" fill="url(#bg)"/><polyline points="190.0,100.0 322.0,232.0" fill="none" stroke="url(#gx)" stroke-width="47" stroke-linecap="round" stroke-linejoin="round"/><polyline points="322.0,100.0 190.0,232.0" fill="none" stroke="url(#gx)" stroke-width="47" stroke-linecap="round" stroke-linejoin="round"/><polyline points="177.0,356.0 239.0,294.0" fill="none" stroke="url(#gb)" stroke-width="41" stroke-linecap="round" stroke-linejoin="round"/><polyline points="177.0,356.0 239.0,418.0" fill="none" stroke="url(#gb)" stroke-width="41" stroke-linecap="round" stroke-linejoin="round"/><polyline points="314.0,294.0 376.0,356.0" fill="none" stroke="url(#gb)" stroke-width="41" stroke-linecap="round" stroke-linejoin="round"/><polyline points="314.0,418.0 376.0,356.0" fill="none" stroke="url(#gb)" stroke-width="41" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </defs><rect width="512" height="512" rx="104" fill="url(#bg)"/><polygon points="60.0,256.0 154.0,150.0 260.0,256.0 154.0,362.0" fill="none" stroke="url(#gb)" stroke-width="38" stroke-linejoin="round"/><polygon points="452.0,256.0 358.0,150.0 252.0,256.0 358.0,362.0" fill="none" stroke="url(#gb)" stroke-width="38" stroke-linejoin="round"/><line x1="194.0" y1="167.0" x2="318.0" y2="345.0" stroke="url(#gx)" stroke-width="46" stroke-linecap="round"/><line x1="318.0" y1="167.0" x2="194.0" y2="345.0" stroke="url(#gx)" stroke-width="46" stroke-linecap="round"/></svg>
