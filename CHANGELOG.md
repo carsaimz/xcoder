@@ -3,6 +3,12 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.9] - 2026-09-02
+
+### Fixed
+- Native Firebase off by default — v1.4.8 failed to boot on devices
+
+
 ## [1.4.8] - 2026-09-02
 
 ### Added
