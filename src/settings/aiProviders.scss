@@ -6,370 +6,485 @@
  */
 
 .ai-providers-page {
-	.ai-providers {
-		padding: 12px 12px 24px;
-		max-width: 760px;
-		margin: 0 auto;
-	}
+        .ai-providers {
+                padding: 12px 12px 24px;
+                max-width: 760px;
+                margin: 0 auto;
+        }
 
-	.ai-providers-hint {
-		font-size: 12px;
-		line-height: 1.5;
-		color: var(--secondary-text-color, #999);
-		padding: 4px 4px 12px;
-	}
+        .ai-providers-hint {
+                font-size: 12px;
+                line-height: 1.5;
+                color: var(--secondary-text-color, #999);
+                padding: 4px 4px 12px;
+        }
 
-	.ai-providers-list {
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-	}
+        // -------------------------------------------------------- search bar
+        .ai-psearch {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-height: 42px;
+                padding: 0 12px;
+                margin: 2px 0 4px;
+                border-radius: 12px;
+                border: 1px solid var(--border-color);
+                background: color-mix(in srgb, var(--primary-color) 60%, transparent);
 
-	.ai-pgroup-title {
-		font-size: 11px;
-		font-weight: 800;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--secondary-text-color, #999);
-		padding: 4px 2px 8px;
-	}
+                &:focus-within {
+                        border-color: var(--active-color);
+                }
 
-	.ai-pgroup-cards {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-	}
+                .icon {
+                        font-size: 16px;
+                        color: var(--secondary-text-color, #999);
+                        flex-shrink: 0;
+                }
 
-	// ------------------------------------------------------------- card
-	.ai-pcard {
-		background: color-mix(in srgb, var(--secondary-color) 72%, transparent);
-		border: 1px solid var(--border-color);
-		border-radius: 14px;
-		padding: 12px;
-		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+                input {
+                        flex: 1;
+                        min-width: 0;
+                        height: 40px;
+                        border: none;
+                        outline: none;
+                        background: transparent;
+                        color: var(--primary-text-color);
+                        font-size: 13px;
 
-		&[data-active='true'] {
-			border-color: var(--active-color);
-			box-shadow: 0 0 0 1px color-mix(in srgb, var(--active-color) 45%, transparent),
-				0 4px 16px color-mix(in srgb, var(--active-color) 14%, transparent);
-		}
+                        &::placeholder {
+                                color: var(--secondary-text-color, #999);
+                        }
 
-		// advanced section hidden by default
-		.ai-padv {
-			display: none;
-		}
+                        // hide native clear button (webkit)
+                        &::-webkit-search-cancel-button {
+                                -webkit-appearance: none;
+                        }
+                }
+        }
 
-		&[data-expanded='true'] {
-			.ai-padv {
-				display: block;
-			}
+        .ai-pempty {
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                padding: 32px 12px;
+                color: var(--secondary-text-color, #999);
+                font-size: 12.5px;
 
-			.ai-pbtn.toggle .icon {
-				transform: rotate(180deg);
-			}
-		}
-	}
+                .icon {
+                        font-size: 26px;
+                        opacity: 0.6;
+                }
+        }
 
-	.ai-pcard-head {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 8px;
-	}
+        .ai-providers-list {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+        }
 
-	.ai-pcard-main {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		min-width: 0;
-		flex: 1;
-		cursor: pointer;
-		padding: 2px;
-		margin: -2px;
-		border-radius: 10px;
-	}
+        .ai-pgroup-title {
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: var(--secondary-text-color, #999);
+                padding: 4px 2px 8px;
+        }
 
-	.ai-picon {
-		width: 34px;
-		height: 34px;
-		border-radius: 10px;
-		flex-shrink: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 800;
-		font-size: 16px;
-		color: #fff;
+        .ai-pgroup-cards {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+        }
 
-		&.g-free {
-			background: linear-gradient(135deg, #4caf50, #2e7d32);
-		}
+        // ------------------------------------------------------------- card
+        .ai-pcard {
+                background: color-mix(in srgb, var(--secondary-color) 72%, transparent);
+                border: 1px solid var(--border-color);
+                border-radius: 14px;
+                padding: 12px;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-		&.g-freetier {
-			background: linear-gradient(135deg, #7a74fc, #4b7ef8);
-		}
+                &[data-active='true'] {
+                        border-color: var(--active-color);
+                        box-shadow: 0 0 0 1px color-mix(in srgb, var(--active-color) 45%, transparent),
+                                0 4px 16px color-mix(in srgb, var(--active-color) 14%, transparent);
+                }
 
-		&.g-premium {
-			background: linear-gradient(135deg, #ffb74d, #f57c00);
-		}
-	}
+                // advanced section hidden by default
+                .ai-padv {
+                        display: none;
+                }
 
-	.ai-pcard-text {
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
+                &[data-expanded='true'] {
+                        .ai-padv {
+                                display: block;
+                        }
 
-	.ai-pname {
-		font-size: 13.5px;
-		font-weight: 700;
-		color: var(--primary-text-color);
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		white-space: nowrap;
-		overflow: hidden;
-	}
+                        .ai-pbtn.toggle .icon {
+                                transform: rotate(180deg);
+                        }
+                }
+        }
 
-	.ai-pactive {
-		display: inline-flex;
-		align-items: center;
-		gap: 2px;
-		font-size: 9.5px;
-		font-weight: 800;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		color: var(--active-color);
+        .ai-pcard-head {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 8px;
 
-		.icon {
-			font-size: 11px;
-		}
-	}
+                .ai-pchip {
+                        flex-shrink: 0;
+                        margin-top: 2px;
+                }
+        }
 
-	.ai-pbadge {
-		align-self: flex-start;
-		font-size: 9px;
-		font-weight: 800;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		padding: 2px 7px;
-		border-radius: 999px;
+        .ai-pcard-main {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                min-width: 0;
+                flex: 1;
+                cursor: pointer;
+                padding: 2px;
+                margin: -2px;
+                border-radius: 10px;
+        }
 
-		&.g-free {
-			background: #4caf50;
-			color: #fff;
-		}
+        .ai-picon {
+                width: 34px;
+                height: 34px;
+                border-radius: 10px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+                font-size: 16px;
+                color: #fff;
 
-		&.g-freetier {
-			background: #4b7ef8;
-			color: #fff;
-		}
+                &.g-free {
+                        background: linear-gradient(135deg, #4caf50, #2e7d32);
+                }
 
-		&.g-premium {
-			background: #ffc107;
-			color: #232323;
-		}
-	}
+                &.g-freetier {
+                        background: linear-gradient(135deg, #7a74fc, #4b7ef8);
+                }
 
-	.ai-pcard-side {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 6px;
-		flex-shrink: 0;
-	}
+                &.g-premium {
+                        background: linear-gradient(135deg, #ffb74d, #f57c00);
+                }
+        }
 
-	// ------------------------------------------------------- status chip
-	.ai-pchip {
-		font-size: 9.5px;
-		font-weight: 800;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		padding: 3px 9px;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
-		color: var(--secondary-text-color, #999);
+        .ai-pcard-text {
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+        }
 
-		&.is-connected {
-			background: #4caf50;
-			color: #fff;
-		}
+        .ai-pname {
+                font-size: 13.5px;
+                font-weight: 700;
+                color: var(--primary-text-color);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                white-space: nowrap;
+                overflow: hidden;
+        }
 
-		&.is-offline {
-			background: #f44336;
-			color: #fff;
-		}
+        // graceful ellipsis when a name + "active" tag exceeds the width
+        .ai-pname > :first-child {
+                overflow: hidden;
+                text-overflow: ellipsis;
+        }
 
-		&.is-testing {
-			background: color-mix(in srgb, var(--active-color) 22%, transparent);
-			color: var(--active-color);
-		}
-	}
+        .ai-pname .ai-pactive {
+                flex-shrink: 0;
+        }
 
-	// ------------------------------------------- circular icon buttons
-	.ai-pactions {
-		display: flex;
-		gap: 6px;
-	}
+        .ai-pactive {
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+                font-size: 9.5px;
+                font-weight: 800;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                color: var(--active-color);
 
-	.ai-pbtn {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		border: 1px solid var(--border-color);
-		background: color-mix(in srgb, var(--primary-color) 60%, transparent);
-		color: var(--primary-text-color);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		padding: 0;
-		transition: background-color 0.15s ease, transform 0.1s ease;
+                .icon {
+                        font-size: 11px;
+                }
+        }
 
-		.icon {
-			font-size: 16px;
-		}
+        .ai-pbadge {
+                align-self: flex-start;
+                font-size: 9px;
+                font-weight: 800;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                padding: 2px 7px;
+                border-radius: 999px;
 
-		&:hover {
-			background: color-mix(in srgb, var(--active-color) 14%, transparent);
-		}
+                &.g-free {
+                        background: #4caf50;
+                        color: #fff;
+                }
 
-		&:active {
-			transform: scale(0.92);
-			background: color-mix(in srgb, var(--active-color) 24%, transparent);
-		}
+                &.g-freetier {
+                        background: #4b7ef8;
+                        color: #fff;
+                }
 
-		&.toggle .icon {
-			transition: transform 0.18s ease;
-		}
-	}
+                &.g-premium {
+                        background: #ffc107;
+                        color: #232323;
+                }
+        }
 
-	// ------------------------------------------------------ summary row
-	.ai-psummary {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 4px 14px;
-		padding: 9px 2px 0;
-		font-size: 11px;
-		color: var(--secondary-text-color, #999);
+        // ------------------------------------------------------- status chip
+        .ai-pchip {
+                font-size: 9.5px;
+                font-weight: 800;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                padding: 3px 9px;
+                border-radius: 999px;
+                background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
+                color: var(--secondary-text-color, #999);
 
-		.ai-psummary-item {
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			white-space: nowrap;
+                &.is-connected {
+                        background: #4caf50;
+                        color: #fff;
+                }
 
-			.icon {
-				font-size: 12px;
-			}
-		}
-	}
+                &.is-offline {
+                        background: #f44336;
+                        color: #fff;
+                }
 
-	.ai-pdot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		display: inline-block;
-		flex-shrink: 0;
-	}
+                &.is-testing {
+                        background: color-mix(in srgb, var(--active-color) 22%, transparent);
+                        color: var(--active-color);
+                }
+        }
 
-	// ------------------------------------------------- advanced section
-	.ai-padv {
-		margin-top: 11px;
-		padding-top: 11px;
-		border-top: 1px dashed var(--border-color);
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-	}
+        // ------------------------------------------- circular icon buttons
+        .ai-pactions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                padding: 10px 0 0;
+        }
 
-	.ai-padv-row {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		min-height: 44px;
-	}
+        .ai-pbtn {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                border: 1px solid var(--border-color);
+                background: color-mix(in srgb, var(--primary-color) 60%, transparent);
+                color: var(--primary-text-color);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                padding: 0;
+                position: relative;
+                transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
 
-	.ai-padv-label {
-		width: 96px;
-		flex-shrink: 0;
-		font-size: 12px;
-		font-weight: 600;
-		color: var(--primary-text-color);
-	}
+                // extends the touch target to ~46px without changing visuals
+                &::after {
+                        content: '';
+                        position: absolute;
+                        inset: -7px;
+                        border-radius: 50%;
+                }
 
-	.ai-padv-value {
-		flex: 1;
-		display: inline-flex;
-		align-items: center;
-		gap: 7px;
-		font-size: 12.5px;
-		color: var(--primary-text-color);
-	}
+                .icon {
+                        font-size: 16px;
+                }
 
-	.ai-pslider {
-		flex: 1;
-		accent-color: var(--active-color);
-		height: 44px;
-		margin: 0;
-	}
+                &:hover {
+                        background: color-mix(in srgb, var(--active-color) 14%, transparent);
+                }
 
-	.ai-pnum {
-		width: 84px;
-		flex-shrink: 0;
-		height: 38px;
-		border-radius: 10px;
-		border: 1px solid var(--border-color);
-		background: color-mix(in srgb, var(--primary-color) 70%, transparent);
-		color: var(--primary-text-color);
-		text-align: center;
-		font-size: 13px;
-		font-weight: 600;
-		outline: none;
+                &:active {
+                        transform: scale(0.92);
+                        background: color-mix(in srgb, var(--active-color) 24%, transparent);
+                }
 
-		&:focus {
-			border-color: var(--active-color);
-		}
-	}
+                &.toggle .icon {
+                        transition: transform 0.18s ease;
+                }
 
-	.ai-prow {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		min-height: 44px;
-		cursor: pointer;
-		border-radius: 10px;
-		padding: 0 6px;
-		margin: 0 -6px;
+                // own key configured — highlight the pencil
+                &.ownkey {
+                        border-color: color-mix(in srgb, var(--active-color) 55%, transparent);
+                        color: var(--active-color);
+                }
+        }
 
-		&:active {
-			background: color-mix(in srgb, var(--active-color) 10%, transparent);
-		}
-	}
+        // no key available — dim the eye, warn on the key summary
+        &[data-nokey='true'] .ai-pbtn.eye {
+                opacity: 0.45;
+        }
 
-	.ai-prow-label {
-		width: 96px;
-		flex-shrink: 0;
-		font-size: 12px;
-		font-weight: 600;
-		color: var(--primary-text-color);
-	}
+        // while testing — lock actions and spin the play icon
+        &[data-testing='true'] .ai-pactions .ai-pbtn {
+                pointer-events: none;
+                opacity: 0.5;
+        }
 
-	.ai-prow-value {
-		flex: 1;
-		font-size: 11.5px;
-		color: var(--secondary-text-color, #999);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		direction: rtl;
-		text-align: left;
-	}
+        &[data-testing='true'] .ai-pbtn.test .icon {
+                animation: ai-pspin 0.9s linear infinite;
+        }
 
-	.ai-prow-ico {
-		font-size: 16px;
-		color: var(--secondary-text-color, #999);
-		flex-shrink: 0;
-	}
+        // ------------------------------------------------------ summary row
+        .ai-psummary {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px 14px;
+                padding: 9px 2px 0;
+                font-size: 11px;
+                color: var(--secondary-text-color, #999);
+
+                .ai-psummary-item {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                        white-space: nowrap;
+
+                        .icon {
+                                font-size: 12px;
+                        }
+
+                        &.warn {
+                                color: #ffc107;
+                        }
+                }
+        }
+
+        .ai-pdot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                display: inline-block;
+                flex-shrink: 0;
+        }
+
+        // ------------------------------------------------- advanced section
+        .ai-padv {
+                margin-top: 11px;
+                padding-top: 11px;
+                border-top: 1px dashed var(--border-color);
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+        }
+
+        .ai-padv-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                min-height: 44px;
+        }
+
+        .ai-padv-label {
+                width: 96px;
+                flex-shrink: 0;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--primary-text-color);
+        }
+
+        .ai-padv-value {
+                flex: 1;
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+                font-size: 12.5px;
+                color: var(--primary-text-color);
+        }
+
+        .ai-pslider {
+                flex: 1;
+                accent-color: var(--active-color);
+                height: 44px;
+                margin: 0;
+        }
+
+        .ai-pnum {
+                width: 84px;
+                flex-shrink: 0;
+                height: 38px;
+                border-radius: 10px;
+                border: 1px solid var(--border-color);
+                background: color-mix(in srgb, var(--primary-color) 70%, transparent);
+                color: var(--primary-text-color);
+                text-align: center;
+                font-size: 13px;
+                font-weight: 600;
+                outline: none;
+
+                &:focus {
+                        border-color: var(--active-color);
+                }
+        }
+
+        .ai-prow {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-height: 44px;
+                cursor: pointer;
+                border-radius: 10px;
+                padding: 0 6px;
+                margin: 0 -6px;
+
+                &:active {
+                        background: color-mix(in srgb, var(--active-color) 10%, transparent);
+                }
+        }
+
+        .ai-prow-label {
+                width: 96px;
+                flex-shrink: 0;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--primary-text-color);
+        }
+
+        .ai-prow-value {
+                flex: 1;
+                font-size: 11.5px;
+                color: var(--secondary-text-color, #999);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                direction: rtl;
+                text-align: left;
+        }
+
+        .ai-prow-ico {
+                font-size: 16px;
+                color: var(--secondary-text-color, #999);
+                flex-shrink: 0;
+        }
+
+        .ai-padv-note {
+                font-size: 11px;
+                line-height: 1.5;
+                color: var(--secondary-text-color, #999);
+                margin: 0;
+                padding: 0 2px;
+        }
+}
+
+@keyframes ai-pspin {
+        to {
+                transform: rotate(360deg);
+        }
 }

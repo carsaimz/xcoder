@@ -1,13 +1,17 @@
 /**
  * XCoder AI providers page — one flexible card per provider.
  *
- * Card layout (full width, no fixed heights):
- *   [icon tile] [name + group badge]        [status chip]
- *               [actions: edit · view key · test · expand]
+ * Card layout (full width, wrap_content — no fixed heights):
+ *   [icon tile] [name + "active" tag]                 [status chip]
+ *               [group badge]
+ *   [summary: key owner · max tokens · autonomy]
+ *   [actions row: pencil · eye · test · docs · expand]
  *   [advanced (collapsible): max tokens slider + number, autonomy dropdown,
- *    base url]
+ *    base url, provider note]
  *
- * Tapping the card body selects the provider. Per-provider overrides are
+ * The action buttons live on a footer row so long provider names keep the
+ * full remaining width (no more "Free…" truncation on narrow screens).
+ * Tapping the card body selects the provider; per-provider overrides are
  * stored under settings.aiProviderPrefs (key/url/maxTokens/autonomy/status).
  */
 
@@ -52,18 +56,57 @@ export default function aiProviders() {
 
 	const $list = <div className="ai-providers-list" />;
 
+	const $empty = (
+		<div className="ai-pempty">
+			<span className="icon search" />
+			<span>{strings["ai providers empty"] || "No providers found"}</span>
+		</div>
+	);
+
 	$page.body = (
 		<div className="ai-providers">
+			<div className="ai-psearch" role="search">
+				<span className="icon search" />
+				<input
+					type="search"
+					placeholder={strings["ai providers search"] || "Search providers"}
+					oninput={onSearchInput}
+				/>
+			</div>
 			<p className="ai-providers-hint">
 				{strings["ai providers hint"] ||
-					"Tap a card to use the provider. Use the pencil to set its API key, the eye to check it and the arrow to test the connection."}
+					"Tap a card to use the provider. Pencil sets its key, eye checks it, arrow tests the connection and launch opens the docs. Advanced settings live under the chevron."}
 			</p>
 			{$list}
+			{$empty}
 		</div>
 	);
 
 	/** @type {Map<string, () => void>} providerId -> rerender card fn */
 	const rerender = new Map();
+	/** @type {{el: HTMLElement, cards: HTMLElement[]}[]} group refs for filtering */
+	const groupEls = [];
+
+	/**
+	 * Filters cards by the search box (name or id, case/diacritic loose).
+	 * @param {InputEvent} e
+	 */
+	function onSearchInput(e) {
+		const query = e.target.value.trim().toLowerCase();
+		let visible = 0;
+		for (const group of groupEls) {
+			let groupVisible = 0;
+			for (const $card of group.cards) {
+				const haystack = `${$card.dataset.name} ${$card.dataset.provider}`;
+				const match = !query || haystack.includes(query);
+				$card.style.display = match ? "" : "none";
+				if (match) groupVisible++;
+			}
+			group.el.style.display = groupVisible ? "" : "none";
+			visible += groupVisible;
+		}
+		$empty.style.display = visible ? "none" : "flex";
+	}
 
 	/**
 	 * Builds one provider card.
@@ -71,12 +114,17 @@ export default function aiProviders() {
 	 */
 	function buildCard(provider) {
 		const id = provider.id;
-		const $card = <div className="ai-pcard" data-provider={id} />;
+		const $card = (
+			<div
+				className="ai-pcard"
+				data-provider={id}
+				data-name={provider.name.toLowerCase()}
+			/>
+		);
 
 		const render = () => {
 			const prefs = getProviderPrefs(id);
 			const active = (settings.value.aiProvider || "groq") === id;
-			const hasKey = Boolean(resolveApiKey(id));
 			const keyOwner = prefs.apiKey
 				? "own"
 				: settings.value.aiApiKey
@@ -89,6 +137,7 @@ export default function aiProviders() {
 
 			$card.dataset.active = String(active);
 			$card.dataset.expanded = $card.dataset.expanded || "false";
+			$card.dataset.nokey = String(keyOwner === "none");
 
 			const $chip = (
 				<span className={`ai-pchip is-${status}`}>
@@ -104,7 +153,9 @@ export default function aiProviders() {
 
 			const $summary = (
 				<div className="ai-psummary">
-					<span className="ai-psummary-item">
+					<span
+						className={`ai-psummary-item is-key${keyOwner === "none" ? " warn" : ""}`}
+					>
 						<span className="icon vpn_key" />
 						{keyOwner === "own"
 							? strings["ai provider key own"] || "Own key"
@@ -167,7 +218,7 @@ export default function aiProviders() {
 			);
 
 			const $baseUrl = (
-				<div className="ai-prow" onclick={editBaseUrl}>
+				<div className="ai-prow" role="button" onclick={editBaseUrl}>
 					<span className="ai-prow-label">Base URL</span>
 					<span className="ai-prow-value">
 						{baseUrl ||
@@ -187,7 +238,7 @@ export default function aiProviders() {
 						{$range}
 						{$num}
 					</div>
-					<div className="ai-padv-row" onclick={chooseAutonomy}>
+					<div className="ai-padv-row" role="button" onclick={chooseAutonomy}>
 						<span className="ai-padv-label">
 							{strings["ai autonomy"] || "Autonomy"}
 						</span>
@@ -201,13 +252,18 @@ export default function aiProviders() {
 						<span className="icon expand_more ai-prow-ico" />
 					</div>
 					{$baseUrl}
+					{provider.note && <p className="ai-padv-note">{provider.note}</p>}
 				</div>
 			);
 
 			$card.content = (
 				<>
 					<div className="ai-pcard-head">
-						<div className="ai-pcard-main" onclick={selectProvider}>
+						<div
+							className="ai-pcard-main"
+							role="button"
+							onclick={selectProvider}
+						>
 							<span className={`ai-picon g-${provider.group}`}>
 								{provider.name.charAt(0).toUpperCase()}
 							</span>
@@ -226,41 +282,48 @@ export default function aiProviders() {
 								</span>
 							</div>
 						</div>
-						<div className="ai-pcard-side">
-							{$chip}
-							<div className="ai-pactions">
-								<button
-									className="ai-pbtn"
-									title={strings["ai api key"] || "API key"}
-									onclick={editKey}
-								>
-									<span className="icon edit" />
-								</button>
-								<button
-									className="ai-pbtn"
-									title={strings["ai provider view key"] || "View key"}
-									onclick={viewKey}
-								>
-									<span className="icon visibility" />
-								</button>
-								<button
-									className="ai-pbtn"
-									title={strings["ai provider test"] || "Test connection"}
-									onclick={() => runTest(id, $card, render)}
-								>
-									<span className="icon play_arrow" />
-								</button>
-								<button
-									className="ai-pbtn toggle"
-									title={strings.advanced || "Advanced"}
-									onclick={toggleAdvanced}
-								>
-									<span className="icon expand_more" />
-								</button>
-							</div>
-						</div>
+						{$chip}
 					</div>
 					{$summary}
+					<div className="ai-pactions">
+						<button
+							className={`ai-pbtn edit${keyOwner === "own" ? " ownkey" : ""}`}
+							title={strings["ai api key"] || "API key"}
+							onclick={editKey}
+						>
+							<span className="icon edit" />
+						</button>
+						<button
+							className="ai-pbtn eye"
+							title={strings["ai provider view key"] || "View key"}
+							onclick={viewKey}
+						>
+							<span className="icon visibility" />
+						</button>
+						<button
+							className="ai-pbtn test"
+							title={strings["ai provider test"] || "Test connection"}
+							onclick={() => runTest(id, $card, render)}
+						>
+							<span className="icon play_arrow" />
+						</button>
+						{provider.docs && (
+							<button
+								className="ai-pbtn docs"
+								title={strings["ai provider docs"] || "Get API key"}
+								onclick={() => openDocs(provider)}
+							>
+								<span className="icon launch" />
+							</button>
+						)}
+						<button
+							className="ai-pbtn toggle"
+							title={strings.advanced || "Advanced"}
+							onclick={toggleAdvanced}
+						>
+							<span className="icon expand_more" />
+						</button>
+					</div>
 					{$adv}
 				</>
 			);
@@ -286,7 +349,9 @@ export default function aiProviders() {
 					`${strings["ai api key"] || "API key"} — ${provider.name}`,
 					"",
 					"text",
-					{ required: false },
+					{
+						required: false,
+					},
 				);
 				if (value === null) return;
 				const key = String(value).trim();
@@ -307,10 +372,12 @@ export default function aiProviders() {
 						strings["ai provider key none"] ||
 							"No key — get one at the provider docs",
 					);
+					openDocs(provider);
 					return;
 				}
 				const masked = key.slice(0, 8) + "•".repeat(12) + ` (${key.length})`;
-				if (prefs.apiKey) {
+				const current = getProviderPrefs(id);
+				if (current.apiKey) {
 					await alert(provider.name, masked);
 				} else {
 					toast(
@@ -357,14 +424,19 @@ export default function aiProviders() {
 		const providers = PROVIDERS.filter((p) => p.group === group);
 		if (!providers.length) continue;
 
-		$list.append(
+		const $cards = (
+			<div className="ai-pgroup-cards">
+				{providers.map((provider) => buildCard(provider))}
+			</div>
+		);
+		const $group = (
 			<div className="ai-pgroup">
 				<div className="ai-pgroup-title">{groupTitle(group)}</div>
-				<div className="ai-pgroup-cards">
-					{providers.map((provider) => buildCard(provider))}
-				</div>
-			</div>,
+				{$cards}
+			</div>
 		);
+		groupEls.push({ el: $group, cards: [...$cards.children] });
+		$list.append($group);
 	}
 
 	actionStack.push({
@@ -382,7 +454,9 @@ export default function aiProviders() {
 
 	// ---- helpers ------------------------------------------------------------
 
-	/** @param {keyof typeof GROUPS} group */
+	/**
+	 * @param {string} group
+	 */
 	function groupTitle(group) {
 		if (group === "free") return strings["ai badge free"] || "Free";
 		if (group === "freetier")
@@ -411,18 +485,39 @@ export default function aiProviders() {
 	}
 
 	/**
+	 * Opens the provider docs (where the user gets an API key).
+	 * @param {object} provider
+	 */
+	function openDocs(provider) {
+		if (!provider.docs) return;
+		try {
+			system.openInBrowser(provider.docs);
+		} catch (error) {
+			helpers.error(error);
+		}
+	}
+
+	/**
 	 * Runs the connection test for a provider card.
 	 * @param {string} providerId
 	 * @param {HTMLElement} $cardEl
 	 * @param {() => void} render
 	 */
 	async function runTest(providerId, $cardEl, render) {
+		if ($cardEl.dataset.testing === "true") return;
 		const provider = PROVIDER_MAP[providerId];
+
+		if (!resolveApiKey(providerId)) {
+			toast(strings["ai provider key needed"] || "Add an API key first", 2500);
+			return;
+		}
+
 		const $chip = $cardEl.get(".ai-pchip");
 		if ($chip) {
 			$chip.className = "ai-pchip is-testing";
 			$chip.textContent = strings["ai provider testing"] || "Testing...";
 		}
+		$cardEl.dataset.testing = "true";
 		let ok = false;
 		try {
 			const models = await Promise.race([
@@ -442,6 +537,7 @@ export default function aiProviders() {
 			status: ok ? "connected" : "offline",
 			testedAt: Date.now(),
 		});
+		delete $cardEl.dataset.testing;
 		render();
 		toast(
 			ok
