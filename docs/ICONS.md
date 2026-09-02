@@ -65,9 +65,32 @@ Current registrations:
   cloud→`svg:cloud`, settings.json→`svg:file-cog`,
   reset→`svg:rotate-ccw`, about→`svg:info`, changelog→`svg:history`.
 
+Tier 3 — menus and static pages (shipped): the icon enhancer
+(`utils/iconEnhancer.js`) upgrades rendered font glyphs to the SVG pack at
+runtime. Wired into:
+
+- `components/contextmenu/index.js` — every context menu, which covers the
+  main editor menu (`views/menu.hbs`) and the file menu
+  (`views/file-menu.hbs`): new file→`file-plus`, save→`save`,
+  open folder→`folder`, close→`x`, history→`history`, search→`search`,
+  AI chat→`message-square`, insight→`lightbulb`, actions→`sparkles`,
+  code→`code`, terminal→`terminal`, apps→`layout-grid`,
+  settings→`settings`, help→`circle-help`, exit→`log-out`,
+  share→`share-2`, in browser→`external-link`, rename→`pencil`,
+  home→`house`, pin/pin-off, jump tabs→`chevrons-left/right`,
+  compare→`arrow-right-left`, encoding→`corner-up-left`,
+  theme→`palette`, and more.
+- `pages/about/about.js` — update→`refresh-cw`, offline→`smartphone`,
+  GitHub→`github`, issues→`circle-alert`, license→`history`,
+  contributors→`user`, community→`heart`. Brand glyphs (`xcoder`,
+  `javascript`) intentionally stay on the icon font.
+
 Extra glyphs ready for future UI: download, book-open, bug, shield,
 git-pull-request, refresh-cw, external-link, save, play, message-square,
-sparkles, folder.
+sparkles, folder, plus, x, file-plus, lightbulb, code, layout-grid,
+circle-help, log-out, share-2, pencil, house, pin, pin-off,
+chevrons-left/right, arrow-right-left, corner-up-left, github, user,
+heart, smartphone, circle-alert.
 
 Path data © Lucide Contributors, ISC license.
 

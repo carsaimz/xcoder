@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "136334398331",
+    "project_id": "carsai-mozambique-d5983",
+    "storage_bucket": "carsai-mozambique-d5983.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136334398331:android:adee64769cb8738835e3de",
+        "android_client_info": {
+          "package_name": "com.carsaimz.xcoder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136334398331-lkvfb8snapjs7oput493636h7u8u71dl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9HTZ_AkvcNyTZthgh9YmrQfqlfAgYZqw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "136334398331-lkvfb8snapjs7oput493636h7u8u71dl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

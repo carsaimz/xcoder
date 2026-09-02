@@ -1,5 +1,6 @@
 import "./style.scss";
 import actionStack from "lib/actionStack";
+import { enhanceIcons } from "utils/iconEnhancer";
 
 /**
  * @typedef {object} ContextMenuObj
@@ -72,6 +73,7 @@ export default function Contextmenu(content, options) {
 		});
 	}
 
+	if (content) enhanceIcons($el);
 	if (!options.innerHTML) addTabindex();
 
 	function show() {
@@ -85,6 +87,7 @@ export default function Contextmenu(content, options) {
 		if (options.innerHTML) {
 			$el.innerHTML = options.innerHTML.call($el);
 			addTabindex();
+			enhanceIcons($el);
 		}
 
 		if (options.toggler) {

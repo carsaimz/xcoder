@@ -32,79 +32,79 @@ const fromIdx = args.indexOf("--from");
 const fromTag = fromIdx !== -1 ? args[fromIdx + 1] : undefined;
 
 if (!version || /^--/.test(version)) {
-	console.error("Usage: node utils/scripts/update-changelog.mjs <version> [--from <tag>]");
-	process.exit(1);
+        console.error("Usage: node utils/scripts/update-changelog.mjs <version> [--from <tag>]");
+        process.exit(1);
 }
 
 function gitOr(pattern, fallback) {
-	try {
-		return execSync(pattern, { cwd: ROOT, encoding: "utf8" }).trim();
-	} catch {
-		return fallback;
-	}
+        try {
+                return execSync(pattern, { cwd: ROOT, encoding: "utf8" }).trim();
+        } catch {
+                return fallback;
+        }
 }
 
 const prevTag =
-	fromTag ||
-	gitOr('git describe --tags --abbrev=0 "HEAD^" 2>/dev/null', "");
+        fromTag ||
+        gitOr('git describe --tags --abbrev=0 "HEAD^" 2>/dev/null', "");
 
 const range = prevTag ? `${prevTag}..HEAD` : "HEAD";
 const subjectRegex = /^([a-z_]+)(?:\([^)]*\))?!?: (.+)$/;
 
 /** conventional commit type -> changelog section */
 const SECTIONS = {
-	feat: "Added",
-	fix: "Fixed",
-	perf: "Performance",
-	refactor: "Changed",
-	revert: "Changed",
-	docs: "Documentation",
-	chore: "Maintenance",
-	ci: "Maintenance",
-	build: "Maintenance",
-	test: "Maintenance",
-	style: "Changed",
+        feat: "Added",
+        fix: "Fixed",
+        perf: "Performance",
+        refactor: "Changed",
+        revert: "Changed",
+        docs: "Documentation",
+        chore: "Maintenance",
+        ci: "Maintenance",
+        build: "Maintenance",
+        test: "Maintenance",
+        style: "Changed",
 };
 
 const SECTION_ORDER = [
-	"Added",
-	"Fixed",
-	"Changed",
-	"Performance",
-	"Documentation",
-	"Maintenance",
+        "Added",
+        "Fixed",
+        "Changed",
+        "Performance",
+        "Documentation",
+        "Maintenance",
 ];
 
 let commits = [];
 try {
-	const raw = execSync(`git log --format="%s" ${range}`, {
-		cwd: ROOT,
-		encoding: "utf8",
-		maxBuffer: 10 * 1024 * 1024,
-	});
-	commits = raw
-		.split("\n")
-		.map((s) => s.trim())
-		.filter(Boolean)
-		// skip release bumps themselves
-		.filter((s) => !/^chore\((pre-)?release\)/i.test(s));
+        const raw = execSync(`git log --format="%s" ${range}`, {
+                cwd: ROOT,
+                encoding: "utf8",
+                maxBuffer: 10 * 1024 * 1024,
+        });
+        commits = raw
+                .split("\n")
+                .map((s) => s.trim())
+                .filter(Boolean)
+                // skip release bumps themselves
+                .filter((s) => !/^chore\((pre-)?release\)/i.test(s));
 } catch {
-	// no git history available (shallow checkout) — keep going, section may
-	// already exist or will be filled by the release workflow
+        // no git history available (shallow checkout) — keep going, section may
+        // already exist or will be filled by the release workflow
 }
 
 /** @type {Map<string, string[]>} */
 const grouped = new Map();
 for (const subject of commits) {
-	const match = subject.match(subjectRegex);
-	if (!match) continue;
-	const type = match[1];
-	const text = match[2].replace(/\s+$/, "");
-	const section = SECTIONS[type];
-	if (!section) continue;
-	const bucket = grouped.get(section) || [];
-	bucket.push(text);
-	grouped.set(section, bucket);
+        const match = subject.match(subjectRegex);
+        if (!match) continue;
+        const type = match[1];
+        const text = match[2].replace(/\s+$/, "");
+        const section = SECTIONS[type];
+        if (!section) continue;
+        const bucket = grouped.get(section) || [];
+        bucket.push(text);
+        grouped.set(section, bucket);
 }
 
 const today = new Date().toISOString().slice(0, 10);
@@ -112,41 +112,45 @@ const header = `## [${version}] - ${today}`;
 
 let body = "";
 for (const section of SECTION_ORDER) {
-	const items = grouped.get(section);
-	if (!items?.length) continue;
-	body += `### ${section}\n`;
-	for (const item of items) {
-		body += `- ${item.charAt(0).toUpperCase()}${item.slice(1)}\n`;
-	}
-	body += "\n";
+        const items = grouped.get(section);
+        if (!items?.length) continue;
+        body += `### ${section}\n`;
+        for (const item of items) {
+                body += `- ${item.charAt(0).toUpperCase()}${item.slice(1)}\n`;
+        }
+        body += "\n";
 }
 
 const current = fs.existsSync(CHANGELOG) ? fs.readFileSync(CHANGELOG, "utf8") : "# Changelog\n";
 
 // replace an existing section for this version, or insert after the header
+// NOTE: the lookahead must match either the next "## " heading OR the true
+// end of the string. `$` cannot be used here — in multiline mode it matches
+// at the end of EVERY line, which makes the lazy body capture stop after the
+// heading itself and the old section content was never replaced (duplicates).
 const sectionRegex = new RegExp(
-	`^## \\[${version.replace(/\./g, "\\.")}\\][^\\n]*\\n([\\s\\S]*?)(?=^## |$)`,
-	"m",
+        `^## \\[${version.replace(/\./g, "\\.")}\\][^\\n]*\\n([\\s\\S]*?)(?=^## |(?![\\s\\S]))`,
+        "m",
 );
 
 let next;
 if (sectionRegex.test(current)) {
-	next = current.replace(sectionRegex, `${header}\n${body ? `\n${body}` : "\n"}`);
+        next = current.replace(sectionRegex, `${header}\n${body ? `\n${body}` : "\n"}`);
 } else {
-	const lines = current.split("\n");
-	// find the first "## " section after the intro lines
-	const insertAt = lines.findIndex((l, i) => i > 0 && l.startsWith("## "));
-	const insertBlock = `${header}\n${body ? `\n${body}` : "\n"}`;
-	if (insertAt === -1) {
-		next = `${current.replace(/\s*$/, "\n")}\n${insertBlock}`;
-	} else {
-		lines.splice(insertAt, 0, insertBlock);
-		next = lines.join("\n");
-	}
+        const lines = current.split("\n");
+        // find the first "## " section after the intro lines
+        const insertAt = lines.findIndex((l, i) => i > 0 && l.startsWith("## "));
+        const insertBlock = `${header}\n${body ? `\n${body}` : "\n"}`;
+        if (insertAt === -1) {
+                next = `${current.replace(/\s*$/, "\n")}\n${insertBlock}`;
+        } else {
+                lines.splice(insertAt, 0, insertBlock);
+                next = lines.join("\n");
+        }
 }
 
 fs.writeFileSync(CHANGELOG, next);
 console.log(
-	`changelog: ${version} <- ${prevTag || "no previous tag"} (${commits.length} commits, ` +
-		`${[...grouped.values()].reduce((n, list) => n + list.length, 0)} entries)`,
+        `changelog: ${version} <- ${prevTag || "no previous tag"} (${commits.length} commits, ` +
+                `${[...grouped.values()].reduce((n, list) => n + list.length, 0)} entries)`,
 );

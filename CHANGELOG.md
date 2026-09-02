@@ -12,7 +12,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 - Bundled SVG icon pack on the sidebar rail + official site URL
 - Provider cards page, chat header/footer rework, site APIs, Firebase cleanup
 
-
 ## [Unreleased]
 
 ### Added
@@ -20,9 +19,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 - **AI chat quick header**: compact 24dp actions (model picker, new chat, history, settings) and a footer switch to toggle between **Chat** and **Agente** modes.
 - **Site integration**: the app now consumes the community site APIs (`/api/config`, `/api/feedback`) with anonymous `X-Device-ID` headers; the official site URL is `https://xcoderapp.vercel.app`.
 - **SVG icon pack**: Lucide-style vector icons on the sidebar rail, sharper at any density and independent of the icon font.
+- **Native Firebase**: `google-services.json` (project `carsai-mozambique-d5983`, app `com.carsaimz.xcoder`) ships with the repository — Analytics, Crashlytics, Remote Config and FCM initialize automatically in release builds; F-Droid flavours and self-hosters without the file build without any Firebase dependency.
+- **Icon pack tier 3**: the main editor menu, file menu and About page now render Lucide SVG vectors via a runtime icon enhancer (22 new glyphs; pack grown to 54 icons).
 
 ### Changed
 - **Firebase minimized**: only Analytics, Crashlytics, Remote Config and FCM remain; the in-app Backup/Backend UI was removed and preferences moved to SharedPreferences/DataStore.
+
+### Fixed
+- **Changelog generator**: re-running `update-changelog.mjs` for the same version no longer inserts a duplicate section — the existing section is replaced (Keep a Changelog format preserved).
 
 ## [1.4.6] - 2026-09-02
 

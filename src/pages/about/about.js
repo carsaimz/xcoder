@@ -9,6 +9,7 @@ import Reactive from "html-tag-js/reactive";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
 import helpers from "utils/helpers";
+import { enhanceIcons } from "utils/iconEnhancer";
 
 async function checkForUpdates() {
 	const hide = await loader.show();
@@ -265,6 +266,9 @@ export default function AboutInclude() {
 			</div>
 		</main>
 	);
+
+	// Upgrade icon-font glyphs to the SVG pack (Lucide tier)
+	enhanceIcons($page.body);
 
 	$page.body
 		.querySelector("#check-updates-item")

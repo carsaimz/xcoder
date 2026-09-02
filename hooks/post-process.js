@@ -6,6 +6,7 @@ const { execSync } = require('child_process');
 const buildFilePath = path.resolve(__dirname, '../build.json');
 const copyToPath = path.resolve(__dirname, '../platforms/android/build.json');
 const gradleFilePath = path.resolve(__dirname, '../build-extras.gradle');
+const googleServicesPath = path.resolve(__dirname, '../google-services.json');
 const androidGradleFilePath = path.resolve(
   __dirname,
   '../platforms/android/app/build-extras.gradle'
@@ -20,6 +21,7 @@ if (
 
 if (fs.existsSync(androidGradleFilePath)) fs.unlinkSync(androidGradleFilePath);
 fs.copyFileSync(gradleFilePath, androidGradleFilePath);
+copyGoogleServices();
 
 // Cordova Android 15 generates `cdv_*` resources and version-qualified value
 // directories that are required later in the build. Keep the generated tree and
@@ -30,6 +32,56 @@ enableStaticContext();
 disableSplashFadeOnRealmeAndroid13();
 removeLegacyKeyboardWorkaround();
 patchTargetSdkVersion();
+
+/**
+ * Copies google-services.json into the Android app module so the
+ * google-services gradle plugin (wired conditionally in
+ * build-extras.gradle) can enable native Firebase — Analytics,
+ * Crashlytics, Remote Config and FCM.
+ *
+ * Skipped on F-Droid builds (flag file `<tmpdir>/fdroid.bool`), which
+ * must ship without proprietary Firebase services, and silently
+ * skipped when the file is absent (self-hosters without a Firebase
+ * project keep building normally).
+ */
+function copyGoogleServices() {
+  try {
+    const tmp = getTmpDir();
+    if (tmp) {
+      const fdroidFlag = path.join(tmp, 'fdroid.bool');
+      if (
+        fs.existsSync(fdroidFlag)
+        && fs.readFileSync(fdroidFlag, 'utf-8').trim() === 'true'
+      ) {
+        console.log(
+          '[Cordova Hook] ⛔ F-Droid flavour — google-services.json skipped (no Firebase)'
+        );
+        return;
+      }
+    }
+
+    if (!fs.existsSync(googleServicesPath)) {
+      console.warn(
+        '[Cordova Hook] ⚠️ google-services.json not found — native Firebase disabled'
+      );
+      return;
+    }
+
+    const dest = path.resolve(
+      __dirname,
+      '../platforms/android/app/google-services.json'
+    );
+    fs.copyFileSync(googleServicesPath, dest);
+    console.log(
+      '[Cordova Hook] ✅ Copied google-services.json — native Firebase enabled'
+    );
+  } catch (err) {
+    console.error(
+      '[Cordova Hook] ❌ Failed to copy google-services.json:',
+      err.message
+    );
+  }
+}
 
 function getPackageName() {
   const configPath = path.resolve(__dirname, '../config.xml');

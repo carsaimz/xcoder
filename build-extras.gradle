@@ -13,3 +13,34 @@ configurations {
       exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
   }
 }
+// ---------------------------------------------------------------------------
+// Native Firebase (Analytics, Crashlytics, Remote Config, FCM)
+//
+// Enabled ONLY when google-services.json exists in this app module — it is
+// copied here by hooks/post-process.js when the project root provides the
+// file. Builds without it (self-hosters, F-Droid flavour) compile normally
+// without any Firebase dependency, and the F-Droid flag file (<tmpdir>/fdroid
+// .bool) actively prevents the copy.
+// ---------------------------------------------------------------------------
+def googleServicesFile = file('google-services.json')
+if (googleServicesFile.exists()) {
+    buildscript {
+        repositories {
+            google()
+            mavenCentral()
+        }
+        dependencies {
+            classpath 'com.google.gms:google-services:4.4.2'
+        }
+    }
+
+    apply plugin: 'com.google.gms.google-services'
+
+    dependencies {
+        implementation platform('com.google.firebase:firebase-bom:33.7.0')
+        implementation 'com.google.firebase:firebase-analytics'
+        implementation 'com.google.firebase:firebase-crashlytics'
+        implementation 'com.google.firebase:firebase-config'
+        implementation 'com.google.firebase:firebase-messaging'
+    }
+}
