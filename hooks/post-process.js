@@ -43,13 +43,31 @@ patchTargetSdkVersion();
  * build-extras.gradle) can enable native Firebase — Analytics,
  * Crashlytics, Remote Config and FCM.
  *
- * Skipped on F-Droid builds (flag file `<tmpdir>/fdroid.bool`), which
+ * Native Firebase is OFF by default (NATIVE_FIREBASE != "true"): the
+ * libraries alone — with no consumer code — change nothing functionally,
+ * but the first build that shipped them (v1.4.8) failed to boot on real
+ * devices (no logs available to pinpoint the crash). Until the crash is
+ * reproduced and fixed with device logs, keep this off to preserve the
+ * last-known-good native surface. Turn it on by exporting
+ * NATIVE_FIREBASE=true in the build environment/CI workflow AND testing
+ * on a device before releasing.
+ *
+ * Also skipped on F-Droid builds (flag file `<tmpdir>/fdroid.bool`), which
  * must ship without proprietary Firebase services, and silently
  * skipped when the file is absent (self-hosters without a Firebase
  * project keep building normally).
  */
 function copyGoogleServices() {
   try {
+    if (process.env.NATIVE_FIREBASE !== 'true') {
+      console.log(
+        '[Cordova Hook] ⛔ Native Firebase disabled by default (NATIVE_FIREBASE != "true")'
+      );
+      removeCopiedGoogleServices();
+      setGoogleServicesGradleFlag(false);
+      return;
+    }
+
     const tmp = getTmpDir();
     if (tmp) {
       const fdroidFlag = path.join(tmp, 'fdroid.bool');

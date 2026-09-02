@@ -26,13 +26,18 @@ configurations {
 // throw aborts app/build.gradle evaluation before android{} sets compileSdk.
 //
 // This file only adds the Firebase libraries when the hook managed to copy
-// google-services.json into this app module. Builds without it
-// (self-hosters, F-Droid flavour) compile normally without any Firebase
-// dependency, and the F-Droid flag file (<tmpdir>/fdroid.bool) actively
-// prevents the copy.
-// ---------------------------------------------------------------------------
+// google-services.json into this app module AND the build environment opted
+// in via NATIVE_FIREBASE=true (hooks/post-process.js is the gatekeeper and
+// won't copy the JSON otherwise). Builds without both (default, self-hosters,
+// F-Droid flavour) compile normally without any Firebase dependency; the
+// F-Droid flag file (<tmpdir>/fdroid.bool) actively prevents the copy.
+//
+// v1.4.8 shipped these libraries for the first time and the app stopped
+// booting on real devices, so native Firebase now stays OFF until the
+// crash is reproduced with device logs and fixed.
+def nativeFirebaseEnabled = System.getenv('NATIVE_FIREBASE') == 'true'
 def googleServicesFile = file('google-services.json')
-if (googleServicesFile.exists()) {
+if (nativeFirebaseEnabled && googleServicesFile.exists()) {
     dependencies {
         implementation platform('com.google.firebase:firebase-bom:33.7.0')
         implementation 'com.google.firebase:firebase-analytics'
