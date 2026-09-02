@@ -2,8 +2,6 @@ import settingsPage from "components/settingsPage";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
-import { pullAll as fbPull, pushAll as fbPush } from "lib/fbBackend";
-import { isReady as fbReady, logEvent } from "lib/firebaseLite";
 import {
 	backupAll as ghBackup,
 	isConfigured as ghReady,
@@ -13,7 +11,8 @@ import settings from "lib/settings";
 import helpers from "utils/helpers";
 
 /**
- * Cloud settings page — GitHub-as-backend and Firebase (optional).
+ * Cloud settings page — GitHub storage (optional). Firebase is limited
+ * to Analytics/Crashlytics/Remote Config/FCM, so no Firestore or Auth here.
  */
 export default function cloudSettings() {
 	const title = strings["cloud settings"] || "Cloud";
@@ -82,51 +81,6 @@ export default function cloudSettings() {
 				strings["settings-info-gh-restore"] ||
 				"Restores settings (token excluded) and AI chats from the last backup.",
 		},
-		{
-			key: "firebaseEnabled",
-			text: strings["firebase enabled"] || "Firebase events",
-			value: Boolean(values.firebaseEnabled),
-			checkbox: true,
-			info:
-				strings["settings-info-firebase-enabled"] ||
-				"Optional anonymous usage events via the Firestore REST API (no SDK). No events are sent when disabled.",
-		},
-		{
-			key: "firebaseProjectId",
-			text: strings["firebase project"] || "Firebase project id",
-			value: values.firebaseProjectId || "",
-			prompt: strings["firebase project"] || "Firebase project id",
-			promptType: "text",
-			promptOptions: { required: false },
-			info: strings["settings-info-firebase-project"] || "e.g. my-xcoder-app",
-		},
-		{
-			key: "firebaseApiKey",
-			text: strings["firebase key"] || "Firebase web API key",
-			value: values.firebaseApiKey ? "••••••••" : "",
-			prompt: strings["firebase key"] || "Firebase web API key",
-			promptType: "text",
-			promptOptions: { required: false },
-			info:
-				strings["settings-info-firebase-key"] ||
-				"The Web API key from your Firebase project settings (public by design).",
-		},
-		{
-			key: "fb-backup",
-			text: strings["fb backup"] || "Firebase backup",
-			value: "",
-			info:
-				strings["settings-info-fb-backup"] ||
-				"Signs in anonymously and saves your settings and AI chats to Firestore (xcoder_users/<uid>/sync/backup). Requires Anonymous sign-in enabled in your Firebase project.",
-		},
-		{
-			key: "fb-restore",
-			text: strings["fb restore"] || "Firebase restore",
-			value: "",
-			info:
-				strings["settings-info-fb-restore"] ||
-				"Restores settings (token excluded) and AI chats from the last Firebase backup made on this device.",
-		},
 	];
 
 	const page = settingsPage(
@@ -142,19 +96,8 @@ export default function cloudSettings() {
 					await runRestore();
 					return;
 				}
-				if (key === "fb-backup") {
-					await runFbBackup();
-					return;
-				}
-				if (key === "fb-restore") {
-					await runFbRestore();
-					return;
-				}
 				if (key === "ghRepo") value = normalizeRepo(value);
 				await settings.update({ [key]: value ?? "" });
-				if (key === "firebaseEnabled" && value && fbReady()) {
-					void logEvent("firebase_enabled");
-				}
 			} catch (error) {
 				helpers.error(error);
 			}
@@ -209,54 +152,6 @@ export default function cloudSettings() {
 			);
 		} catch (error) {
 			toast(`restore: ${error.message || error}`);
-		} finally {
-			hide();
-		}
-	}
-
-	async function runFbBackup() {
-		if (!fbReady()) {
-			toast(
-				strings["fb not configured"] ||
-					"Configure the Firebase project id and API key first",
-			);
-			return;
-		}
-		const hide = await loader.show();
-		try {
-			const summary = await fbPush();
-			toast(summary, 4000);
-		} catch (error) {
-			toast(`firebase backup: ${error.message || error}`);
-		} finally {
-			hide();
-		}
-	}
-
-	async function runFbRestore() {
-		if (!fbReady()) {
-			toast(
-				strings["fb not configured"] ||
-					"Configure the Firebase project id and API key first",
-			);
-			return;
-		}
-		const ok = await confirm(
-			strings["fb restore"] || "Firebase restore",
-			strings["fb restore confirm"] ||
-				"Current settings will be overwritten by the Firebase backup (token excluded). Continue?",
-		);
-		if (!ok) return;
-
-		const hide = await loader.show();
-		try {
-			const { restored } = await fbPull();
-			toast(
-				`${strings["fb restored"] || "Restored"}: ${restored.join(", ")}`,
-				4000,
-			);
-		} catch (error) {
-			toast(`firebase restore: ${error.message || error}`);
 		} finally {
 			hide();
 		}

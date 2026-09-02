@@ -10,7 +10,6 @@ import themeSetting from "pages/themeSetting";
 import About from "../pages/about";
 import aiSettings from "./aiSettings";
 import otherSettings from "./appSettings";
-import backupRestore from "./backupRestore";
 import cloudSettings from "./cloudSettings";
 import editorSettings from "./editorSettings";
 import filesSettings from "./filesSettings";
@@ -105,19 +104,6 @@ export default function mainSettings() {
 			category: categories.customizationTools,
 		},
 		{
-			key: "backendUrl",
-			text: strings["backend url"] || "Backend URL",
-			value: appSettings.value.backendUrl || "",
-			valueText: (value) => value || "Off",
-			prompt: strings["backend url"] || "Backend URL",
-			promptType: "url",
-			promptOptions: { required: false },
-			info:
-				strings["settings-info-backend-url"] ||
-				"Companion backend (xcoder-backend) for remote config: managed marketplace, announcements and Firebase credentials. Leave empty to disable.",
-			category: categories.customizationTools,
-		},
-		{
 			key: "lsp-settings",
 			text:
 				strings?.lsp_settings ||
@@ -144,15 +130,7 @@ export default function mainSettings() {
 			icon: "cloud",
 			info:
 				strings["settings-info-main-cloud"] ||
-				"Optional GitHub backend (backup/restore) and Firebase events.",
-			category: categories.maintenance,
-			chevron: true,
-		},
-		{
-			key: "backup-restore",
-			text: `${strings.backup.capitalize()} & ${strings.restore.capitalize()}`,
-			icon: "cached",
-			info: strings["settings-info-main-backup-restore"],
+				"Optional GitHub storage for your files and data.",
 			category: categories.maintenance,
 			chevron: true,
 		},
@@ -198,7 +176,6 @@ export default function mainSettings() {
 	async function callback(key, value) {
 		switch (key) {
 			case "app-settings":
-			case "backup-restore":
 			case "editor-settings":
 			case "preview-settings":
 			case "terminal-settings":
@@ -210,10 +187,6 @@ export default function mainSettings() {
 
 			case "marketplaceUrl":
 				await appSettings.update({ marketplaceUrl: value ?? "" });
-				break;
-
-			case "backendUrl":
-				await appSettings.update({ backendUrl: value ?? "" });
 				break;
 
 			case "theme":
@@ -270,7 +243,6 @@ export default function mainSettings() {
 	const lazyPages = {
 		"app-settings": otherSettings,
 		"file-settings": filesSettings,
-		"backup-restore": backupRestore,
 		"editor-settings": editorSettings,
 		"scroll-settings": scrollSettings,
 		"search-settings": searchSettings,

@@ -11,6 +11,8 @@
  *  - premium:  paid/enterprise-grade services
  */
 
+import settings from "lib/settings";
+
 export const GROUPS = /** @type {const} */ ({
 	free: "Free",
 	freetier: "Paid (free tier available)",
@@ -271,4 +273,87 @@ export function badgeLabel(group) {
 	return (
 		window.strings?.[`ai badge ${group}`] || BADGE_FALLBACKS[group] || group
 	);
+}
+
+// ------------- per-provider preferences (advanced card config) ----------
+
+/**
+ * Per-provider preferences (API key, base URL, max tokens, autonomy and
+ * the last connection-test status) stored under settings.aiProviderPrefs.
+ * @param {string} providerId
+ * @returns {{apiKey?: string, baseUrl?: string, maxTokens?: number, autonomy?: string, status?: string}}
+ */
+export function getProviderPrefs(providerId) {
+	try {
+		const all = settings.value?.aiProviderPrefs;
+		const prefs = all?.[providerId];
+		return prefs && typeof prefs === "object" ? prefs : {};
+	} catch {
+		return {};
+	}
+}
+
+/**
+ * Merges a patch into the preferences of one provider.
+ * @param {string} providerId
+ * @param {object} patch
+ * @returns {Promise<void>}
+ */
+export async function updateProviderPrefs(providerId, patch) {
+	const all = { ...(settings.value.aiProviderPrefs || {}) };
+	all[providerId] = { ...(all[providerId] || {}), ...patch };
+	for (const key of Object.keys(all[providerId])) {
+		if (all[providerId][key] === undefined) delete all[providerId][key];
+	}
+	if (!Object.keys(all[providerId]).length) delete all[providerId];
+	await settings.update({ aiProviderPrefs: all });
+}
+
+/**
+ * API key for a provider: per-provider override first, then global.
+ * @param {string} providerId
+ * @returns {string}
+ */
+export function resolveApiKey(providerId) {
+	return (
+		getProviderPrefs(providerId).apiKey ||
+		String(settings.value?.aiApiKey || "")
+	);
+}
+
+/**
+ * Base URL override for a provider (per-provider first, then global).
+ * @param {string} providerId
+ * @returns {string}
+ */
+export function resolveBaseUrl(providerId) {
+	return (
+		getProviderPrefs(providerId).baseUrl ||
+		String(settings.value?.aiBaseUrl || "")
+	);
+}
+
+/**
+ * Effective max tokens: per-provider override, then the legacy global
+ * value, then 4096.
+ * @param {string} providerId
+ * @returns {number}
+ */
+export function resolveMaxTokens(providerId) {
+	const prefs = getProviderPrefs(providerId);
+	const value = Number(prefs.maxTokens ?? settings.value?.aiMaxTokens ?? 4096);
+	return Number.isFinite(value)
+		? Math.max(256, Math.min(8192, Math.round(value)))
+		: 4096;
+}
+
+/**
+ * Effective autonomy level: per-provider override, then legacy global.
+ * @param {string} providerId
+ * @returns {"ask" | "safe" | "auto"}
+ */
+export function resolveAutonomy(providerId) {
+	const value =
+		getProviderPrefs(providerId).autonomy || settings.value?.aiAutonomy;
+	return value === "ask" || value === "auto" ? value : "safe";
 }

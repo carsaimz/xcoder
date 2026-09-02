@@ -1,0 +1,375 @@
+/*
+ * XCoder AI providers page — flexible full-width cards.
+ * Deep indigo family + orange accent, per-provider status chips and
+ * circular 32dp icon buttons. Only theme variables are used so every
+ * theme skins it.
+ */
+
+.ai-providers-page {
+	.ai-providers {
+		padding: 12px 12px 24px;
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.ai-providers-hint {
+		font-size: 12px;
+		line-height: 1.5;
+		color: var(--secondary-text-color, #999);
+		padding: 4px 4px 12px;
+	}
+
+	.ai-providers-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+
+	.ai-pgroup-title {
+		font-size: 11px;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--secondary-text-color, #999);
+		padding: 4px 2px 8px;
+	}
+
+	.ai-pgroup-cards {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	// ------------------------------------------------------------- card
+	.ai-pcard {
+		background: color-mix(in srgb, var(--secondary-color) 72%, transparent);
+		border: 1px solid var(--border-color);
+		border-radius: 14px;
+		padding: 12px;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+		&[data-active='true'] {
+			border-color: var(--active-color);
+			box-shadow: 0 0 0 1px color-mix(in srgb, var(--active-color) 45%, transparent),
+				0 4px 16px color-mix(in srgb, var(--active-color) 14%, transparent);
+		}
+
+		// advanced section hidden by default
+		.ai-padv {
+			display: none;
+		}
+
+		&[data-expanded='true'] {
+			.ai-padv {
+				display: block;
+			}
+
+			.ai-pbtn.toggle .icon {
+				transform: rotate(180deg);
+			}
+		}
+	}
+
+	.ai-pcard-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 8px;
+	}
+
+	.ai-pcard-main {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+		flex: 1;
+		cursor: pointer;
+		padding: 2px;
+		margin: -2px;
+		border-radius: 10px;
+	}
+
+	.ai-picon {
+		width: 34px;
+		height: 34px;
+		border-radius: 10px;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 800;
+		font-size: 16px;
+		color: #fff;
+
+		&.g-free {
+			background: linear-gradient(135deg, #4caf50, #2e7d32);
+		}
+
+		&.g-freetier {
+			background: linear-gradient(135deg, #7a74fc, #4b7ef8);
+		}
+
+		&.g-premium {
+			background: linear-gradient(135deg, #ffb74d, #f57c00);
+		}
+	}
+
+	.ai-pcard-text {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.ai-pname {
+		font-size: 13.5px;
+		font-weight: 700;
+		color: var(--primary-text-color);
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	.ai-pactive {
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
+		font-size: 9.5px;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--active-color);
+
+		.icon {
+			font-size: 11px;
+		}
+	}
+
+	.ai-pbadge {
+		align-self: flex-start;
+		font-size: 9px;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		padding: 2px 7px;
+		border-radius: 999px;
+
+		&.g-free {
+			background: #4caf50;
+			color: #fff;
+		}
+
+		&.g-freetier {
+			background: #4b7ef8;
+			color: #fff;
+		}
+
+		&.g-premium {
+			background: #ffc107;
+			color: #232323;
+		}
+	}
+
+	.ai-pcard-side {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 6px;
+		flex-shrink: 0;
+	}
+
+	// ------------------------------------------------------- status chip
+	.ai-pchip {
+		font-size: 9.5px;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		padding: 3px 9px;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
+		color: var(--secondary-text-color, #999);
+
+		&.is-connected {
+			background: #4caf50;
+			color: #fff;
+		}
+
+		&.is-offline {
+			background: #f44336;
+			color: #fff;
+		}
+
+		&.is-testing {
+			background: color-mix(in srgb, var(--active-color) 22%, transparent);
+			color: var(--active-color);
+		}
+	}
+
+	// ------------------------------------------- circular icon buttons
+	.ai-pactions {
+		display: flex;
+		gap: 6px;
+	}
+
+	.ai-pbtn {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 1px solid var(--border-color);
+		background: color-mix(in srgb, var(--primary-color) 60%, transparent);
+		color: var(--primary-text-color);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		padding: 0;
+		transition: background-color 0.15s ease, transform 0.1s ease;
+
+		.icon {
+			font-size: 16px;
+		}
+
+		&:hover {
+			background: color-mix(in srgb, var(--active-color) 14%, transparent);
+		}
+
+		&:active {
+			transform: scale(0.92);
+			background: color-mix(in srgb, var(--active-color) 24%, transparent);
+		}
+
+		&.toggle .icon {
+			transition: transform 0.18s ease;
+		}
+	}
+
+	// ------------------------------------------------------ summary row
+	.ai-psummary {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 14px;
+		padding: 9px 2px 0;
+		font-size: 11px;
+		color: var(--secondary-text-color, #999);
+
+		.ai-psummary-item {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			white-space: nowrap;
+
+			.icon {
+				font-size: 12px;
+			}
+		}
+	}
+
+	.ai-pdot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	// ------------------------------------------------- advanced section
+	.ai-padv {
+		margin-top: 11px;
+		padding-top: 11px;
+		border-top: 1px dashed var(--border-color);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.ai-padv-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 44px;
+	}
+
+	.ai-padv-label {
+		width: 96px;
+		flex-shrink: 0;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--primary-text-color);
+	}
+
+	.ai-padv-value {
+		flex: 1;
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		font-size: 12.5px;
+		color: var(--primary-text-color);
+	}
+
+	.ai-pslider {
+		flex: 1;
+		accent-color: var(--active-color);
+		height: 44px;
+		margin: 0;
+	}
+
+	.ai-pnum {
+		width: 84px;
+		flex-shrink: 0;
+		height: 38px;
+		border-radius: 10px;
+		border: 1px solid var(--border-color);
+		background: color-mix(in srgb, var(--primary-color) 70%, transparent);
+		color: var(--primary-text-color);
+		text-align: center;
+		font-size: 13px;
+		font-weight: 600;
+		outline: none;
+
+		&:focus {
+			border-color: var(--active-color);
+		}
+	}
+
+	.ai-prow {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		min-height: 44px;
+		cursor: pointer;
+		border-radius: 10px;
+		padding: 0 6px;
+		margin: 0 -6px;
+
+		&:active {
+			background: color-mix(in srgb, var(--active-color) 10%, transparent);
+		}
+	}
+
+	.ai-prow-label {
+		width: 96px;
+		flex-shrink: 0;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--primary-text-color);
+	}
+
+	.ai-prow-value {
+		flex: 1;
+		font-size: 11.5px;
+		color: var(--secondary-text-color, #999);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		direction: rtl;
+		text-align: left;
+	}
+
+	.ai-prow-ico {
+		font-size: 16px;
+		color: var(--secondary-text-color, #999);
+		flex-shrink: 0;
+	}
+}

@@ -3,9 +3,10 @@ import toast from "components/toast";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import { listModels } from "lib/ai/client";
-import { badgeLabel, byGroup, PROVIDER_MAP, PROVIDERS } from "lib/ai/providers";
+import { badgeLabel, byGroup, PROVIDER_MAP } from "lib/ai/providers";
 import settings from "lib/settings";
 import helpers from "utils/helpers";
+import aiProviders from "./aiProviders";
 
 /**
  * XCoder AI assistant settings page.
@@ -14,46 +15,18 @@ export default function aiSettings() {
 	const title = strings["ai settings"] || "AI assistant";
 	const values = settings.value;
 
-	const providerOptions = [
-		...byGroup("free").map((provider) => [
-			`group:free:${provider.id}`,
-			`${provider.name} · ${badgeLabel("free")}`,
-		]),
-		...byGroup("freetier").map((provider) => [
-			`group:freetier:${provider.id}`,
-			`${provider.name} · ${badgeLabel("freetier")}`,
-		]),
-		...byGroup("premium").map((provider) => [
-			`group:premium:${provider.id}`,
-			`${provider.name} · ${badgeLabel("premium")}`,
-		]),
-	];
-
 	const currentProviderId = values.aiProvider || "groq";
-
-	/** @param {string} value */
-	function providerIdFromValue(value) {
-		return String(value || "").replace(/^group:[^:]+:/, "") || "groq";
-	}
+	const currentProvider = PROVIDER_MAP[currentProviderId];
 
 	const items = [
 		{
-			key: "aiProvider",
-			text: strings["ai provider"] || "Provider",
-			value: `group:${PROVIDER_MAP[currentProviderId]?.group || "free"}:${currentProviderId}`,
-			valueText: (value) => {
-				const provider = PROVIDER_MAP[providerIdFromValue(value)];
-				return provider ? provider.name : value;
-			},
-			valueBadge: (value) => {
-				const provider = PROVIDER_MAP[providerIdFromValue(value)];
-				if (!provider) return null;
-				return { label: badgeLabel(provider.group), tone: provider.group };
-			},
-			select: providerOptions,
+			key: "providers",
+			text: strings["ai providers"] || "Providers",
+			value: currentProvider ? currentProvider.name : currentProviderId,
 			info:
-				strings["settings-info-ai-provider"] ||
-				"Free providers, paid providers with a free tier and premium providers.",
+				strings["settings-info-ai-providers"] ||
+				"Cards for every provider: status, key, max tokens and autonomy per provider.",
+			chevron: true,
 		},
 		{
 			key: "aiApiKey",
@@ -64,7 +37,7 @@ export default function aiSettings() {
 			promptOptions: { required: false },
 			info:
 				strings["settings-info-ai-api-key"] ||
-				"Stored locally on this device only.",
+				"Global fallback key. Each provider can have its own key on the Providers page.",
 		},
 		{
 			key: "aiBaseUrl",
@@ -75,7 +48,7 @@ export default function aiSettings() {
 			promptOptions: { required: false },
 			info:
 				strings["settings-info-ai-base-url"] ||
-				"Leave empty to use the provider default. Useful for custom OpenAI-compatible endpoints (Ollama, LM Studio...).",
+				"Global fallback URL. Each provider can have its own URL on the Providers page.",
 		},
 		{
 			key: "aiModel",
@@ -108,27 +81,6 @@ export default function aiSettings() {
 				"Lower values are more deterministic.",
 		},
 		{
-			key: "aiMaxTokens",
-			text: "Max tokens",
-			value: values.aiMaxTokens ?? 4096,
-			slider: { min: 256, max: 8192, step: 128 },
-			info:
-				strings["settings-info-ai-max-tokens"] || "Maximum response length.",
-		},
-		{
-			key: "aiAutonomy",
-			text: strings["ai autonomy"] || "Autonomy",
-			value: values.aiAutonomy || "safe",
-			segment: [
-				["ask", strings["ai autonomy low"] || "Baixo", "low"],
-				["safe", strings["ai autonomy medium"] || "Médio", "medium"],
-				["auto", strings["ai autonomy high"] || "Alto", "high"],
-			],
-			info:
-				strings["settings-info-ai-autonomy"] ||
-				"How much the agent can do without confirmation.",
-		},
-		{
 			key: "aiSubagents",
 			text: strings["ai subagents"] || "Enable subagents",
 			checkbox: values.aiSubagents !== false,
@@ -155,14 +107,12 @@ export default function aiSettings() {
 		items,
 		async (key, value) => {
 			try {
-				if (key === "fetchModels") {
-					await pickModel();
+				if (key === "providers") {
+					aiProviders();
 					return;
 				}
-				if (key === "aiProvider") {
-					const providerId = providerIdFromValue(value);
-					await settings.update({ aiProvider: providerId, aiModel: "" });
-					toast(`${PROVIDER_MAP[providerId]?.name || providerId}`, 2000);
+				if (key === "fetchModels") {
+					await pickModel();
 					return;
 				}
 				if (key === "aiApiKey") {
@@ -179,20 +129,11 @@ export default function aiSettings() {
 					});
 					return;
 				}
-				if (key === "aiMaxTokens") {
-					await settings.update({
-						aiMaxTokens: Math.max(
-							256,
-							Math.min(8192, Number.parseInt(value, 10) || 4096),
-						),
-					});
-					return;
-				}
 				if (key === "aiSubagents") {
 					await settings.update({ aiSubagents: Boolean(value) });
 					return;
 				}
-				// aiBaseUrl / aiModel / aiAutonomy / aiSystemPrompt: verbatim
+				// aiBaseUrl / aiModel / aiSystemPrompt: verbatim
 				await settings.update({ [key]: value ?? "" });
 			} catch (error) {
 				helpers.error(error);

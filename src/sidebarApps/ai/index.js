@@ -5,8 +5,14 @@ import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import { Agent } from "lib/ai/agent";
+import { listModels, resolveBaseURL } from "lib/ai/client";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
-import { badgeLabel, PROVIDER_MAP } from "lib/ai/providers";
+import {
+	badgeLabel,
+	PROVIDER_MAP,
+	resolveApiKey,
+	resolveBaseUrl,
+} from "lib/ai/providers";
 import {
 	deriveTitle,
 	formatSessionTime,
@@ -50,9 +56,13 @@ let $status = null;
 /** @type {HTMLElement} */
 let $slashMenu = null;
 /** @type {HTMLElement} */
-let $modeChip = null;
-/** @type {HTMLElement} */
 let $sessionTitle = null;
+/** @type {HTMLElement} */
+let $modelBtn = null;
+/** @type {HTMLElement} */
+let $modeTrack = null;
+/** @type {HTMLElement} */
+let $modeFooter = null;
 /** @type {Function} */
 let cleanupOnHide = null;
 
@@ -123,7 +133,10 @@ export async function askAI(text) {
 }
 
 function onSelected(el) {
-	// live in the sidebar panel again; scroll to the latest message and focus
+	// live in the sidebar panel again; resync controls, scroll to the
+	// latest message and focus the input
+	updateModeSwitch();
+	updateModelButton();
 	scrollToEnd();
 	setTimeout(() => {
 		el?.querySelector("textarea.ai-input")?.focus();
@@ -140,7 +153,8 @@ function initApp(el) {
 
 	restoreSessions();
 	renderMessages();
-	renderModeChip();
+	updateModeSwitch();
+	updateModelButton();
 
 	return () => {
 		container = null;
@@ -149,59 +163,66 @@ function initApp(el) {
 }
 
 function buildUi() {
-	const providerId = settings.value.aiProvider || "groq";
-	const provider = PROVIDER_MAP[providerId];
-	const model = settings.value.aiModel || provider?.models?.[0] || "—";
-	const badge = provider ? badgeLabel(provider.group) : null;
-
 	$sessionTitle = <span className="ai-session-title" title=""></span>;
 
-	$modeChip = <span className="ai-mode-chip" onclick={chooseMode}></span>;
+	// Header — quick action icons only (compact 24dp glyphs, 40dp targets)
+	$modelBtn = (
+		<span
+			className="icon tune ai-act"
+			title={strings["ai model"] || "Model"}
+			onclick={openModelPicker}
+		></span>
+	);
 
 	const $header = (
 		<div className="ai-header">
-			<div className="ai-title">
-				<span className="icon brain"></span>
-				<div className="ai-title-text">
-					{$sessionTitle}
-					<span className="ai-meta">
-						{badge && (
-							<span
-								className={`ai-provider-badge tone-${provider?.group || "neutral"}`}
-							>
-								{badge}
-							</span>
-						)}
-						<span className="ai-model" title={model}>
-							{model}
-						</span>
-					</span>
-				</div>
-				{$modeChip}
-			</div>
-			<div className="ai-actions">
-				<span
-					className="icon historyrestore"
-					title={strings["ai sessions"] || "Chat sessions"}
-					onclick={openSessions}
-				></span>
-				<span
-					className="icon delete"
-					title={strings["ai clear chat"] || "Clear chat"}
-					onclick={clearChat}
-				></span>
-				<span
-					className="icon settings"
-					title={strings["ai settings"] || "AI settings"}
-					onclick={openSettings}
-				></span>
-			</div>
+			{$modelBtn}
+			<span
+				className="icon add ai-act"
+				title={strings["ai new chat"] || "New chat"}
+				onclick={startNewChat}
+			></span>
+			<span
+				className="icon historyrestore ai-act"
+				title={strings["ai sessions"] || "Chat sessions"}
+				onclick={openSessions}
+			></span>
+			<span
+				className="icon settings ai-act"
+				title={strings["ai settings"] || "AI settings"}
+				onclick={openSettings}
+			></span>
 		</div>
 	);
+
+	// Slim session title strip (kept out of the header on purpose)
+	const $sessionBar = <div className="ai-session-bar">{$sessionTitle}</div>;
 
 	$messages = <div className="ai-messages" ontouchstart={handleTouch}></div>;
 
 	$status = <div className="ai-status"></div>;
+
+	// Footer — centered Agent/Chat switch (iOS/VS Code style)
+	$modeTrack = <div className="ai-mode-track" onclick={toggleMode}></div>;
+	$modeFooter = (
+		<div className="ai-modebar">
+			<span
+				className="ai-mode-label"
+				data-side="chat"
+				onclick={() => setMode("chat")}
+			>
+				{strings["ai mode chat"] || "Chat"}
+			</span>
+			{$modeTrack}
+			<span
+				className="ai-mode-label"
+				data-side="agent"
+				onclick={() => setMode("agent")}
+			>
+				{strings["ai mode agent"] || "Agent"}
+			</span>
+		</div>
+	);
 
 	$slashMenu = <div className="ai-slash-menu" style="display:none"></div>;
 
@@ -241,8 +262,10 @@ function buildUi() {
 	return (
 		<div className="ai-chat">
 			{$header}
+			{$sessionBar}
 			{$messages}
 			{$status}
+			{$modeFooter}
 			{$composer}
 		</div>
 	);
@@ -524,41 +547,157 @@ function renderSessionTitle() {
 }
 
 /**
- * Renders the chat/agent mode chip from settings.aiMode.
+ * Renders the Agent/Chat footer switch from settings.aiMode.
  */
-function renderModeChip() {
-	if (!$modeChip) return;
+function updateModeSwitch() {
+	if (!$modeTrack || !$modeFooter) return;
 	const mode = settings.value.aiMode === "chat" ? "chat" : "agent";
-	$modeChip.textContent =
+	$modeTrack.dataset.mode = mode;
+	$modeTrack.content = (
+		<span className="ai-mode-thumb">
+			<span
+				className={`icon ${mode === "chat" ? "chat_bubble" : "wand"}`}
+			></span>
+		</span>
+	);
+	$modeFooter.dataset.mode = mode;
+	$modeTrack.title =
 		mode === "chat"
-			? strings["ai mode chat"] || "Chat"
-			: strings["ai mode agent"] || "Agent";
-	$modeChip.dataset.mode = mode;
-	$modeChip.title = strings["ai mode"] || "AI mode";
+			? strings["ai mode switch agent"] || "Switch to Agent (tools)"
+			: strings["ai mode switch chat"] || "Switch to Chat (no tools)";
+}
+
+/** Flips the current mode. */
+function toggleMode() {
+	setMode(settings.value.aiMode === "chat" ? "agent" : "chat");
 }
 
 /**
- * Mode picker (chat = conversation only, agent = full tools).
+ * Sets the AI mode (chat = conversation only, agent = full tools).
+ * @param {string} mode
  */
-async function chooseMode() {
-	const choice = await select(strings["ai mode"] || "AI mode", [
-		{
-			value: "agent",
-			text: strings["ai mode agent"] || "Agent — full tools and file edits",
-			icon: "wand-sparkles",
-		},
-		{
-			value: "chat",
-			text: strings["ai mode chat"] || "Chat — conversation without tools",
-			icon: "chat_bubble",
-		},
+function setMode(mode) {
+	if (mode !== "chat" && mode !== "agent") return;
+	if ((settings.value.aiMode === "chat" ? "chat" : "agent") === mode) return;
+
+	settings.value.aiMode = mode;
+	settings.update();
+	agent = null; // rebuilt on next message with the new mode
+	updateModeSwitch();
+	hapticTick();
+	toast(
+		mode === "chat"
+			? strings["ai mode chat"] || "Chat"
+			: strings["ai mode agent"] || "Agent",
+		1200,
+	);
+}
+
+/** Light haptic feedback for confirmations. */
+function hapticTick() {
+	try {
+		navigator.vibrate?.(10);
+	} catch {
+		/* unsupported — ignore */
+	}
+}
+
+/** Keeps the model button tooltip in sync with the active model. */
+function updateModelButton() {
+	if (!$modelBtn) return;
+	const providerId = settings.value.aiProvider || "groq";
+	const provider = PROVIDER_MAP[providerId];
+	const model = settings.value.aiModel || provider?.models?.[0] || "—";
+	const badge = provider ? badgeLabel(provider.group) : null;
+	$modelBtn.title = `${strings["ai model"] || "Model"}: ${model}${badge ? ` (${badge})` : ""}`;
+}
+
+/**
+ * Quick model picker: instant dialog with the provider's known models,
+ * plus live fetch from the API and manual entry.
+ */
+async function openModelPicker() {
+	const providerId = settings.value.aiProvider || "groq";
+	const provider = PROVIDER_MAP[providerId];
+
+	/** @type {Array<string>} deduplicated model ids */
+	const models = [];
+	for (const model of provider?.models || []) {
+		if (!models.includes(model)) models.push(model);
+	}
+
+	const current = settings.value.aiModel || models[0] || "";
+	const fetchLabel = strings["ai fetch models"] || "Fetch available models";
+	const manualLabel = strings["ai model manual"] || "Type model id manually";
+
+	const choice = await select(strings["ai model"] || "Model", [
+		...models.map((model) => [model, model === current ? `✓ ${model}` : model]),
+		["__fetch__", `⟳ ${fetchLabel}`],
+		["__manual__", manualLabel],
 	]);
 	if (!choice) return;
 
-	settings.value.aiMode = choice;
-	settings.update();
-	agent = null; // rebuilt on next message with the new mode
-	renderModeChip();
+	if (choice === "__fetch__") {
+		await pickModelLive();
+		return;
+	}
+
+	if (choice === "__manual__") {
+		const manual = await prompt(
+			strings["ai model"] || "Model",
+			current,
+			"text",
+			{ required: false },
+		);
+		const value = String(manual || "").trim();
+		if (!value) return;
+		await settings.update({ aiModel: value });
+		agent = null;
+		updateModelButton();
+		toast(value, 2000);
+		return;
+	}
+
+	if (choice !== current) {
+		await settings.update({ aiModel: choice });
+		agent = null;
+		updateModelButton();
+		toast(choice, 2000);
+	}
+}
+
+/**
+ * Queries /models at the current endpoint and lets the user pick one.
+ */
+async function pickModelLive() {
+	const providerId = settings.value.aiProvider || "groq";
+	const provider = PROVIDER_MAP[providerId];
+	toast(strings["loading..."] || "Loading...", 3000);
+	try {
+		const models = await listModels({
+			baseURL: resolveBaseURL(provider, resolveBaseUrl(providerId)),
+			apiKey: resolveApiKey(providerId),
+		});
+		if (!models.length) {
+			toast(
+				strings["ai no models"] || "No models found — set the model manually.",
+				4000,
+			);
+			return;
+		}
+		const selected = await select(
+			strings["ai model"] || "Model",
+			models.slice(0, 200).map((model) => [model, model]),
+		);
+		if (selected) {
+			await settings.update({ aiModel: selected });
+			agent = null;
+			updateModelButton();
+			toast(selected, 2000);
+		}
+	} catch (error) {
+		toast(`models: ${error.message || error}`);
+	}
 }
 
 /** @returns {object | undefined} the currently active session */

@@ -563,9 +563,11 @@ xcoder.popupIconColor = "rgb(235, 232, 248)";
 xcoder.popupBackgroundColor = "rgb(38, 36, 54)";
 xcoder.popupTextColor = "rgb(235, 232, 248)";
 xcoder.popupActiveColor = "rgb(133, 108, 250)";
-xcoder.buttonBackgroundColor = "rgb(122, 116, 252)";
+// Accent: orange CTAs over the deep indigo base (brand rule: purple UI,
+// orange highlight — away from the Acode blue).
+xcoder.buttonBackgroundColor = "rgb(255, 138, 61)";
 xcoder.buttonTextColor = "rgb(255, 255, 255)";
-xcoder.buttonActiveColor = "rgb(95, 100, 248)";
+xcoder.buttonActiveColor = "rgb(224, 104, 34)";
 xcoder.boxShadowColor = "rgba(0, 0, 0, 0.5)";
 xcoder.activeTextColor = "rgb(255, 255, 255)";
 xcoder.errorTextColor = "rgb(255, 160, 120)";

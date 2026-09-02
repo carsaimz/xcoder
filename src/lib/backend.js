@@ -1,24 +1,33 @@
 import settings from "lib/settings";
 
 /**
- * XCoder companion backend client (Task 9.4).
+ * XCoder site backend client (app ↔ site ↔ repo integration).
  *
- * Talks to an optional self-hosted backend (see
- * github.com/carsaimz/xcoder-backend). When the user configures a
- * "Backend URL" in Settings, the app fetches `/api/config` with a
- * stale-while-revalidate cache and consumes:
+ * Talks to the community site (github.com/carsaimz/xcoder-web, deployed on
+ * Vercel). The site URL no longer needs to be configured by hand: it
+ * defaults to the official deployment and can be overridden for
+ * self-hosters via settings.json (`backendUrl`) or by the site itself via
+ * remote config (`config.backendUrl`).
  *
- *  - marketplaceUrl — remote-managed plugin marketplace fallback
- *  - firebase       — externalized Firebase credentials (Task 9.3)
- *  - announcements  — remote messages for future UI use
+ * Consumed endpoints:
+ *  - GET  /api/config    → marketplaceUrl, announcements, changelog repo,
+ *                          stableVersion, firebase (native) config
+ *  - POST /api/feedback  → anonymous logs/feedback events (X-Device-ID)
  *
- * Everything silently no-ops when the URL is unset, the backend is
- * unreachable or the payload is invalid — boot is never blocked.
+ * The app identifies itself with an anonymous `X-Device-ID` header (UUID
+ * generated on first run) — no login required.
+ *
+ * Everything silently no-ops when the backend is unreachable or the
+ * payload is invalid — boot is never blocked.
  */
 
 const CACHE_KEY = "xcoder.backend.config";
 const CACHE_TTL = 30 * 60 * 1000;
 const FETCH_TIMEOUT = 8000;
+const DEVICE_ID_KEY = "xcoder.deviceId";
+
+/** Official site deployment (Vercel). Overridable via settings/remote config. */
+export const DEFAULT_BACKEND_URL = "https://xcoder-web.vercel.app";
 
 /** @type {any | null} module-level cached config (sync access for consumers) */
 let cached = readCache();
@@ -27,24 +36,50 @@ let cached = readCache();
 let cachedUrl = null;
 let inFlight = false;
 
-// Kick a background refresh shortly after boot (no-op without backend URL).
+// Kick a background refresh shortly after boot (no-op offline).
 setTimeout(() => {
 	ensureBackendConfig().catch(() => {});
 }, 2000);
 
 /**
- * Returns the configured backend URL (trailing slashes stripped) or null.
- * @returns {string | null}
+ * Anonymous device id (UUID) generated on first run and kept in
+ * localStorage. Sent as `X-Device-ID` so the site can aggregate anonymous
+ * usage without any account.
+ * @returns {string}
+ */
+export function deviceId() {
+	try {
+		let id = localStorage.getItem(DEVICE_ID_KEY);
+		if (!id) {
+			id =
+				typeof crypto?.randomUUID === "function"
+					? crypto.randomUUID()
+					: `dev-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+			localStorage.setItem(DEVICE_ID_KEY, id);
+		}
+		return id;
+	} catch {
+		return "anonymous";
+	}
+}
+
+/**
+ * Returns the effective backend URL: manual settings override first, then
+ * the URL advertised by the remote config itself, then the official site.
+ * @returns {string}
  */
 export function backendUrl() {
-	try {
-		const url = String(settings.value?.backendUrl || "")
-			.trim()
-			.replace(/\/+$/, "");
-		return /^https?:\/\//.test(url) ? url : null;
-	} catch {
-		return null;
-	}
+	const manual = String(settings.value?.backendUrl || "")
+		.trim()
+		.replace(/\/+$/, "");
+	if (/^https?:\/\//.test(manual)) return manual;
+
+	const remote = String(cached?.backendUrl || "")
+		.trim()
+		.replace(/\/+$/, "");
+	if (/^https?:\/\//.test(remote)) return remote;
+
+	return DEFAULT_BACKEND_URL;
 }
 
 /**
@@ -57,13 +92,12 @@ export function backendConfig() {
 
 /**
  * Fetches `/api/config` when needed (stale-while-revalidate) and returns
- * the freshest config available, or null when the backend is unset/unreachable.
+ * the freshest config available, or null when the backend is unreachable.
  * @param {boolean} [force] bypass the TTL and refetch
  * @returns {Promise<any | null>}
  */
 export async function ensureBackendConfig(force = false) {
 	const url = backendUrl();
-	if (!url) return null;
 
 	if (cached && cachedUrl === url && !force && !isExpired()) {
 		return cached;
@@ -90,6 +124,42 @@ export async function ensureBackendConfig(force = false) {
 		return cached;
 	} finally {
 		inFlight = false;
+	}
+}
+
+/**
+ * Sends an anonymous feedback/log event to the site (`POST /api/feedback`).
+ * @param {string} type e.g. "feedback" | "event" | "crash"
+ * @param {Record<string, any>} payload small JSON-serializable fields
+ * @returns {Promise<boolean>} true when accepted
+ */
+export async function sendFeedback(type, payload = {}) {
+	try {
+		const url = backendUrl();
+		const body = JSON.stringify({
+			type: String(type || "feedback").slice(0, 40),
+			payload,
+			deviceId: deviceId(),
+			appVersion: window.BuildInfo?.version || null,
+			platform: window.cordova ? "android" : "web",
+			at: Date.now(),
+		});
+		const response = await Promise.race([
+			fetch(`${url}/api/feedback`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Device-ID": deviceId(),
+				},
+				body,
+			}),
+			new Promise((_, reject) =>
+				setTimeout(() => reject(new Error("timeout")), FETCH_TIMEOUT),
+			),
+		]);
+		return response?.ok === true;
+	} catch {
+		return false;
 	}
 }
 
@@ -144,7 +214,10 @@ function httpGetJson(url) {
 			FETCH_TIMEOUT,
 		);
 
-		fetch(url, { cache: "no-cache" })
+		fetch(url, {
+			cache: "no-cache",
+			headers: { "X-Device-ID": deviceId() },
+		})
 			.then((response) => {
 				if (!response.ok) {
 					throw new Error(`HTTP ${response.status}`);

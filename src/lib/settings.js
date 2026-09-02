@@ -114,7 +114,7 @@ class Settings {
 	constructor() {
 		this.#defaultSettings = {
 			animation: "system",
-			appTheme: "dark",
+			appTheme: "Xcoder",
 			autosave: 0,
 			fileBrowser: this.#fileBrowserSettings,
 			formatter: {},
@@ -217,6 +217,7 @@ class Settings {
 			aiMode: "agent",
 			aiSubagents: true,
 			aiSystemPrompt: "",
+			aiProviderPrefs: {}, // per-provider overrides (key/url/tokens/autonomy/status)
 			gitRemoteUrl: "",
 			ghRepo: "",
 			ghToken: "",
@@ -248,7 +249,7 @@ class Settings {
 		if (this.#initialized) return;
 		this.settingsFile = Url.join(DATA_STORAGE, "settings.json");
 
-		this.#defaultSettings.appTheme = "system";
+		this.#defaultSettings.appTheme = "Xcoder";
 		this.#defaultSettings.editorTheme = getSystemEditorTheme(
 			isDeviceDarkTheme(),
 		);
@@ -297,6 +298,13 @@ class Settings {
 			// Ensure backendUrl is a string
 			if (typeof this.value.backendUrl !== "string") {
 				this.value.backendUrl = "";
+			}
+			// Ensure aiProviderPrefs is an object
+			if (
+				!this.value.aiProviderPrefs ||
+				typeof this.value.aiProviderPrefs !== "object"
+			) {
+				this.value.aiProviderPrefs = {};
 			}
 
 			return;
