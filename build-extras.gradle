@@ -16,26 +16,23 @@ configurations {
 // ---------------------------------------------------------------------------
 // Native Firebase (Analytics, Crashlytics, Remote Config, FCM)
 //
-// Enabled ONLY when google-services.json exists in this app module — it is
-// copied here by hooks/post-process.js when the project root provides the
-// file. Builds without it (self-hosters, F-Droid flavour) compile normally
-// without any Firebase dependency, and the F-Droid flag file (<tmpdir>/fdroid
-// .bool) actively prevents the copy.
+// Cordova Android 15 owns the google-services plugin lifecycle itself: when
+// the post-process hook flips IS_GRADLE_PLUGIN_GOOGLE_SERVICES_ENABLED in
+// platforms/android/cdv-gradle-config.json, the platform adds the plugin
+// classpath (com.google.gms:google-services:4.4.2) and applies it at the END
+// of app/build.gradle. Do NOT re-declare buildscript{} or apply plugin here —
+// a buildscript block inside a script applied with `apply from:` has an
+// isolated classpath under Gradle 8, the plugin id cannot be resolved and the
+// throw aborts app/build.gradle evaluation before android{} sets compileSdk.
+//
+// This file only adds the Firebase libraries when the hook managed to copy
+// google-services.json into this app module. Builds without it
+// (self-hosters, F-Droid flavour) compile normally without any Firebase
+// dependency, and the F-Droid flag file (<tmpdir>/fdroid.bool) actively
+// prevents the copy.
 // ---------------------------------------------------------------------------
 def googleServicesFile = file('google-services.json')
 if (googleServicesFile.exists()) {
-    buildscript {
-        repositories {
-            google()
-            mavenCentral()
-        }
-        dependencies {
-            classpath 'com.google.gms:google-services:4.4.2'
-        }
-    }
-
-    apply plugin: 'com.google.gms.google-services'
-
     dependencies {
         implementation platform('com.google.firebase:firebase-bom:33.7.0')
         implementation 'com.google.firebase:firebase-analytics'

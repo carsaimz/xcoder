@@ -7,6 +7,10 @@ const buildFilePath = path.resolve(__dirname, '../build.json');
 const copyToPath = path.resolve(__dirname, '../platforms/android/build.json');
 const gradleFilePath = path.resolve(__dirname, '../build-extras.gradle');
 const googleServicesPath = path.resolve(__dirname, '../google-services.json');
+const gradleConfigPath = path.resolve(
+  __dirname,
+  '../platforms/android/cdv-gradle-config.json'
+);
 const androidGradleFilePath = path.resolve(
   __dirname,
   '../platforms/android/app/build-extras.gradle'
@@ -56,6 +60,8 @@ function copyGoogleServices() {
         console.log(
           '[Cordova Hook] ⛔ F-Droid flavour — google-services.json skipped (no Firebase)'
         );
+        removeCopiedGoogleServices();
+        setGoogleServicesGradleFlag(false);
         return;
       }
     }
@@ -64,6 +70,8 @@ function copyGoogleServices() {
       console.warn(
         '[Cordova Hook] ⚠️ google-services.json not found — native Firebase disabled'
       );
+      removeCopiedGoogleServices();
+      setGoogleServicesGradleFlag(false);
       return;
     }
 
@@ -75,9 +83,87 @@ function copyGoogleServices() {
     console.log(
       '[Cordova Hook] ✅ Copied google-services.json — native Firebase enabled'
     );
+    setGoogleServicesGradleFlag(true);
   } catch (err) {
     console.error(
       '[Cordova Hook] ❌ Failed to copy google-services.json:',
+      err.message
+    );
+    setGoogleServicesGradleFlag(false);
+  }
+}
+
+/**
+ * Deletes a stale google-services.json left in the app module by a previous
+ * non-F-Droid build. build-extras.gradle gates its Firebase dependency block
+ * on that file's existence, so the flag and the file must move together —
+ * otherwise a flavour switch would bundle Firebase libraries without the
+ * google-services resources.
+ */
+function removeCopiedGoogleServices() {
+  const copied = path.resolve(
+    __dirname,
+    '../platforms/android/app/google-services.json'
+  );
+  if (fs.existsSync(copied)) {
+    fs.rmSync(copied);
+    console.log(
+      '[Cordova Hook] 🧹 Removed stale google-services.json from the app module'
+    );
+  }
+}
+
+/**
+ * Keeps IS_GRADLE_PLUGIN_GOOGLE_SERVICES_ENABLED in cdv-gradle-config.json in
+ * lockstep with the presence of google-services.json in the app module.
+ *
+ * Cordova Android 15 resolves the google-services plugin itself: when the
+ * flag is true, app/build.gradle adds the plugin classpath
+ * (com.google.gms:google-services:$GRADLE_PLUGIN_GOOGLE_SERVICES_VERSION) in
+ * its buildscript block and applies the plugin at the END of the script —
+ * after android{} (and thus compileSdk) is configured. That first-party path
+ * is the only reliable one: a buildscript{} block inside build-extras.gradle
+ * is applied with an isolated script classpath under Gradle 8, so the plugin
+ * id cannot resolve there and the failure aborts evaluation before the
+ * android block runs (breaking compileSdk on every following check).
+ *
+ * The flag is forced back to false on F-Droid/absent-file builds so the
+ * plugin is never applied without its JSON (the plugin hard-fails the build
+ * when google-services.json is missing).
+ */
+function setGoogleServicesGradleFlag(enable) {
+  try {
+    if (!fs.existsSync(gradleConfigPath)) {
+      console.warn(
+        '[Cordova Hook] ⚠️ cdv-gradle-config.json not found — google-services flag untouched'
+      );
+      return;
+    }
+
+    const config = JSON.parse(fs.readFileSync(gradleConfigPath, 'utf-8'));
+    const desired = enable === true;
+
+    if (
+      config.IS_GRADLE_PLUGIN_GOOGLE_SERVICES_ENABLED === desired
+      && (!desired || config.GRADLE_PLUGIN_GOOGLE_SERVICES_VERSION === '4.4.2')
+    ) {
+      return;
+    }
+
+    config.IS_GRADLE_PLUGIN_GOOGLE_SERVICES_ENABLED = desired;
+    if (desired) {
+      config.GRADLE_PLUGIN_GOOGLE_SERVICES_VERSION = '4.4.2';
+    }
+
+    fs.writeFileSync(gradleConfigPath, JSON.stringify(config, null, 2), 'utf-8');
+    console.log(
+      `[Cordova Hook] ✅ google-services gradle plugin ${
+        desired ? 'ENABLED' : 'disabled'
+      } in cdv-gradle-config.json`
+    );
+  } catch (err) {
+    console.error(
+      '[Cordova Hook] ❌ Failed to update cdv-gradle-config.json:',
       err.message
     );
   }
@@ -389,7 +475,7 @@ function copyDirRecursively(src, dest, skip = [], currPath = '') {
   }
 
   if (!fs.existsSync(dest) && isDirectory) {
-    fs.mkdirSync(dest);
+    fs.mkdirSync(dest, { recursive: true });
   }
 
   if (exists && isDirectory) {
