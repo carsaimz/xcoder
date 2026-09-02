@@ -78,7 +78,9 @@ jobs:
             VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package.json config.xml
+            # keep CHANGELOG.md in sync (section for this version, from commits)
+            node utils/scripts/update-changelog.mjs "$VERSION" || true
+            git add package.json config.xml CHANGELOG.md
             git commit -m "chore(release): v${VERSION}"
             git tag -a "v${VERSION}" -m "XCoder v${VERSION}"
             git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"

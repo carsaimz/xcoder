@@ -5,6 +5,7 @@ import Page from "components/page";
 import DOMPurify from "dompurify";
 import Ref from "html-tag-js/ref";
 import actionStack from "lib/actionStack";
+import { backendUrl } from "lib/backend";
 import config from "lib/config";
 import markdownIt from "markdown-it";
 import markdownItFootnote from "markdown-it-footnote";
@@ -165,12 +166,27 @@ export default async function Changelog() {
 	}
 
 	/**
-	 * Fetches CHANGELOG.md from the repo and extracts the section of the
-	 * given version (## [v1.2.3] / ## v1.2.3 / ### v1.2.3 style headers).
+	 * Fetches the changelog section for the given version. Order: site
+	 * API (cached contract endpoint) -> raw CHANGELOG.md from the repo.
 	 * @param {string} version
 	 * @returns {Promise<string|null>}
 	 */
 	async function loadRawChangelogSection(version) {
+		// 1) community site API (contract: GET /api/changelog?v=...)
+		try {
+			const response = await fetch(
+				`${backendUrl()}/api/changelog?v=${encodeURIComponent(version)}`,
+			);
+			if (response.ok) {
+				const data = await response.json();
+				if (data?.section) {
+					return `## v${version}\n${data.section}`;
+				}
+			}
+		} catch (error) {
+			window.log("warn", "Site changelog failed:", error);
+		}
+		// 2) raw CHANGELOG.md from the repo
 		try {
 			const text = await fsOperation(CHANGELOG_FILE_URL).readFile("utf8");
 			const escaped = version.replace(/\./g, "\\.");

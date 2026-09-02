@@ -3,6 +3,83 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **Provider management page**: one flexible card per AI provider — status chip (Connected/Offline/Testing), per-provider API key, base URL, max tokens slider (256–8192) and autonomy level (Baixa/Média/Alta), connection test with spinner and a link to get the API key; searchable list.
+- **AI chat quick header**: compact 24dp actions (model picker, new chat, history, settings) and a footer switch to toggle between **Chat** and **Agente** modes.
+- **Site integration**: the app now consumes the community site APIs (`/api/config`, `/api/feedback`) with anonymous `X-Device-ID` headers; the official site URL is `https://xcoderapp.vercel.app`.
+- **SVG icon pack**: Lucide-style vector icons on the sidebar rail, sharper at any density and independent of the icon font.
+
+### Changed
+- **Firebase minimized**: only Analytics, Crashlytics, Remote Config and FCM remain; the in-app Backup/Backend UI was removed and preferences moved to SharedPreferences/DataStore.
+
+## [1.4.6] - 2026-09-02
+
+### Added
+- **Community wiki sources**: 15 PT-BR pages (installation, first steps, interface, shortcuts, AI, Git, themes, plugins, build, FAQ, contributing…) ready to publish on GitHub.
+- **Documentation hub** linking the site, wiki and repositories.
+
+## [1.4.5] - 2026-09-02
+
+### Added
+- **Command palette polish**: fuzzy search (subsequence matching with word-boundary bonuses) and 117 localized command names in pt-br.
+- **About page credits**: section thanking open-source libraries, contributors and the community.
+- **Hidden developer menu**: 7 taps on the version number open dev actions (clear cache, restart, devtools, copy build info, console).
+
+### Fixed
+- **Startup crash** `Cannot read properties of undefined (reading 'bind')` — the Cordova bridge is now resolved lazily; plugins fail gracefully instead of breaking the boot.
+
+### Improved
+- Motion and feedback: material ripple on taps, page transition animations and optional haptics (all respecting `prefers-reduced-motion`).
+
+## [1.4.4] - 2026-09-01
+
+### Changed
+- Release/maintenance sync — no app changes in this cycle.
+
+## [1.4.3] - 2026-09-01
+
+### Added
+- **Settings control kit** shared by every settings screen: 30%/70% label-control grid, touchable "?" info buttons, segmented autonomy control (Baixo/Médio/Alto), primary full-width buttons with spinner, and slider + numeric input controls.
+- **Provider badges**: Grátis / Free tier / Premium chips on the provider row and chat header (replacing the truncated "Free — …" text).
+
+### Fixed
+- AI and Git panels returned to the sidebar apps (no longer opened as editor tabs), with external calls re-opening and focusing them properly.
+
+## [1.4.2] - 2026-09-01
+
+### Added
+- **Own plugin marketplace**: remote registry (`carsaimz/xcoder-plugins`) with jsDelivr → raw fallback, stale-while-revalidate caching, custom marketplace URLs in settings and 7 built-in plugins (word-count, case-toggle, sort-lines, insert-date, lorem-ipsum, base64-tool, line-tools).
+- Installing by plugin id now resolves through the registry with dependency support and automatic fallback source retry.
+
+## [1.4.1] - 2026-09-01
+
+### Added
+- 6 new editor themes.
+
+### Changed
+- **New Xcoder brand**: icon with the X layered over the < > chevrons everywhere (app, header, about).
+- Xcoder panel design refresh across settings screens.
+
+### Fixed
+- Language switch now applies instantly (no reload needed).
+- Changelog loading failed on fresh installs.
+
+## [1.4.0] - 2026-09-01
+
+### Added
+- **AI chat & Git as editor tabs** with tab renaming and quick tools.
+- **GitHub device-flow sign-in**: sign in from the app (also works on devices without a browser handshake), enabling Git operations over HTTPS.
+- Manual update check on the About page; Portuguese-first language detection on first run.
+
+### Fixed
+- axs and proot downloads now point to the real upstream repositories.
+
+### Changed
+- Completed all 30 locale files and polished pt-br; replaced Dependabot with Renovate and added Stale + CodeRabbit configs.
+- CI/security: CodeQL, Dependency Review and OSSF Scorecard workflows; bilingual EN/PT-BR README with badges.
+
 ## [1.3.0] - 2026-09-01
 
 ### Added
