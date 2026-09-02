@@ -11,6 +11,7 @@ import { animate, hover, press } from "motion";
 import FileBrowser from "pages/fileBrowser";
 import { isValidColor } from "utils/color/regex";
 import helpers from "utils/helpers";
+import svgIcon from "utils/svgIcons";
 import Checkbox from "./checkbox";
 import Page from "./page";
 import searchBar from "./searchbar";
@@ -415,6 +416,14 @@ function createListItemElement(item, options, useInfoAsDescription, callback) {
 	const $tail = Ref();
 	const isCheckboxItem = isBooleanSetting(item);
 	const state = getItemDisplayState(item, useInfoAsDescription, options);
+	// "svg:<name>" renders a vector from the SVG icon pack (utils/svgIcons)
+	// instead of a glyph from the icon font — fallback to the font when the
+	// name is not registered.
+	const svgName =
+		typeof item.icon === "string" && item.icon.startsWith("svg:")
+			? item.icon.slice(4)
+			: null;
+	const $svg = svgName ? svgIcon(svgName) : null;
 	/**@type {HTMLDivElement} */
 	const $item = (
 		<div
@@ -424,9 +433,14 @@ function createListItemElement(item, options, useInfoAsDescription, callback) {
 			data-action="list-item"
 		>
 			<span
-				className={`icon ${item.icon || (item.image ? "" : "no-icon")}`}
+				className={
+					$svg
+						? "icon xc-svgicon"
+						: `icon ${item.icon || (item.image ? "" : "no-icon")}`
+				}
 				style={{ color: item.iconColor }}
 			>
+				{$svg}
 				{item.image && (
 					<img
 						src={item.image}

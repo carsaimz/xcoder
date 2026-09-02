@@ -37,7 +37,7 @@ export default function mainSettings() {
 		{
 			key: "app-settings",
 			text: strings["app settings"],
-			icon: "tune",
+			icon: "svg:sliders-horizontal",
 			info: strings["settings-info-main-app-settings"],
 			category: categories.core,
 			chevron: true,
@@ -45,7 +45,7 @@ export default function mainSettings() {
 		{
 			key: "editor-settings",
 			text: strings["editor settings"],
-			icon: "text_format",
+			icon: "svg:file-code",
 			info: strings["settings-info-main-editor-settings"],
 			category: categories.core,
 			chevron: true,
@@ -53,7 +53,7 @@ export default function mainSettings() {
 		{
 			key: "terminal-settings",
 			text: `${strings["terminal settings"]}`,
-			icon: "terminal",
+			icon: "svg:square-terminal",
 			info: strings["settings-info-main-terminal-settings"],
 			category: categories.core,
 			chevron: true,
@@ -61,7 +61,7 @@ export default function mainSettings() {
 		{
 			key: "preview-settings",
 			text: strings["preview settings"],
-			icon: "public",
+			icon: "svg:globe",
 			info: strings["settings-info-main-preview-settings"],
 			category: categories.core,
 			chevron: true,
@@ -69,7 +69,7 @@ export default function mainSettings() {
 		{
 			key: "formatter",
 			text: strings.formatter,
-			icon: "spellcheck",
+			icon: "svg:braces",
 			info: strings["settings-info-main-formatter"],
 			category: categories.customizationTools,
 			chevron: true,
@@ -77,7 +77,7 @@ export default function mainSettings() {
 		{
 			key: "theme",
 			text: strings.theme,
-			icon: "color_lenspalette",
+			icon: "svg:palette",
 			info: strings["settings-info-main-theme"],
 			category: categories.customizationTools,
 			chevron: true,
@@ -85,7 +85,7 @@ export default function mainSettings() {
 		{
 			key: "plugins",
 			text: strings["plugins"],
-			icon: "extension",
+			icon: "svg:puzzle",
 			info: strings["settings-info-main-plugins"],
 			category: categories.customizationTools,
 			chevron: true,
@@ -109,7 +109,7 @@ export default function mainSettings() {
 				strings?.lsp_settings ||
 				strings["language servers"] ||
 				"Language servers",
-			icon: "zap",
+			icon: "svg:zap",
 			info: strings["settings-info-main-lsp-settings"],
 			category: categories.customizationTools,
 			chevron: true,
@@ -117,7 +117,7 @@ export default function mainSettings() {
 		{
 			key: "ai-settings",
 			text: strings["ai settings"] || "AI assistant",
-			icon: "brain",
+			icon: "svg:brain",
 			info:
 				strings["settings-info-main-ai"] ||
 				"Configure AI providers and agent behavior.",
@@ -127,7 +127,7 @@ export default function mainSettings() {
 		{
 			key: "cloud-settings",
 			text: strings["cloud settings"] || "Cloud",
-			icon: "cloud",
+			icon: "svg:cloud",
 			info:
 				strings["settings-info-main-cloud"] ||
 				"Optional GitHub storage for your files and data.",
@@ -137,7 +137,7 @@ export default function mainSettings() {
 		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
-			icon: "edit",
+			icon: "svg:file-cog",
 			info: strings["settings-info-main-edit-settings"],
 			category: categories.maintenance,
 			chevron: true,
@@ -145,7 +145,7 @@ export default function mainSettings() {
 		{
 			key: "reset",
 			text: strings["restore default settings"],
-			icon: "historyrestore",
+			icon: "svg:rotate-ccw",
 			info: strings["settings-info-main-reset"],
 			category: categories.maintenance,
 			chevron: true,
@@ -153,7 +153,7 @@ export default function mainSettings() {
 		{
 			key: "about",
 			text: strings.about,
-			icon: "info",
+			icon: "svg:info",
 			info: `Version ${BuildInfo.version}`,
 			category: categories.aboutXCoder,
 			chevron: true,
@@ -161,7 +161,7 @@ export default function mainSettings() {
 		{
 			key: "changeLog",
 			text: `${strings["changelog"]}`,
-			icon: "update",
+			icon: "svg:history",
 			info: strings["settings-info-main-changelog"],
 			category: categories.aboutXCoder,
 			chevron: true,
