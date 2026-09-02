@@ -3,6 +3,12 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.8] - 2026-09-02
+
+### Added
+- Native Firebase wired, icon pack tier 3, changelog fix
+
+
 ## [1.4.7] - 2026-09-02
 
 ### Added
