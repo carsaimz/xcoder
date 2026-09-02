@@ -127,6 +127,13 @@ export default function editorSettings() {
 			category: categories.assistance,
 		},
 		{
+			key: "iconCompletion",
+			text: strings["icon completion"],
+			checkbox: values.iconCompletion,
+			info: strings["settings-info-editor-icon-completion"],
+			category: categories.assistance,
+		},
+		{
 			key: "languageCompletion",
 			text: strings["language package completion"],
 			checkbox: values.languageCompletion ?? true,

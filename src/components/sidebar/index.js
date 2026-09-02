@@ -32,7 +32,7 @@ function create($container, $toggler) {
 
 	const START_THRESHOLD = config.SIDEBAR_SLIDE_START_THRESHOLD_PX; //Point where to start swipe
 	const MIN_WIDTH = 250; //Min width of the side bar
-	const MAX_WIDTH = () => innerWidth * 0.7; //Max width of the side bar
+	const MAX_WIDTH = () => Math.round(innerWidth * 0.88); //Max width of the side bar (≈88% of layout)
 	const resizeBar = Ref();
 
 	$container = $container || app;
@@ -51,7 +51,6 @@ function create($container, $toggler) {
 				onmousedown={onresize}
 				ontouchstart={onresize}
 			></div>
-
 		</div>
 	);
 	const mask = <span className="mask" onclick={hide}></span>;
@@ -77,7 +76,6 @@ function create($container, $toggler) {
 	if (mode === "tab" && localStorage.sidebarShown === "1") {
 		show();
 	}
-
 
 	function onWindowResize() {
 		clearTimeout(resizeTimeout);
@@ -224,14 +222,14 @@ function create($container, $toggler) {
 		events.show.forEach((fn) => fn());
 
 		// try {
-		// 	if (await auth.isLoggedIn()) {
-		// 		const avatar = await auth.getAvatar();
-		// 		if (avatar) {
-		// 			auth.updateSidebarAvatar(avatar);
-		// 		}
-		// 	}
+		//      if (await auth.isLoggedIn()) {
+		//              const avatar = await auth.getAvatar();
+		//              if (avatar) {
+		//                      auth.updateSidebarAvatar(avatar);
+		//              }
+		//      }
 		// } catch (error) {
-		// 	console.error("Error updating avatar:", error);
+		//      console.error("Error updating avatar:", error);
 		// }
 	}
 
@@ -452,8 +450,8 @@ function create($container, $toggler) {
 	$el.toggle = toggle;
 	$el.onshow = () => {};
 	$el.getWidth = function () {
-		const width = innerWidth * 0.7;
-		return mode === "phone" ? (width >= 350 ? 350 : width) : MIN_WIDTH;
+		const width = Math.round(innerWidth * 0.85);
+		return mode === "phone" ? width : MIN_WIDTH;
 	};
 
 	return $el;

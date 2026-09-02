@@ -932,3 +932,115 @@
 .icon.all_inclusive:before {
   content: "\ea18";
 }
+
+/* Xcoder generated aliases — compound icon-font class names split into
+ * their plain names so `<span class="icon <name>">` renders everywhere.
+ * Regenerate with: python3 scripts/gen_icon_aliases.py */
+.icon.add_circle_outline:before {
+  content: "\e963";
+}
+.icon.backup:before {
+  content: "\e986";
+}
+.icon.chevron_left:before {
+  content: "\e99d";
+}
+.icon.chevron_right:before {
+  content: "\e99e";
+}
+.icon.clear:before {
+  content: "\e965";
+}
+.icon.close:before {
+  content: "\e965";
+}
+.icon.cloud_upload:before {
+  content: "\e986";
+}
+.icon.color_lens:before {
+  content: "\e99b";
+}
+.icon.control_point:before {
+  content: "\e963";
+}
+.icon.do_not_disturb:before {
+  content: "\e951";
+}
+.icon.do_not_disturb_on:before {
+  content: "\e96d";
+}
+.icon.event:before {
+  content: "\e97d";
+}
+.icon.file_download:before {
+  content: "\e987";
+}
+.icon.get_app:before {
+  content: "\e987";
+}
+.icon.grade:before {
+  content: "\e9cc";
+}
+.icon.history:before {
+  content: "\e9dd";
+}
+.icon.https:before {
+  content: "\e9df";
+}
+.icon.insert_invitation:before {
+  content: "\e97d";
+}
+.icon.insert_link:before {
+  content: "\ea00";
+}
+.icon.launch:before {
+  content: "\e9fc";
+}
+.icon.local_movies:before {
+  content: "\e98c";
+}
+.icon.lock:before {
+  content: "\e9df";
+}
+.icon.navigate_before:before {
+  content: "\e99d";
+}
+.icon.navigate_next:before {
+  content: "\e99e";
+}
+.icon.not_interested:before {
+  content: "\e951";
+}
+.icon.open_in_new:before {
+  content: "\e9fc";
+}
+.icon.remove_circle:before {
+  content: "\e96d";
+}
+.icon.remove_red_eye:before {
+  content: "\e99f";
+}
+.icon.report_problem:before {
+  content: "\e94d";
+}
+.icon.restore:before {
+  content: "\e9dd";
+}
+.icon.sd_card:before {
+  content: "\e973";
+}
+.icon.sd_storage:before {
+  content: "\e973";
+}
+.icon.star:before {
+  content: "\e9cc";
+}
+.icon.theaters:before {
+  content: "\e98c";
+}
+.icon.visibility:before {
+  content: "\e99f";
+}
+.icon.warning:before {
+  content: "\e94d";
+}

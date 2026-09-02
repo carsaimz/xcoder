@@ -44,6 +44,7 @@ import {
 	focusEditorIfEditable,
 	reconfigureEditorReadOnly,
 } from "cm/editorReadOnly";
+import iconCompletions, { iconCompletionSource } from "cm/iconCompletions";
 import { handleLineNumberClick } from "cm/lineNumberSelection";
 import localWordCompletions, {
 	localWordCompletionSource,
@@ -938,6 +939,8 @@ async function EditorManager($header, $body) {
 	const completionCompartment = new Compartment();
 	// Compartment for local document word completions
 	const localWordCompletionCompartment = new Compartment();
+	// Compartment for icon-library completions (Font Awesome, Bootstrap…)
+	const iconCompletionCompartment = new Compartment();
 	// Compartment for rainbow bracket colorizer
 	const rainbowCompartment = new Compartment();
 	// Compartment for indent guides
@@ -994,6 +997,10 @@ async function EditorManager($header, $body) {
 
 			if (appSettings?.value?.localWordCompletion) {
 				config.override.push(localWordCompletionSource);
+			}
+
+			if (appSettings?.value?.iconCompletion !== false) {
+				config.override.push(iconCompletionSource);
 			}
 
 			if (appSettings?.value?.useEmmet !== false) {
@@ -1272,6 +1279,15 @@ async function EditorManager($header, $body) {
 			build() {
 				const enabled = !!appSettings?.value?.localWordCompletion;
 				return enabled ? localWordCompletions() : [];
+			},
+		},
+		{
+			keys: ["iconCompletion"],
+			compartments: [iconCompletionCompartment],
+			build() {
+				return appSettings?.value?.iconCompletion === false
+					? []
+					: iconCompletions();
 			},
 		},
 		{
@@ -3524,7 +3540,7 @@ async function EditorManager($header, $body) {
 	});
 
 	// appSettings.on("update:showPrintMargin", function (value) {
-	// 	// manager.editor.setOption("showPrintMargin", value);
+	//      // manager.editor.setOption("showPrintMargin", value);
 	// });
 
 	appSettings.on("update:scrollbarSize", function (value) {
@@ -3544,6 +3560,10 @@ async function EditorManager($header, $body) {
 
 	appSettings.on("update:localWordCompletion", function () {
 		applyOptions(["localWordCompletion"]);
+	});
+
+	appSettings.on("update:iconCompletion", function () {
+		applyOptions(["iconCompletion"]);
 	});
 
 	appSettings.on("update:languageCompletion", function () {
@@ -3601,7 +3621,7 @@ async function EditorManager($header, $body) {
 	});
 
 	// appSettings.on("update:elasticTabstops", function (_value) {
-	// 	// Not applicable in CodeMirror (Ace-era). No-op for now.
+	//      // Not applicable in CodeMirror (Ace-era). No-op for now.
 	// });
 
 	appSettings.on("update:rtlText", function () {
@@ -3609,7 +3629,7 @@ async function EditorManager($header, $body) {
 	});
 
 	// appSettings.on("update:printMargin", function (_value) {
-	// 	// Not applicable in CodeMirror (Ace-era). No-op for now.
+	//      // Not applicable in CodeMirror (Ace-era). No-op for now.
 	// });
 
 	appSettings.on("update:colorPreview", function () {
@@ -4949,8 +4969,8 @@ async function EditorManager($header, $body) {
 		if (!updateGutter) return;
 
 		// editor.setOptions({
-		// 	showGutter: linenumbers || showAnnotations,
-		// 	showLineNumbers: linenumbers,
+		//      showGutter: linenumbers || showAnnotations,
+		//      showLineNumbers: linenumbers,
 		// });
 	}
 

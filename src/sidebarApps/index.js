@@ -89,6 +89,8 @@ async function loadApps() {
 	add(...(await import("./git")).default);
 	add(...(await import("./notification")).default);
 	add(...(await import("./settings")).default);
+	add(...(await import("./about")).default);
+	add(...(await import("./updates")).default);
 }
 
 /**
@@ -132,10 +134,12 @@ function get(id) {
  * @param {MouseEvent} e
  */
 function onclick(e) {
-	const target = e.target;
-	const { action, id } = target.dataset;
-
-	if (action !== "sidebar-app") return;
+	// Use closest() so taps on the inner SVG glyph (path/svg) still resolve
+	// to the app icon — fixes the "need multiple taps" bug where the event
+	// target was a child of the icon without the data-action attribute.
+	const $target = e.target.closest?.('[data-action="sidebar-app"]');
+	if (!$target) return;
+	const { id } = $target.dataset;
 
 	pulseApp(id);
 }

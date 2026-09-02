@@ -198,7 +198,9 @@ function buildUi() {
 	// Slim session title strip (kept out of the header on purpose)
 	const $sessionBar = <div className="ai-session-bar">{$sessionTitle}</div>;
 
-	$messages = <div className="ai-messages" ontouchstart={handleTouch}></div>;
+	$messages = (
+		<div className="ai-messages scroll" ontouchstart={handleTouch}></div>
+	);
 
 	$status = <div className="ai-status"></div>;
 
@@ -224,7 +226,9 @@ function buildUi() {
 		</div>
 	);
 
-	$slashMenu = <div className="ai-slash-menu" style="display:none"></div>;
+	$slashMenu = (
+		<div className="ai-slash-menu scroll" style="display:none"></div>
+	);
 
 	$input = (
 		<textarea

@@ -151,6 +151,7 @@ class Settings {
 			floatingButton: false,
 			liveAutoCompletion: true,
 			localWordCompletion: true,
+			iconCompletion: true,
 			languageCompletion: true,
 			recommendExtensions: true,
 			useEmmet: true,

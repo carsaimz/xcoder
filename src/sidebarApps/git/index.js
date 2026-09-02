@@ -77,7 +77,7 @@ function onSelected(el) {
  */
 function initApp(el) {
 	container = el;
-	el.classList.add("git-app");
+	el.classList.add("git-app", "scroll");
 	el.content = buildUi();
 	refresh();
 

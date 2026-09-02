@@ -472,6 +472,26 @@ async function loadApp() {
 			style={{ fontSize: "1.2em" }}
 		/>
 	);
+	const $terminalToggler = (
+		<span
+			id="header-terminal-btn"
+			className="icon terminal"
+			title={strings["terminal"] || "Terminal"}
+			attr-action="toggle-terminal"
+			style={{ fontSize: "1.2em" }}
+			onclick={() => xcoder.exec("new-terminal")}
+		/>
+	);
+	const $paletteToggler = (
+		<span
+			id="header-palette-btn"
+			className="icon palette"
+			title={strings["command palette"] || "Command palette"}
+			attr-action="toggle-command-palette"
+			style={{ fontSize: "1.2em" }}
+			onclick={() => xcoder.exec("command-palette")}
+		/>
+	);
 	const $navToggler = (
 		<span className="icon menu" attr-action="toggle-sidebar" />
 	);
@@ -701,6 +721,15 @@ async function loadApp() {
 			}
 		} else {
 			$editMenuToggler.remove();
+		}
+
+		// Terminal + command palette buttons live in the header next to
+		// the pencil, always available. Order: [terminal][palette][pencil].
+		if (!$terminalToggler.isConnected) {
+			$header.insertBefore($terminalToggler, $header.lastChild);
+		}
+		if (!$paletteToggler.isConnected) {
+			$header.insertBefore($paletteToggler, $header.lastChild);
 		}
 
 		if (mode === "switch-file") {
