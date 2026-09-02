@@ -41,7 +41,7 @@ let refreshTimer = 0;
  * @returns {Array} sidebar app descriptor
  */
 export default [
-	"git",
+	"svg:git-branch",
 	"git",
 	strings["git panel"] || "Git",
 	initApp,

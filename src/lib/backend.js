@@ -27,7 +27,7 @@ const FETCH_TIMEOUT = 8000;
 const DEVICE_ID_KEY = "xcoder.deviceId";
 
 /** Official site deployment (Vercel). Overridable via settings/remote config. */
-export const DEFAULT_BACKEND_URL = "https://xcoder-web.vercel.app";
+export const DEFAULT_BACKEND_URL = "https://xcoder.vercel.app";
 
 /** @type {any | null} module-level cached config (sync access for consumers) */
 let cached = readCache();

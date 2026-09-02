@@ -8,7 +8,7 @@ let container;
 let $notificationContainer = null;
 
 export default [
-	"notifications", // icon
+	"svg:bell", // icon
 	"notification", // id
 	strings["notifications"], // title
 	initApp, // init function

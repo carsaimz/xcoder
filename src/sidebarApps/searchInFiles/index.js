@@ -201,7 +201,7 @@ function toggleExtras() {
 }
 
 export default [
-	"search",
+	"svg:search",
 	"searchInFiles",
 	strings["search in files"],
 	(/**@type {HTMLElement} */ el) => {

@@ -8,7 +8,7 @@ const mockBackend = {
 vi.mock("lib/backend", () => ({
 	backendConfig: () => mockBackend.config,
 	sendFeedback: (...args) => mockBackend.sendFeedback(...args),
-	backendUrl: () => "https://xcoder-web.vercel.app",
+	backendUrl: () => "https://xcoder.vercel.app",
 	deviceId: () => "test-device",
 }));
 

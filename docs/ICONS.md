@@ -36,6 +36,29 @@ like `icon edit`). The convention governs **which glyph we pick** for new UI:
 On the **web side** (`xcoder-web`), Lucide ships as `lucide-react` and is the
 single source for site navigation — matching tier 1 of this convention.
 
+## The SVG icon pack (tier 1, shipped)
+
+The sidebar/activities tier is backed by a real, versioned pack — no longer a
+convention on paper:
+
+- **Runtime module**: `src/utils/svgIcons.js` — 16 Lucide-flavored icons
+  (24×24, stroke `currentColor`, width 1.75) as inline SVG, with
+  `svgIcon(name)` / `hasIcon(name)`.
+- **Pack files**: `src/res/icons/svg/*.svg` — standalone vectors regenerated
+  from the module with `node scripts/export_svg_pack.cjs` (source of truth =
+  the module).
+- **Integration**: `SidebarApp` icons registered as `svg:<name>` render the
+  inline vector (`.icon.xc-svgicon`); any unknown name silently falls back to
+  the icon font glyph, so plugins using font names keep working.
+
+Current registrations: files→`svg:files`, search→`svg:search`,
+plugins→`svg:puzzle`, AI→`svg:brain`, Git→`svg:git-branch`,
+notifications→`svg:bell`, settings→`svg:settings`. Extra glyphs in the pack
+(terminal, history, sliders-horizontal, save, play, message-square, sparkles,
+folder, square-terminal) are ready for future UI without font changes.
+
+Path data © Lucide Contributors, ISC license.
+
 ## Palette rules
 
 - Primary surfaces/text: theme driven (default theme **Xcoder**: deep plum

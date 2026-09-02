@@ -492,3 +492,17 @@ body.no-animation {
 @supports not (gap: 1px) {
   .user-menu-item > * + * { margin-left: 8px; }
 }
+
+// SVG icon pack (Lucide) — icons rendered by utils/svgIcons.js
+.icon.xc-svgicon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  svg.xc-svg {
+    display: block;
+    width: 26px;
+    height: 26px;
+  }
+}

@@ -71,7 +71,7 @@ let cleanupOnHide = null;
  * @returns {Array} sidebar app descriptor
  */
 export default [
-	"brain",
+	"svg:brain",
 	"ai",
 	strings["ai assistant"] || "AI",
 	initApp,

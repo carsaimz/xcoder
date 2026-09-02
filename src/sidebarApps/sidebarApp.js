@@ -1,3 +1,5 @@
+import svgIcon from "utils/svgIcons";
+
 /**@type {HTMLElement} */
 let $apps;
 /**@type {HTMLElement} */
@@ -215,6 +217,24 @@ export default class SidebarApp {
  * @returns {HTMLElement}
  */
 function Icon({ icon, id, title }) {
+	// SVG icon pack (Lucide): icons registered as "svg:<name>" render as inline
+	// vectors — tier 1 of the hybrid icon convention (docs/ICONS.md).
+	if (icon?.startsWith("svg:")) {
+		const $svg = svgIcon(icon.slice(4));
+		if ($svg) {
+			return (
+				<span
+					data-action="sidebar-app"
+					data-id={id}
+					title={title}
+					className="icon xc-svgicon"
+				>
+					{$svg}
+				</span>
+			);
+		}
+		// pack miss — fall through to the icon font glyph below
+	}
 	const className = `icon ${icon}`;
 	return (
 		<span
