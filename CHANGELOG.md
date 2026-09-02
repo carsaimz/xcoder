@@ -3,6 +3,16 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.7] - 2026-09-02
+
+### Added
+- Settings navigation joins the SVG pack (Lucide tier 2)
+- Backfill 1.4.0-1.4.6, auto-update on release, site API source
+- Provider page refinements — search, footer actions, docs link, key/test states
+- Bundled SVG icon pack on the sidebar rail + official site URL
+- Provider cards page, chat header/footer rework, site APIs, Firebase cleanup
+
+
 ## [Unreleased]
 
 ### Added
