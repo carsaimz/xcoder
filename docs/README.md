@@ -6,7 +6,9 @@ Markdown files are consumed by three surfaces:
 1. **GitHub** — rendered directly in the repository and the wiki.
 2. **App** — displayed in-app (WebView) and bundled where useful.
 3. **Website** — [`carsaimz/xcoder-web`](https://github.com/carsaimz/xcoder-web)
-   renders these files via its API (planned).
+   (live) renders the community docs, blog, forum and marketplace, and serves
+   the app integration APIs (Backend URL). The wiki sources in `wiki/` are the
+   Portuguese canonical set consumed there.
 
 ## Layout
 
