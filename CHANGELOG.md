@@ -3,6 +3,12 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.10] - 2026-09-02
+
+### Fixed
+- Single menu icons, on-screen context menus, tappable info buttons, no row chevrons
+
+
 ## [1.4.9] - 2026-09-02
 
 ### Fixed
