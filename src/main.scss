@@ -13,6 +13,15 @@
   --app-font-family: "Roboto", sans-serif;
 }
 
+/* Icon enhancer (utils/iconEnhancer.js) inlines an SVG inside the original
+   icon-font span. Without this rule the font ::before glyph keeps rendering
+   next to the SVG, so menus showed every icon twice. The class is doubled
+   to out-specify res/icons/style.css, which loads after main.scss. */
+.icon.xc-svgicon.xc-svgicon::before,
+i.icon.xc-svgicon::before {
+  content: none;
+}
+
 * {
   margin: 0;
   padding: 0;

@@ -244,9 +244,22 @@
                 font-size: 1.05rem;
                 cursor: pointer;
 
+                // list.scss silences every child of .list-item
+                // (".list-item * { pointer-events: none }"); without this the
+                // tap falls through to the row and fires the row action
+                // instead of the info tip.
+                pointer-events: all;
+
                 &:active {
                         background: color-mix(in srgb, var(--secondary-text-color) 12%, transparent);
                 }
+        }
+
+        // Same for every tail control that carries its own handlers —
+        // segmented buttons and the slider/number pair are dead otherwise.
+        .segmented .segment,
+        .slider-control input {
+                pointer-events: all;
         }
 
         // ---- small provider badges (Grátis / Free tier / Premium) -----------
@@ -395,18 +408,6 @@ wc-page.main-settings-page {
 
         @include settings-xcoder-controls;
 
-        .main-settings-list .settings-chevron {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 1.2rem;
-                min-width: 1.2rem;
-                height: 1.2rem;
-                margin-left: 0.35rem;
-                font-size: 1.1rem;
-                color: var(--secondary-text-color);
-                color: color-mix(in srgb, var(--secondary-text-color), transparent 40%);
-        }
 
         .settings-search-section .list-item {
                 >.container {
@@ -516,9 +517,7 @@ wc-page.main-settings-page {
                 }
         }
 
-        .settings-search-section .setting-value-icon,
-        .settings-search-section .settings-chevron,
-        .main-settings-list .settings-chevron {
+        .settings-search-section .setting-value-icon {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -541,15 +540,6 @@ wc-page.main-settings-page {
                 }
         }
 
-        .settings-search-section .settings-chevron,
-        .main-settings-list .settings-chevron {
-                width: 1.2rem;
-                min-width: 1.2rem;
-                height: 1.2rem;
-                margin-left: 0.1rem;
-                font-size: 1.1rem;
-                line-height: 1;
-        }
 
         .settings-search-section .input-checkbox {
                 display: inline-flex;
@@ -847,8 +837,7 @@ wc-page.detail-settings-page {
                 }
         }
 
-        .setting-value-icon,
-        .settings-chevron {
+        .setting-value-icon {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -871,14 +860,6 @@ wc-page.detail-settings-page {
                 }
         }
 
-        .settings-chevron {
-                width: 1.2rem;
-                min-width: 1.2rem;
-                height: 1.2rem;
-                margin-left: 0.1rem;
-                font-size: 1.1rem;
-                line-height: 1;
-        }
 
         .input-checkbox {
                 display: inline-flex;

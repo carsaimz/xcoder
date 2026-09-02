@@ -102,6 +102,34 @@ export default function Contextmenu(content, options) {
 
 		app.append($el, $mask);
 
+		// Keep the menu fully on screen. Right/left-anchored menus
+		// opened by togglers near an edge (e.g. the pencil, which
+		// sits left of the terminal/palette buttons) would otherwise
+		// overflow that edge on narrow screens. Layout values are
+		// read from offsetWidth/offsetHeight because the grow
+		// animation (scale 0->1) makes getBoundingClientRect lie.
+		const menuWidth = $el.offsetWidth || 0;
+		const menuHeight = $el.offsetHeight || 0;
+		const rightPx = Number.parseFloat($el.style.right);
+		const leftPx = Number.parseFloat($el.style.left);
+		const topPx = Number.parseFloat($el.style.top);
+		const bottomPx = Number.parseFloat($el.style.bottom);
+		if (!Number.isNaN(rightPx) && innerWidth - rightPx - menuWidth < 6) {
+			$el.style.left = "6px";
+			$el.style.right = "auto";
+		} else if (!Number.isNaN(leftPx) && leftPx + menuWidth > innerWidth - 6) {
+			$el.style.left = Math.max(6, innerWidth - menuWidth - 6) + "px";
+			$el.style.right = "auto";
+		}
+		if (!Number.isNaN(topPx) && topPx + menuHeight > innerHeight - 6) {
+			$el.style.top = Math.max(6, innerHeight - menuHeight - 6) + "px";
+		} else if (
+			!Number.isNaN(bottomPx) &&
+			bottomPx + menuHeight > innerHeight - 6
+		) {
+			$el.style.bottom = "6px";
+		}
+
 		const $firstChild = $el.firstChild;
 		if ($firstChild && $firstChild.focus) $firstChild.focus();
 	}

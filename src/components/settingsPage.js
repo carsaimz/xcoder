@@ -518,12 +518,6 @@ function createListItemElement(item, options, useInfoAsDescription, callback) {
 		$tail.el.append(createSliderControl(item, callback, $item));
 	}
 
-	if (shouldShowTailChevron(item)) {
-		$tail.el.append(
-			<span className="icon keyboard_arrow_right settings-chevron"></span>,
-		);
-	}
-
 	if (useInfoIcon(item, options)) {
 		$tail.el.append(createInfoButton(item));
 	}
@@ -921,15 +915,6 @@ function createTrailingValueDisplay(item) {
 	);
 }
 
-function shouldShowTailChevron(item) {
-	if (item.segment || item.slider) return false;
-	return (
-		item.chevron ||
-		(!item.select &&
-			Boolean(item.prompt || item.file || item.folder || item.link))
-	);
-}
-
 function insertRenderedItem(renderedItems, item, $item) {
 	if (Number.isInteger(item.index)) {
 		renderedItems.splice(item.index, 0, { item, $item });
@@ -1114,12 +1099,7 @@ function syncTrailingValueDisplay($target, item, options) {
 
 	if (!$valueDisplay) {
 		$valueDisplay = createTrailingValueDisplay(item);
-		const $chevron = $tail.get(".settings-chevron");
-		if ($chevron) {
-			$tail.insertBefore($valueDisplay, $chevron);
-		} else {
-			$tail.append($valueDisplay);
-		}
+		$tail.append($valueDisplay);
 	}
 
 	const $trailingValueText = $valueDisplay.get(".setting-trailing-value");
