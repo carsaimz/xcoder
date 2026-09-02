@@ -10,7 +10,6 @@ import themeSetting from "pages/themeSetting";
 import About from "../pages/about";
 import aiSettings from "./aiSettings";
 import otherSettings from "./appSettings";
-import cloudSettings from "./cloudSettings";
 import editorSettings from "./editorSettings";
 import filesSettings from "./filesSettings";
 import formatterSettings from "./formatterSettings";
@@ -125,16 +124,6 @@ export default function mainSettings() {
 			chevron: true,
 		},
 		{
-			key: "cloud-settings",
-			text: strings["cloud settings"] || "Cloud",
-			icon: "svg:cloud",
-			info:
-				strings["settings-info-main-cloud"] ||
-				"Optional GitHub storage for your files and data.",
-			category: categories.maintenance,
-			chevron: true,
-		},
-		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
 			icon: "svg:file-cog",
@@ -181,7 +170,6 @@ export default function mainSettings() {
 			case "terminal-settings":
 			case "lsp-settings":
 			case "ai-settings":
-			case "cloud-settings":
 				appSettings.uiSettings[key].show();
 				break;
 
@@ -250,7 +238,6 @@ export default function mainSettings() {
 		"terminal-settings": terminalSettings,
 		"lsp-settings": lspSettings,
 		"ai-settings": aiSettings,
-		"cloud-settings": cloudSettings,
 	};
 
 	const instantiated = {};
