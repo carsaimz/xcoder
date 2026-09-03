@@ -410,7 +410,10 @@ async function run(
 	 * @param {string} reqId
 	 */
 	function sendIco(assets, reqId) {
-		const ico = Url.join(assets, "res/logo/favicon.ico");
+		// www/favicon.ico (the current <X> mark). The legacy
+		// "res/logo/favicon.ico" path no longer exists in the package and
+		// made the preview tab fall back to a stale/Acode icon.
+		const ico = Url.join(assets, "favicon.ico");
 		sendFile(ico, reqId);
 	}
 
