@@ -1,14 +1,16 @@
 import toast from "components/toast";
 import prompt from "dialogs/prompt";
-import { buildActionPrompt, MAX_CODE_CHARS } from "./actionPrompt";
+import { buildActionPrompt, MUTATING_KINDS } from "./actionPrompt";
 
 /**
  * Selection-aware AI actions ("AI: explain/fix/refactor/comments/ask").
  *
- * They grab the current selection (or the whole file), build a context-rich
- * prompt and hand it to the AI chat sidebar, where the full agent runs —
- * so mutating actions (fix/refactor/comments) can actually edit the file
- * with its tools, honoring the configured permission mode.
+ * They reference the active file (name + selection line range) and hand
+ * the prompt to the AI chat sidebar, where the agent runs — the file
+ * content is NOT copied into the message: the model reads the file
+ * itself with its tools (read_active_file / read_file), honoring the
+ * configured permission mode. Mutating actions (fix/refactor/comments)
+ * get the full toolset; explain/ask run with read-only tools.
  */
 
 /**
@@ -17,66 +19,64 @@ import { buildActionPrompt, MAX_CODE_CHARS } from "./actionPrompt";
  * @returns {Promise<void>}
  */
 export async function runAiAction(kind) {
-        const editorManager = window.editorManager;
-        const file = editorManager?.activeFile;
+	const editorManager = window.editorManager;
+	const file = editorManager?.activeFile;
 
-        if (!file || file.type !== "editor") {
-                toast(strings["ai no file open"] || "Open a file first");
-                return;
-        }
+	if (!file || file.type !== "editor") {
+		toast(strings["ai no file open"] || "Open a file first");
+		return;
+	}
 
-        const editor = editorManager.editor;
-        if (!editor) {
-                toast(strings["ai no file open"] || "Open a file first");
-                return;
-        }
+	const editor = editorManager.editor;
+	if (!editor) {
+		toast(strings["ai no file open"] || "Open a file first");
+		return;
+	}
 
-        const state = editor.state;
-        const selection = state.selection.main;
-        let code = state.doc.sliceString(selection.from, selection.to);
-        let lineStart = 1;
+	const state = editor.state;
+	const selection = state.selection.main;
+	const hasSelection = selection.to > selection.from;
 
-        // Nothing selected -> operate on the whole file (capped).
-        if (!code.trim()) {
-                code = state.doc.toString();
-                lineStart = 1;
-        } else {
-                lineStart = state.doc.lineAt(selection.from).number;
-        }
+	let lineStart = 0;
+	let lineEnd = 0;
+	let selectionChars = 0;
+	if (hasSelection) {
+		lineStart = state.doc.lineAt(selection.from).number;
+		lineEnd = state.doc.lineAt(selection.to).number;
+		selectionChars = selection.to - selection.from;
+	}
 
-        let truncated = false;
-        if (code.length > MAX_CODE_CHARS) {
-                code = code.slice(0, MAX_CODE_CHARS);
-                truncated = true;
-        }
+	let instruction = "";
+	if (kind === "custom") {
+		instruction = await prompt(
+			strings["ai ask about selection"] || "Ask AI about this code",
+			"",
+			"text",
+		);
+		if (!instruction) return;
+	}
 
-        let instruction = "";
-        if (kind === "custom") {
-                instruction = await prompt(
-                        strings["ai ask about selection"] || "Ask AI about this code",
-                        "",
-                        "text",
-                );
-                if (!instruction) return;
-        }
+	const promptText = buildActionPrompt(kind, {
+		fileName: file.name || file.filename || "untitled",
+		lineStart,
+		lineEnd,
+		selectionChars,
+		instruction,
+	});
 
-        const promptText = buildActionPrompt(kind, {
-                fileName: file.name || "untitled",
-                code,
-                truncated,
-                instruction,
-                lineStart,
-        });
-
-        try {
-                const { askAI } = await import("sidebarApps/ai");
-                const ok = await askAI(promptText);
-                if (ok !== false) {
-                        toast(strings["ai sent to chat"] || "Sent to AI chat");
-                }
-        } catch (error) {
-                toast(`AI: ${error.message || error}`);
-        }
+	try {
+		const { askAI } = await import("sidebarApps/ai");
+		const mutating = MUTATING_KINDS.has(kind);
+		const ok = await askAI(promptText, {
+			readOnly: !mutating,
+			forceTools: mutating,
+		});
+		if (ok !== false) {
+			toast(strings["ai sent to chat"] || "Sent to AI chat");
+		}
+	} catch (error) {
+		toast(`AI: ${error.message || error}`);
+	}
 }
 
 /**
@@ -84,10 +84,10 @@ export async function runAiAction(kind) {
  * @returns {Promise<void>}
  */
 export async function openAiChat() {
-        try {
-                const { openAiChat: open } = await import("sidebarApps/ai");
-                await open();
-        } catch (error) {
-                toast(`AI: ${error.message || error}`);
-        }
+	try {
+		const { openAiChat: open } = await import("sidebarApps/ai");
+		await open();
+	} catch (error) {
+		toast(`AI: ${error.message || error}`);
+	}
 }

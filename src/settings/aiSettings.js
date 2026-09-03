@@ -3,7 +3,13 @@ import toast from "components/toast";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import { listModels } from "lib/ai/client";
-import { badgeLabel, byGroup, PROVIDER_MAP } from "lib/ai/providers";
+import {
+	badgeLabel,
+	byGroup,
+	PROVIDER_MAP,
+	resolveModel,
+	setProviderModel,
+} from "lib/ai/providers";
 import settings from "lib/settings";
 import helpers from "utils/helpers";
 import aiProviders from "./aiProviders";
@@ -53,13 +59,13 @@ export default function aiSettings() {
 		{
 			key: "aiModel",
 			text: "Model",
-			value: values.aiModel || "",
+			value: resolveModel(currentProviderId) || "",
 			prompt: "Model id",
 			promptType: "text",
 			promptOptions: { required: false },
 			info:
 				strings["settings-info-ai-model"] ||
-				"Model id from the provider (e.g. llama-3.3-70b-versatile).",
+				"Model id for the active provider (e.g. llama-3.3-70b-versatile). Each provider remembers its own model.",
 		},
 		{
 			key: "fetchModels",
@@ -133,7 +139,12 @@ export default function aiSettings() {
 					await settings.update({ aiSubagents: Boolean(value) });
 					return;
 				}
-				// aiBaseUrl / aiModel / aiSystemPrompt: verbatim
+				if (key === "aiModel") {
+					// per-provider model memory
+					await setProviderModel(currentProviderId, value || "");
+					return;
+				}
+				// aiBaseUrl / aiSystemPrompt: verbatim
 				await settings.update({ [key]: value ?? "" });
 			} catch (error) {
 				helpers.error(error);
@@ -170,7 +181,7 @@ export default function aiSettings() {
 				models.slice(0, 200).map((model) => [model, model]),
 			);
 			if (selected) {
-				await settings.update({ aiModel: selected });
+				await setProviderModel(providerId, selected);
 				toast(selected, 2000);
 			}
 		} catch (error) {

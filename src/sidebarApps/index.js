@@ -90,7 +90,8 @@ async function loadApps() {
 	add(...(await import("./notification")).default);
 	add(...(await import("./settings")).default);
 	add(...(await import("./about")).default);
-	add(...(await import("./updates")).default);
+	// NOTE: the "updates" launcher app was removed on purpose — the
+	// changelog stays reachable from About ("Actualizações").
 }
 
 /**

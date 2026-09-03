@@ -26,11 +26,13 @@ import { listModels } from "lib/ai/client";
 import {
 	badgeLabel,
 	getProviderPrefs,
+	isProviderEnabled,
 	PROVIDER_MAP,
 	PROVIDERS,
 	resolveApiKey,
 	resolveBaseUrl,
 	resolveMaxTokens,
+	setProviderEnabled,
 	updateProviderPrefs,
 } from "lib/ai/providers";
 import settings from "lib/settings";
@@ -75,7 +77,7 @@ export default function aiProviders() {
 			</div>
 			<p className="ai-providers-hint">
 				{strings["ai providers hint"] ||
-					"Tap a card to use the provider. Pencil sets its key, eye checks it, arrow tests the connection and launch opens the docs. Advanced settings live under the chevron."}
+					"Tap a card to use the provider. The power icon enables or disables it. Pencil sets its key, eye checks it, arrow tests the connection and launch opens the docs. Advanced settings live under the chevron."}
 			</p>
 			{$list}
 			{$empty}
@@ -125,6 +127,7 @@ export default function aiProviders() {
 		const render = () => {
 			const prefs = getProviderPrefs(id);
 			const active = (settings.value.aiProvider || "groq") === id;
+			const enabled = isProviderEnabled(id);
 			const keyOwner = prefs.apiKey
 				? "own"
 				: settings.value.aiApiKey
@@ -136,18 +139,21 @@ export default function aiProviders() {
 			const baseUrl = prefs.baseUrl || "";
 
 			$card.dataset.active = String(active);
+			$card.dataset.enabled = String(enabled);
 			$card.dataset.expanded = $card.dataset.expanded || "false";
 			$card.dataset.nokey = String(keyOwner === "none");
 
 			const $chip = (
-				<span className={`ai-pchip is-${status}`}>
-					{status === "connected"
-						? strings["ai provider connected"] || "Connected"
-						: status === "offline"
-							? strings["ai provider offline"] || "Offline"
-							: status === "testing"
-								? strings["ai provider testing"] || "Testing..."
-								: strings["ai provider untested"] || "Not tested"}
+				<span className={`ai-pchip is-${!enabled ? "off" : status}`}>
+					{!enabled
+						? strings["ai provider off"] || "Off"
+						: status === "connected"
+							? strings["ai provider connected"] || "Connected"
+							: status === "offline"
+								? strings["ai provider offline"] || "Offline"
+								: status === "testing"
+									? strings["ai provider testing"] || "Testing..."
+									: strings["ai provider untested"] || "Not tested"}
 				</span>
 			);
 
@@ -287,6 +293,17 @@ export default function aiProviders() {
 					{$summary}
 					<div className="ai-pactions">
 						<button
+							className={`ai-pbtn power${enabled ? " on" : ""}`}
+							title={
+								enabled
+									? strings["ai provider disable"] || "Disable provider"
+									: strings["ai provider enable"] || "Enable provider"
+							}
+							onclick={toggleEnabled}
+						>
+							<span className="icon power_settings_new" />
+						</button>
+						<button
 							className={`ai-pbtn edit${keyOwner === "own" ? " ownkey" : ""}`}
 							title={strings["ai api key"] || "API key"}
 							onclick={editKey}
@@ -330,11 +347,64 @@ export default function aiProviders() {
 
 			function selectProvider() {
 				if ((settings.value.aiProvider || "groq") === id) return;
+				if (!isProviderEnabled(id)) {
+					// tapping a disabled card enables it first
+					setProviderEnabled(id, true)
+						.then(() =>
+							settings.update({ aiProvider: id, aiModel: "" }).then(() => {
+								toast(
+									`${provider.name}: ${strings["ai provider enabled toast"] || "enabled"}`,
+									1800,
+								);
+								rerenderAll();
+							}),
+						)
+						.catch((error) => helpers.error(error));
+					return;
+				}
 				settings
 					.update({ aiProvider: id, aiModel: "" })
 					.then(() => {
 						toast(provider.name, 1600);
 						rerenderAll();
+					})
+					.catch((error) => helpers.error(error));
+			}
+
+			function toggleEnabled() {
+				const next = !isProviderEnabled(id);
+				setProviderEnabled(id, next)
+					.then(() => {
+						if (!next && (settings.value.aiProvider || "groq") === id) {
+							// cannot keep a disabled provider selected
+							const fallback = PROVIDERS.find(
+								(candidate) =>
+									candidate.id !== id && isProviderEnabled(candidate.id),
+							);
+							return settings
+								.update({
+									aiProvider: fallback?.id || "",
+									aiModel: "",
+								})
+								.then(() => {
+									toast(
+										`${provider.name}: ${strings["ai provider disabled toast"] || "disabled"}`,
+										1800,
+									);
+								});
+						}
+						toast(
+							`${provider.name}: ${
+								next
+									? strings["ai provider enabled toast"] || "enabled"
+									: strings["ai provider disabled toast"] || "disabled"
+							}`,
+							1800,
+						);
+						return undefined;
+					})
+					.then(() => {
+						render();
 					})
 					.catch((error) => helpers.error(error));
 			}

@@ -85,6 +85,75 @@
                 }
         }
 
+        // provider · model strip with capability chips
+        .ai-provider-strip {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 12px;
+                background: color-mix(in srgb, var(--secondary-color) 30%, transparent);
+                border-bottom: 1px solid var(--border-color);
+                cursor: pointer;
+                min-height: 28px;
+                user-select: none;
+
+                &:active {
+                        background: color-mix(in srgb, var(--active-color) 10%, transparent);
+                }
+
+                .ai-strip-provider {
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: var(--active-color);
+                        white-space: nowrap;
+                        flex-shrink: 0;
+                }
+
+                .ai-strip-model {
+                        font-size: 10.5px;
+                        color: var(--secondary-text-color, #999);
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        min-width: 0;
+                        flex-shrink: 1;
+                }
+
+                .ai-strip-multi {
+                        font-size: 9.5px;
+                        font-weight: 700;
+                        color: var(--secondary-text-color, #999);
+                        background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
+                        border-radius: 999px;
+                        padding: 1px 7px;
+                        flex-shrink: 0;
+                        margin-left: auto;
+                }
+
+                .ai-cap {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 2px;
+                        font-size: 9px;
+                        color: var(--secondary-text-color, #999);
+                        background: color-mix(in srgb, var(--active-color) 14%, transparent);
+                        border-radius: 999px;
+                        padding: 1.5px 6px;
+                        flex-shrink: 0;
+
+                        .icon {
+                                font-size: 10px;
+                        }
+
+                        // unsupported capability — dimmed
+                        &.off {
+                                opacity: 0.38;
+                                background: color-mix(in srgb, var(--primary-text-color) 8%, transparent);
+                                text-decoration: line-through;
+                        }
+                }
+        }
+
         .ai-messages {
                 flex: 1;
                 overflow-y: auto;

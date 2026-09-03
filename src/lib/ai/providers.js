@@ -357,3 +357,152 @@ export function resolveAutonomy(providerId) {
 		getProviderPrefs(providerId).autonomy || settings.value?.aiAutonomy;
 	return value === "ask" || value === "auto" ? value : "safe";
 }
+
+// -------------------- enable / disable (activation) ----------------------
+
+/**
+ * Whether a provider is enabled ("active"). An explicit toggle wins;
+ * otherwise legacy behaviour applies: the selected provider and any
+ * provider with its own key are considered enabled.
+ * @param {string} providerId
+ * @returns {boolean}
+ */
+export function isProviderEnabled(providerId) {
+	const prefs = getProviderPrefs(providerId);
+	if (typeof prefs.enabled === "boolean") return prefs.enabled;
+	return (
+		(settings.value?.aiProvider || "groq") === providerId ||
+		Boolean(prefs.apiKey)
+	);
+}
+
+/**
+ * Enables or disables a provider.
+ * @param {string} providerId
+ * @param {boolean} enabled
+ * @returns {Promise<void>}
+ */
+export async function setProviderEnabled(providerId, enabled) {
+	await updateProviderPrefs(providerId, { enabled: Boolean(enabled) });
+}
+
+/**
+ * All providers currently enabled, in catalog order.
+ * @returns {AIProvider[]}
+ */
+export function enabledProviders() {
+	return PROVIDERS.filter((provider) => isProviderEnabled(provider.id));
+}
+
+// ------------------------ per-provider model -----------------------------
+
+/**
+ * Effective model for a provider: the per-provider choice first, then the
+ * legacy global selection when it belongs to the selected provider, then
+ * the provider default.
+ * @param {string} providerId
+ * @returns {string}
+ */
+export function resolveModel(providerId) {
+	const provider = PROVIDER_MAP[providerId];
+	const own = getProviderPrefs(providerId).model;
+	if (own) return own;
+	if ((settings.value?.aiProvider || "groq") === providerId) {
+		const legacy = String(settings.value?.aiModel || "");
+		if (legacy) return legacy;
+	}
+	return provider?.models?.[0] || "";
+}
+
+/**
+ * Remembers the model chosen for a provider. When it is the selected
+ * provider the legacy global setting is kept in sync.
+ * @param {string} providerId
+ * @param {string} model
+ * @returns {Promise<void>}
+ */
+export async function setProviderModel(providerId, model) {
+	const patch = { model: String(model || "") || undefined };
+	await updateProviderPrefs(providerId, patch);
+	if ((settings.value.aiProvider || "groq") === providerId) {
+		await settings.update({ aiModel: String(model || "") });
+	}
+}
+
+// --------------------------- capabilities --------------------------------
+
+/**
+ * @typedef {object} ModelCapabilities
+ * @property {boolean} text always true for chat models
+ * @property {boolean} image accepts image inputs (vision)
+ * @property {boolean} video accepts video inputs
+ * @property {boolean} agents supports OpenAI-style tool calling
+ */
+
+/** Model-id substrings that accept image input (vision). */
+const VISION_PATTERNS = [
+	"gpt-4o",
+	"gpt-4.1",
+	"gpt-4-turbo",
+	"gpt-4.5",
+	"o4-mini",
+	"gemini",
+	"claude-3",
+	"claude-sonnet",
+	"claude-opus",
+	"claude-haiku-4",
+	"claude-sonnet-4",
+	"grok-4",
+	"grok-3",
+	"gemma-3",
+	"llama-3.2",
+	"llama-4",
+	"pixtral",
+	"qwen2.5-vl",
+	"qwen-vl",
+	"qwen3-vl",
+	"glm-4v",
+	"sonar-pro",
+	"llama-3.3-70b-versatile",
+];
+
+/** Model-id substrings that accept video input. */
+const VIDEO_PATTERNS = ["gemini-2.5", "gemini-2.0", "grok-4-video"];
+
+/** Known model families WITHOUT tool-calling support. */
+const NO_TOOLS_PATTERNS = ["gemma", "deepseek-reasoner"];
+
+/**
+ * Best-effort capability map for a provider/model pair. Unknown models
+ * fall back to text + agents (the common case for chat endpoints).
+ * @param {string} providerId
+ * @param {string} [model]
+ * @returns {ModelCapabilities}
+ */
+export function modelCapabilities(providerId, model) {
+	const id = String(model || resolveModel(providerId) || "").toLowerCase();
+	const image = VISION_PATTERNS.some((pattern) => id.includes(pattern));
+	const video = VIDEO_PATTERNS.some((pattern) => id.includes(pattern));
+	const noTools = NO_TOOLS_PATTERNS.some((pattern) => id.includes(pattern));
+	return {
+		text: true,
+		image: image || video,
+		video,
+		agents: !noTools,
+	};
+}
+
+/**
+ * Short type label for a model of a provider: "free" or "paid".
+ * OpenRouter marks free models with a ":free" suffix; otherwise the
+ * provider group decides.
+ * @param {AIProvider} provider
+ * @param {string} model
+ * @returns {"free" | "paid"}
+ */
+export function modelType(provider, model) {
+	const id = String(model || "").toLowerCase();
+	if (id.endsWith(":free")) return "free";
+	if (provider?.group === "free") return "free";
+	return "paid";
+}

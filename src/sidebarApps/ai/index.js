@@ -9,9 +9,15 @@ import { listModels, resolveBaseURL } from "lib/ai/client";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
 import {
 	badgeLabel,
+	enabledProviders,
+	isProviderEnabled,
+	modelCapabilities,
+	modelType,
 	PROVIDER_MAP,
 	resolveApiKey,
 	resolveBaseUrl,
+	resolveModel,
+	setProviderModel,
 } from "lib/ai/providers";
 import {
 	deriveTitle,
@@ -33,6 +39,21 @@ import settings from "lib/settings";
 import Url from "utils/Url";
 
 const LEGACY_CHAT_KEY = "xcoder.ai.chat";
+
+/**
+ * Read-only tool allowlist for selection actions (explain/fix/ask): the
+ * model must read the file itself instead of receiving the code in the
+ * message. Write tools stay out so chat-mode users never get surprises.
+ * @type {string[]}
+ */
+const READ_ONLY_TOOLS = [
+	"list_dir",
+	"read_file",
+	"search_files",
+	"editor_context",
+	"read_active_file",
+	"list_open_files",
+];
 
 /** @type {Array<{type: string, payload?: any, name?: string, toolCallId?: string, toolCalls?: any[]}>} */
 let events = [];
@@ -59,6 +80,8 @@ let $slashMenu = null;
 let $sessionTitle = null;
 /** @type {HTMLElement} */
 let $modelBtn = null;
+/** @type {HTMLElement} */
+let $providerStrip = null;
 /** @type {HTMLElement} */
 let $modeTrack = null;
 /** @type {HTMLElement} */
@@ -100,9 +123,13 @@ export async function openAiChat() {
  * Sends a message to the AI chat (used by the selection actions).
  * Shows the sidebar and runs the full agent, streaming events into the UI.
  * @param {string} text prompt text
+ * @param {{readOnly?: boolean, forceTools?: boolean}} [opts]
+ *        readOnly restricts the agent to read-only tools (explain/ask
+ *        actions read the file themselves), forceTools runs the full
+ *        agent even in chat mode (fix/refactor apply edits)
  * @returns {Promise<boolean>} false if the chat was busy
  */
-export async function askAI(text) {
+export async function askAI(text, opts = {}) {
 	const message = String(text || "").trim();
 	if (!message) return false;
 
@@ -115,8 +142,17 @@ export async function askAI(text) {
 
 	ensureTitle(message);
 
-	if (!agent) {
-		agent = new Agent({ onEvent: handleEvent });
+	if (!agent || opts.readOnly || opts.forceTools) {
+		agent = opts.readOnly
+			? new Agent({
+					onEvent: handleEvent,
+					mode: "agent",
+					tools: READ_ONLY_TOOLS,
+				})
+			: new Agent({
+					onEvent: handleEvent,
+					...(opts.forceTools ? { mode: "agent" } : {}),
+				});
 		agent.restore(events);
 	}
 
@@ -198,6 +234,15 @@ function buildUi() {
 	// Slim session title strip (kept out of the header on purpose)
 	const $sessionBar = <div className="ai-session-bar">{$sessionTitle}</div>;
 
+	// Provider · model strip with capability chips (tap to change)
+	$providerStrip = (
+		<div
+			className="ai-provider-strip"
+			role="button"
+			onclick={openModelPicker}
+		/>
+	);
+
 	$messages = (
 		<div className="ai-messages scroll" ontouchstart={handleTouch}></div>
 	);
@@ -267,6 +312,7 @@ function buildUi() {
 		<div className="ai-chat">
 			{$header}
 			{$sessionBar}
+			{$providerStrip}
 			{$messages}
 			{$status}
 			{$modeFooter}
@@ -606,39 +652,114 @@ function hapticTick() {
 	}
 }
 
-/** Keeps the model button tooltip in sync with the active model. */
+/**
+ * Renders the provider · model strip (with capability chips) under the
+ * session bar and keeps the model button tooltip in sync. If more than
+ * one provider is enabled the strip says so — the picker lists each
+ * provider's models separately.
+ */
 function updateModelButton() {
 	if (!$modelBtn) return;
 	const providerId = settings.value.aiProvider || "groq";
 	const provider = PROVIDER_MAP[providerId];
-	const model = settings.value.aiModel || provider?.models?.[0] || "—";
+	const model = resolveModel(providerId) || "—";
 	const badge = provider ? badgeLabel(provider.group) : null;
+	const enabledCount = enabledProviders().length;
 	$modelBtn.title = `${strings["ai model"] || "Model"}: ${model}${badge ? ` (${badge})` : ""}`;
+
+	if (!$providerStrip) return;
+	const caps = modelCapabilities(providerId, model);
+	const chip = (key, ok, icon) => (
+		<span className={`ai-cap${ok ? "" : " off"}`} title={strings[key] || key}>
+			<span className={`icon ${icon}`} />
+			<span>{strings[key] || key}</span>
+		</span>
+	);
+	$providerStrip.content = [
+		<span className="ai-strip-provider">{provider?.name || providerId}</span>,
+		<span className="ai-strip-model">{model}</span>,
+		chip("ai cap text", caps.text, "text"),
+		chip("ai cap image", caps.image, "image"),
+		chip("ai cap video", caps.video, "videocam"),
+		chip("ai cap agents", caps.agents, "wand"),
+		enabledCount > 1 ? (
+			<span className="ai-strip-multi">+{enabledCount - 1}</span>
+		) : null,
+	];
+	$providerStrip.title =
+		strings["ai strip hint"] || "Active provider and model — tap to change";
 }
 
 /**
- * Quick model picker: instant dialog with the provider's known models,
- * plus live fetch from the API and manual entry.
+ * Quick model picker over ENABLED providers only. Entries are grouped per
+ * provider ("Provider · model") and carry a type label (free/paid), and
+ * each provider keeps its own remembered model. Picking a model from
+ * another enabled provider also switches to it.
  */
 async function openModelPicker() {
-	const providerId = settings.value.aiProvider || "groq";
-	const provider = PROVIDER_MAP[providerId];
-
-	/** @type {Array<string>} deduplicated model ids */
-	const models = [];
-	for (const model of provider?.models || []) {
-		if (!models.includes(model)) models.push(model);
+	const activeId = settings.value.aiProvider || "groq";
+	const providers = enabledProviders();
+	if (!providers.length) {
+		toast(
+			strings["ai provider none enabled"] ||
+				"No providers enabled — enable one on the Providers page",
+		);
+		return;
 	}
 
-	const current = settings.value.aiModel || models[0] || "";
+	const current = resolveModel(activeId);
+	const typeFree = strings["ai model free"] || "free";
+	const typePaid = strings["ai model paid"] || "paid";
+	const mark = (model, providerId) =>
+		model === current && providerId === activeId ? `✓ ${model}` : model;
+
+	/** @type {any[]} flat select items, grouped per provider */
+	const items = [];
+	const meta = new Map();
+	for (const provider of providers) {
+		const own = resolveModel(provider.id);
+		const models = [];
+		for (const model of [own, ...(provider.models || [])]) {
+			if (model && !models.includes(model)) models.push(model);
+		}
+		if (provider.id === activeId) continue; // active provider handled below
+		for (const model of models.slice(0, 12)) {
+			const type = modelType(provider, model) === "free" ? typeFree : typePaid;
+			const value = `${provider.id}::${model}`;
+			items.push({
+				value,
+				text: `${provider.name} · ${mark(model, provider.id)} (${type})`,
+			});
+			meta.set(value, { providerId: provider.id, model });
+		}
+	}
+	// active provider first/expanded: its models at the top
+	const activeProvider = PROVIDER_MAP[activeId];
+	if (activeProvider && providers.some((p) => p.id === activeId)) {
+		const own = resolveModel(activeId);
+		const models = [own, ...(activeProvider.models || [])].filter(
+			(model, index, all) => model && all.indexOf(model) === index,
+		);
+		for (const model of models.slice(0, 12)) {
+			const type =
+				modelType(activeProvider, model) === "free" ? typeFree : typePaid;
+			const value = `${activeId}::${model}`;
+			items.unshift({
+				value,
+				text: `${activeProvider.name} · ${mark(model, activeId)} (${type})`,
+			});
+			meta.set(value, { providerId: activeId, model });
+		}
+	}
+
 	const fetchLabel = strings["ai fetch models"] || "Fetch available models";
 	const manualLabel = strings["ai model manual"] || "Type model id manually";
+	items.push(
+		{ value: "__fetch__", text: `⟳ ${fetchLabel}` },
+		{ value: "__manual__", text: manualLabel },
+	);
 
-	const choice = await select(strings["ai model"] || "Model", [
-		...models.map((model) => [model, model === current ? `✓ ${model}` : model]),
-		["__fetch__", `⟳ ${fetchLabel}`],
-		["__manual__", manualLabel],
-	]);
+	const choice = await select(strings["ai model"] || "Model", items);
 	if (!choice) return;
 
 	if (choice === "__fetch__") {
@@ -655,32 +776,59 @@ async function openModelPicker() {
 		);
 		const value = String(manual || "").trim();
 		if (!value) return;
-		await settings.update({ aiModel: value });
+		await setProviderModel(activeId, value);
 		agent = null;
 		updateModelButton();
 		toast(value, 2000);
 		return;
 	}
 
-	if (choice !== current) {
-		await settings.update({ aiModel: choice });
-		agent = null;
-		updateModelButton();
-		toast(choice, 2000);
+	const hit = meta.get(choice);
+	if (!hit) return;
+	if (hit.providerId !== activeId) {
+		// switching to another enabled provider (keeps its own model)
+		await settings.update({ aiProvider: hit.providerId });
 	}
+	await setProviderModel(hit.providerId, hit.model);
+	agent = null;
+	updateModelButton();
+	toast(hit.model, 2000);
 }
 
 /**
- * Queries /models at the current endpoint and lets the user pick one.
+ * Queries /models at an ENABLED provider's endpoint and lets the user
+ * pick one. Each entry is annotated with its type (free/paid).
  */
 async function pickModelLive() {
-	const providerId = settings.value.aiProvider || "groq";
-	const provider = PROVIDER_MAP[providerId];
+	const providers = enabledProviders();
+	if (!providers.length) {
+		toast(
+			strings["ai provider none enabled"] ||
+				"No providers enabled — enable one on the Providers page",
+		);
+		return;
+	}
+
+	let provider = PROVIDER_MAP[settings.value.aiProvider || "groq"];
+	if (!provider || !providers.some((p) => p.id === provider.id)) {
+		provider = providers[0];
+	} else if (providers.length > 1) {
+		const which = await select(
+			strings["ai provider"] || "Provider",
+			providers.map((item) => ({
+				value: item.id,
+				text: item.id === provider.id ? `✓ ${item.name}` : item.name,
+			})),
+		);
+		if (!which) return;
+		provider = PROVIDER_MAP[which] || provider;
+	}
+
 	toast(strings["loading..."] || "Loading...", 3000);
 	try {
 		const models = await listModels({
-			baseURL: resolveBaseURL(provider, resolveBaseUrl(providerId)),
-			apiKey: resolveApiKey(providerId),
+			baseURL: resolveBaseURL(provider, resolveBaseUrl(provider.id)),
+			apiKey: resolveApiKey(provider.id),
 		});
 		if (!models.length) {
 			toast(
@@ -689,12 +837,21 @@ async function pickModelLive() {
 			);
 			return;
 		}
+		const typeFree = strings["ai model free"] || "free";
+		const typePaid = strings["ai model paid"] || "paid";
 		const selected = await select(
-			strings["ai model"] || "Model",
-			models.slice(0, 200).map((model) => [model, model]),
+			`${strings["ai model"] || "Model"} — ${provider.name}`,
+			models.slice(0, 300).map((model) => {
+				const type =
+					modelType(provider, model) === "free" ? typeFree : typePaid;
+				return { value: model, text: `${model} (${type})` };
+			}),
 		);
 		if (selected) {
-			await settings.update({ aiModel: selected });
+			await setProviderModel(provider.id, selected);
+			if (settings.value.aiProvider !== provider.id) {
+				await settings.update({ aiProvider: provider.id });
+			}
 			agent = null;
 			updateModelButton();
 			toast(selected, 2000);

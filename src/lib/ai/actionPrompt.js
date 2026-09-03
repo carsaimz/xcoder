@@ -1,11 +1,11 @@
 /**
  * Prompt builders for the AI selection actions ("explain", "fix", etc.).
  *
- * Kept pure (no editor/DOM imports) so it can be unit-tested.
+ * The file content is NOT embedded in the message: the agent reads the
+ * file itself with its tools (read_active_file / read_file), so it always
+ * sees the live buffer and the whole project context. Kept pure (no
+ * editor/DOM imports) so it can be unit-tested.
  */
-
-/** Maximum characters of code sent in a single action prompt. */
-export const MAX_CODE_CHARS = 12000;
 
 /**
  * @typedef {"explain"|"fix"|"refactor"|"comments"|"custom"} AiActionKind
@@ -16,12 +16,12 @@ export const MUTATING_KINDS = new Set(["fix", "refactor", "comments"]);
 
 const INSTRUCTIONS = {
 	explain:
-		"Explain the code below: what it does, its key logic and any pitfalls or bugs you notice. Be concise and structured. Do not modify anything.",
-	fix: "Find the bugs and problems in the code below and FIX them. Use your editing tools (read_file + edit_file) to apply the changes to the real file, then list each change you made.",
+		"Explain the file below: what it does, its key logic and any pitfalls or bugs you notice. Be concise and structured. Do not modify anything.",
+	fix: "Find the bugs and problems in the file below and FIX them. Read the file first, then use your editing tools (read_file + edit_file or apply_to_editor) to apply the changes to the real file, then list each change you made.",
 	refactor:
-		"Refactor the code below for readability and maintainability without changing its behavior. Use your editing tools (read_file + edit_file) to apply the changes to the real file, then summarize what you improved.",
+		"Refactor the file below for readability and maintainability without changing its behavior. Read the file first, then use your editing tools (read_file + edit_file or apply_to_editor) to apply the changes, then summarize what you improved.",
 	comments:
-		"Add clear, helpful comments/docstrings to the code below, keeping the existing style. Use your editing tools (read_file + edit_file) to apply them to the real file, then show the updated code.",
+		"Add clear, helpful comments/docstrings to the file below, keeping the existing style. Read the file first, then use your editing tools (read_file + edit_file or apply_to_editor) to apply them to the real file, then show the updated code.",
 };
 
 /**
@@ -29,49 +29,42 @@ const INSTRUCTIONS = {
  *
  * @param {AiActionKind} kind
  * @param {object} ctx
- * @param {string} ctx.fileName name of the active file
- * @param {string} ctx.code selected code (or whole file)
- * @param {boolean} [ctx.truncated] whether code was cut at MAX_CODE_CHARS
+ * @param {string} [ctx.fileName] name of the active file
+ * @param {number} [ctx.lineStart] 1-based first line of the selection
+ * @param {number} [ctx.lineEnd] 1-based last line of the selection
+ * @param {number} [ctx.selectionChars] size of the selection, if any
  * @param {string} [ctx.instruction] free-form instruction (kind === "custom")
- * @param {number} [ctx.lineStart] 1-based line where the code starts
  * @returns {string} prompt text
  */
 export function buildActionPrompt(kind, ctx) {
-	const { fileName, code, truncated, instruction, lineStart } = ctx || {};
-	const where = fileName ? `\`${fileName}\`` : "the current file";
-	const location =
-		lineStart && lineStart > 1 ? ` (starting at line ${lineStart})` : "";
+	const { fileName, lineStart, lineEnd, selectionChars, instruction } =
+		ctx || {};
+	const where = fileName ? `\`${fileName}\`` : "the file open in the editor";
+	const readHint =
+		"Read the file yourself first (read_active_file for the live buffer incl. unsaved edits, or read_file with the path) — its content is intentionally not included in this message.";
+
+	let target = where;
+	if (lineStart && selectionChars) {
+		const lines =
+			lineEnd && lineEnd > lineStart
+				? `${lineStart}-${lineEnd}`
+				: `${lineStart}`;
+		target = `${where} — the current selection (lines ${lines}, ${selectionChars} chars)`;
+	}
 
 	switch (kind) {
 		case "custom": {
 			const ask = String(instruction || "").trim();
-			const head = ask || "Review the code below and share your thoughts.";
 			return [
-				head,
+				ask || `Review ${where} and share your thoughts.`,
 				"",
-				`Code from ${where}${location}:`,
-				fence(code),
+				`Target: ${target}.`,
+				readHint,
 			].join("\n");
 		}
 		default: {
-			const lines = [INSTRUCTIONS[kind] || INSTRUCTIONS.explain, ""];
-			if (truncated) {
-				lines.push(
-					`Note: the code was truncated at ${MAX_CODE_CHARS} characters — ask to read the full file if needed.`,
-					"",
-				);
-			}
-			lines.push(`Code from ${where}${location}:`, fence(code));
-			return lines.join("\n");
+			const instruction2 = INSTRUCTIONS[kind] || INSTRUCTIONS.explain;
+			return [instruction2, "", `Target: ${target}.`, readHint].join("\n");
 		}
 	}
-}
-
-/**
- * Wraps code in a fenced block, inferring nothing (model sees the filename).
- * @param {string} code
- * @returns {string}
- */
-function fence(code) {
-	return `\`\`\`\n${String(code ?? "")}\n\`\`\``;
 }

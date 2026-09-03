@@ -104,12 +104,21 @@
                 border: 1px solid var(--border-color);
                 border-radius: 14px;
                 padding: 12px;
-                transition: border-color 0.15s ease, box-shadow 0.15s ease;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 
                 &[data-active='true'] {
                         border-color: var(--active-color);
                         box-shadow: 0 0 0 1px color-mix(in srgb, var(--active-color) 45%, transparent),
                                 0 4px 16px color-mix(in srgb, var(--active-color) 14%, transparent);
+                }
+
+                // disabled (power off) — dimmed, no selection highlight
+                &[data-enabled='false'] {
+                        opacity: 0.62;
+
+                        .ai-picon {
+                                filter: grayscale(0.9);
+                        }
                 }
 
                 // advanced section hidden by default
@@ -270,6 +279,11 @@
                         background: color-mix(in srgb, var(--active-color) 22%, transparent);
                         color: var(--active-color);
                 }
+
+                &.is-off {
+                        background: color-mix(in srgb, var(--primary-text-color) 14%, transparent);
+                        color: var(--secondary-text-color, #999);
+                }
         }
 
         // ------------------------------------------- circular icon buttons
@@ -324,6 +338,12 @@
                 &.ownkey {
                         border-color: color-mix(in srgb, var(--active-color) 55%, transparent);
                         color: var(--active-color);
+                }
+
+                // provider enabled — highlight the power button
+                &.power.on {
+                        border-color: #4caf50;
+                        color: #4caf50;
                 }
         }
 
