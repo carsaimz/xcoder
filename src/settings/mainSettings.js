@@ -13,6 +13,7 @@ import otherSettings from "./appSettings";
 import editorSettings from "./editorSettings";
 import filesSettings from "./filesSettings";
 import formatterSettings from "./formatterSettings";
+import ghSettings from "./ghSettings";
 import lspSettings from "./lspSettings";
 import previewSettings from "./previewSettings";
 import scrollSettings from "./scrollSettings";
@@ -124,6 +125,16 @@ export default function mainSettings() {
 			chevron: true,
 		},
 		{
+			key: "gh-settings",
+			text: strings["github settings"] || "GitHub",
+			icon: "svg:github",
+			info:
+				strings["settings-info-main-gh"] ||
+				"GitHub account, personal access token, repositories and branch.",
+			category: categories.customizationTools,
+			chevron: true,
+		},
+		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
 			icon: "svg:file-cog",
@@ -171,6 +182,10 @@ export default function mainSettings() {
 			case "lsp-settings":
 			case "ai-settings":
 				appSettings.uiSettings[key].show();
+				break;
+
+			case "gh-settings":
+				ghSettings();
 				break;
 
 			case "marketplaceUrl":
