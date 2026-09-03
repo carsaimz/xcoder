@@ -6,13 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 ## [1.4.14] - 2026-09-03
 
 ### Added
-- Payment methods live in the project database (PayPal, Stripe, Buy Me a Coffee, M-Pesa, e-Mola — no Pix), served by the site and managed in /admin
-- XCoder account (Supabase auth) in the support dialog — sign in / create account, donations become Premium automatically on every device
-- Cloud premium sync: premium_grants from the database activate Premium at boot, no unlock code needed
-
-### Changed
-- Supabase credentials are built into the app (publishable key — public by design); site config and settings.json overrides still win
-- Support dialog lists every payment method from the database: URL methods open the browser, account methods (e.g. M-Pesa number) copy with one tap
+- Live streaming, markdown answers, parallel subagents, UX fixes
+- Payment methods from the database, Supabase account + cloud premium sync
 
 ## [1.4.13] - 2026-09-03
 
