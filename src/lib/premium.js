@@ -82,7 +82,7 @@ async function hmac(message) {
 }
 
 function base32(bytes) {
-	const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no I/L/0/1
+	const alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // no I/L/0/1
 	let bits = 0;
 	let value = 0;
 	let output = "";

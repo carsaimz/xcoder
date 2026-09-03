@@ -97,7 +97,7 @@ describe("premium themes", () => {
 
 // -- helpers --------------------------------------------------------------
 
-const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 const SECRET = "xcoder·premium·v1·carsaimz";
 
 function base32(bytes, length = 10) {

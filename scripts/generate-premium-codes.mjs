@@ -19,7 +19,7 @@
 import { webcrypto as crypto } from "node:crypto";
 
 const SECRET = "xcoder·premium·v1·carsaimz";
-const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no I/L/0/1 (matches app)
+const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // no I/L/0/1 (matches app)
 
 function base32(bytes, length = 10) {
 	let bits = 0;
