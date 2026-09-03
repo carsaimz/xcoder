@@ -2,15 +2,20 @@ import fsOperation from "fileSystem";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
-import { FREE_AGENT_DAILY_LIMIT, canUseAgentTurn, trackAgentTurn } from "lib/premium";
+import {
+	canUseAgentTurn,
+	FREE_AGENT_DAILY_LIMIT,
+	trackAgentTurn,
+} from "lib/premium";
 import { showSupportDialog } from "lib/premiumUI";
 import settings from "lib/settings";
 import Url from "utils/Url";
 import { buildUserContent } from "./artifacts";
-import { chatCompletion, resolveBaseURL } from "./client";
+import { chatCompletion, resolveBaseURL, streamChatCompletion } from "./client";
 import {
 	DEFAULT_PROVIDER_ID,
 	keyShapeWarning,
+	normalizeModel,
 	PROVIDER_MAP,
 	resolveApiKey,
 	resolveAutonomy,
@@ -84,7 +89,9 @@ export class Agent {
 			context,
 			"",
 			"Capabilities:",
-			"- You can list/read/create/edit/delete files, run a virtual shell, execute JavaScript in a sandbox and spawn subagents.",
+			"- You can list/read/create/edit/delete files, run a virtual shell, execute JavaScript in a sandbox, search the web (web_search) and read pages (read_url).",
+			"- TERMINAL: run_command executes shell commands and waits for the result. If a tool/dependency is missing, INSTALL it (pip install / npm install / apt-get via run_command), then retry. Always wait for the command output before continuing.",
+			"- SUBAGENTS: use spawn_subagent for one research task; use spawn_subagents to run 2-5 INDEPENDENT subtasks in PARALLEL, optionally on different providers/models (pass provider/model per subtask) — merge their reports in your answer.",
 			"- Editor tools let you see and edit the file the user has open right now: editor_context, read_active_file (live buffer incl. unsaved edits), list_open_files and apply_to_editor (insert / replace_selection / replace_all, stays unsaved for review).",
 			'- When the user asks about "the file", "this code", explain or fix without naming a path, READ the active file first with read_active_file (or read_file with the path) — do not assume you already have its content.',
 			"- Paths are relative to the workspace root ('.').",
@@ -92,6 +99,8 @@ export class Agent {
 			"- Use vcs (run_command with 'vcs commit ...') before large changes so the user can restore.",
 			"- Keep answers short and structured; mention exact paths of files you changed.",
 			"- BACKGROUND WORK: write code through the file tools (create_file, edit_file, apply_to_editor) — the chat renders every file write as an artifact automatically. NEVER paste whole file contents or large code blocks into your reply; a short summary of what changed (file, lines, reason) is enough.",
+			"- IMAGES (OCR): when the user attaches images, read text in them (vision models do OCR automatically). For image files in the workspace, mention they need attaching — or read bytes yourself only when needed.",
+			"- PDFs: read_file returns binary garbage for .pdf. Extract text via run_command when a tool exists (e.g. 'pdftotext file.pdf -' or python with pypdf — install it if missing), then read the extracted text.",
 			"- If a task is ambiguous, ask the user.",
 		];
 		if (settings.value.aiSystemPrompt) {
@@ -186,7 +195,7 @@ export class Agent {
 			step++;
 			let response;
 			try {
-				this.onEvent({ type: "status", payload: "thinking" });
+				this.onEvent({ type: "status", payload: { action: "thinking" } });
 				response = await this.requestWithRecovery({
 					config,
 					messages: this.messages,
@@ -234,6 +243,12 @@ export class Agent {
 			}
 
 			this.messages.push({ role: "assistant", content: content || "" });
+			if (response.reasoning) {
+				this.onEvent({
+					type: "reasoning",
+					payload: response.reasoning,
+				});
+			}
 			this.onEvent({ type: "assistant", payload: content || "" });
 			return content || "";
 		}
@@ -252,10 +267,17 @@ export class Agent {
 	 *  - model rejected / not found  -> retry with the provider default
 	 *  - tool use rejected           -> retry without tools (rest of loop)
 	 * Anything else bubbles up to a friendly error.
+	 *
+	 * Streams when possible: deltas flow to the UI as "delta" events
+	 * (a "delta-reset" event opens each attempt so partial text from a
+	 * failed attempt is never shown twice). If streaming itself is
+	 * unavailable (CORS-blocked host, old webview) it silently falls
+	 * back to the non-streaming request.
+	 *
 	 * @param {object} opts
 	 * @param {object} opts.config aiConfig() result
 	 * @param {Array<object>} opts.messages OpenAI messages
-	 * @returns {Promise<{content: string, toolCalls: Array<object>, raw: object}>}
+	 * @returns {Promise<{content: string, toolCalls: Array<object>, raw: object, reasoning?: string}>}
 	 */
 	async requestWithRecovery({ config, messages }) {
 		const provider = PROVIDER_MAP[config.providerId];
@@ -265,16 +287,14 @@ export class Agent {
 		let model = config.model;
 
 		for (let attempt = 0; attempt < 3; attempt++) {
+			// every attempt re-opens the live bubble
+			this.onEvent({ type: "delta-reset" });
 			try {
-				return await chatCompletion({
-					baseURL: config.baseURL,
-					apiKey: config.apiKey,
-					providerId: config.providerId,
-					model,
+				return await this.streamOrRequest({
+					config,
 					messages,
 					tools,
-					temperature: settings.value.aiTemperature,
-					maxTokens: resolveMaxTokens(config.providerId),
+					model,
 				});
 			} catch (error) {
 				const text = String(error?.message || error);
@@ -316,15 +336,62 @@ export class Agent {
 				throw error;
 			}
 		}
-		return chatCompletion({
+		this.onEvent({ type: "delta-reset" });
+		return this.streamOrRequest({
+			config,
+			messages,
+			tools: [],
+			model,
+		});
+	}
+
+	/**
+	 * Tries the streaming path first (live typing), falling back to the
+	 * plain request when the environment cannot stream (no ReadableStream,
+	 * CORS-blocked host, etc.).
+	 * @param {object} opts
+	 * @param {object} opts.config
+	 * @param {Array<object>} opts.messages
+	 * @param {Array<object>} opts.tools
+	 * @param {string} opts.model
+	 */
+	async streamOrRequest({ config, messages, tools, model }) {
+		const common = {
 			baseURL: config.baseURL,
 			apiKey: config.apiKey,
 			providerId: config.providerId,
 			model,
 			messages,
+			tools,
 			temperature: settings.value.aiTemperature,
 			maxTokens: resolveMaxTokens(config.providerId),
-		});
+		};
+
+		try {
+			return await streamChatCompletion({
+				...common,
+				onDelta: (delta) => {
+					this.onEvent({ type: "delta", payload: delta });
+				},
+			});
+		} catch (error) {
+			const status = httpStatus(String(error?.message || error));
+			// HTTP errors are real provider answers — rethrow so the
+			// recovery logic sees them; anything else (TypeError from
+			// CORS, missing stream support, abort) retries plain.
+			if (status !== null) throw error;
+			if (error?.name === "AbortError") throw error;
+			window.log?.("warn", "AI streaming unavailable, falling back:", error);
+			const result = await chatCompletion(common);
+			// reasoning models also report thoughts in the plain body
+			const message = result.raw?.choices?.[0]?.message;
+			const thought = message?.reasoning_content ?? message?.reasoning ?? null;
+			if (typeof thought === "string" && thought) {
+				result.reasoning = thought;
+				this.onEvent({ type: "reasoning", payload: thought });
+			}
+			return result;
+		}
 	}
 
 	/**
@@ -344,7 +411,8 @@ export class Agent {
 	}
 
 	/**
-	 * Executes a tool call honoring permissions.
+	 * Executes a tool call honoring permissions, announcing what is
+	 * happening in real time ("reading file…", "running command…").
 	 * @param {object} call OpenAI tool call
 	 * @returns {Promise<string>}
 	 */
@@ -361,9 +429,16 @@ export class Agent {
 			return "DENIED by user.";
 		}
 
+		this.onEvent({
+			type: "status",
+			payload: toolStatus(name, args),
+		});
 		try {
-			return await executeTool(name, args, this);
+			const result = await executeTool(name, args, this);
+			this.onEvent({ type: "status", payload: { action: "done" } });
+			return result;
 		} catch (error) {
+			this.onEvent({ type: "status", payload: { action: "done" } });
 			return `ERROR: ${error.message || error}`;
 		}
 	}
@@ -397,16 +472,37 @@ export class Agent {
 
 	/**
 	 * Resolves provider settings (per-provider overrides first).
+	 * The model is normalized so stale ids from a provider's old
+	 * catalog (e.g. Pollinations models that no longer exist) map to
+	 * a working default instead of failing with 404/"inválido".
 	 */
 	aiConfig() {
-		const providerId = settings.value.aiProvider || DEFAULT_PROVIDER_ID;
+		const providerId =
+			this.providerOverride || settings.value.aiProvider || DEFAULT_PROVIDER_ID;
 		const provider = PROVIDER_MAP[providerId];
 		const baseURL = resolveBaseURL(provider, resolveBaseUrl(providerId));
+		const model = normalizeModel(
+			providerId,
+			this.modelOverride || resolveModel(providerId),
+		);
+		if (model !== (this.modelOverride || resolveModel(providerId))) {
+			// one-time notice per session — the saved model was
+			// retired by the provider
+			this.onEvent({
+				type: "status",
+				payload: {
+					action: "notice",
+					detail:
+						window.strings?.["ai model remapped"] ||
+						`Model "${resolveModel(providerId)}" is no longer available — using "${model}"`,
+				},
+			});
+		}
 		return {
 			providerId,
 			baseURL,
 			apiKey: resolveApiKey(providerId),
-			model: resolveModel(providerId),
+			model,
 			noKeyRequired: Boolean(provider?.noKeyRequired),
 		};
 	}
@@ -414,7 +510,7 @@ export class Agent {
 
 /**
  * Runs a restricted subagent.
- * @param {{task: string, context?: string}} args
+ * @param {{task: string, context?: string, provider?: string, model?: string}} args
  * @param {import("./agent").Agent} [parent]
  * @returns {Promise<string>}
  */
@@ -433,17 +529,73 @@ export async function runSubagent(args, parent) {
 			"editor_context",
 			"read_active_file",
 			"list_open_files",
+			"web_search",
+			"read_url",
 		],
 	});
+
+	// optional model override — parallel subagents may each use a
+	// different provider/model chosen for the subtask
+	if (PROVIDER_MAP[args?.provider]) {
+		subagent.providerOverride = args.provider;
+	}
+	if (args?.model) {
+		subagent.modelOverride = String(args.model);
+	}
 
 	const promptText = args?.context
 		? `${task}\n\nContext from the main agent:\n${args.context}`
 		: task;
 
-	parent?.onEvent({ type: "status", payload: "subagent started" });
+	parent?.onEvent({
+		type: "status",
+		payload: { action: "subagent", detail: task.slice(0, 80) },
+	});
 	const report = await subagent.run(promptText);
-	parent?.onEvent({ type: "status", payload: "subagent finished" });
+	parent?.onEvent({ type: "status", payload: { action: "done" } });
 	return truncate(report || "(subagent returned nothing)", 6000);
+}
+
+/**
+ * Runs multiple subagents in PARALLEL (Promise.allSettled), optionally on
+ * different providers/models — the model-selection side of agent mode.
+ * @param {{subtasks?: Array<{task?: string, context?: string, provider?: string, model?: string}>}} args
+ * @param {import("./agent").Agent} [parent]
+ * @returns {Promise<string>} merged report
+ */
+export async function runSubagentsParallel(args, parent) {
+	const subtasks = Array.isArray(args?.subtasks)
+		? args.subtasks.slice(0, 5)
+		: [];
+	if (subtasks.length < 2) {
+		// single subtask — degrade gracefully to the simple path
+		if (subtasks.length === 1) return runSubagent(subtasks[0], parent);
+		return "ERROR: spawn_subagents requires a 'subtasks' array (2-5 entries)";
+	}
+
+	parent?.onEvent({
+		type: "status",
+		payload: {
+			action: "subagents",
+			detail: `${subtasks.length} subagents em paralelo`,
+		},
+	});
+
+	const settled = await Promise.allSettled(
+		subtasks.map((subtask) => runSubagent(subtask, parent)),
+	);
+
+	parent?.onEvent({ type: "status", payload: { action: "done" } });
+
+	const parts = settled.map((result, index) => {
+		const label = subtasks[index]?.task?.slice(0, 60) || `subtask ${index + 1}`;
+		const body =
+			result.status === "fulfilled"
+				? result.value
+				: `ERROR: ${result.reason?.message || result.reason}`;
+		return `### Subtask ${index + 1}: ${label}\n${body}`;
+	});
+	return parts.join("\n\n---\n\n");
 }
 
 /**
@@ -550,6 +702,49 @@ async function workspaceContext() {
 }
 
 /**
+ * Maps a tool call to a live-activity payload for the status chip.
+ * @param {string} name tool name
+ * @param {object} args parsed tool arguments
+ * @returns {{action: string, detail?: string}}
+ */
+function toolStatus(name, args) {
+	const detail = String(
+		args?.path || args?.command || args?.pattern || args?.task || "",
+	).slice(0, 60);
+	switch (name) {
+		case "list_dir":
+			return { action: "list_dir", detail };
+		case "read_file":
+		case "read_active_file":
+		case "editor_context":
+		case "list_open_files":
+			return { action: "reading", detail };
+		case "search_files":
+			return { action: "searching", detail };
+		case "create_file":
+		case "delete_file":
+		case "move_path":
+			return { action: "writing", detail };
+		case "edit_file":
+		case "apply_to_editor":
+			return { action: "editing", detail };
+		case "run_command":
+			return { action: "command", detail: String(args?.command || "") };
+		case "run_js":
+			return { action: "js", detail };
+		case "spawn_subagent":
+		case "spawn_subagents":
+			return { action: "subagent", detail };
+		case "web_search":
+			return { action: "web", detail: String(args?.query || "") };
+		case "read_url":
+			return { action: "fetch", detail: String(args?.url || "") };
+		default:
+			return { action: "tool", detail: name };
+	}
+}
+
+/**
  * Extracts the HTTP status code from a client error message
  * ("400: {...}" from the native plugin, "HTTP 401" from fetch).
  * @param {string} message
@@ -590,7 +785,24 @@ function friendlyError(error, config) {
 			` (${raw.slice(0, 160)})`
 		);
 	}
+	if (
+		status === 400 &&
+		/invalid api key|invalid_api_key|incorrect api key/i.test(raw)
+	) {
+		return (
+			(window.strings?.["ai err key invalid"] ||
+				`${name} rejected the API key as invalid. Re-copy the key (no spaces/quotes) on Settings > AI > Providers.`) +
+			` (${raw.slice(0, 160)})`
+		);
+	}
 	if (status === 404) {
+		if (/model not found|model_not_found|no such model/i.test(raw)) {
+			return (
+				(window.strings?.["ai err model missing"] ||
+					`Model "${config.model}" does not exist on ${name}. Open the model picker (⟳ Fetch available models) and pick a current one.`) +
+				` (${raw.slice(0, 160)})`
+			);
+		}
 		return (
 			(window.strings?.["ai err endpoint"] ||
 				`Endpoint not found on ${name} — verify the Base URL.`) +

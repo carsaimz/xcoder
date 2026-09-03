@@ -45,10 +45,25 @@ export const PROVIDERS = [
 		name: "Pollinations (sem chave)",
 		group: "free",
 		baseURL: "https://text.pollinations.ai/openai",
-		models: ["openai", "openai-fast", "openai-large", "mistral", "qwen-coder"],
+		// VERIFIED (2026-09): the legacy API exposes exactly one
+		// anonymous model — openai-fast (GPT-OSS 20B, aliases:
+		// "openai", "gpt-oss", "gpt-oss-20b"). Anything else
+		// (mistral, qwen-coder, openai-large, z-ai…) answers 404
+		// "Model not found" — that was the source of the
+		// "inválido" errors on the free provider.
+		models: ["openai-fast", "openai"],
 		docs: "https://pollinations.ai",
-		note: "Grátis e SEM API key — funciona de cara. Limitado a ~1 req/s e os prompts passam por um serviço público.",
+		note: "Grátis e SEM API key — funciona de cara. Modelo anônimo: openai-fast (GPT-OSS 20B, com raciocínio). Limitado a ~1 req/s e os prompts passam por um serviço público.",
 		noKeyRequired: true,
+	},
+	{
+		id: "zai",
+		name: "Z.AI (GLM)",
+		group: "freetier",
+		baseURL: "https://api.z.ai/api/paas/v4",
+		models: ["glm-4.5-flash", "glm-4.6", "glm-4.5-air"],
+		docs: "https://z.ai/manage-apikey/apikey-list",
+		note: "glm-4.5-flash é gratuito (chave necessária); os demais são pagos.",
 	},
 	{
 		id: "groq",
@@ -537,6 +552,85 @@ const KEY_PREFIXES = [
 	["csk-", "cerebras"],
 	["r8_", "replicate"],
 ];
+
+// ------------------------- model normalization ----------------------------
+
+/**
+ * Pollinations models that stopped existing on the legacy API (404
+ * "Model not found") — mapped to the only anonymous model left.
+ */
+const POLLINATIONS_DEAD_MODELS = new Set([
+	"openai-large",
+	"openai-large-reasoning",
+	"mistral",
+	"mistral-nemo",
+	"qwen-coder",
+	"llama",
+	"llamascout",
+	"deepseek",
+	"deepseek-reasoning",
+	"gemini",
+	"gemini-search",
+	"searchgpt",
+	"evil",
+	"unity",
+	"z-ai",
+	"zai",
+]);
+
+/**
+ * Normalizes a model id for a provider. Fixes the classic "the free
+ * provider answers 'inválido' for every model" trap: stale model ids
+ * saved before the provider changed its catalog are silently remapped to
+ * a known-good default (once, with a warning from the agent).
+ * @param {string} providerId
+ * @param {string} model
+ * @returns {string} a usable model id
+ */
+export function normalizeModel(providerId, model) {
+	const value = String(model || "").trim();
+	if (providerId === "pollinations") {
+		if (!value) return "openai-fast";
+		const lower = value.toLowerCase();
+		if (POLLINATIONS_DEAD_MODELS.has(lower)) return "openai-fast";
+		if (lower === "openai-large" || lower === "openai-fast-reasoning") {
+			return "openai-fast";
+		}
+		return value;
+	}
+	return value || PROVIDER_MAP[providerId]?.models?.[0] || "";
+}
+
+/**
+ * Whether a model id is part of the provider's static catalog (or an
+ * accepted alias). Custom endpoints (baseUrl override / custom provider)
+ * accept any model, so the check is skipped there.
+ * @param {string} providerId
+ * @param {string} model
+ * @returns {boolean}
+ */
+export function isCatalogModel(providerId, model) {
+	const value = String(model || "")
+		.trim()
+		.toLowerCase();
+	if (!value) return false;
+	const provider = PROVIDER_MAP[providerId];
+	if (!provider) return true;
+	if (provider.id === "custom") return true;
+	if (
+		getProviderPrefs(providerId).baseUrl ||
+		getProviderPrefs(providerId).apiKey
+	) {
+		// custom base URL: the endpoint defines the model list
+		return true;
+	}
+	if ((provider.models || []).some((m) => m.toLowerCase() === value))
+		return true;
+	if (providerId === "pollinations") {
+		return ["openai", "openai-fast", "gpt-oss", "gpt-oss-20b"].includes(value);
+	}
+	return true; // unknown to the catalog but let the provider decide
+}
 
 /**
  * Detects keys that look like they belong to a DIFFERENT provider

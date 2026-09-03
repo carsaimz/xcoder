@@ -25,96 +25,96 @@ const MAX_INLINE_SELECTION = 8000;
 
 /** @type {SlashCommand[]} */
 export const SLASH_COMMANDS = [
-        {
-                id: "explain",
-                descriptionKey: "ai cmd explain",
-                fallbackDescription: "Explain the selected code or the active file",
-                build: ({ text, ctx }) =>
-                        [
-                                "Explain the following code in clear terms: what it does, its inputs/outputs and any notable behavior.",
-                                codeRef(ctx),
-                                text ? `Focus on: ${text}` : "",
-                                codeBlock(ctx),
-                        ]
-                                .filter(Boolean)
-                                .join("\n\n"),
-        },
-        {
-                id: "fix",
-                descriptionKey: "ai cmd fix",
-                fallbackDescription: "Find and fix bugs in the selection or active file",
-                build: ({ text, ctx }) =>
-                        [
-                                "Find the bug or problem in the code below and fix it.",
-                                codeRef(ctx),
-                                text ? `Symptoms / context: ${text}` : "",
-                                codeBlock(ctx),
-                                "When you know the fix, apply it with edit_file (or apply_to_editor for the open buffer) and show the changed snippet.",
-                        ]
-                                .filter(Boolean)
-                                .join("\n\n"),
-        },
-        {
-                id: "refactor",
-                descriptionKey: "ai cmd refactor",
-                fallbackDescription: "Refactor for clarity and structure",
-                build: ({ text, ctx }) =>
-                        [
-                                "Refactor the code below to improve clarity and structure without changing its behavior.",
-                                codeRef(ctx),
-                                text ? `Preferences: ${text}` : "",
-                                codeBlock(ctx),
-                                "Apply the changes with edit_file (or apply_to_editor for the open buffer) and summarize what you changed.",
-                        ]
-                                .filter(Boolean)
-                                .join("\n\n"),
-        },
-        {
-                id: "tests",
-                descriptionKey: "ai cmd tests",
-                fallbackDescription: "Write unit tests for the code",
-                build: ({ text, ctx }) =>
-                        [
-                                "Write focused unit tests for the code below. Cover the happy paths, edge cases and error handling.",
-                                codeRef(ctx),
-                                text ? `Extra requirements: ${text}` : "",
-                                codeBlock(ctx),
-                                "Return the tests in a single code block and, when a test file already exists in the workspace, propose where to add them.",
-                        ]
-                                .filter(Boolean)
-                                .join("\n\n"),
-        },
-        {
-                id: "review",
-                descriptionKey: "ai cmd review",
-                fallbackDescription: "Review the code and list findings",
-                build: ({ text, ctx }) =>
-                        [
-                                "Review the code below like a senior engineer. List concrete findings ordered by severity (bugs, security, performance, readability) with exact locations, then give an overall verdict.",
-                                codeRef(ctx),
-                                text ? `Focus areas: ${text}` : "",
-                                codeBlock(ctx),
-                        ]
-                                .filter(Boolean)
-                                .join("\n\n"),
-        },
-        {
-                id: "commit",
-                descriptionKey: "ai cmd commit",
-                fallbackDescription: "Commit a workspace snapshot via vcs",
-                build: ({ text, ctx }) =>
-                        [
-                                "Create a version-control snapshot of the workspace.",
-                                "Steps: run `vcs status` to inspect what changed, derive a short conventional-commit message (feat/fix/chore/...), then run `vcs commit <message>`.",
-                                text ? `Message hint from the user: ${text}` : "",
-                        ]
-                                .filter(Boolean)
-                                .join("\n\n"),
-        },
+	{
+		id: "explain",
+		descriptionKey: "ai cmd explain",
+		fallbackDescription: "Explain the selected code or the active file",
+		build: ({ text, ctx }) =>
+			[
+				"Explain the following code in clear terms: what it does, its inputs/outputs and any notable behavior.",
+				codeRef(ctx),
+				text ? `Focus on: ${text}` : "",
+				codeBlock(ctx),
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
+		id: "fix",
+		descriptionKey: "ai cmd fix",
+		fallbackDescription: "Find and fix bugs in the selection or active file",
+		build: ({ text, ctx }) =>
+			[
+				"Find the bug or problem in the code below and fix it.",
+				codeRef(ctx),
+				text ? `Symptoms / context: ${text}` : "",
+				codeBlock(ctx),
+				"When you know the fix, apply it with edit_file (or apply_to_editor for the open buffer) and show the changed snippet.",
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
+		id: "refactor",
+		descriptionKey: "ai cmd refactor",
+		fallbackDescription: "Refactor for clarity and structure",
+		build: ({ text, ctx }) =>
+			[
+				"Refactor the code below to improve clarity and structure without changing its behavior.",
+				codeRef(ctx),
+				text ? `Preferences: ${text}` : "",
+				codeBlock(ctx),
+				"Apply the changes with edit_file (or apply_to_editor for the open buffer) and summarize what you changed.",
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
+		id: "tests",
+		descriptionKey: "ai cmd tests",
+		fallbackDescription: "Write unit tests for the code",
+		build: ({ text, ctx }) =>
+			[
+				"Write focused unit tests for the code below. Cover the happy paths, edge cases and error handling.",
+				codeRef(ctx),
+				text ? `Extra requirements: ${text}` : "",
+				codeBlock(ctx),
+				"Return the tests in a single code block and, when a test file already exists in the workspace, propose where to add them.",
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
+		id: "review",
+		descriptionKey: "ai cmd review",
+		fallbackDescription: "Review the code and list findings",
+		build: ({ text, ctx }) =>
+			[
+				"Review the code below like a senior engineer. List concrete findings ordered by severity (bugs, security, performance, readability) with exact locations, then give an overall verdict.",
+				codeRef(ctx),
+				text ? `Focus areas: ${text}` : "",
+				codeBlock(ctx),
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
+		id: "commit",
+		descriptionKey: "ai cmd commit",
+		fallbackDescription: "Commit a workspace snapshot via vcs",
+		build: ({ text, ctx }) =>
+			[
+				"Create a version-control snapshot of the workspace.",
+				"Steps: run `vcs status` to inspect what changed, derive a short conventional-commit message (feat/fix/chore/...), then run `vcs commit <message>`.",
+				text ? `Message hint from the user: ${text}` : "",
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
 ];
 
 export const SLASH_MAP = Object.fromEntries(
-        SLASH_COMMANDS.map((command) => [command.id, command]),
+	SLASH_COMMANDS.map((command) => [command.id, command]),
 );
 
 /**
@@ -124,13 +124,13 @@ export const SLASH_MAP = Object.fromEntries(
  * @returns {SlashCommand[]}
  */
 export function matchSlashCommands(input) {
-        const value = String(input || "");
-        if (!value.startsWith("/")) return [];
-        const rest = value.slice(1);
-        // once the user typed a space the command word is finished — close popup
-        if (/\s/.test(rest)) return [];
-        const query = rest.toLowerCase();
-        return SLASH_COMMANDS.filter((command) => command.id.startsWith(query));
+	const value = String(input || "");
+	if (!value.startsWith("/")) return [];
+	const rest = value.slice(1);
+	// once the user typed a space the command word is finished — close popup
+	if (/\s/.test(rest)) return [];
+	const query = rest.toLowerCase();
+	return SLASH_COMMANDS.filter((command) => command.id.startsWith(query));
 }
 
 /**
@@ -141,17 +141,17 @@ export function matchSlashCommands(input) {
  *                          valid slash command (plain input passes through)
  */
 export function expandSlashCommand(input, ctx = {}) {
-        const value = String(input || "").trim();
-        if (!value.startsWith("/")) return null;
+	const value = String(input || "").trim();
+	if (!value.startsWith("/")) return null;
 
-        const [rawId, ...rest] = value.slice(1).split(/\s+/);
-        const command = SLASH_MAP[(rawId || "").toLowerCase()];
-        if (!command) return null;
+	const [rawId, ...rest] = value.slice(1).split(/\s+/);
+	const command = SLASH_MAP[(rawId || "").toLowerCase()];
+	if (!command) return null;
 
-        return command.build({
-                text: rest.join(" ").trim(),
-                ctx: { selection: "", ...ctx },
-        });
+	return command.build({
+		text: rest.join(" ").trim(),
+		ctx: { selection: "", ...ctx },
+	});
 }
 
 /**
@@ -160,9 +160,10 @@ export function expandSlashCommand(input, ctx = {}) {
  * @returns {string}
  */
 function codeRef(ctx) {
-        if (ctx.selection) return "Target: the editor selection below.";
-        if (ctx.hasFile) return `Target: the active file "${ctx.fileName}". Read it with read_active_file if you need more context.`;
-        return "Target: none — no file is open and nothing is selected. Ask the user which file to use if needed.";
+	if (ctx.selection) return "Target: the editor selection below.";
+	if (ctx.hasFile)
+		return `Target: the active file "${ctx.fileName}". Read it with read_active_file if you need more context.`;
+	return "Target: none — no file is open and nothing is selected. Ask the user which file to use if needed.";
 }
 
 /**
@@ -171,10 +172,10 @@ function codeRef(ctx) {
  * @returns {string}
  */
 function codeBlock(ctx) {
-        if (!ctx.selection) return "";
-        const selection =
-                ctx.selection.length > MAX_INLINE_SELECTION
-                        ? `${ctx.selection.slice(0, MAX_INLINE_SELECTION)}\n... (selection truncated)`
-                        : ctx.selection;
-        return `\`\`\`\n${selection}\n\`\`\``;
+	if (!ctx.selection) return "";
+	const selection =
+		ctx.selection.length > MAX_INLINE_SELECTION
+			? `${ctx.selection.slice(0, MAX_INLINE_SELECTION)}\n... (selection truncated)`
+			: ctx.selection;
+	return `\`\`\`\n${selection}\n\`\`\``;
 }

@@ -122,22 +122,47 @@ export function suffixVersion(version, suffix) {
 	return clean ? `${base}-${clean}` : base;
 }
 
+const VERSION_FIELD_PATTERN = /("version"\s*:\s*")[^"]*(")/;
+
+/**
+ * Inserts a "version" field into package.json contents that lack one.
+ * The key is placed right after "name"/"displayName" (or after the
+ * opening brace when neither exists), preserving the original file.
+ * @param {string} content
+ * @param {string} version
+ * @returns {string}
+ */
+export function insertVersionIntoPackageJson(content, version) {
+	const afterName = content.replace(
+		/^([ \t]*)("(?:name|displayName)"\s*:\s*"[^"]*",[ \t]*)$/m,
+		(_match, indent, line) => `${indent}${line}\n${indent}"version": "${version}",`,
+	);
+	if (afterName !== content) return afterName;
+	const afterBrace = content.replace(
+		/^([ \t]*)(\{[ \t]*)$/m,
+		(_match, indent, brace) => `${indent}${brace}\n${indent}  "version": "${version}",`,
+	);
+	if (afterBrace !== content) return afterBrace;
+	throw new Error(
+		'package.json: could not insert "version" field (unexpected file shape)',
+	);
+}
+
 /**
  * Rewrites the "version" field of package.json contents.
+ * When the field is missing entirely it is inserted automatically.
+ * A no-op replace (field already holds the target version) is NOT an
+ * error — release re-runs must stay idempotent.
  * @param {string} content
  * @param {string} version
  * @returns {string}
  */
 export function applyVersionToPackageJson(content, version) {
 	if (!parseSemver(version)) throw new Error(`Invalid version: ${version}`);
-	const next = content.replace(
-		/("version"\s*:\s*")[^"]*(")/,
-		`$1${version}$2`,
-	);
-	if (next === content) {
-		throw new Error('package.json: no "version" field found');
+	if (!/"version"\s*:/.test(content)) {
+		return insertVersionIntoPackageJson(content, version);
 	}
-	return next;
+	return content.replace(VERSION_FIELD_PATTERN, `$1${version}$2`);
 }
 
 /**

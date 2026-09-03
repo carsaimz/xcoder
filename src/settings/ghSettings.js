@@ -95,7 +95,10 @@ export default function ghSettings() {
 	const title = strings["github settings"] || "GitHub";
 
 	const page = settingsPage(title, buildItems(), handleCallback, "united", {
-		pageClassName: "gh-settings-page",
+		// detail-settings-page activates the shared themed settings
+		// shell (background, rows, buttons, info tips); the extra
+		// gh-settings-page class only scopes the hero card styles.
+		pageClassName: "detail-settings-page gh-settings-page",
 	});
 	page.show();
 	mountHero(page.getListElement?.());

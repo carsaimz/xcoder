@@ -1274,5 +1274,22 @@
     "confirm email": "Conta criada! Confirme o e-mail e entre para sincronizar o Premium.",
     "account created": "Conta criada ✓",
     "account sync hint": "Depois de confirmarmos a sua doação, o Premium é ativado sozinho nesta conta.",
-    "support payments db": "Os métodos de pagamento são geridos no site e guardados na base de dados (PayPal, Stripe, Buy Me a Coffee, M-Pesa…)."
+    "support payments db": "Os métodos de pagamento são geridos no site e guardados na base de dados (PayPal, Stripe, Buy Me a Coffee, M-Pesa…).",
+    "ai enter hint": "Enter = nova linha · Ctrl+Enter = enviar",
+    "ai reasoning": "Processo de raciocínio",
+    "ai model remapped": "Modelo indisponível — usando o modelo padrão do provedor",
+    "ai err model missing": "O modelo \"{model}\" não existe no {name}. Abra o seletor de modelos (⟳ Buscar modelos disponíveis) e escolha um atual.",
+    "ai err key invalid": "{name} rejeitou a chave de API como inválida. Copie a chave novamente (sem espaços/aspas) em Configurações > IA > Provedores.",
+    "ai status thinking": "Pensando...",
+    "ai status reading": "Lendo arquivo...",
+    "ai status writing": "Criando/escrevendo arquivo...",
+    "ai status editing": "Editando arquivo...",
+    "ai status searching": "Buscando nos arquivos...",
+    "ai status listing": "Listando arquivos...",
+    "ai status command": "Executando comando...",
+    "ai status js": "Executando JavaScript...",
+    "ai status subagents": "Correndo subagentes em paralelo...",
+    "ai status web": "Pesquisando na web...",
+    "ai status fetch": "Carregando página...",
+    "ai status tool": "Usando ferramenta..."
 }

@@ -33,11 +33,19 @@ function create($container, $toggler) {
 	const START_THRESHOLD = config.SIDEBAR_SLIDE_START_THRESHOLD_PX; //Point where to start swipe
 	const MIN_WIDTH = 250; //Min width of the side bar
 	const MAX_WIDTH = () => Math.round(innerWidth * 0.88); //Max width of the side bar (≈88% of layout)
+	// Generous default so Git/AI/Files/Plugins panels are usable without
+	// a first manual resize (user-resized width still wins)
+	const DEFAULT_WIDTH = () =>
+		Math.min(Math.max(Math.round(innerWidth * 0.6), 300), 480);
 	const resizeBar = Ref();
 
 	$container = $container || app;
 	let mode = innerWidth > 750 ? "tab" : "phone";
-	let width = +(localStorage.sideBarWidth || MIN_WIDTH);
+	const savedWidth = Number(localStorage.sideBarWidth);
+	let width =
+		Number.isFinite(savedWidth) && savedWidth >= MIN_WIDTH
+			? savedWidth
+			: DEFAULT_WIDTH();
 
 	const eventOptions = { passive: false };
 	const $el = (

@@ -1157,5 +1157,22 @@
     "confirm email": "Account created! Confirm your e-mail and sign in to sync Premium.",
     "account created": "Account created ✓",
     "account sync hint": "Once we confirm your donation, Premium is activated on this account automatically.",
-    "support payments db": "Payment methods are managed on the site and stored in the database (PayPal, Stripe, Buy Me a Coffee, M-Pesa…)."
+    "support payments db": "Payment methods are managed on the site and stored in the database (PayPal, Stripe, Buy Me a Coffee, M-Pesa…).",
+    "ai enter hint": "Enter = new line · Ctrl+Enter = send",
+    "ai reasoning": "Thought process",
+    "ai model remapped": "Model unavailable — using the provider default model",
+    "ai err model missing": "Model \"{model}\" does not exist on {name}. Open the model picker (⟳ Fetch available models) and pick a current one.",
+    "ai err key invalid": "{name} rejected the API key as invalid. Re-copy the key (no spaces/quotes) on Settings > AI > Providers.",
+    "ai status thinking": "Thinking...",
+    "ai status reading": "Reading file...",
+    "ai status writing": "Writing file...",
+    "ai status editing": "Editing file...",
+    "ai status searching": "Searching files...",
+    "ai status listing": "Listing files...",
+    "ai status command": "Running command...",
+    "ai status js": "Executing JavaScript...",
+    "ai status subagents": "Running subagents in parallel...",
+    "ai status web": "Searching the web...",
+    "ai status fetch": "Fetching page...",
+    "ai status tool": "Running tool..."
 }

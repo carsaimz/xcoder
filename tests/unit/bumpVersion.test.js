@@ -102,10 +102,39 @@ describe("applyVersionToPackageJson", () => {
 		expect(next).toContain('"test": "vitest run"');
 	});
 
-	it("throws when the version field is missing", () => {
-		expect(() => applyVersionToPackageJson("{}", "1.4.0")).toThrow(
-			/no "version" field/,
-		);
+	it("is idempotent when the version is already the target (release re-run)", () => {
+		// Regression: package.json already at 1.4.14 + release 1.4.14
+		// used to throw 'no "version" field found' because replace()
+		// returned identical content.
+		const content = `{
+  "name": "com.carsaimz.xcoder",
+  "version": "1.4.14",
+  "scripts": {}
+}`;
+		expect(applyVersionToPackageJson(content, "1.4.14")).toBe(content);
+	});
+
+	it("inserts the version field when it is missing", () => {
+		const content = `{
+  "name": "com.carsaimz.xcoder",
+  "description": "XCoder"
+}`;
+		const next = applyVersionToPackageJson(content, "1.4.14");
+		expect(next).toContain('"name": "com.carsaimz.xcoder"');
+		expect(next).toContain('"version": "1.4.14"');
+		expect(() => JSON.parse(next)).not.toThrow();
+	});
+
+	it("inserts after displayName and keeps the original indentation", () => {
+		const content = `{
+\t"name": "pkg",
+\t"displayName": "Pkg",
+\t"scripts": {}
+}`;
+		const next = applyVersionToPackageJson(content, "2.0.0");
+		const lines = next.split("\n");
+		expect(lines[2]).toBe('\t"version": "2.0.0",');
+		expect(() => JSON.parse(next)).not.toThrow();
 	});
 });
 

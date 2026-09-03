@@ -312,6 +312,80 @@ export const TOOLS = [
 			return runSubagent(args, agent);
 		},
 	},
+	{
+		name: "spawn_subagents",
+		description:
+			"Run MULTIPLE subagents IN PARALLEL for independent subtasks. Each subagent may use a different provider/model — pick capable models for the job. Returns one merged report per subtask. Use this to split research/analysis work (e.g. review several files at once) across models.",
+		danger: "exec",
+		parameters: {
+			type: "object",
+			properties: {
+				subtasks: {
+					type: "array",
+					description: "2-5 independent subtasks to run in parallel",
+					items: {
+						type: "object",
+						properties: {
+							task: {
+								type: "string",
+								description: "the subagent objective",
+							},
+							context: { type: "string" },
+							provider: {
+								type: "string",
+								description:
+									"optional provider id (e.g. pollinations, groq, google)",
+							},
+							model: {
+								type: "string",
+								description: "optional model id for this subagent",
+							},
+						},
+						required: ["task"],
+					},
+				},
+			},
+			required: ["subtasks"],
+		},
+		async run(args, agent) {
+			const { runSubagentsParallel } = await import("./agent");
+			return runSubagentsParallel(args, agent);
+		},
+	},
+	{
+		name: "web_search",
+		description:
+			"Search the public web (no API key needed). Returns result titles, URLs and snippets. Use for documentation, error messages, library usage — anything outside the workspace.",
+		danger: "read",
+		parameters: {
+			type: "object",
+			properties: {
+				query: { type: "string", description: "search keywords" },
+			},
+			required: ["query"],
+		},
+		async run(args) {
+			const { webSearch } = await import("./webTools");
+			return webSearch(String(args?.query || ""));
+		},
+	},
+	{
+		name: "read_url",
+		description:
+			"Fetch a web page and return its readable text (tags stripped, scripts removed). Use after web_search to read docs or articles.",
+		danger: "read",
+		parameters: {
+			type: "object",
+			properties: {
+				url: { type: "string", description: "absolute http(s) URL" },
+			},
+			required: ["url"],
+		},
+		async run(args) {
+			const { readUrl } = await import("./webTools");
+			return readUrl(String(args?.url || ""));
+		},
+	},
 ];
 
 export const TOOL_MAP = Object.fromEntries(

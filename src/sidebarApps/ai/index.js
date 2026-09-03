@@ -13,6 +13,11 @@ import {
 import { listModels, resolveBaseURL } from "lib/ai/client";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
 import {
+	highlightMarkdownCode,
+	markdownToHtml,
+	renderMarkdownElement,
+} from "lib/ai/markdown";
+import {
 	badgeLabel,
 	DEFAULT_PROVIDER_ID,
 	enabledProviders,
@@ -311,8 +316,12 @@ function buildUi() {
 			placeholder={
 				strings["ai input placeholder"] || "Ask about your project..."
 			}
+			title={strings["ai enter hint"] || "Enter = new line · Ctrl+Enter = send"}
 			onkeydown={(e) => {
-				if (e.key === "Enter" && !e.shiftKey) {
+				// Enter inserts a newline (like the editor);
+				// Ctrl/Cmd+Enter sends. On touch keyboards the
+				// send button is the primary way to send.
+				if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
 					e.preventDefault();
 					send();
 				}
@@ -855,10 +864,15 @@ function handleEvent(event) {
 		return;
 	}
 	if (event.type === "status") {
-		$status.textContent =
-			event.payload === "subagent started"
-				? strings["ai subagent running"] || "Subagent working..."
-				: strings.thinking || "Thinking...";
+		renderStatus(event.payload);
+		return;
+	}
+	if (event.type === "delta-reset") {
+		resetLiveStream();
+		return;
+	}
+	if (event.type === "delta") {
+		updateLiveStream(event.payload);
 		return;
 	}
 	if (event.type === "usage") {
@@ -882,13 +896,89 @@ function handleEvent(event) {
 			payload: event.payload,
 			toolCalls: event.toolCalls,
 		});
+	} else if (event.type === "reasoning") {
+		events.push({ type: "reasoning", payload: event.payload });
 	} else if (event.type === "error") {
 		events.push({ type: "error", payload: event.payload });
 	}
 
+	// the live bubble already shows this answer — finalize it in place
+	if (event.type === "assistant" && liveStream?.wrap?.isConnected) {
+		finalizeLiveStream(event.payload, event.toolCalls || []);
+		scrollToEnd();
+		persist();
+		return;
+	}
+
 	appendEvent(event);
+	if (event.type === "assistant") renderPendingReasoning();
 	scrollToEnd();
 	persist();
+}
+
+/**
+ * Renders the live-activity status chip ("reading file…", "running
+ * command…") — Z.AI/Claude style. Payload shapes:
+ *   {action, detail?}  ·  "thinking" (legacy string)
+ * The "notice" action becomes a persistent message row instead.
+ * @param {{action?: string, detail?: string} | string} payload
+ */
+function renderStatus(payload) {
+	if (typeof payload === "string") payload = { action: payload };
+	const action = payload?.action || "thinking";
+
+	if (action === "notice") {
+		events.push({ type: "notice", payload: payload.detail || "" });
+		appendEvent({ type: "notice", payload: payload.detail || "" });
+		scrollToEnd();
+		persist();
+		return;
+	}
+
+	if (action === "done") {
+		$status.textContent = "";
+		return;
+	}
+
+	const LABELS = {
+		thinking: "ai status thinking",
+		reading: "ai status reading",
+		writing: "ai status writing",
+		editing: "ai status editing",
+		searching: "ai status searching",
+		list_dir: "ai status listing",
+		command: "ai status command",
+		js: "ai status js",
+		subagent: "ai subagent running",
+		subagents: "ai status subagents",
+		web: "ai status web",
+		fetch: "ai status fetch",
+		tool: "ai status tool",
+	};
+	const fallbacks = {
+		thinking: "Thinking...",
+		reading: "Reading file...",
+		writing: "Writing file...",
+		editing: "Editing file...",
+		searching: "Searching files...",
+		list_dir: "Listing files...",
+		command: "Running command...",
+		js: "Executing JS...",
+		subagent: "Subagent working...",
+		subagents: "Running subagents in parallel...",
+		web: "Searching the web...",
+		fetch: "Fetching page...",
+		tool: "Running tool...",
+	};
+	const label = strings[LABELS[action]] || fallbacks[action] || `${action}...`;
+	const detail = String(payload?.detail || "");
+	$status.content = (
+		<span className="ai-status-chip">
+			<span className="ai-status-spinner" />
+			<span className="ai-status-label">{label}</span>
+			{detail ? <span className="ai-status-detail">{detail}</span> : null}
+		</span>
+	);
 }
 
 /**
@@ -910,7 +1000,7 @@ function updateToolRow(event) {
 	if ($result) $result.textContent = text;
 }
 
-function appendEvent(event) {
+function appendEvent(event, opts = {}) {
 	if (event.type === "user") {
 		const $chips = renderAttachmentChips(event.attachments);
 		$messages.append(
@@ -925,16 +1015,43 @@ function appendEvent(event) {
 	if (event.type === "assistant") {
 		const $bubble = (
 			<div className="ai-bubble assistant">
-				{renderRichText(event.payload || "")}
+				{renderMarkdownElement(event.payload || "")}
 			</div>
 		);
-		const $wrap = <div className="ai-msg assistant">{$bubble}</div>;
+		const $body = <div className="ai-body">{$bubble}</div>;
+		const $wrap = (
+			<div
+				className="ai-msg assistant"
+				data-skip-reasoning={opts.skipReasoning ? "1" : ""}
+			>
+				<div className="ai-avatar">
+					<span className="icon bot" />
+				</div>
+				{$body}
+			</div>
+		);
 
 		for (const call of event.toolCalls || []) {
-			$wrap.append(toolCallView(call));
+			$body.append(toolCallView(call));
 		}
 
 		$messages.append($wrap);
+		return;
+	}
+
+	if (event.type === "reasoning") {
+		// transient: shown as a collapsible block above the answer
+		pendingReasoning = String(event.payload || "");
+		return;
+	}
+
+	if (event.type === "notice") {
+		$messages.append(
+			<div className="ai-msg notice">
+				<span className="icon info" />
+				<span>{event.payload}</span>
+			</div>,
+		);
 		return;
 	}
 
@@ -945,6 +1062,170 @@ function appendEvent(event) {
 			</div>,
 		);
 	}
+}
+
+/** Reasoning text waiting to be rendered with the next assistant row. */
+let pendingReasoning = null;
+
+/**
+ * Renders a pending reasoning payload as a collapsible block inside the
+ * latest assistant message (thought process — Z.AI/Claude style).
+ */
+function renderPendingReasoning() {
+	if (!pendingReasoning) return;
+	const text = pendingReasoning;
+	pendingReasoning = null;
+	const rows = $messages?.querySelectorAll(".ai-msg.assistant");
+	const $row = rows?.[rows.length - 1];
+	const $body = $row?.querySelector(".ai-body");
+	if (!$body) return;
+	if ($row.querySelector(".ai-reasoning")) return; // already shown
+	$body.prepend(reasoningView(text));
+}
+
+/**
+ * Builds the collapsible "thought process" block.
+ * @param {string} text
+ */
+function reasoningView(text) {
+	const $body = <div className="ai-reasoning-body" />;
+	$body.innerHTML = markdownToHtml(text);
+	highlightMarkdownCode($body);
+	return (
+		<details className="ai-reasoning">
+			<summary>
+				<span className="icon brain" />
+				{strings["ai reasoning"] || "Thought process"}
+			</summary>
+			{$body}
+		</details>
+	);
+}
+
+// ---------------------------------------------------------------------------
+// Live streaming (IA “digitando”) — delta events update the open bubble
+// ---------------------------------------------------------------------------
+
+/** @type {{wrap: HTMLElement, body: HTMLElement, text: HTMLElement, reasoning: HTMLElement|null, reasoningBody: HTMLElement|null, content: string, reasoningText: string, timer: number}|null} */
+let liveStream = null;
+
+/**
+ * Whether the messages list is near the bottom (auto-scroll decision).
+ */
+function isNearBottom() {
+	if (!$messages) return true;
+	return (
+		$messages.scrollHeight - $messages.scrollTop - $messages.clientHeight < 140
+	);
+}
+
+/** Removes any open live bubble (failed attempt / reset). */
+function resetLiveStream() {
+	if (liveStream?.timer) clearTimeout(liveStream.timer);
+	liveStream?.wrap?.remove();
+	liveStream = null;
+}
+
+/** Opens the live bubble (assistant row with a blinking cursor). */
+function ensureLiveStream() {
+	if (liveStream?.wrap?.isConnected) return liveStream;
+	const $reasoning = (
+		<details className="ai-reasoning" style="display:none">
+			<summary>
+				<span className="icon brain" />
+				{strings["ai reasoning"] || "Thought process"}
+			</summary>
+			<div className="ai-reasoning-body" />
+		</details>
+	);
+	const $text = <div className="ai-live-text" />;
+	const $bubble = (
+		<div className="ai-bubble assistant streaming">
+			{$text}
+			<span className="ai-cursor" />
+		</div>
+	);
+	const $wrap = (
+		<div className="ai-msg assistant">
+			<div className="ai-avatar">
+				<span className="icon bot" />
+			</div>
+			<div className="ai-body">
+				{$reasoning}
+				{$bubble}
+			</div>
+		</div>
+	);
+	$messages.append($wrap);
+	liveStream = {
+		wrap: $wrap,
+		body: $wrap.querySelector(".ai-body"),
+		text: $text,
+		reasoning: $reasoning,
+		reasoningBody: $reasoning.querySelector(".ai-reasoning-body"),
+		content: "",
+		reasoningText: "",
+		timer: 0,
+	};
+	scrollToEnd();
+	return liveStream;
+}
+
+/**
+ * Feeds one delta into the live bubble; markdown re-renders are throttled
+ * (~90 ms) so the answer types out live without thrashing the DOM.
+ * @param {{content?: string, reasoning?: string}} delta
+ */
+function updateLiveStream(delta) {
+	if (!delta) return;
+	const live = ensureLiveStream();
+	if (typeof delta.reasoning === "string" && delta.reasoning) {
+		live.reasoningText += delta.reasoning;
+		live.reasoning.style.display = "block";
+		live.reasoning.open = !live.content;
+		live.reasoningBody.textContent = live.reasoningText;
+	}
+	if (typeof delta.content === "string" && delta.content) {
+		live.content += delta.content;
+		if (live.reasoning) live.reasoning.open = false;
+		if (!live.timer) {
+			live.timer = setTimeout(() => {
+				live.timer = 0;
+				if (!liveStream) return;
+				live.text.innerHTML = markdownToHtml(live.content);
+				highlightMarkdownCode(live.text);
+				if (isNearBottom()) scrollToEnd();
+			}, 90);
+		}
+	}
+}
+
+/**
+ * Converts the live bubble into the final rendered answer.
+ * @param {string} [payload] authoritative final text (may differ slightly)
+ * @param {Array<object>} [toolCalls] tool calls announced with this answer
+ */
+function finalizeLiveStream(payload, toolCalls = []) {
+	if (!liveStream) return;
+	const live = liveStream;
+	if (live.timer) clearTimeout(live.timer);
+	const text = typeof payload === "string" ? payload : live.content;
+	const $bubble = live.wrap.querySelector(".ai-bubble");
+	if ($bubble) {
+		$bubble.classList.remove("streaming");
+		$bubble.content = text ? renderMarkdownElement(text) : "";
+	}
+	if (live.reasoningText && live.reasoning) {
+		live.reasoning.style.display = "";
+		live.reasoningBody.innerHTML = markdownToHtml(live.reasoningText);
+		highlightMarkdownCode(live.reasoningBody);
+	} else {
+		live.reasoning?.remove();
+	}
+	for (const call of toolCalls) {
+		live.body?.append(toolCallView(call));
+	}
+	liveStream = null;
 }
 
 /**
@@ -1001,6 +1282,7 @@ function renderMessages() {
 	for (const event of events) {
 		appendEvent(event);
 	}
+	renderPendingReasoning();
 	scrollToEnd();
 	updateArtifactsBar();
 }
@@ -1536,46 +1818,16 @@ function autosize() {
 	$input.style.height = `${Math.min($input.scrollHeight, 140)}px`;
 }
 
-/**
- * Minimal rich text: fenced code blocks -> <pre>, otherwise plain text.
- * @param {string} text
- */
-function renderRichText(text) {
-	const parts = String(text).split(/```/);
-	const nodes = [];
-	parts.forEach((part, index) => {
-		if (index % 2 === 1) {
-			const [maybeLang, ...rest] = part.split("\n");
-			const code = rest.length ? rest.join("\n") : maybeLang;
-			const clean = code.replace(/\n$/, "");
-			nodes.push(
-				<pre
-					className="ai-code tappable"
-					onclick={() => codeBlockActions(clean)}
-					title={strings["ai code actions"] || "Tap for code actions"}
-					data-hint={strings["ai tap hint"] || "tap for actions"}
-				>
-					{clean}
-				</pre>,
-			);
-		} else if (part.trim()) {
-			part.split("\n").forEach((line) => {
-				nodes.push(<div className="ai-line">{line}</div>);
-			});
-		}
-	});
-	return nodes;
-}
-
 function handleTouch() {
 	/* reserved: long-press actions */
 }
 
 /**
  * Actions available on an AI code block (copy / insert / replace / save).
+ * Exported so the markdown renderer (lib/ai/markdown.js) can reuse it.
  * @param {string} code
  */
-async function codeBlockActions(code) {
+export async function codeBlockActions(code) {
 	const choice = await select(strings["ai code actions"] || "Code actions", [
 		{
 			text: strings["insert at cursor"] || "Insert at cursor",

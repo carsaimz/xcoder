@@ -96,6 +96,176 @@ export async function listModels({ baseURL, apiKey, providerId, strict }) {
 }
 
 /**
+ * Streams a chat completion over SSE (fetch + ReadableStream).
+ *
+ * Most OpenAI-compatible providers send `access-control-allow-origin: *`,
+ * so streaming works inside the Cordova webview. When fetch/streaming is
+ * unavailable (CORS-blocked host, old webview) the caller can fall back
+ * to the non-streaming chatCompletion().
+ *
+ * @param {object} opts
+ * @param {string} opts.baseURL
+ * @param {string} opts.apiKey
+ * @param {string} [opts.providerId]
+ * @param {string} opts.model
+ * @param {Array<object>} opts.messages
+ * @param {Array<object>} [opts.tools]
+ * @param {number} [opts.temperature]
+ * @param {number} [opts.maxTokens]
+ * @param {AbortSignal} [opts.signal]
+ * @param {(delta: {content?: string, reasoning?: string}) => void} [opts.onDelta]
+ *        called for every chunk as the answer types out
+ * @returns {Promise<{content: string, toolCalls: Array<object>, raw: object, reasoning: string}>}
+ */
+export async function streamChatCompletion({
+	baseURL,
+	apiKey,
+	providerId,
+	model,
+	messages,
+	tools,
+	temperature,
+	maxTokens,
+	signal,
+	onDelta,
+}) {
+	const body = {
+		model,
+		messages,
+		stream: true,
+	};
+	if (tools?.length) {
+		body.tools = tools;
+		body.tool_choice = "auto";
+	}
+	if (typeof temperature === "number") body.temperature = temperature;
+	if (typeof maxTokens === "number" && maxTokens > 0) {
+		body.max_tokens = maxTokens;
+	}
+	// ask providers to report usage in the final chunk (OpenAI spec;
+	// unknown fields are ignored by providers that don't support it)
+	if (!tools?.length) body.stream_options = { include_usage: true };
+
+	const response = await fetch(endpoint(baseURL, "chat/completions"), {
+		method: "POST",
+		headers: buildHeaders(baseURL, apiKey, providerId),
+		body: JSON.stringify(body),
+		signal,
+	});
+
+	if (!response.ok) {
+		const text = await response.text().catch(() => "");
+		let json = {};
+		try {
+			json = text ? JSON.parse(text) : {};
+		} catch {
+			/* non-JSON error body */
+		}
+		const detail =
+			json?.error?.message ||
+			String(text || response.statusText || "request failed").slice(0, 200);
+		throw new Error(`${response.status}: ${detail}`);
+	}
+
+	if (!response.body || typeof response.body.getReader !== "function") {
+		throw new Error("streaming not supported");
+	}
+
+	const reader = response.body.getReader();
+	const decoder = new TextDecoder();
+	let buffer = "";
+	let content = "";
+	let reasoning = "";
+	/** @type {Array<object>} accumulated tool calls from deltas */
+	const toolAcc = [];
+	let finishReason = null;
+	let usage = null;
+
+	/** Pushes accumulated tool-call deltas into OpenAI-shaped calls. */
+	const absorbToolDelta = (toolDelta) => {
+		const index = toolDelta.index ?? toolAcc.length;
+		const current = toolAcc[index] || {
+			id: "",
+			type: "function",
+			function: { name: "", arguments: "" },
+		};
+		if (toolDelta.id) current.id = toolDelta.id;
+		if (toolDelta.function?.name) {
+			current.function.name += toolDelta.function.name;
+		}
+		if (toolDelta.function?.arguments) {
+			current.function.arguments += toolDelta.function.arguments;
+		}
+		toolAcc[index] = current;
+	};
+
+	while (true) {
+		const { done, value } = await reader.read();
+		if (done) break;
+		buffer += decoder.decode(value, { stream: true });
+		const lines = buffer.split("\n");
+		buffer = lines.pop() || "";
+
+		for (const rawLine of lines) {
+			const line = rawLine.trim();
+			if (!line.startsWith("data:")) continue;
+			const payload = line.slice(5).trim();
+			if (!payload || payload === "[DONE]") continue;
+			let chunk;
+			try {
+				chunk = JSON.parse(payload);
+			} catch {
+				continue;
+			}
+			if (chunk?.usage) usage = chunk.usage;
+			const choice = chunk?.choices?.[0];
+			if (!choice) continue;
+			if (choice.finish_reason) finishReason = choice.finish_reason;
+			const delta = choice.delta || {};
+			const reasoningPiece = delta.reasoning_content ?? delta.reasoning ?? null;
+			if (typeof reasoningPiece === "string" && reasoningPiece) {
+				reasoning += reasoningPiece;
+				onDelta?.({ reasoning: reasoningPiece });
+			}
+			if (typeof delta.content === "string" && delta.content) {
+				content += delta.content;
+				onDelta?.({ content: delta.content });
+			}
+			if (Array.isArray(delta.tool_calls)) {
+				for (const toolDelta of delta.tool_calls) {
+					absorbToolDelta(toolDelta);
+				}
+			}
+		}
+	}
+
+	const toolCalls = toolAcc.filter(Boolean).map((call, index) => ({
+		id: call.id || `call_${index}`,
+		type: "function",
+		function: {
+			name: call.function?.name,
+			arguments: call.function?.arguments || "{}",
+		},
+	}));
+
+	const raw = {
+		model,
+		choices: [
+			{
+				finish_reason: finishReason,
+				message: {
+					content,
+					...(toolCalls.length ? { tool_calls: toolAcc } : {}),
+				},
+			},
+		],
+		...(usage ? { usage } : {}),
+	};
+
+	return { content, toolCalls, raw, reasoning };
+}
+
+/**
  * Runs a (non-streaming) chat completion.
  * @param {object} opts
  * @param {string} opts.baseURL
@@ -323,6 +493,7 @@ export function resolveBaseURL(provider, override) {
 
 export default {
 	chatCompletion,
+	streamChatCompletion,
 	listModels,
 	resolveBaseURL,
 	endpoint,

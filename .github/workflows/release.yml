@@ -81,8 +81,9 @@ jobs:
             # keep CHANGELOG.md in sync (section for this version, from commits)
             node utils/scripts/update-changelog.mjs "$VERSION" || true
             git add package.json config.xml CHANGELOG.md
-            git commit -m "chore(release): v${VERSION}"
-            git tag -a "v${VERSION}" -m "XCoder v${VERSION}"
+            # tolerant re-run: files may already carry the target version
+            git diff --cached --quiet || git commit -m "chore(release): v${VERSION}"
+            git tag -a "v${VERSION}" -m "XCoder v${VERSION}" || true
             git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
           else
             # tag push: the new tag must compare greater than previous tags

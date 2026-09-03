@@ -91,7 +91,9 @@ export function formatEditorContext(context) {
 		);
 	}
 	if (context.cursorLine) {
-		parts.push(`cursor: line ${context.cursorLine}, column ${context.cursorColumn}`);
+		parts.push(
+			`cursor: line ${context.cursorLine}, column ${context.cursorColumn}`,
+		);
 	}
 	return `Active editor file\n${parts.join("\n")}`;
 }
@@ -191,7 +193,8 @@ export function applyToEditor(manager, args) {
 		if (!selection || selection.to === selection.from) {
 			return {
 				ok: false,
-				message: "ERROR: there is no selection to replace. Use action 'insert' or 'replace_all'.",
+				message:
+					"ERROR: there is no selection to replace. Use action 'insert' or 'replace_all'.",
 			};
 		}
 		transaction = {
