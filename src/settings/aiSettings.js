@@ -6,6 +6,7 @@ import { listModels } from "lib/ai/client";
 import {
 	badgeLabel,
 	byGroup,
+	DEFAULT_PROVIDER_ID,
 	PROVIDER_MAP,
 	resolveModel,
 	setProviderModel,
@@ -21,7 +22,7 @@ export default function aiSettings() {
 	const title = strings["ai settings"] || "AI assistant";
 	const values = settings.value;
 
-	const currentProviderId = values.aiProvider || "groq";
+	const currentProviderId = values.aiProvider || DEFAULT_PROVIDER_ID;
 	const currentProvider = PROVIDER_MAP[currentProviderId];
 
 	const items = [
@@ -160,7 +161,7 @@ export default function aiSettings() {
 	);
 
 	async function pickModel() {
-		const providerId = settings.value.aiProvider || "groq";
+		const providerId = settings.value.aiProvider || DEFAULT_PROVIDER_ID;
 		const provider = PROVIDER_MAP[providerId];
 		toast(strings["loading..."] || "Loading...", 3000);
 		try {

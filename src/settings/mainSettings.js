@@ -2,6 +2,8 @@ import settingsPage from "components/settingsPage";
 import confirm from "dialogs/confirm";
 import actionStack from "lib/actionStack";
 import openFile from "lib/openFile";
+import { getPremiumStatus } from "lib/premium";
+import { showSupportDialog } from "lib/premiumUI";
 import appSettings from "lib/settings";
 import settings from "lib/settings";
 import Changelog from "pages/changelog/changelog";
@@ -117,7 +119,7 @@ export default function mainSettings() {
 		{
 			key: "ai-settings",
 			text: strings["ai settings"] || "AI assistant",
-			icon: "svg:brain",
+			icon: "svg:bot",
 			info:
 				strings["settings-info-main-ai"] ||
 				"Configure AI providers and agent behavior.",
@@ -145,41 +147,6 @@ export default function mainSettings() {
 			category: categories.customizationTools,
 		},
 		{
-			key: "adsEnabled",
-			text: strings["ads"] || "Ads",
-			value: appSettings.value.adsEnabled !== false,
-			checkbox: true,
-			info:
-				strings["settings-info-ads"] ||
-				"Support XCoder with respectful ads from the community site (banner + rare interstitials, never disruptive). No AdMob.",
-			category: categories.customizationTools,
-		},
-		{
-			key: "supabaseUrl",
-			text: "Supabase URL",
-			value: appSettings.value.supabaseUrl || "",
-			valueText: (value) => value || strings.off || "Off",
-			prompt: "Supabase URL",
-			promptType: "url",
-			promptOptions: { required: false },
-			info:
-				strings["settings-info-supabase"] ||
-				"Supabase project URL (https://xxx.supabase.co) used for cloud features. Provided by the XCoder site.",
-			category: categories.customizationTools,
-		},
-		{
-			key: "supabaseAnonKey",
-			text: strings["supabase anon key"] || "Supabase anon key",
-			value: appSettings.value.supabaseAnonKey ? "••••••••" : "",
-			prompt: strings["supabase anon key"] || "Supabase anon key",
-			promptType: "text",
-			promptOptions: { required: false },
-			info:
-				strings["settings-info-supabase-key"] ||
-				"The public anon key of the project (safe on the device — the same one browsers use).",
-			category: categories.customizationTools,
-		},
-		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
 			icon: "svg:file-cog",
@@ -193,6 +160,18 @@ export default function mainSettings() {
 			icon: "svg:rotate-ccw",
 			info: strings["settings-info-main-reset"],
 			category: categories.maintenance,
+			chevron: true,
+		},
+		{
+			key: "support",
+			text: getPremiumStatus()?.active
+				? strings["support premium active"] || "Premium ativo ✓"
+				: strings["support the project"] || "Apoie o projeto",
+			icon: "svg:heart",
+			info:
+				strings["settings-info-support"] ||
+				"Doe para ativar o Premium: sem anúncios, temas exclusivos e agente IA ilimitado.",
+			category: categories.aboutXCoder,
 			chevron: true,
 		},
 		{
@@ -241,18 +220,8 @@ export default function mainSettings() {
 				await appSettings.update({ notificationsEnabled: value === true });
 				break;
 
-			case "adsEnabled":
-				await appSettings.update({ adsEnabled: value === true });
-				break;
-
-			case "supabaseUrl":
-				await appSettings.update({ supabaseUrl: String(value ?? "").trim() });
-				break;
-
-			case "supabaseAnonKey":
-				await appSettings.update({
-					supabaseAnonKey: String(value ?? "").trim(),
-				});
+			case "support":
+				showSupportDialog().catch(() => {});
 				break;
 
 			case "theme":

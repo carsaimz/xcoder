@@ -9,9 +9,15 @@
  *  - free:     services with genuinely free tiers (no credit card)
  *  - freetier: paid services that include a free tier
  *  - premium:  paid/enterprise-grade services
+ *
+ * Providers marked `noKeyRequired: true` work without ANY API key — they
+ * are the out-of-the-box experience (zero configuration, zero 401s).
  */
 
 import settings from "lib/settings";
+
+/** Provider used when the user never picked one (zero-config chat). */
+export const DEFAULT_PROVIDER_ID = "pollinations";
 
 export const GROUPS = /** @type {const} */ ({
 	free: "Free",
@@ -28,11 +34,22 @@ export const GROUPS = /** @type {const} */ ({
  * @property {string[]} models default model ids
  * @property {string} [docs] where to get an API key
  * @property {string} [note]
+ * @property {boolean} [noKeyRequired] works with no API key at all
  */
 
 /** @type {AIProvider[]} */
 export const PROVIDERS = [
 	// ---------------------------------------------------------------- free
+	{
+		id: "pollinations",
+		name: "Pollinations (sem chave)",
+		group: "free",
+		baseURL: "https://text.pollinations.ai/openai",
+		models: ["openai", "openai-fast", "openai-large", "mistral", "qwen-coder"],
+		docs: "https://pollinations.ai",
+		note: "Grátis e SEM API key — funciona de cara. Limitado a ~1 req/s e os prompts passam por um serviço público.",
+		noKeyRequired: true,
+	},
 	{
 		id: "groq",
 		name: "Groq Cloud",
@@ -371,7 +388,7 @@ export function isProviderEnabled(providerId) {
 	const prefs = getProviderPrefs(providerId);
 	if (typeof prefs.enabled === "boolean") return prefs.enabled;
 	return (
-		(settings.value?.aiProvider || "groq") === providerId ||
+		(settings.value?.aiProvider || DEFAULT_PROVIDER_ID) === providerId ||
 		Boolean(prefs.apiKey)
 	);
 }
@@ -407,7 +424,7 @@ export function resolveModel(providerId) {
 	const provider = PROVIDER_MAP[providerId];
 	const own = getProviderPrefs(providerId).model;
 	if (own) return own;
-	if ((settings.value?.aiProvider || "groq") === providerId) {
+	if ((settings.value?.aiProvider || DEFAULT_PROVIDER_ID) === providerId) {
 		const legacy = String(settings.value?.aiModel || "");
 		if (legacy) return legacy;
 	}
@@ -424,7 +441,7 @@ export function resolveModel(providerId) {
 export async function setProviderModel(providerId, model) {
 	const patch = { model: String(model || "") || undefined };
 	await updateProviderPrefs(providerId, patch);
-	if ((settings.value.aiProvider || "groq") === providerId) {
+	if ((settings.value.aiProvider || DEFAULT_PROVIDER_ID) === providerId) {
 		await settings.update({ aiModel: String(model || "") });
 	}
 }

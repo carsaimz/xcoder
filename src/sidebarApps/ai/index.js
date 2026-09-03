@@ -14,6 +14,7 @@ import { listModels, resolveBaseURL } from "lib/ai/client";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
 import {
 	badgeLabel,
+	DEFAULT_PROVIDER_ID,
 	enabledProviders,
 	isProviderEnabled,
 	modelCapabilities,
@@ -108,7 +109,7 @@ let cleanupOnHide = null;
  * @returns {Array} sidebar app descriptor
  */
 export default [
-	"svg:brain",
+	"svg:bot",
 	"ai",
 	strings["ai assistant"] || "AI",
 	initApp,
@@ -469,7 +470,7 @@ async function send() {
  */
 function currentModelSupportsImages() {
 	try {
-		const providerId = settings.value.aiProvider || "groq";
+		const providerId = settings.value.aiProvider || DEFAULT_PROVIDER_ID;
 		return Boolean(
 			modelCapabilities(providerId, resolveModel(providerId)).image,
 		);
@@ -1076,7 +1077,7 @@ function hapticTick() {
  */
 function updateModelButton() {
 	if (!$modelBtn) return;
-	const providerId = settings.value.aiProvider || "groq";
+	const providerId = settings.value.aiProvider || DEFAULT_PROVIDER_ID;
 	const provider = PROVIDER_MAP[providerId];
 	const model = resolveModel(providerId) || "—";
 	const badge = provider ? badgeLabel(provider.group) : null;
@@ -1113,7 +1114,7 @@ function updateModelButton() {
  * another enabled provider also switches to it.
  */
 async function openModelPicker() {
-	const activeId = settings.value.aiProvider || "groq";
+	const activeId = settings.value.aiProvider || DEFAULT_PROVIDER_ID;
 	const providers = enabledProviders();
 	if (!providers.length) {
 		toast(
@@ -1225,7 +1226,7 @@ async function pickModelLive() {
 		return;
 	}
 
-	let provider = PROVIDER_MAP[settings.value.aiProvider || "groq"];
+	let provider = PROVIDER_MAP[settings.value.aiProvider || DEFAULT_PROVIDER_ID];
 	if (!provider || !providers.some((p) => p.id === provider.id)) {
 		provider = providers[0];
 	} else if (providers.length > 1) {

@@ -499,7 +499,7 @@ async function loadApp() {
 	const $paletteToggler = (
 		<span
 			id="header-palette-btn"
-			className="icon palette"
+			className="icon code"
 			title={strings["command palette"] || "Command palette"}
 			attr-action="toggle-command-palette"
 			style={{ fontSize: "1.2em" }}

@@ -208,7 +208,7 @@ class Settings {
                         marketplaceUrl: "", // custom plugin marketplace registry URL (empty = default)
                         backendUrl: "", // companion backend (xcoder-backend) providing remote config (empty = off)
                         pluginsDisabled: {}, // pluginId: true/false
-                        aiProvider: "groq",
+                        aiProvider: "pollinations",
                         aiBaseUrl: "",
                         aiApiKey: "",
                         aiModel: "",
@@ -231,8 +231,8 @@ class Settings {
                         firebaseProjectId: "",
                         firebaseApiKey: "",
                         notificationsEnabled: true, // site notifications (poll /api/app/notifications)
-                        adsEnabled: true, // house ads from the community site (respectful caps)
-                        supabaseUrl: "", // Supabase project URL (Settings > Supabase)
+                        adsEnabled: true, // house ads (no UI toggle; premium never sees ads)
+                        supabaseUrl: "", // manual override — default comes from the site (/api/config)
                         supabaseAnonKey: "", // anon key — public, same as the site browser uses
                         lsp: {
                                 servers: {},

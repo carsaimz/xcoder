@@ -176,7 +176,7 @@ function createWelcomeContent() {
 						onClick={() => xcoder.exec("recent")}
 					/>
 					<ActionRow
-						icon="tune"
+						icon="code"
 						label={strings["command palette"]}
 						shortcut={kb("openCommandPalette")}
 						onClick={() => xcoder.exec("command-palette")}

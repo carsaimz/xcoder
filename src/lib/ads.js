@@ -1,3 +1,4 @@
+import { isPremium } from "lib/premium";
 import settings from "lib/settings";
 
 /**
@@ -52,10 +53,12 @@ export function registerNativeProvider(name, impl) {
 }
 
 /**
- * Whether ads may be shown right now (user toggle + site config).
+ * Whether ads may be shown right now (premium status + user toggle + site
+ * config). Premium supporters never see ads — checked first.
  * @returns {boolean}
  */
 export function adsAvailable() {
+	if (isPremium()) return false;
 	if (settings.value.adsEnabled === false) return false;
 	if (cachedAds?.enabled === false) return false;
 	return true;

@@ -1,0 +1,118 @@
+/**
+ * GitHub settings page — account hero card + list polish.
+ * Loaded only by Settings > GitHub (ghSettings.js).
+ */
+.gh-settings-page {
+	.main.list {
+		> *:not(:first-child) {
+			margin-top: 0.9rem;
+		}
+
+		// ------------------------------------------------ account hero card
+		.gh-hero {
+			display: flex;
+			align-items: center;
+			gap: 0.85rem;
+			width: 100%;
+			box-sizing: border-box;
+			padding: 1rem;
+			border-radius: 0.75rem;
+			background: linear-gradient(
+				135deg,
+				color-mix(in srgb, var(--active-color) 22%, var(--secondary-color)),
+				var(--secondary-color) 62%
+			);
+			border: 1px solid
+				color-mix(in srgb, var(--active-color) 32%, transparent);
+
+			.gh-hero-avatar {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex: none;
+				width: 52px;
+				height: 52px;
+				border-radius: 50%;
+				overflow: hidden;
+				background: color-mix(
+					in srgb,
+					var(--active-color) 34%,
+					var(--primary-color)
+				);
+				color: var(--secondary-text-color);
+				font-size: 1.4rem;
+				font-weight: 700;
+				text-transform: uppercase;
+
+				img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+					display: block;
+				}
+			}
+
+			.gh-hero-text {
+				display: flex;
+				flex-direction: column;
+				gap: 0.15rem;
+				min-width: 0;
+				flex: 1;
+
+				.gh-hero-login {
+					font-size: 1.02rem;
+					font-weight: 700;
+					color: var(--primary-color);
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				.gh-hero-status {
+					font-size: 0.84rem;
+					color: var(--secondary-text-color);
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+			}
+
+			.gh-hero-chip {
+				flex: none;
+				padding: 0.28rem 0.62rem;
+				border-radius: 999px;
+				font-size: 0.72rem;
+				font-weight: 700;
+				letter-spacing: 0.02em;
+				background: color-mix(in srgb, #f44336 24%, transparent);
+				color: #ff8a80;
+				border: 1px solid color-mix(in srgb, #f44336 42%, transparent);
+
+				&::before {
+					content: "";
+					display: inline-block;
+					width: 7px;
+					height: 7px;
+					border-radius: 50%;
+					margin-right: 5px;
+					background: currentColor;
+					vertical-align: middle;
+				}
+			}
+
+			&[data-signed="true"] .gh-hero-chip {
+				background: color-mix(in srgb, #4caf50 22%, transparent);
+				color: #81c784;
+				border-color: color-mix(in srgb, #4caf50 40%, transparent);
+			}
+		}
+
+		// buttons from the control kit keep their 44px touch height
+		[data-key="gh-signin"],
+		[data-key="gh-signout"] {
+			button {
+				width: 100%;
+			}
+		}
+	}
+}

@@ -1242,9 +1242,15 @@
     "github repo saved": "Repositório",
     "site notifications": "Notificações do site",
     "settings-info-notifications": "Recebe avisos de atualização e da comunidade enviados pelo site (no app e, com o plugin de notificações, na área de push do sistema).",
-    "ads": "Anúncios",
-    "settings-info-ads": "Apoie o XCoder com anúncios respeitosos do site da comunidade (banner + interstitials raros, nunca intrusivos). Sem AdMob.",
-    "supabase anon key": "Chave anon do Supabase",
-    "settings-info-supabase": "URL do projeto Supabase (https://xxx.supabase.co) usada nas funcionalidades de nuvem. Fornecida pelo site do XCoder.",
-    "settings-info-supabase-key": "A chave anon pública do projeto (segura no dispositivo — a mesma que os navegadores usam)."
+    "support the project": "Apoie o projeto",
+    "support premium active": "Premium ativo ✓",
+    "settings-info-support": "Doe para ativar o Premium: sem anúncios, temas exclusivos e agente IA ilimitado.",
+    "premium supporter": "Apoiador Premium",
+    "premium theme locked": "Tema exclusivo de apoiadores — doe para desbloquear ♥",
+    "ai provider key free": "Sem chave ✓",
+    "github chip connected": "Conectado",
+    "github chip offline": "Desconectado",
+    "about website": "Site",
+    "about docs": "Documentação",
+    "about website short": "Site"
 }

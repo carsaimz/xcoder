@@ -1,10 +1,14 @@
 const GITHUB_URL = "https://github.com/carsaimz/xcoder";
 
+/** Official community site (docs live there too). */
+const WEBSITE_URL = "https://xcoderapp.vercel.app";
+
 let hasPro = true; // all features are unlocked in XCoder
 
 const config = {
 	GITHUB_URL,
-	BASE_URL: GITHUB_URL,
+	WEBSITE_URL,
+	BASE_URL: WEBSITE_URL,
 	SUPPORTED_EDITOR: "cm",
 	FILE_NAME_REGEX: /^((?![:<>"\\\|\?\*]).)*$/,
 	FONT_SIZE: /^[0-9\.]{1,3}(px|rem|em|pt|mm|pc|in)$/,
@@ -33,7 +37,7 @@ const config = {
 	LOG_FILE_NAME: "XCoder.log",
 
 	get DOCS_URL() {
-		return `${GITHUB_URL}#readme`;
+		return `${WEBSITE_URL}/docs`;
 	},
 
 	get HAS_PRO() {

@@ -1,6 +1,9 @@
 import "./style.scss";
 import palette from "components/palette";
+import toast from "components/toast";
 import config from "lib/config";
+import { canUseTheme } from "lib/premium";
+import { showSupportDialog } from "lib/premiumUI";
 import appSettings from "lib/settings";
 import themes, { updateSystemThemeWatcher } from "theme/list";
 import changeEditorTheme from "../changeEditorTheme";
@@ -55,6 +58,16 @@ function onselect(value) {
 	} else {
 		if (selection.theme === "custom") {
 			CustomTheme();
+			return;
+		}
+		// supporter-only themes gate (mirrors Settings > Theme)
+		if (!canUseTheme(selection.theme)) {
+			toast(
+				strings["premium theme locked"] ||
+					"Tema exclusivo de apoiadores — doe para desbloquear \u2665",
+				4000,
+			);
+			showSupportDialog().catch(() => {});
 			return;
 		}
 		themes.apply(selection.theme, true);

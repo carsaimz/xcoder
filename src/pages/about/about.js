@@ -8,6 +8,7 @@ import select from "dialogs/select";
 import Reactive from "html-tag-js/reactive";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
+import { isPremium } from "lib/premium";
 import helpers from "utils/helpers";
 import { enhanceIcons } from "utils/iconEnhancer";
 
@@ -127,6 +128,11 @@ export default function AboutInclude() {
 					{strings.version || "Version"} {BuildInfo.version} (
 					{BuildInfo.versionCode})
 				</div>
+				{isPremium() && (
+					<div className="premium-badge">
+						♥ {strings["premium supporter"] || "Apoiador Premium"}
+					</div>
+				)}
 				<p className="about-description">
 					{strings["about description"] ||
 						"A fast, offline-first code editor and web IDE for Android. Forked from Acode, rebuilt with AI assistance, Git integration and a Linux terminal in your pocket."}
@@ -157,6 +163,26 @@ export default function AboutInclude() {
 						</div>
 					</div>
 				</div>
+				<a href={config.WEBSITE_URL} className="info-item">
+					<div className="info-item-icon">
+						<span className="icon language"></span>
+					</div>
+					<div className="info-item-text">
+						{strings["about website"] || "Website"}
+						<div className="info-item-subtext">{config.WEBSITE_URL}</div>
+					</div>
+				</a>
+				<a href={`${config.WEBSITE_URL}/docs`} className="info-item">
+					<div className="info-item-icon">
+						<span className="icon menu_book"></span>
+					</div>
+					<div className="info-item-text">
+						{strings["about docs"] || "Documentation"}
+						<div className="info-item-subtext">
+							{`${config.WEBSITE_URL}/docs`}
+						</div>
+					</div>
+				</a>
 				<a href={config.GITHUB_URL} className="info-item">
 					<div className="info-item-icon">
 						<span className="icon github"></span>
@@ -251,17 +277,23 @@ export default function AboutInclude() {
 			</div>
 
 			<div className="social-links">
+				<a href={config.WEBSITE_URL} className="social-link">
+					<div className="social-icon">
+						<span className="icon language"></span>
+					</div>
+					{strings["about website short"] || "Site"}
+				</a>
+				<a href={`${config.WEBSITE_URL}/docs`} className="social-link">
+					<div className="social-icon">
+						<span className="icon menu_book"></span>
+					</div>
+					{strings.documentation || "Docs"}
+				</a>
 				<a href={config.GITHUB_URL} className="social-link">
 					<div className="social-icon">
 						<span className="icon github"></span>
 					</div>
 					GitHub
-				</a>
-				<a href={`${config.GITHUB_URL}/wiki`} className="social-link">
-					<div className="social-icon">
-						<span className="icon search"></span>
-					</div>
-					{strings.documentation || "Docs"}
 				</a>
 			</div>
 		</main>

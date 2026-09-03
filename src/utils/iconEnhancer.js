@@ -48,6 +48,9 @@ const GLYPHS = {
 	color_lenspalette: "palette",
 	// about page (src/pages/about/about.js)
 	update: "refresh-cw",
+	language: "globe",
+	menu_book: "book-open",
+	tune: "sliders-horizontal",
 	phone_android: "smartphone",
 	github: "github",
 	error_outline: "circle-alert",

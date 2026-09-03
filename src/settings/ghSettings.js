@@ -6,6 +6,7 @@ import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
 import settings from "lib/settings";
+import "./gh-settings.scss";
 
 /**
  * XCoder GitHub settings — account (device-flow sign in), token (PAT),
@@ -97,7 +98,79 @@ export default function ghSettings() {
 		pageClassName: "gh-settings-page",
 	});
 	page.show();
+	mountHero(page.getListElement?.());
+	refresh();
 	return page;
+
+	/**
+	 * Builds (once) and inserts the account hero card above the list.
+	 * @param {HTMLElement} [$list]
+	 */
+	function mountHero($list) {
+		if (!$list || $list.get(".gh-hero")) return;
+		const $hero = (
+			<div className="gh-hero" data-signed="false">
+				<div className="gh-hero-avatar" aria-hidden="true">
+					<span className="gh-hero-letter">G</span>
+				</div>
+				<div className="gh-hero-text">
+					<span className="gh-hero-login">GitHub</span>
+					<span className="gh-hero-status">
+						{strings["not signed in"] || "Not signed in"}
+					</span>
+				</div>
+				<span className="gh-hero-chip" />
+			</div>
+		);
+		$list.prepend($hero);
+	}
+
+	/**
+	 * Re-renders the hero card contents from current settings.
+	 */
+	function refreshHero() {
+		const $list = page.getListElement?.();
+		const $hero = $list?.get(".gh-hero");
+		if (!$hero) return;
+		const values = settings.value;
+		const signedIn = Boolean(values.ghUserLogin || values.ghToken);
+
+		$hero.dataset.signed = String(signedIn);
+		const $avatar = $hero.get(".gh-hero-avatar");
+		if ($avatar) {
+			$avatar.textContent = "";
+			if (values.ghUserAvatar) {
+				const $img = (
+					<img src={values.ghUserAvatar} alt={values.ghUserLogin || ""} />
+				);
+				$img.onerror = () => {
+					$img.remove();
+					$avatar.append((values.ghUserLogin || "G").charAt(0).toUpperCase());
+				};
+				$avatar.append($img);
+			} else {
+				$avatar.append((values.ghUserLogin || "G").charAt(0).toUpperCase());
+			}
+		}
+		const $login = $hero.get(".gh-hero-login");
+		if ($login) {
+			$login.textContent = values.ghUserLogin || "GitHub";
+		}
+		const $status = $hero.get(".gh-hero-status");
+		if ($status) {
+			$status.textContent = values.ghUserLogin
+				? values.ghUserName || `@${values.ghUserLogin}`
+				: signedIn
+					? strings["github token only"] || "Token set — no profile"
+					: strings["not signed in"] || "Not signed in";
+		}
+		const $chip = $hero.get(".gh-hero-chip");
+		if ($chip) {
+			$chip.textContent = signedIn
+				? strings["github chip connected"] || "Connected"
+				: strings["github chip offline"] || "Offline";
+		}
+	}
 
 	/**
 	 * Builds the item list from current settings.
@@ -249,6 +322,7 @@ export default function ghSettings() {
 	function refresh() {
 		const $list = page.getListElement?.();
 		if (!$list) return;
+		refreshHero();
 		const values = settings.value;
 		const signedIn = Boolean(values.ghUserLogin || values.ghToken);
 

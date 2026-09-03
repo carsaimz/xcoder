@@ -25,6 +25,7 @@ import actionStack from "lib/actionStack";
 import { listModels } from "lib/ai/client";
 import {
 	badgeLabel,
+	DEFAULT_PROVIDER_ID,
 	getProviderPrefs,
 	isProviderEnabled,
 	keyShapeWarning,
@@ -127,13 +128,16 @@ export default function aiProviders() {
 
 		const render = () => {
 			const prefs = getProviderPrefs(id);
-			const active = (settings.value.aiProvider || "groq") === id;
+			const active = (settings.value.aiProvider || DEFAULT_PROVIDER_ID) === id;
 			const enabled = isProviderEnabled(id);
 			const keyOwner = prefs.apiKey
 				? "own"
 				: settings.value.aiApiKey
 					? "global"
 					: "none";
+			// keyless providers: no key is EXPECTED, not a warning
+			const noKeyNeeded =
+				Boolean(provider.noKeyRequired) && keyOwner === "none";
 			const autonomy = prefs.autonomy || settings.value.aiAutonomy || "safe";
 			const maxTokens = resolveMaxTokens(id);
 			const status = prefs.status || "idle";
@@ -142,7 +146,7 @@ export default function aiProviders() {
 			$card.dataset.active = String(active);
 			$card.dataset.enabled = String(enabled);
 			$card.dataset.expanded = $card.dataset.expanded || "false";
-			$card.dataset.nokey = String(keyOwner === "none");
+			$card.dataset.nokey = String(keyOwner === "none" && !noKeyNeeded);
 
 			const $chip = (
 				<span className={`ai-pchip is-${!enabled ? "off" : status}`}>
@@ -166,14 +170,16 @@ export default function aiProviders() {
 			const $summary = (
 				<div className="ai-psummary">
 					<span
-						className={`ai-psummary-item is-key${keyOwner === "none" ? " warn" : ""}`}
+						className={`ai-psummary-item is-key${keyOwner === "none" && !noKeyNeeded ? " warn" : ""}`}
 					>
 						<span className="icon vpn_key" />
 						{keyOwner === "own"
 							? strings["ai provider key own"] || "Own key"
 							: keyOwner === "global"
 								? strings["ai provider key global"] || "Global key"
-								: strings["ai provider key none"] || "No key"}
+								: noKeyNeeded
+									? strings["ai provider key free"] || "No key needed ✓"
+									: strings["ai provider key none"] || "No key"}
 					</span>
 					<span className="ai-psummary-item">
 						{strings["ai max tokens"] || "Max tokens"}: {maxTokens}
@@ -359,7 +365,7 @@ export default function aiProviders() {
 			);
 
 			function selectProvider() {
-				if ((settings.value.aiProvider || "groq") === id) return;
+				if ((settings.value.aiProvider || DEFAULT_PROVIDER_ID) === id) return;
 				if (!isProviderEnabled(id)) {
 					// tapping a disabled card enables it first
 					setProviderEnabled(id, true)
@@ -388,7 +394,10 @@ export default function aiProviders() {
 				const next = !isProviderEnabled(id);
 				setProviderEnabled(id, next)
 					.then(() => {
-						if (!next && (settings.value.aiProvider || "groq") === id) {
+						if (
+							!next &&
+							(settings.value.aiProvider || DEFAULT_PROVIDER_ID) === id
+						) {
 							// cannot keep a disabled provider selected
 							const fallback = PROVIDERS.find(
 								(candidate) =>

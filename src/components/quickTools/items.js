@@ -31,7 +31,7 @@ export default [
 	item("equal", "letters", "insert", "=", "="),
 	item("slash", "letters", "insert", "/", "/"),
 	item("exclamation", "letters", "insert", "!", "!"),
-	item("command-palette", "keyboard_control", "command", "openCommandPalette"),
+	item("command-palette", "code", "command", "openCommandPalette"),
 	item("alt-key", "letters", "alt", undefined, "alt", false),
 	item("meta-key", "letters", "meta", undefined, "meta", false),
 	item("home-key", "letters", "key", 36, "home", true),

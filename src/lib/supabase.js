@@ -1,14 +1,18 @@
+import { backendConfig } from "lib/backend";
 import settings from "lib/settings";
 
 /**
  * Minimal Supabase client (REST — no SDK dependency).
  *
- * Prepared so the app can use the same Supabase project as the community
- * site as soon as the user provides the credentials (Settings > Supabase):
- * account sync, user data, cloud backups and future dynamic features.
+ * Credentials resolve in this order:
+ *  1. manual override in settings.json (`supabaseUrl`/`supabaseAnonKey`,
+ *     kept for self-hosters — no UI anymore);
+ *  2. the community site remote config (`/api/config` → `supabase.url` +
+ *     `supabase.anonKey`), so the project is configured ON THE SITE and
+ *     served to every app install with zero user setup.
  *
- * Only the ANON key is stored on the device — exactly like a browser on
- * the site. All privileged work keeps happening server-side (site).
+ * Only the ANON key reaches the device — exactly like a browser on the
+ * site. All privileged work keeps happening server-side (site).
  *
  * Endpoints used (Supabase REST, all CORS-friendly):
  *  - POST {url}/auth/v1/token?grant_type=password
@@ -39,7 +43,11 @@ export function supabaseConfigured() {
  * @returns {string} project URL without trailing slash
  */
 export function supabaseUrl() {
-	return String(settings.value?.supabaseUrl || "")
+	const local = String(settings.value?.supabaseUrl || "")
+		.trim()
+		.replace(/\/+$/, "");
+	if (local) return local;
+	return String(backendConfig()?.supabase?.url || "")
 		.trim()
 		.replace(/\/+$/, "");
 }
@@ -48,7 +56,9 @@ export function supabaseUrl() {
  * @returns {string} anon (publishable) key
  */
 export function supabaseAnonKey() {
-	return String(settings.value?.supabaseAnonKey || "").trim();
+	const local = String(settings.value?.supabaseAnonKey || "").trim();
+	if (local) return local;
+	return String(backendConfig()?.supabase?.anonKey || "").trim();
 }
 
 // -------------------------------------------------------------------- auth

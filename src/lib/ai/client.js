@@ -24,25 +24,46 @@ const EXTRA_AUTH_HEADERS = /** @type {const} */ ({
  * @param {string} baseURL
  * @param {string} path
  */
-function endpoint(baseURL, path) {
+export function endpoint(baseURL, path) {
 	const base = String(baseURL || "").replace(/\/+$/, "");
 	return `${base}/${path.replace(/^\/+/, "")}`;
+}
+
+/**
+ * Cleans a pasted API key: surrounding whitespace, wrapping quotes and
+ * hidden newlines are the #1 real-world cause of "falha de autenticação"
+ * right after a wrong-provider key (the provider literally receives
+ * " Bearer sk-...\n" and answers 401).
+ * @param {string} key
+ * @returns {string}
+ */
+export function sanitizeApiKey(key) {
+	let value = String(key || "");
+	value = value.replace(/[\r\n\t]/g, "").trim();
+	if (
+		(value.startsWith('"') && value.endsWith('"') && value.length > 1) ||
+		(value.startsWith("'") && value.endsWith("'") && value.length > 1)
+	) {
+		value = value.slice(1, -1).trim();
+	}
+	return value;
 }
 
 /**
  * @param {string} baseURL
  * @param {string} apiKey
  */
-function buildHeaders(baseURL, apiKey, providerId) {
+export function buildHeaders(baseURL, apiKey, providerId) {
 	/** @type {Record<string, string>} */
 	const headers = { "Content-Type": "application/json" };
-	if (apiKey) {
-		headers[API_KEY_HEADER] = `Bearer ${apiKey}`;
-		// OpenRouter etiquette
-		headers["HTTP-Referer"] = "https://github.com/carsaimz/xcoder";
-		headers["X-Title"] = "XCoder";
+	const cleanKey = sanitizeApiKey(apiKey);
+	// OpenRouter etiquette (harmless everywhere else)
+	headers["HTTP-Referer"] = "https://github.com/carsaimz/xcoder";
+	headers["X-Title"] = "XCoder";
+	if (cleanKey) {
+		headers[API_KEY_HEADER] = `Bearer ${cleanKey}`;
 		const extra = providerId && EXTRA_AUTH_HEADERS[providerId];
-		if (extra) Object.assign(headers, extra(apiKey));
+		if (extra) Object.assign(headers, extra(cleanKey));
 	}
 	return headers;
 }
@@ -164,55 +185,100 @@ function nativeOrFetchJson({ url, headers, method, body, signal }) {
 }
 
 /**
+ * Mirrors the request headers into the plugin's host-scoped global headers
+ * before every send. Some advanced-http builds lose per-call headers in
+ * specific paths (redirects, aborted pooled connections); the host-scoped
+ * store is applied by getMergedHeaders() on the Java side too, so auth
+ * always rides along. Values are overwritten on every call, so a changed
+ * key or provider never goes stale.
+ * @param {string} url
+ * @param {Record<string, string>} headers
+ */
+function mirrorHeadersToHost(url, headers) {
+	try {
+		const host = /^https?:\/\/([^/?#]+)/i.exec(url)?.[1];
+		if (!host || !cordova.plugin?.http?.setHeader) return;
+		for (const [name, value] of Object.entries(headers)) {
+			cordova.plugin.http.setHeader(host, name, value);
+		}
+		// keyless request on a host previously used WITH a key: drop
+		// the stale global Authorization so it never leaks back in
+		if (!headers.Authorization) {
+			cordova.plugin.http.setHeader(host, "Authorization", null);
+		}
+	} catch {
+		/* best effort — per-call headers still apply */
+	}
+}
+
+/**
  * @param {object} opts
  */
 function nativeRequest({ url, headers, method, body }) {
-	return new Promise((resolve, reject) => {
-		cordova.plugin.http.sendRequest(
-			url,
-			{
-				method,
-				headers,
-				data: body,
-				// CRITICAL: the plugin's default serializer is
-				// "urlencoded", which silently converts the JSON
-				// body into a form-encoded string
-				// ("...&messages=[object Object]") while the
-				// header still says application/json — every
-				// provider then answers 400/401. "json" sends
-				// the body exactly as built above.
-				serializer: "json",
-				responseType: "json",
-				timeout: 120000,
-			},
-			(response) => {
-				let data = response.data;
-				if (typeof data === "string") {
-					try {
-						data = JSON.parse(data);
-					} catch (error) {
-						reject(new Error("Invalid JSON from AI endpoint"));
-						return;
+	const attempt = () =>
+		new Promise((resolve, reject) => {
+			cordova.plugin.http.sendRequest(
+				url,
+				{
+					method,
+					headers,
+					data: body,
+					// CRITICAL: the plugin's default serializer is
+					// "urlencoded", which silently converts the JSON
+					// body into a form-encoded string
+					// ("...&messages=[object Object]") while the
+					// header still says application/json — every
+					// provider then answers 400/401. "json" sends
+					// the body exactly as built above.
+					serializer: "json",
+					responseType: "json",
+					timeout: 120000,
+				},
+				(response) => {
+					let data = response.data;
+					if (typeof data === "string") {
+						try {
+							data = JSON.parse(data);
+						} catch (error) {
+							reject(new Error("Invalid JSON from AI endpoint"));
+							return;
+						}
 					}
-				}
-				resolve(data);
-			},
-			(error) => {
-				let detail = error?.error || "";
-				if (detail && typeof detail !== "string") {
-					try {
-						detail = detail?.error?.message || JSON.stringify(detail);
-					} catch {
-						detail = String(detail);
+					resolve(data);
+				},
+				(error) => {
+					let detail = error?.error || "";
+					if (detail && typeof detail !== "string") {
+						try {
+							detail = detail?.error?.message || JSON.stringify(detail);
+						} catch {
+							detail = String(detail);
+						}
 					}
-				}
-				reject(
-					new Error(
-						`${error?.status || "Network"}: ${detail || error?.statusText || "request failed"}`,
-					),
-				);
-			},
-		);
+					reject(
+						new Error(
+							`${error?.status || "Network"}: ${detail || error?.statusText || "request failed"}`,
+						),
+					);
+				},
+			);
+		});
+
+	// First pass: per-call headers (+ mirrored host headers).
+	mirrorHeadersToHost(url, headers);
+	return attempt().catch(async (firstError) => {
+		const status = /^\d{3}/.exec(String(firstError?.message || ""))?.[0];
+		if (status !== "401" && status !== "403") throw firstError;
+
+		// Second pass: re-mirror explicitly and retry ONCE — covers
+		// plugin builds where the first per-call header set is
+		// dropped (fresh host, redirect, pooled connection).
+		mirrorHeadersToHost(url, headers);
+		try {
+			return await attempt();
+		} catch (secondError) {
+			throw secondError;
+		}
 	});
 }
 
@@ -260,5 +326,7 @@ export default {
 	listModels,
 	resolveBaseURL,
 	endpoint,
+	buildHeaders,
+	sanitizeApiKey,
 	Url,
 };

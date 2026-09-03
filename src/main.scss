@@ -7,6 +7,7 @@
 @use "./styles/markdown.scss";
 @use "./styles/codemirror.scss";
 @use "./styles/notification.scss";
+@use "./styles/support.scss";
 
 :root {
   --scrollbar-width: 4px;

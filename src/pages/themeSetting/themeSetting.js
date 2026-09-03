@@ -13,6 +13,8 @@ import alert from "dialogs/alert";
 import Ref from "html-tag-js/ref";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
+import { canUseTheme, isThemePremium } from "lib/premium";
+import { showSupportDialog } from "lib/premiumUI";
 import appSettings from "lib/settings";
 import CustomTheme from "pages/customTheme";
 import { updateActiveTerminals } from "settings/terminalSettings";
@@ -122,8 +124,9 @@ export default function () {
 			const $item = (
 				<Item
 					name={themeSummary.name}
-						isCurrent={isCurrentTheme}
+					isCurrent={isCurrentTheme}
 					swatches={getAppThemeSwatches(theme)}
+					isPremium={isThemePremium(theme.id)}
 					onclick={() => setAppTheme(theme)}
 				/>
 			);
@@ -314,6 +317,17 @@ export default function () {
 
 		if (theme.id === "custom") {
 			CustomTheme();
+			return;
+		}
+
+		// supporter-only themes: nudge to the support dialog instead
+		if (!canUseTheme(theme.id)) {
+			toast(
+				strings["premium theme locked"] ||
+					"Tema exclusivo de apoiadores — doe para desbloquear ♥",
+				4000,
+			);
+			showSupportDialog().catch(() => {});
 			return;
 		}
 
