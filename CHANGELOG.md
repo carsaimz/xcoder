@@ -3,6 +3,15 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.13] - 2026-09-03
+
+### Added
+- Keyless AI (Pollinations default), premium/support system, ads decision, GitHub hero, hardened 401 diagnostics, site links, icon updates
+
+### Fixed
+- Base32 alphabet had 31 chars — index 31 resolved to undefined inside codes
+
+
 ## [1.4.12] - 2026-09-03
 
 ### Added
