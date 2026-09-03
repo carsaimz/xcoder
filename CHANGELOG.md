@@ -3,6 +3,17 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.12] - 2026-09-03
+
+### Added
+- Site notifications, house ads, Supabase hooks, Firebase -> analytics+crashlytics
+- Dedicated GitHub settings — account, token, repositories, branch
+
+### Fixed
+- Purge old icon leftovers — orphan about wordmark, fastlane icon, preview favicon
+- Native JSON serializer (400/401 root cause), strict connection test, key-shape diagnostics, artifacts panel, attachments
+
+
 ## [1.4.11] - 2026-09-03
 
 ### Added
