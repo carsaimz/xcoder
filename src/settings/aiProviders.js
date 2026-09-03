@@ -27,6 +27,7 @@ import {
 	badgeLabel,
 	getProviderPrefs,
 	isProviderEnabled,
+	keyShapeWarning,
 	PROVIDER_MAP,
 	PROVIDERS,
 	resolveApiKey,
@@ -157,6 +158,11 @@ export default function aiProviders() {
 				</span>
 			);
 
+			// warn when the key in use looks like it belongs to another
+			// provider (gsk_… key on the Gemini card etc.) — the top cause
+			// of "falha de autenticação"
+			const keyWarn = keyShapeWarning(id, resolveApiKey(id));
+
 			const $summary = (
 				<div className="ai-psummary">
 					<span
@@ -181,6 +187,12 @@ export default function aiProviders() {
 					</span>
 				</div>
 			);
+
+			const $keyWarn = keyWarn ? (
+				<div className="ai-pkeywarn" role="alert">
+					{keyWarn}
+				</div>
+			) : null;
 
 			// ---- advanced (collapsible) section ----------------------------
 			const effectiveTokens = maxTokens;
@@ -291,6 +303,7 @@ export default function aiProviders() {
 						{$chip}
 					</div>
 					{$summary}
+					{$keyWarn}
 					<div className="ai-pactions">
 						<button
 							className={`ai-pbtn power${enabled ? " on" : ""}`}
@@ -589,19 +602,27 @@ export default function aiProviders() {
 		}
 		$cardEl.dataset.testing = "true";
 		let ok = false;
+		/** @type {string} the real provider answer (status + body) on failure */
+		let failReason = "";
 		try {
+			// strict: true makes HTTP errors (401 bad key, 404 wrong base
+			// url, 429 quota...) THROW instead of resolving to [] — the
+			// test used to always report "Connected".
 			const models = await Promise.race([
 				listModels({
 					baseURL: resolveBaseURLFor(provider, providerId),
 					apiKey: resolveApiKey(providerId),
+					providerId,
+					strict: true,
 				}),
 				new Promise((_, reject) =>
 					setTimeout(() => reject(new Error("timeout")), TEST_TIMEOUT),
 				),
 			]);
 			ok = Array.isArray(models);
-		} catch {
+		} catch (error) {
 			ok = false;
+			failReason = String(error?.message || error).slice(0, 140);
 		}
 		await updateProviderPrefs(providerId, {
 			status: ok ? "connected" : "offline",
@@ -609,12 +630,19 @@ export default function aiProviders() {
 		});
 		delete $cardEl.dataset.testing;
 		render();
-		toast(
-			ok
-				? `${provider?.name || providerId}: ${strings["ai provider connected"] || "Connected"}`
-				: `${provider?.name || providerId}: ${strings["ai provider offline"] || "Offline"}`,
-			2500,
-		);
+		if (ok) {
+			toast(
+				`${provider?.name || providerId}: ${strings["ai provider connected"] || "Connected"}`,
+				2500,
+			);
+		} else {
+			const warn = keyShapeWarning(providerId, resolveApiKey(providerId));
+			const extra = failReason ? ` — ${failReason}` : "";
+			toast(
+				`${provider?.name || providerId}: ${strings["ai provider offline"] || "Offline"}${extra}${warn ? ` ${warn}` : ""}`,
+				4500,
+			);
+		}
 	}
 
 	/**

@@ -5,6 +5,11 @@ import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import { Agent } from "lib/ai/agent";
+import {
+	buildUserContent,
+	collectArtifacts,
+	formatTokenCount,
+} from "lib/ai/artifacts";
 import { listModels, resolveBaseURL } from "lib/ai/client";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
 import {
@@ -35,6 +40,7 @@ import {
 	SLASH_COMMANDS,
 } from "lib/ai/slashCommands";
 import vshell from "lib/ai/vshell";
+import openFile from "lib/openFile";
 import settings from "lib/settings";
 import Url from "utils/Url";
 
@@ -84,8 +90,16 @@ let $modelBtn = null;
 let $providerStrip = null;
 /** @type {HTMLElement} */
 let $modeTrack = null;
-/** @type {HTMLElement} */
+/** @type {HTMLElement | null} */
 let $modeFooter = null;
+/** @type {HTMLElement | null} */
+let $artifactsBar = null;
+/** @type {HTMLElement | null} */
+let $artifactsPanel = null;
+/** @type {HTMLElement | null} */
+let $attachRow = null;
+/** @type {Array<import("lib/ai/artifacts").Attachment>} */
+let attachments = [];
 /** @type {Function} */
 let cleanupOnHide = null;
 
@@ -243,6 +257,20 @@ function buildUi() {
 		/>
 	);
 
+	// Artifacts bar + panel — shows files written, commands run, tools
+	// used and tokens consumed by the agent (tap the bar to open/close)
+	$artifactsBar = (
+		<div
+			className="ai-artifacts-bar"
+			role="button"
+			onclick={toggleArtifactsPanel}
+			style="display:none"
+		/>
+	);
+	$artifactsPanel = (
+		<div className="ai-artifacts-panel scroll" style="display:none" />
+	);
+
 	$messages = (
 		<div className="ai-messages scroll" ontouchstart={handleTouch}></div>
 	);
@@ -298,10 +326,24 @@ function buildUi() {
 		</button>
 	);
 
+	const $attachBtn = (
+		<button
+			className="ai-attach"
+			title={strings["ai attach"] || "Attach files or images"}
+			onclick={attachFlow}
+		>
+			<span className="icon add"></span>
+		</button>
+	);
+
+	$attachRow = <div className="ai-attach-row" style="display:none" />;
+
 	const $composer = (
 		<div className="ai-composer">
 			{$slashMenu}
+			{$attachRow}
 			<div className="ai-composer-row">
+				{$attachBtn}
 				{$input}
 				{$send}
 			</div>
@@ -313,6 +355,8 @@ function buildUi() {
 			{$header}
 			{$sessionBar}
 			{$providerStrip}
+			{$artifactsBar}
+			{$artifactsPanel}
 			{$messages}
 			{$status}
 			{$modeFooter}
@@ -373,10 +417,24 @@ async function send() {
 	const raw = ($input.value || "").trim();
 	if (!raw || running) return;
 
+	// image attachments need a vision-capable model
+	let pending = [...attachments];
+	const hasImages = pending.some((item) => item.type === "image");
+	if (hasImages && !currentModelSupportsImages()) {
+		toast(
+			strings["ai no vision"] ||
+				"The active model has no vision — images were dropped",
+			3500,
+		);
+		pending = pending.filter((item) => item.type !== "image");
+	}
+
 	$input.value = "";
 	autosize();
 	$slashMenu.style.display = "none";
 	$slashMenu.content = "";
+	attachments = [];
+	renderAttachRow();
 
 	// slash command expansion uses the live editor context (selection/file)
 	const expanded = expandSlashCommand(raw, getEditorContext());
@@ -391,12 +449,356 @@ async function send() {
 
 	try {
 		setRunning(true);
-		await agent.run(text);
+		await agent.run(text, { attachments: pending });
 	} catch (error) {
 		handleEvent({ type: "error", payload: error.message || String(error) });
 	} finally {
 		setRunning(false);
 		persist();
+		updateArtifactsBar();
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Attachments + artifacts (files written, commands, tools, tokens)
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether the currently selected provider/model accepts image input.
+ * @returns {boolean}
+ */
+function currentModelSupportsImages() {
+	try {
+		const providerId = settings.value.aiProvider || "groq";
+		return Boolean(
+			modelCapabilities(providerId, resolveModel(providerId)).image,
+		);
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Attachment chips rendered inside a user message bubble.
+ * @param {Array<import("lib/ai/artifacts").Attachment>} [list]
+ * @returns {HTMLElement | null}
+ */
+function renderAttachmentChips(list) {
+	if (!Array.isArray(list) || !list.length) return null;
+	const $wrap = <div className="ai-attach-chips" />;
+	for (const item of list) {
+		if (!item) continue;
+		if (item.type === "image" && item.dataUrl) {
+			$wrap.append(
+				<img
+					className="ai-attach-thumb"
+					src={item.dataUrl}
+					alt={item.name || "image"}
+				/>,
+			);
+		} else if (item.type === "file" && item.path) {
+			$wrap.append(
+				<span className="ai-attach-chip">
+					<span className="icon code" />
+					{item.path}
+				</span>,
+			);
+		}
+	}
+	return $wrap.children.length ? $wrap : null;
+}
+
+/**
+ * "+" button flow: attach the active file, a workspace file by path or
+ * an image from the device gallery/camera.
+ */
+async function attachFlow() {
+	const manager = window.editorManager;
+	const active = manager?.activeFile;
+	const options = [
+		["active", strings["ai attach active"] || "Attach active file", "code"],
+		["path", strings["ai attach path"] || "Attach workspace file", "folder"],
+		["image", strings["ai attach image"] || "Attach image", "image"],
+	];
+
+	const choice = await select(
+		strings["ai attach"] || "Attach files or images",
+		active ? options : options.slice(1),
+	);
+	if (!choice) return;
+
+	if (choice === "active" && active) {
+		const root = vshell.getRoot();
+		let path = active.uri || active.filename || "active file";
+		if (root && path.startsWith(root)) {
+			path = path.slice(root.length).replace(/^\/+/, "") || path;
+		}
+		attachments.push({ type: "file", path });
+	} else if (choice === "path") {
+		const root = vshell.getRoot();
+		const value = await prompt(
+			strings["ai attach path"] || "Workspace file path",
+			"",
+			"text",
+		);
+		if (value === null) return;
+		const path = String(value).trim().replace(/^\/+/, "");
+		if (!path) return;
+		const uri = root ? Url.join(root, path) : path;
+		try {
+			if (!(await fsOperation(uri).exists())) {
+				toast(
+					strings["ai attach missing"] || "File not found in workspace",
+					2500,
+				);
+				return;
+			}
+		} catch {
+			/* fs unavailable — keep the reference anyway */
+		}
+		attachments.push({ type: "file", path });
+	} else if (choice === "image") {
+		const image = await pickImageFile();
+		if (image) attachments.push(image);
+	}
+
+	renderAttachRow();
+}
+
+/**
+ * Opens the system image picker and reads the image as a data URL.
+ * @returns {Promise<import("lib/ai/artifacts").Attachment | null>}
+ */
+function pickImageFile() {
+	return new Promise((resolve) => {
+		const $file = <input type="file" accept="image/*" style="display:none" />;
+		$file.onchange = () => {
+			const file = $file.files?.[0];
+			cleanup();
+			if (!file) return resolve(null);
+			if (file.size > 4 * 1024 * 1024) {
+				toast(
+					strings["ai attach too large"] || "Image is larger than 4 MB",
+					3000,
+				);
+				return resolve(null);
+			}
+			const reader = new FileReader();
+			reader.onload = () =>
+				resolve({
+					type: "image",
+					name: file.name,
+					dataUrl: String(reader.result),
+				});
+			reader.onerror = () => resolve(null);
+			reader.readAsDataURL(file);
+		};
+		const cleanup = () => setTimeout(() => $file.remove(), 0);
+		document.body.append($file);
+		$file.click();
+	});
+}
+
+/**
+ * Renders the pending attachment chips above the input.
+ */
+function renderAttachRow() {
+	if (!$attachRow) return;
+	if (!attachments.length) {
+		$attachRow.style.display = "none";
+		$attachRow.content = "";
+		return;
+	}
+	$attachRow.content = attachments.map((item, index) => (
+		<span
+			className={`ai-attach-chip pending${item.type === "image" ? " image" : ""}`}
+			role="button"
+			onclick={() => {
+				attachments.splice(index, 1);
+				renderAttachRow();
+			}}
+		>
+			{item.type === "image" && item.dataUrl ? (
+				<img
+					className="ai-attach-thumb"
+					src={item.dataUrl}
+					alt={item.name || "image"}
+				/>
+			) : (
+				<span className="icon code" />
+			)}
+			<span className="ai-attach-name">
+				{item.type === "file" ? item.path : item.name || "image"}
+			</span>
+			<span className="ai-attach-remove">✕</span>
+		</span>
+	));
+	$attachRow.style.display = "flex";
+}
+
+/**
+ * Refreshes the compact artifacts bar (files · commands · tools · tokens)
+ * from the current transcript.
+ */
+function updateArtifactsBar() {
+	if (!$artifactsBar) return;
+	const data = collectArtifacts(events);
+	const toolCount = Object.values(data.tools).reduce((sum, n) => sum + n, 0);
+
+	if (
+		!data.files.length &&
+		!data.commands.length &&
+		!toolCount &&
+		!data.tokens.total
+	) {
+		$artifactsBar.style.display = "none";
+		$artifactsBar.content = "";
+		return;
+	}
+
+	$artifactsBar.content = [
+		<span className="ai-artifacts-label">
+			{strings["ai artifacts"] || "Artifacts"}
+		</span>,
+		data.files.length ? (
+			<span className="ai-artifacts-chip">
+				<span className="icon edit" />
+				{data.files.length}
+			</span>
+		) : null,
+		data.commands.length ? (
+			<span className="ai-artifacts-chip">
+				<span className="icon play_arrow" />
+				{data.commands.length}
+			</span>
+		) : null,
+		toolCount ? (
+			<span className="ai-artifacts-chip">
+				<span className="icon wand" />
+				{toolCount}
+			</span>
+		) : null,
+		data.tokens.total ? (
+			<span className="ai-artifacts-chip is-tokens">
+				{formatTokenCount(data.tokens.total)} tk
+			</span>
+		) : null,
+		<span className="icon expand_more ai-artifacts-arrow" />,
+	];
+	$artifactsBar.style.display = "flex";
+}
+
+/**
+ * Opens/closes the artifacts panel.
+ */
+function toggleArtifactsPanel() {
+	if (!$artifactsPanel) return;
+	const hidden = $artifactsPanel.style.display === "none";
+	if (hidden) {
+		renderArtifactsPanel();
+		$artifactsPanel.style.display = "block";
+		$artifactsBar?.classList?.add("open");
+	} else {
+		$artifactsPanel.style.display = "none";
+		$artifactsBar?.classList?.remove("open");
+	}
+}
+
+/**
+ * Builds the artifacts panel content from the transcript.
+ */
+function renderArtifactsPanel() {
+	const data = collectArtifacts(events);
+	$artifactsPanel.content = "";
+
+	const toolCount = Object.values(data.tools).reduce((sum, n) => sum + n, 0);
+	if (!data.files.length && !data.commands.length && !toolCount) {
+		$artifactsPanel.append(
+			<div className="ai-artifacts-empty">
+				{strings["ai artifacts empty"] || "Nothing generated yet in this chat"}
+			</div>,
+		);
+		return;
+	}
+
+	if (data.files.length) {
+		$artifactsPanel.append(
+			<div className="ai-artifacts-head">
+				{strings["ai artifacts files"] || "Files"}
+			</div>,
+		);
+		for (const file of data.files) {
+			$artifactsPanel.append(
+				<div
+					className={`ai-artifacts-row${file.ok ? "" : " failed"}`}
+					role="button"
+					onclick={() => openArtifactFile(file)}
+				>
+					<span className="ai-artifact-action">{file.action}</span>
+					<span className="ai-artifact-path">{file.path}</span>
+					<span className="ai-tool-state">{file.ok ? "✓" : "✗"}</span>
+				</div>,
+			);
+		}
+	}
+
+	if (data.commands.length) {
+		$artifactsPanel.append(
+			<div className="ai-artifacts-head">
+				{strings["ai artifacts commands"] || "Commands"}
+			</div>,
+		);
+		for (const command of data.commands) {
+			$artifactsPanel.append(
+				<div className={`ai-artifacts-row${command.ok ? "" : " failed"}`}>
+					<span className="ai-artifact-action">
+						{command.tool === "run_js" ? "js" : "sh"}
+					</span>
+					<span className="ai-artifact-path">{command.command}</span>
+					<span className="ai-tool-state">{command.ok ? "✓" : "✗"}</span>
+				</div>,
+			);
+		}
+	}
+
+	if (toolCount) {
+		$artifactsPanel.append(
+			<div className="ai-artifacts-head">
+				{strings["ai artifacts tools"] || "Tools"}
+			</div>,
+		);
+		const $tools = <div className="ai-artifacts-toolchips" />;
+		for (const [name, count] of Object.entries(data.tools)) {
+			$tools.append(
+				<span className="ai-artifacts-toolchip">
+					{name}
+					{count > 1 ? ` ×${count}` : ""}
+				</span>,
+			);
+		}
+		$artifactsPanel.append($tools);
+	}
+}
+
+/**
+ * Opens a file written by the agent in the editor.
+ * @param {{path: string, action: string}} file
+ */
+async function openArtifactFile(file) {
+	if (file.action === "deleted") {
+		toast(strings["ai artifacts deleted"] || "This file was deleted", 2200);
+		return;
+	}
+	try {
+		const root = vshell.getRoot();
+		if (!root) {
+			toast(strings["ai artifacts no folder"] || "Open a folder first", 2200);
+			return;
+		}
+		const uri = Url.join(root, file.path);
+		await openFile(uri);
+	} catch (error) {
+		toast(String(error?.message || error), 2500);
 	}
 }
 
@@ -448,6 +850,7 @@ function ensureTitle(rawText) {
 function handleEvent(event) {
 	if (event.type === "tool") {
 		updateToolRow(event);
+		updateArtifactsBar();
 		return;
 	}
 	if (event.type === "status") {
@@ -457,11 +860,21 @@ function handleEvent(event) {
 				: strings.thinking || "Thinking...";
 		return;
 	}
+	if (event.type === "usage") {
+		events.push({ type: "usage", payload: event.payload });
+		updateArtifactsBar();
+		persist();
+		return;
+	}
 
 	$status.textContent = "";
 
 	if (event.type === "user") {
-		events.push({ type: "user", payload: event.payload });
+		events.push({
+			type: "user",
+			payload: event.payload,
+			attachments: event.attachments,
+		});
 	} else if (event.type === "assistant") {
 		events.push({
 			type: "assistant",
@@ -498,9 +911,11 @@ function updateToolRow(event) {
 
 function appendEvent(event) {
 	if (event.type === "user") {
+		const $chips = renderAttachmentChips(event.attachments);
 		$messages.append(
 			<div className="ai-msg user">
 				<div className="ai-bubble">{event.payload}</div>
+				{$chips}
 			</div>,
 		);
 		return;
@@ -586,6 +1001,7 @@ function renderMessages() {
 		appendEvent(event);
 	}
 	scrollToEnd();
+	updateArtifactsBar();
 }
 
 function renderSessionTitle() {

@@ -12,6 +12,15 @@ import Url from "utils/Url";
 const API_KEY_HEADER = "Authorization";
 
 /**
+ * Extra per-provider auth headers. Gemini accepts Bearer on its OpenAI
+ * compatibility endpoint, but the native key header is also sent as a
+ * safety net (e.g. proxies and future endpoint changes).
+ */
+const EXTRA_AUTH_HEADERS = /** @type {const} */ ({
+	google: (apiKey) => ({ "x-goog-api-key": apiKey }),
+});
+
+/**
  * @param {string} baseURL
  * @param {string} path
  */
@@ -24,7 +33,7 @@ function endpoint(baseURL, path) {
  * @param {string} baseURL
  * @param {string} apiKey
  */
-function buildHeaders(baseURL, apiKey) {
+function buildHeaders(baseURL, apiKey, providerId) {
 	/** @type {Record<string, string>} */
 	const headers = { "Content-Type": "application/json" };
 	if (apiKey) {
@@ -32,29 +41,34 @@ function buildHeaders(baseURL, apiKey) {
 		// OpenRouter etiquette
 		headers["HTTP-Referer"] = "https://github.com/carsaimz/xcoder";
 		headers["X-Title"] = "XCoder";
+		const extra = providerId && EXTRA_AUTH_HEADERS[providerId];
+		if (extra) Object.assign(headers, extra(apiKey));
 	}
 	return headers;
 }
 
 /**
- * Lists models available at the endpoint (best effort).
  * @param {object} opts
  * @param {string} opts.baseURL
  * @param {string} opts.apiKey
+ * @param {string} [opts.providerId] provider id for per-provider headers
+ * @param {boolean} [opts.strict] when true, HTTP errors THROW instead of
+ *        resolving to [] — used by the connection test so a bad key is
+ *        actually detected (listModels used to swallow every error and
+ *        the test always reported "Connected").
  * @returns {Promise<string[]>}
  */
-export async function listModels({ baseURL, apiKey }) {
+export async function listModels({ baseURL, apiKey, providerId, strict }) {
 	try {
 		const json = await nativeOrFetchJson({
 			url: endpoint(baseURL, "models"),
-			headers: buildHeaders(baseURL, apiKey),
+			headers: buildHeaders(baseURL, apiKey, providerId),
 			method: "GET",
 		});
 		const data = json?.data || json?.models || [];
-		return data
-			.map((model) => model?.id || model?.name)
-			.filter(Boolean);
+		return data.map((model) => model?.id || model?.name).filter(Boolean);
 	} catch (error) {
+		if (strict) throw error;
 		window.log("error", "AI listModels failed:", error);
 		return [];
 	}
@@ -65,6 +79,7 @@ export async function listModels({ baseURL, apiKey }) {
  * @param {object} opts
  * @param {string} opts.baseURL
  * @param {string} opts.apiKey
+ * @param {string} [opts.providerId] provider id for per-provider headers
  * @param {string} opts.model
  * @param {Array<object>} opts.messages OpenAI-format messages
  * @param {Array<object>} [opts.tools] OpenAI-format tools
@@ -76,6 +91,7 @@ export async function listModels({ baseURL, apiKey }) {
 export async function chatCompletion({
 	baseURL,
 	apiKey,
+	providerId,
 	model,
 	messages,
 	tools,
@@ -98,7 +114,7 @@ export async function chatCompletion({
 
 	const json = await nativeOrFetchJson({
 		url: endpoint(baseURL, "chat/completions"),
-		headers: buildHeaders(baseURL, apiKey),
+		headers: buildHeaders(baseURL, apiKey, providerId),
 		method: "POST",
 		body,
 		signal,
@@ -158,6 +174,14 @@ function nativeRequest({ url, headers, method, body }) {
 				method,
 				headers,
 				data: body,
+				// CRITICAL: the plugin's default serializer is
+				// "urlencoded", which silently converts the JSON
+				// body into a form-encoded string
+				// ("...&messages=[object Object]") while the
+				// header still says application/json — every
+				// provider then answers 400/401. "json" sends
+				// the body exactly as built above.
+				serializer: "json",
 				responseType: "json",
 				timeout: 120000,
 			},
@@ -177,9 +201,7 @@ function nativeRequest({ url, headers, method, body }) {
 				let detail = error?.error || "";
 				if (detail && typeof detail !== "string") {
 					try {
-						detail =
-							detail?.error?.message ||
-							JSON.stringify(detail);
+						detail = detail?.error?.message || JSON.stringify(detail);
 					} catch {
 						detail = String(detail);
 					}
@@ -204,11 +226,20 @@ async function fetchRequest({ url, headers, method, body, signal }) {
 		signal,
 		body: body ? JSON.stringify(body) : undefined,
 	});
-	const json = await response.json().catch(() => ({}));
+	const text = await response.text().catch(() => "");
+	let json = {};
+	try {
+		json = text ? JSON.parse(text) : {};
+	} catch {
+		/* non-JSON error body (HTML proxy pages etc.) */
+	}
 	if (!response.ok) {
-		const message =
-			json?.error?.message || `HTTP ${response.status}`;
-		throw new Error(message);
+		const detail =
+			json?.error?.message ||
+			String(text || response.statusText || "request failed").slice(0, 200);
+		// Same "<status>: <detail>" shape as the native path so
+		// httpStatus() and the recovery logic treat both alike.
+		throw new Error(`${response.status}: ${detail}`);
 	}
 	return json;
 }

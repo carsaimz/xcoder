@@ -506,3 +506,40 @@ export function modelType(provider, model) {
 	if (provider?.group === "free") return "free";
 	return "paid";
 }
+
+// ------------------------- key shape diagnostics -------------------------
+
+/** Known API key prefixes -> owning provider family. */
+const KEY_PREFIXES = [
+	["gsk_", "groq"],
+	["sk-or-", "openrouter"],
+	["sk-ant-", "anthropic"],
+	["xai-", "xai"],
+	["AIza", "google"],
+	["hf_", "huggingface"],
+	["csk-", "cerebras"],
+	["r8_", "replicate"],
+];
+
+/**
+ * Detects keys that look like they belong to a DIFFERENT provider
+ * (e.g. a gsk_… Groq key pasted into the Gemini card) — the #1 real-world
+ * cause of "falha de autenticação". Returns a short warning or "".
+ * @param {string} providerId
+ * @param {string} key
+ * @returns {string}
+ */
+export function keyShapeWarning(providerId, key) {
+	const value = String(key || "");
+	if (!value) return "";
+	const openrouterSelf = providerId.startsWith("openrouter");
+	const OWNER_NAMES = { openrouter: "OpenRouter", google: "Google" };
+	for (const [prefix, owner] of KEY_PREFIXES) {
+		if (!value.startsWith(prefix)) continue;
+		if (owner === providerId) return "";
+		if (openrouterSelf && owner === "openrouter") return "";
+		const ownerName = OWNER_NAMES[owner] || PROVIDER_MAP[owner]?.name || owner;
+		return `⚠️ ${prefix}… key looks like a ${ownerName} key`;
+	}
+	return "";
+}

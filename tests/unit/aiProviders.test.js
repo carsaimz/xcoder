@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
         enabledProviders,
         isProviderEnabled,
+        keyShapeWarning,
         modelCapabilities,
         modelType,
         PROVIDER_MAP,
@@ -140,5 +141,33 @@ describe("model capabilities and type", () => {
         it("classifies by provider group when there is no suffix", () => {
                 expect(modelType(PROVIDER_MAP.groq, "llama-3.3-70b-versatile")).toBe("free");
                 expect(modelType(PROVIDER_MAP.openai, "gpt-4.1")).toBe("paid");
+        });
+});
+
+describe("keyShapeWarning", () => {
+        it("flags a Groq key used on the Google card", () => {
+                const warn = keyShapeWarning("google", "gsk_ABCDEF1234567890");
+                expect(warn).toContain("Groq");
+        });
+
+        it("flags a Gemini key used on the Groq card", () => {
+                const warn = keyShapeWarning("groq", "AIzaSyABCDEF1234567890");
+                expect(warn).toContain("Google");
+        });
+
+        it("accepts a matching key and an unknown shape", () => {
+                expect(keyShapeWarning("groq", "gsk_ABCDEF1234567890")).toBe("");
+                expect(keyShapeWarning("custom", "totally-private-token")).toBe("");
+        });
+
+        it("treats both OpenRouter catalogs as one family", () => {
+                expect(keyShapeWarning("openrouter-free", "sk-or-v1-abcdef")).toBe("");
+                expect(keyShapeWarning("openrouter-paid", "sk-or-v1-abcdef")).toBe("");
+                expect(keyShapeWarning("groq", "sk-or-v1-abcdef")).toContain("OpenRouter");
+        });
+
+        it("returns empty for a missing key", () => {
+                expect(keyShapeWarning("groq", "")).toBe("");
+                expect(keyShapeWarning("groq", undefined)).toBe("");
         });
 });

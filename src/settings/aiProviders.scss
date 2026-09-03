@@ -395,6 +395,18 @@
                 flex-shrink: 0;
         }
 
+        .ai-pkeywarn {
+                margin: 8px 2px 0;
+                padding: 7px 10px;
+                border-radius: 8px;
+                background: rgba(244, 67, 54, 0.12);
+                border: 1px solid rgba(244, 67, 54, 0.35);
+                color: #ef5350;
+                font-size: 11px;
+                line-height: 1.45;
+                word-break: break-word;
+        }
+
         // ------------------------------------------------- advanced section
         .ai-padv {
                 margin-top: 11px;
