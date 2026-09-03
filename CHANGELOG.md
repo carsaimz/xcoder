@@ -3,6 +3,12 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.11] - 2026-09-03
+
+### Added
+- Provider enable/disable, per-provider models with type labels, capability strip, self-reading agent
+
+
 ## [1.4.10] - 2026-09-02
 
 ### Fixed
