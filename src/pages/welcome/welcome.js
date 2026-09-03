@@ -29,6 +29,9 @@ export default function openWelcomeTab() {
 
 	// Set custom subtitle for the header
 	welcomeFile.setCustomTitle(() => strings["welcome start"] || "Get Started");
+
+	// banner mounts after the page enters the DOM
+	setTimeout(mountWelcomeAd, 400);
 }
 
 /**
@@ -237,8 +240,32 @@ function createWelcomeContent() {
 					/>
 				</div>
 			</section>
+
+			{/* House-ad banner (community site; dismissible, capped by design) */}
+			<section
+				className="welcome-section welcome-ad-slot"
+				id="welcome-ad-slot"
+			/>
 		</div>
 	);
+}
+
+/**
+ * Mounts the house-ad banner into the welcome page once it is in the DOM.
+ * Silently skipped when ads are disabled/offline.
+ */
+async function mountWelcomeAd() {
+	try {
+		const { createBanner } = await import(
+			/* webpackChunkName: "ads" */ "lib/ads"
+		);
+		const $slot = document.getElementById("welcome-ad-slot");
+		if (!$slot || $slot.children.length) return;
+		const $banner = await createBanner("welcome");
+		if ($banner) $slot.append($banner);
+	} catch {
+		/* ads optional — never break the welcome page */
+	}
 }
 
 /**

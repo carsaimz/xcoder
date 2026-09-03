@@ -343,6 +343,20 @@ async function onDeviceReady() {
 
 	await promptUpdateCheckConsent();
 
+	// Site notifications (poll the community site like an FCM replacement)
+	// and the ads open counter — both are lazy imports so they never block
+	// boot and silently no-op offline.
+	import(/* webpackChunkName: "siteNotifications" */ "lib/siteNotifications")
+		.then(({ startNotificationPolling }) => {
+			startNotificationPolling();
+		})
+		.catch(() => {});
+	import(/* webpackChunkName: "ads" */ "lib/ads")
+		.then(({ trackAppOpen }) => {
+			trackAppOpen();
+		})
+		.catch(() => {});
+
 	// Check for app updates
 	if (
 		!isPlayStoreInstall() &&

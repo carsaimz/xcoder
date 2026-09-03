@@ -135,6 +135,51 @@ export default function mainSettings() {
 			chevron: true,
 		},
 		{
+			key: "notificationsEnabled",
+			text: strings["site notifications"] || "Site notifications",
+			value: appSettings.value.notificationsEnabled !== false,
+			checkbox: true,
+			info:
+				strings["settings-info-notifications"] ||
+				"Receives update and community notices sent by the site (in-app and, with the notifications plugin, in the system push area).",
+			category: categories.customizationTools,
+		},
+		{
+			key: "adsEnabled",
+			text: strings["ads"] || "Ads",
+			value: appSettings.value.adsEnabled !== false,
+			checkbox: true,
+			info:
+				strings["settings-info-ads"] ||
+				"Support XCoder with respectful ads from the community site (banner + rare interstitials, never disruptive). No AdMob.",
+			category: categories.customizationTools,
+		},
+		{
+			key: "supabaseUrl",
+			text: "Supabase URL",
+			value: appSettings.value.supabaseUrl || "",
+			valueText: (value) => value || strings.off || "Off",
+			prompt: "Supabase URL",
+			promptType: "url",
+			promptOptions: { required: false },
+			info:
+				strings["settings-info-supabase"] ||
+				"Supabase project URL (https://xxx.supabase.co) used for cloud features. Provided by the XCoder site.",
+			category: categories.customizationTools,
+		},
+		{
+			key: "supabaseAnonKey",
+			text: strings["supabase anon key"] || "Supabase anon key",
+			value: appSettings.value.supabaseAnonKey ? "••••••••" : "",
+			prompt: strings["supabase anon key"] || "Supabase anon key",
+			promptType: "text",
+			promptOptions: { required: false },
+			info:
+				strings["settings-info-supabase-key"] ||
+				"The public anon key of the project (safe on the device — the same one browsers use).",
+			category: categories.customizationTools,
+		},
+		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
 			icon: "svg:file-cog",
@@ -190,6 +235,24 @@ export default function mainSettings() {
 
 			case "marketplaceUrl":
 				await appSettings.update({ marketplaceUrl: value ?? "" });
+				break;
+
+			case "notificationsEnabled":
+				await appSettings.update({ notificationsEnabled: value === true });
+				break;
+
+			case "adsEnabled":
+				await appSettings.update({ adsEnabled: value === true });
+				break;
+
+			case "supabaseUrl":
+				await appSettings.update({ supabaseUrl: String(value ?? "").trim() });
+				break;
+
+			case "supabaseAnonKey":
+				await appSettings.update({
+					supabaseAnonKey: String(value ?? "").trim(),
+				});
 				break;
 
 			case "theme":

@@ -14,7 +14,13 @@ configurations {
   }
 }
 // ---------------------------------------------------------------------------
-// Native Firebase (Analytics, Crashlytics, Remote Config, FCM)
+// Native Firebase — Analytics + Crashlytics ONLY (v1.4.11 decision)
+//
+// Remote Config and FCM were REMOVED: remote configuration now comes from
+// the community site (/api/config, see lib/backend.js) and notifications
+// are delivered by the site through the notification manager (and system
+// notifications when the local-notifications plugin is installed). Auth and
+// dynamic data live in Supabase on the site side.
 //
 // Cordova Android 15 owns the google-services plugin lifecycle itself: when
 // the post-process hook flips IS_GRADLE_PLUGIN_GOOGLE_SERVICES_ENABLED in
@@ -35,6 +41,11 @@ configurations {
 // v1.4.8 shipped these libraries for the first time and the app stopped
 // booting on real devices, so native Firebase now stays OFF until the
 // crash is reproduced with device logs and fixed.
+//
+// NOTE: the crashlytics-gradle plugin (symbol/mapping upload) is NOT applied
+// here on purpose — it cannot resolve under the isolated classpath of this
+// script. Crash reports still work; obfuscated stack traces would need the
+// mapping file uploaded manually when R8 is enabled.
 def nativeFirebaseEnabled = System.getenv('NATIVE_FIREBASE') == 'true'
 def googleServicesFile = file('google-services.json')
 if (nativeFirebaseEnabled && googleServicesFile.exists()) {
@@ -42,7 +53,5 @@ if (nativeFirebaseEnabled && googleServicesFile.exists()) {
         implementation platform('com.google.firebase:firebase-bom:33.7.0')
         implementation 'com.google.firebase:firebase-analytics'
         implementation 'com.google.firebase:firebase-crashlytics'
-        implementation 'com.google.firebase:firebase-config'
-        implementation 'com.google.firebase:firebase-messaging'
     }
 }

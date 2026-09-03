@@ -1239,5 +1239,12 @@
     "github profile failed": "Não foi possível carregar o perfil",
     "github token needed": "Inicie a sessão ou defina um token para listar repositórios",
     "github no repos": "Nenhum repositório encontrado",
-    "github repo saved": "Repositório"
+    "github repo saved": "Repositório",
+    "site notifications": "Notificações do site",
+    "settings-info-notifications": "Recebe avisos de atualização e da comunidade enviados pelo site (no app e, com o plugin de notificações, na área de push do sistema).",
+    "ads": "Anúncios",
+    "settings-info-ads": "Apoie o XCoder com anúncios respeitosos do site da comunidade (banner + interstitials raros, nunca intrusivos). Sem AdMob.",
+    "supabase anon key": "Chave anon do Supabase",
+    "settings-info-supabase": "URL do projeto Supabase (https://xxx.supabase.co) usada nas funcionalidades de nuvem. Fornecida pelo site do XCoder.",
+    "settings-info-supabase-key": "A chave anon pública do projeto (segura no dispositivo — a mesma que os navegadores usam)."
 }

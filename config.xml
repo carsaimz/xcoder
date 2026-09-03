@@ -22,6 +22,11 @@
     <allow-intent href="geo:*" />
 
     <platform name="android">
+        <!-- System (status-bar) notifications: uncomment after device-testing
+             the plugin with cordova-android 15. lib/siteNotifications.js picks
+             it up automatically when cordova.plugins.notification.local exists.
+        <plugin name="cordova-plugin-local-notifications" spec="0.9.0-beta.3" />
+        -->
         <preference name="GradlePluginKotlinVersion" value="2.3.0" />
         <preference name="fullscreen" value="false" />
         <preference name="SplashScreen" value="none" />
