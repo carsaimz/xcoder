@@ -4,20 +4,48 @@ import {
         FREE_AGENT_DAILY_LIMIT,
         isPremium,
         isThemePremium,
+        supportInfo,
+        syncCloudPremium,
         trackAgentTurn,
         verifyCode,
 } from "lib/premium";
 
 // premium.js reads the remote-config cache through lib/backend — mock it so
 // no network/localStorage backend state leaks into the assertions.
+const backendState = { support: {} };
 vi.mock("lib/backend", () => ({
-        backendConfig: () => ({
-                support: { pixKey: "000.111.222-33", pixName: "Teste" },
-        }),
+        backendConfig: () => backendState,
+}));
+
+// lib/supabase is imported lazily by syncCloudPremium() — mock it with a
+// configurable user + premium_grants table.
+const supabaseState = {
+        configured: false,
+        user: null,
+        grants: [],
+};
+vi.mock("lib/supabase", () => ({
+        default: {
+                supabaseConfigured: () => supabaseState.configured,
+                getUser: () => supabaseState.user,
+                from: (table) => ({
+                        select: async (query) => {
+                                expect(table).toBe("premium_grants");
+                                const uid = /user_id=eq\.([^&]+)/.exec(query)?.[1];
+                                return supabaseState.grants.filter(
+                                        (g) => !uid || g.user_id === decodeURIComponent(uid),
+                                );
+                        },
+                }),
+        },
 }));
 
 vi.mock("lib/settings", () => ({
         default: { value: {}, update: vi.fn() },
+}));
+
+vi.mock("lib/config", () => ({
+        default: { SUPABASE_URL: "", SUPABASE_PUBLISHABLE_KEY: "" },
 }));
 
 // minimal localStorage stub (premium state + agent quota live there)
@@ -92,6 +120,82 @@ describe("premium themes", () => {
                 expect(isThemePremium("obsidian")).toBe(true);
                 expect(isThemePremium("dark")).toBe(false);
                 expect(isThemePremium("")).toBe(false);
+        });
+});
+
+describe("support payment methods", () => {
+        beforeEach(() => {
+                backendState.support = {};
+        });
+
+        it("falls back to the built-in donation links (no Pix)", () => {
+                const info = supportInfo();
+                expect(info.methods.length).toBeGreaterThanOrEqual(3);
+                expect(info.methods.some((m) => /pix/i.test(m.method))).toBe(false);
+                expect(
+                        info.methods.every((m) => Boolean(m.url) || Boolean(m.account)),
+                ).toBe(true);
+                expect(info.links.every((l) => Boolean(l.url))).toBe(true);
+        });
+
+        it("uses the database methods served by the site (M-Pesa copy row)", () => {
+                backendState.support = {
+                        methods: [
+                                {
+                                        method: "paypal",
+                                        label: "PayPal",
+                                        url: "https://paypal.me/owner",
+                                },
+                                {
+                                        method: "mpesa",
+                                        label: "M-Pesa",
+                                        account: "258 84 000 0000",
+                                        account_label: "Número M-Pesa",
+                                        instructions: "Envie e confirme",
+                                },
+                                { method: "broken", label: "" },
+                        ],
+                };
+                const info = supportInfo();
+                expect(info.methods.length).toBe(2);
+                expect(info.methods[1].method).toBe("mpesa");
+                expect(info.methods[1].account).toBe("258 84 000 0000");
+                expect(info.methods[1].accountLabel).toBe("Número M-Pesa");
+                expect(info.links.length).toBe(1);
+        });
+});
+
+describe("cloud premium sync", () => {
+        beforeEach(() => {
+                store.clear();
+                supabaseState.configured = false;
+                supabaseState.user = null;
+                supabaseState.grants = [];
+        });
+
+        it("keeps free tier when signed out", async () => {
+                expect(await syncCloudPremium()).toBe(false);
+        });
+
+        it("activates premium from a database grant and expires yearly ones", async () => {
+                supabaseState.configured = true;
+                supabaseState.user = { id: "uuid-1", email: "a@b.c" };
+                supabaseState.grants = [
+                        { kind: "lifetime", expires_at: null, user_id: "uuid-1" },
+                ];
+                expect(await syncCloudPremium()).toBe(true);
+                expect(isPremium()).toBe(true);
+
+                // expired yearly grant → premium goes away
+                supabaseState.grants = [
+                        {
+                                kind: "yearly",
+                                expires_at: new Date(Date.now() - 86400000).toISOString(),
+                                user_id: "uuid-1",
+                        },
+                ];
+                expect(await syncCloudPremium()).toBe(false);
+                expect(isPremium()).toBe(false);
         });
 });
 

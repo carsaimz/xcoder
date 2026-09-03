@@ -357,6 +357,13 @@ async function onDeviceReady() {
 		})
 		.catch(() => {});
 
+	// Cloud premium sync: when a Supabase session was restored from a
+	// previous run, pull the premium_grants entitlement (donation →
+	// premium on every device). Lazy + silent: never blocks boot.
+	import(/* webpackChunkName: "premium" */ "lib/premium")
+		.then(({ syncCloudPremium }) => syncCloudPremium())
+		.catch(() => {});
+
 	// Check for app updates
 	if (
 		!isPlayStoreInstall() &&

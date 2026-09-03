@@ -1,4 +1,5 @@
 import { backendConfig } from "lib/backend";
+import config from "lib/config";
 import settings from "lib/settings";
 
 /**
@@ -9,10 +10,13 @@ import settings from "lib/settings";
  *     kept for self-hosters — no UI anymore);
  *  2. the community site remote config (`/api/config` → `supabase.url` +
  *     `supabase.anonKey`), so the project is configured ON THE SITE and
- *     served to every app install with zero user setup.
+ *     served to every app install with zero user setup;
+ *  3. the official credentials built into the app (lib/config.js) —
+ *     identical to what the official site serves, available instantly,
+ *     offline, on first run.
  *
- * Only the ANON key reaches the device — exactly like a browser on the
- * site. All privileged work keeps happening server-side (site).
+ * Only the PUBLISHABLE key reaches the device — exactly like a browser
+ * on the site. All privileged work keeps happening server-side (site).
  *
  * Endpoints used (Supabase REST, all CORS-friendly):
  *  - POST {url}/auth/v1/token?grant_type=password
@@ -47,9 +51,11 @@ export function supabaseUrl() {
 		.trim()
 		.replace(/\/+$/, "");
 	if (local) return local;
-	return String(backendConfig()?.supabase?.url || "")
+	const remote = String(backendConfig()?.supabase?.url || "")
 		.trim()
 		.replace(/\/+$/, "");
+	if (remote) return remote;
+	return config.SUPABASE_URL || "";
 }
 
 /**
@@ -58,7 +64,9 @@ export function supabaseUrl() {
 export function supabaseAnonKey() {
 	const local = String(settings.value?.supabaseAnonKey || "").trim();
 	if (local) return local;
-	return String(backendConfig()?.supabase?.anonKey || "").trim();
+	const remote = String(backendConfig()?.supabase?.anonKey || "").trim();
+	if (remote) return remote;
+	return config.SUPABASE_PUBLISHABLE_KEY || "";
 }
 
 // -------------------------------------------------------------------- auth
@@ -87,6 +95,39 @@ export async function signInWithPassword(email, password) {
 	};
 	writeSession(session);
 	return session.user;
+}
+
+/**
+ * Creates an account (e-mail + password) and stores the session when
+ * Supabase returns one (it does unless e-mail confirmation is required).
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<{user: object | null, needsEmailConfirmation: boolean}>}
+ */
+export async function signUpWithPassword(email, password) {
+	const response = await request(`/auth/v1/signup`, {
+		method: "POST",
+		body: { email: String(email).trim(), password: String(password) },
+	});
+	if (response?.error || response?.msg) {
+		throw new Error(
+			response?.msg || response?.error_description || "Sign up failed",
+		);
+	}
+	const user = response?.user || null;
+	if (response?.access_token) {
+		session = {
+			access_token: response.access_token,
+			refresh_token: response.refresh_token,
+			user,
+			expires_at: Date.now() + Number(response.expires_in || 3600) * 1000,
+		};
+		writeSession(session);
+	}
+	return {
+		user,
+		needsEmailConfirmation: !response?.access_token && Boolean(user),
+	};
 }
 
 /**
@@ -315,6 +356,7 @@ export default {
 	supabaseUrl,
 	supabaseAnonKey,
 	signInWithPassword,
+	signUpWithPassword,
 	refreshSession,
 	signOut,
 	getUser,

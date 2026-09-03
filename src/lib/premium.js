@@ -9,16 +9,24 @@ import { backendConfig } from "lib/backend";
  *  - lifts the daily AI agent turn limit (free: 20 runs/day),
  *  - shows a supporter badge (About + welcome).
  *
- * Donations are collected through the links below (GitHub Sponsors,
- * PayPal, Buy Me a Coffee and Pix). The Pix key is served by the site's
- * remote config (/api/config → support.pixKey) so the owner can change it
- * without an app release.
+ * Donations are collected through the payment methods stored in the
+ * project database (PayPal, Stripe, Buy Me a Coffee, M-Pesa, e-Mola,
+ * GitHub Sponsors…). The list is served by the site's remote config
+ * (/api/config → support.methods) and managed in the site's /admin, so
+ * the owner can add/change methods without an app release. The owner is
+ * Mozambican — M-Pesa/e-Mola sit next to the international options; no
+ * Pix anywhere.
  *
- * Unlock codes are generated offline by the project owner with
- * scripts/generate-premium-codes.mjs (HMAC-SHA256 over a build secret).
- * The verifier runs fully offline — no account, no network. It is
- * deliberately lightweight (client-side), which is fine: the point is to
- * make honest support easy, not to fight determined crackers.
+ * Two ways to unlock:
+ *  1. Account (recommended): sign in with the Supabase account used for
+ *     the donation — the site admin confirms it and the grant lands in
+ *     `premium_grants`; syncCloudPremium() picks it up on every device.
+ *  2. Unlock codes, generated offline by the project owner with
+ *     scripts/generate-premium-codes.mjs (HMAC-SHA256 over a build
+ *     secret). The verifier runs fully offline — no account, no network.
+ *     It is deliberately lightweight (client-side), which is fine: the
+ *     point is to make honest support easy, not to fight determined
+ *     crackers.
  */
 
 const PREMIUM_KEY = "xcoder.premium";
@@ -27,12 +35,29 @@ const AGENT_USE_KEY = "xcoder.premium.agent";
 /** Free tier: AI agent runs per calendar day. Premium: unlimited. */
 export const FREE_AGENT_DAILY_LIMIT = 20;
 
-/** Donation destinations (Pix comes from the site remote config). */
+/**
+ * Fallback donation methods (used when the site hasn't served the
+ * database list yet). Mirrors the seed rows in supabase/schema.sql.
+ */
 const SUPPORT_LINKS = {
 	sponsors: "https://github.com/sponsors/carsaimz",
 	paypal: "https://www.paypal.me/carsaimz",
 	coffee: "https://www.buymeacoffee.com/carsaimz",
 };
+
+const FALLBACK_METHODS = [
+	{
+		method: "github_sponsors",
+		label: "GitHub Sponsors",
+		url: SUPPORT_LINKS.sponsors,
+	},
+	{
+		method: "buymeacoffee",
+		label: "Buy Me a Coffee",
+		url: SUPPORT_LINKS.coffee,
+	},
+	{ method: "paypal", label: "PayPal", url: SUPPORT_LINKS.paypal },
+];
 
 /**
  * Build secret for code verification. Split so a plain grep for the
@@ -287,34 +312,105 @@ export function agentTurnsLeft() {
 // ---------------------------------------------------------------- support
 
 /**
- * Support links + Pix key from the site remote config (when available).
- * @returns {{pixKey?: string, pixName?: string, links: {id: string, label: string, url: string}[]}}
+ * Normalizes one payment-method row (site DB shape → app shape).
+ * @param {any} raw
+ * @returns {object | null}
+ */
+function normalizeMethod(raw) {
+	if (!raw || typeof raw !== "object") return null;
+	const method = String(raw.method || "other").slice(0, 40);
+	const label = String(raw.label || "").slice(0, 60);
+	const url = String(raw.url || "").trim();
+	const account = String(raw.account || "").trim();
+	if (!label || (!url && !account)) return null;
+	return {
+		method,
+		label,
+		url,
+		account,
+		// the site serves raw DB rows (snake_case); accept both
+		accountLabel: String(raw.accountLabel ?? raw.account_label ?? "").slice(
+			0,
+			60,
+		),
+		instructions: String(raw.instructions || "").slice(0, 300),
+	};
+}
+
+/**
+ * Payment methods from the project database (served by the site remote
+ * config), falling back to the built-in donation links.
+ * @returns {{methods: {method: string, label: string, url: string, account: string, accountLabel: string, instructions: string}[], links: {id: string, label: string, url: string}[]}}
  */
 export function supportInfo() {
-	const config = backendConfig() || {};
-	const support = config.support || {};
-	const links = [
-		{
-			id: "sponsors",
-			label: "GitHub Sponsors",
-			url: support.sponsorsUrl || SUPPORT_LINKS.sponsors,
-		},
-		{
-			id: "paypal",
-			label: "PayPal",
-			url: support.paypalUrl || SUPPORT_LINKS.paypal,
-		},
-		{
-			id: "coffee",
-			label: "Buy Me a Coffee",
-			url: support.coffeeUrl || SUPPORT_LINKS.coffee,
-		},
-	].filter((link) => Boolean(link.url));
-	return {
-		pixKey: support.pixKey || "",
-		pixName: support.pixName || "",
-		links,
-	};
+	const support = backendConfig()?.support || {};
+	const remote = Array.isArray(support.methods)
+		? support.methods.map(normalizeMethod).filter(Boolean)
+		: [];
+	const methods = remote.length
+		? remote
+		: FALLBACK_METHODS.map(normalizeMethod).filter(Boolean);
+	// `links` kept for callers/tests that only care about URL methods
+	const links = methods
+		.filter((m) => m.url)
+		.map((m) => ({ id: m.method, label: m.label, url: m.url }));
+	return { methods, links };
+}
+
+// ------------------------------------------------------------ cloud grants
+
+/**
+ * Syncs the premium entitlement from the project database: when the user
+ * is signed in (Supabase auth) and the owner granted them premium
+ * (`premium_grants` table), the state is activated locally — and keeps
+ * expiring/expiry info in sync across devices.
+ * @returns {Promise<boolean>} true when a grant is active after the sync
+ */
+export async function syncCloudPremium() {
+	try {
+		const supabase = await import("lib/supabase");
+		if (!supabase.default?.supabaseConfigured?.()) return isPremium();
+		const user = supabase.default.getUser();
+		if (!user?.id) return isPremium();
+
+		const rows = await supabase.default
+			.from("premium_grants")
+			.select(
+				`select=kind,expires_at&user_id=eq.${encodeURIComponent(user.id)}`,
+			);
+		const grant = Array.isArray(rows) ? rows[0] : null;
+		if (!grant) return isPremium();
+
+		const expiresAt = grant.expires_at
+			? new Date(grant.expires_at).getTime()
+			: 0;
+		if (expiresAt && Date.now() > expiresAt) {
+			if (readState()?.active) removePremium();
+			return false;
+		}
+		const state = readState();
+		const alreadyActive =
+			state?.active && (state.expiresAt || 0) === (expiresAt || 0);
+		if (!alreadyActive) {
+			writeState({
+				active: true,
+				since: state?.since || Date.now(),
+				kind: grant.kind || "lifetime",
+				expiresAt,
+				source: "cloud",
+			});
+			try {
+				document.dispatchEvent(
+					new CustomEvent("premiumchange", { detail: true }),
+				);
+			} catch {
+				/* non-DOM environment (tests) */
+			}
+		}
+		return true;
+	} catch {
+		return isPremium();
+	}
 }
 
 // --------------------------------------------------------------- themes
@@ -352,4 +448,5 @@ export default {
 	PREMIUM_THEMES,
 	FREE_AGENT_DAILY_LIMIT,
 	supportInfo,
+	syncCloudPremium,
 };
