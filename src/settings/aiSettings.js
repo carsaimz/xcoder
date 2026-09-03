@@ -8,6 +8,8 @@ import {
 	byGroup,
 	DEFAULT_PROVIDER_ID,
 	PROVIDER_MAP,
+	resolveApiKey,
+	resolveBaseUrl,
 	resolveModel,
 	setProviderModel,
 } from "lib/ai/providers";
@@ -165,9 +167,13 @@ export default function aiSettings() {
 		const provider = PROVIDER_MAP[providerId];
 		toast(strings["loading..."] || "Loading...", 3000);
 		try {
+			// ONLY the selected provider: its own key/URL overrides first,
+			// then the global fallbacks — and the provider id is forwarded
+			// so per-provider auth headers are applied.
 			const models = await listModels({
-				baseURL: settings.value.aiBaseUrl || provider?.baseURL || "",
-				apiKey: settings.value.aiApiKey || "",
+				baseURL: resolveBaseUrl(providerId) || provider?.baseURL || "",
+				apiKey: resolveApiKey(providerId),
+				providerId,
 			});
 			if (!models.length) {
 				toast(
@@ -177,9 +183,23 @@ export default function aiSettings() {
 				);
 				return;
 			}
+			const current = resolveModel(providerId);
+			const items = [
+				{
+					text: `${provider?.name || providerId} · ${Math.min(
+						models.length,
+						300,
+					)} ${strings["ai models count"] || "models available"}`,
+					className: "group-header",
+				},
+				...models.slice(0, 300).map((model) => ({
+					value: model,
+					text: model === current ? `✓ ${model}` : model,
+				})),
+			];
 			const selected = await select(
-				"Model",
-				models.slice(0, 200).map((model) => [model, model]),
+				`${strings["ai model"] || "Model"} — ${provider?.name || providerId}`,
+				items,
 			);
 			if (selected) {
 				await setProviderModel(providerId, selected);

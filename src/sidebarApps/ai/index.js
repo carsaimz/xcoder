@@ -48,6 +48,7 @@ import {
 import vshell from "lib/ai/vshell";
 import openFile from "lib/openFile";
 import settings from "lib/settings";
+import { swalConfirm } from "lib/sweetalert";
 import Url from "utils/Url";
 
 const LEGACY_CHAT_KEY = "xcoder.ai.chat";
@@ -1390,10 +1391,13 @@ function updateModelButton() {
 }
 
 /**
- * Quick model picker over ENABLED providers only. Entries are grouped per
- * provider ("Provider · model") and carry a type label (free/paid), and
- * each provider keeps its own remembered model. Picking a model from
- * another enabled provider also switches to it.
+ * Quick model picker over ENABLED providers only. Models are grouped
+ * under a non-selectable header per provider — the active provider's
+ * group comes first, so its models always sit at the top. Picking a
+ * model from another enabled provider switches to it. Providers without
+ * a usable API key have their entries disabled: a model can never be
+ * picked from an endpoint that cannot authenticate it (the classic
+ * "endpoint error" trap).
  */
 async function openModelPicker() {
 	const activeId = settings.value.aiProvider || DEFAULT_PROVIDER_ID;
@@ -1409,45 +1413,48 @@ async function openModelPicker() {
 	const current = resolveModel(activeId);
 	const typeFree = strings["ai model free"] || "free";
 	const typePaid = strings["ai model paid"] || "paid";
+	const keyNeeded = strings["ai provider key needed"] || "API key needed";
 	const mark = (model, providerId) =>
 		model === current && providerId === activeId ? `✓ ${model}` : model;
 
-	/** @type {any[]} flat select items, grouped per provider */
+	/** model ids of one provider: remembered model first, then catalog */
+	const modelsOf = (provider) => {
+		const own = resolveModel(provider.id);
+		return [own, ...(provider.models || [])].filter(
+			(model, index, all) => model && all.indexOf(model) === index,
+		);
+	};
+
+	/** whether this provider can authenticate a request right now */
+	const usable = (provider) =>
+		Boolean(provider.noKeyRequired) ||
+		provider.id === "custom" ||
+		Boolean(resolveApiKey(provider.id));
+
+	// active provider first, then the remaining enabled ones
+	const order = [
+		...providers.filter((provider) => provider.id === activeId),
+		...providers.filter((provider) => provider.id !== activeId),
+	];
+
+	/** @type {any[]} flat select items, separated by provider headers */
 	const items = [];
 	const meta = new Map();
-	for (const provider of providers) {
-		const own = resolveModel(provider.id);
-		const models = [];
-		for (const model of [own, ...(provider.models || [])]) {
-			if (model && !models.includes(model)) models.push(model);
-		}
-		if (provider.id === activeId) continue; // active provider handled below
-		for (const model of models.slice(0, 12)) {
+	for (const provider of order) {
+		const ok = usable(provider);
+		items.push({
+			text: `${provider.name}${ok ? "" : ` — ${keyNeeded}`}`,
+			className: "group-header",
+		});
+		for (const model of modelsOf(provider).slice(0, 12)) {
 			const type = modelType(provider, model) === "free" ? typeFree : typePaid;
 			const value = `${provider.id}::${model}`;
 			items.push({
-				value,
-				text: `${provider.name} · ${mark(model, provider.id)} (${type})`,
+				value: ok ? value : undefined,
+				disabled: !ok,
+				text: `${mark(model, provider.id)} (${type})`,
 			});
-			meta.set(value, { providerId: provider.id, model });
-		}
-	}
-	// active provider first/expanded: its models at the top
-	const activeProvider = PROVIDER_MAP[activeId];
-	if (activeProvider && providers.some((p) => p.id === activeId)) {
-		const own = resolveModel(activeId);
-		const models = [own, ...(activeProvider.models || [])].filter(
-			(model, index, all) => model && all.indexOf(model) === index,
-		);
-		for (const model of models.slice(0, 12)) {
-			const type =
-				modelType(activeProvider, model) === "free" ? typeFree : typePaid;
-			const value = `${activeId}::${model}`;
-			items.unshift({
-				value,
-				text: `${activeProvider.name} · ${mark(model, activeId)} (${type})`,
-			});
-			meta.set(value, { providerId: activeId, model });
+			if (ok) meta.set(value, { providerId: provider.id, model });
 		}
 	}
 
@@ -1495,12 +1502,15 @@ async function openModelPicker() {
 }
 
 /**
- * Queries /models at an ENABLED provider's endpoint and lets the user
- * pick one. Each entry is annotated with its type (free/paid).
+ * Queries /models at the ACTIVE provider's endpoint and offers ONLY that
+ * provider's models (never a mixed list). Per-provider key/URL overrides
+ * are respected and the provider id is forwarded so per-provider auth
+ * headers are applied.
  */
 async function pickModelLive() {
-	const providers = enabledProviders();
-	if (!providers.length) {
+	const activeId = settings.value.aiProvider || DEFAULT_PROVIDER_ID;
+	const provider = PROVIDER_MAP[activeId];
+	if (!provider) {
 		toast(
 			strings["ai provider none enabled"] ||
 				"No providers enabled — enable one on the Providers page",
@@ -1508,26 +1518,12 @@ async function pickModelLive() {
 		return;
 	}
 
-	let provider = PROVIDER_MAP[settings.value.aiProvider || DEFAULT_PROVIDER_ID];
-	if (!provider || !providers.some((p) => p.id === provider.id)) {
-		provider = providers[0];
-	} else if (providers.length > 1) {
-		const which = await select(
-			strings["ai provider"] || "Provider",
-			providers.map((item) => ({
-				value: item.id,
-				text: item.id === provider.id ? `✓ ${item.name}` : item.name,
-			})),
-		);
-		if (!which) return;
-		provider = PROVIDER_MAP[which] || provider;
-	}
-
 	toast(strings["loading..."] || "Loading...", 3000);
 	try {
 		const models = await listModels({
 			baseURL: resolveBaseURL(provider, resolveBaseUrl(provider.id)),
 			apiKey: resolveApiKey(provider.id),
+			providerId: provider.id,
 		});
 		if (!models.length) {
 			toast(
@@ -1538,13 +1534,26 @@ async function pickModelLive() {
 		}
 		const typeFree = strings["ai model free"] || "free";
 		const typePaid = strings["ai model paid"] || "paid";
-		const selected = await select(
-			`${strings["ai model"] || "Model"} — ${provider.name}`,
-			models.slice(0, 300).map((model) => {
+		const current = resolveModel(provider.id);
+		const items = [
+			{
+				text: `${provider.name} · ${Math.min(models.length, 300)} ${
+					strings["ai models count"] || "models available"
+				}`,
+				className: "group-header",
+			},
+			...models.slice(0, 300).map((model) => {
 				const type =
 					modelType(provider, model) === "free" ? typeFree : typePaid;
-				return { value: model, text: `${model} (${type})` };
+				return {
+					value: model,
+					text: `${model === current ? "✓ " : ""}${model} (${type})`,
+				};
 			}),
+		];
+		const selected = await select(
+			`${strings["ai model"] || "Model"} — ${provider.name}`,
+			items,
 		);
 		if (selected) {
 			await setProviderModel(provider.id, selected);
@@ -1739,12 +1748,13 @@ async function deleteSession(id) {
 	const session = sessions.find((item) => item.id === id);
 	if (!session) return;
 
-	const ok = await confirm(
+	const ok = await swalConfirm(
 		strings["ai delete session"] || "Delete chat",
 		(strings["ai delete session confirm"] || "Delete chat '{title}'?").replace(
 			"{title}",
 			session.title,
 		),
+		{ icon: "warning" },
 	);
 	if (!ok) return;
 
@@ -1775,9 +1785,10 @@ async function deleteSession(id) {
  * Clears the events of the current chat (the session itself is kept).
  */
 async function clearChat() {
-	const ok = await confirm(
+	const ok = await swalConfirm(
 		strings["ai clear chat"] || "Clear chat",
 		strings["ai confirm clear"] || "Clear this chat?",
+		{ icon: "warning" },
 	);
 	if (!ok) return;
 

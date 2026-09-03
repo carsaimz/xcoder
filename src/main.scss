@@ -8,6 +8,7 @@
 @use "./styles/codemirror.scss";
 @use "./styles/notification.scss";
 @use "./styles/support.scss";
+@use "./styles/sweetalert.scss";
 
 :root {
   --scrollbar-width: 4px;
@@ -51,6 +52,11 @@ body {
   background-color: var(--primary-color);
   color: #252525;
   color: var(--secondary-text-color);
+
+  /* word-wrap everywhere: long links, paths, model ids and texts wrap
+     instead of overflowing pages, cards and dialogs (inherited by all
+     elements unless a rule explicitly overrides it) */
+  overflow-wrap: break-word;
 
   &.no-animation * {
     animation: none !important;

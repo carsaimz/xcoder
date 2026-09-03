@@ -1,5 +1,3 @@
-import settings from "lib/settings";
-
 /**
  * Site-driven notifications ("site as FCM replacement").
  *
@@ -145,12 +143,13 @@ function hashCode(text) {
 
 /**
  * Fetches the site list and delivers entries not seen before.
- * @param {boolean} [force] ignore the user toggle (used nowhere by default)
+ * Notifications are MANDATORY — always on, never gated by a user
+ * setting (site notices + new-version alerts are part of the app
+ * experience). The `force` parameter is kept for callers/tests.
+ * @param {boolean} [force] ignored; kept for API compatibility
  * @returns {Promise<number>} number of newly delivered notifications
  */
 export async function pollSiteNotifications(force = false) {
-	if (!force && settings.value.notificationsEnabled === false) return 0;
-
 	let url = "";
 	try {
 		const { backendUrl } = await import("lib/backend");

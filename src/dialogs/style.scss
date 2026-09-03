@@ -113,12 +113,39 @@
     ul li :nth-child(2) {
       display: block;
       overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .tile,
     .title {
       justify-content: center;
+    }
+
+    // non-selectable section caption (e.g. provider name grouping models)
+    li.group-header {
+      pointer-events: none;
+      background: rgba(154, 107, 252, 0.09);
+      margin-top: 0.4rem;
+      padding-block: 0.35rem;
+      border-top: solid 1px var(--border-color);
+
+      &:first-child {
+        margin-top: 0;
+        border-top: none;
+      }
+
+      .text {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--secondary-text-color);
+        text-align: center;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
     }
 
     .no-text-transform {

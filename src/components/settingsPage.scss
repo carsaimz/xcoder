@@ -590,13 +590,15 @@ wc-page.main-settings-page {
                 line-height: 1.2;
                 color: inherit;
                 text-transform: none;
-                white-space: nowrap;
+                white-space: normal;
+                overflow-wrap: anywhere;
+                word-break: break-word;
 
                 &.is-select {
                         flex: 1;
                         min-width: 0;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
+                        overflow-wrap: anywhere;
+                        word-break: break-word;
                         font-size: 0.94rem;
                         font-weight: 500;
                         letter-spacing: -0.01em;
@@ -708,9 +710,9 @@ wc-page.main-settings-page {
 
         @media screen and (max-width: 480px) {
                 .settings-search-section .setting-trailing-value {
-                        max-width: 7rem;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
+                        max-width: 12rem;
+                        overflow-wrap: anywhere;
+                        word-break: break-word;
                 }
 
                 .settings-search-section .setting-value-display.is-select {
@@ -910,13 +912,15 @@ wc-page.detail-settings-page {
                 line-height: 1.2;
                 color: inherit;
                 text-transform: none;
-                white-space: nowrap;
+                white-space: normal;
+                overflow-wrap: anywhere;
+                word-break: break-word;
 
                 &.is-select {
                         flex: 1;
                         min-width: 0;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
+                        overflow-wrap: anywhere;
+                        word-break: break-word;
                         font-size: 0.94rem;
                         font-weight: 500;
                         letter-spacing: -0.01em;
@@ -1007,9 +1011,9 @@ wc-page.detail-settings-page {
 
         @media screen and (max-width: 480px) {
                 .setting-trailing-value {
-                        max-width: 7rem;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
+                        max-width: 12rem;
+                        overflow-wrap: anywhere;
+                        word-break: break-word;
                 }
 
                 .setting-value-display.is-select {

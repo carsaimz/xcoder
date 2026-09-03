@@ -1,0 +1,86 @@
+/* SweetAlert2 — XCoder theme.
+   The popup follows the running theme through the app CSS variables.
+   Applied via customClass "xcoder-swal" (lib/sweetalert.js). */
+
+.swal2-container {
+  /* blur backdrop like the app dialogs */
+  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.swal2-popup.xcoder-swal {
+  font-family: var(--app-font-family);
+  background-color: #ffffff;
+  background-color: var(--popup-background-color);
+  color: #252525;
+  color: var(--popup-text-color);
+  border-radius: 14px;
+  border-radius: max(14px, var(--popup-border-radius));
+  border: solid 1px var(--border-color);
+  box-shadow: 0 12px 32px var(--box-shadow-color);
+  padding: 1.25rem 1.5rem;
+
+  .swal2-title.xcoder-swal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--popup-text-color);
+    overflow-wrap: anywhere;
+  }
+
+  .swal2-html-container.xcoder-swal-html {
+    font-size: 0.92rem;
+    color: var(--secondary-text-color);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .swal2-actions {
+    gap: 0.5rem;
+  }
+
+  /* buttons: styled via the theme, buttonsStyling is disabled in JS */
+  .xcoder-swal-confirm,
+  .xcoder-swal-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 1.1rem;
+    border-radius: 10px;
+    border-radius: max(10px, var(--button-border-radius, 10px));
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: filter 0.15s ease, opacity 0.15s ease;
+  }
+
+  .xcoder-swal-confirm {
+    background: var(--active-color);
+    color: #ffffff;
+  }
+
+  .xcoder-swal-cancel {
+    background: color-mix(in srgb, var(--secondary-color, #8888) 55%, transparent);
+    color: var(--popup-text-color);
+    border-color: var(--border-color);
+  }
+
+  .xcoder-swal-confirm:active,
+  .xcoder-swal-cancel:active {
+    filter: brightness(0.9);
+  }
+
+  .swal2-icon {
+    margin-block: 0.5rem;
+  }
+}
+
+/* toast variant */
+.swal2-toast.xcoder-swal {
+  background-color: var(--popup-background-color);
+  color: var(--popup-text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 24px var(--box-shadow-color);
+  font-family: var(--app-font-family);
+}

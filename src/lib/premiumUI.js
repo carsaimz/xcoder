@@ -8,6 +8,7 @@ import {
 	syncCloudPremium,
 } from "lib/premium";
 import supabase from "lib/supabase";
+import { swalConfirm } from "lib/sweetalert";
 
 /**
  * UI for the support/premium/account system. Kept apart from
@@ -201,7 +202,7 @@ function renderAccountSection(user, premium) {
 						? `${t("signed in as", "Sessão:")} ${user.email}`
 						: t(
 								"account hint",
-								"Entre na sua conta — a doação vira Premium em todos os dispositivos automaticamente.",
+								"Use a MESMA conta do site oficial — o login é partilhado entre site e app. A doação vira Premium em todos os dispositivos automaticamente.",
 							)}
 				</span>
 			</div>
@@ -209,6 +210,12 @@ function renderAccountSection(user, premium) {
 				<button
 					className="xcoder-support-link"
 					onclick={async () => {
+						const ok = await swalConfirm(
+							t("sign out", "Terminar sessão"),
+							t("sign out confirm", "Terminar a sessão nesta conta?"),
+							{ icon: "question" },
+						);
+						if (!ok) return;
 						await supabase.signOut();
 						toast(t("signed out", "Sessão terminada"), 2500);
 						$section.remove();

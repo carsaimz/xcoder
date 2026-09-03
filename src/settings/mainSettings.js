@@ -137,16 +137,6 @@ export default function mainSettings() {
 			chevron: true,
 		},
 		{
-			key: "notificationsEnabled",
-			text: strings["site notifications"] || "Site notifications",
-			value: appSettings.value.notificationsEnabled !== false,
-			checkbox: true,
-			info:
-				strings["settings-info-notifications"] ||
-				"Receives update and community notices sent by the site (in-app and, with the notifications plugin, in the system push area).",
-			category: categories.customizationTools,
-		},
-		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
 			icon: "svg:file-cog",
@@ -214,10 +204,6 @@ export default function mainSettings() {
 
 			case "marketplaceUrl":
 				await appSettings.update({ marketplaceUrl: value ?? "" });
-				break;
-
-			case "notificationsEnabled":
-				await appSettings.update({ notificationsEnabled: value === true });
 				break;
 
 			case "support":

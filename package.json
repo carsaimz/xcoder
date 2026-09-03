@@ -192,6 +192,7 @@
     "motion": "^13.1.1",
     "mustache": "^4.2.0",
     "picomatch": "^4.0.7",
+    "sweetalert2": "^11.26.25",
     "url-parse": "^1.5.10",
     "vanilla-picker": "^2.12.3",
     "vscode-css-languageservice": "6.3.10",
