@@ -14,6 +14,7 @@
  * are the out-of-the-box experience (zero configuration, zero 401s).
  */
 
+import { isPremium, maxTokensLimit } from "lib/premium";
 import settings from "lib/settings";
 
 /** Provider used when the user never picked one (zero-config chat). */
@@ -374,19 +375,24 @@ export function resolveBaseUrl(providerId) {
 export function resolveMaxTokens(providerId) {
 	const prefs = getProviderPrefs(providerId);
 	const value = Number(prefs.maxTokens ?? settings.value?.aiMaxTokens ?? 4096);
+	// premium cap enforced at runtime too: prefs stored while premium was
+	// active degrade gracefully when the grant expires
 	return Number.isFinite(value)
-		? Math.max(256, Math.min(8192, Math.round(value)))
+		? Math.max(256, Math.min(maxTokensLimit(), Math.round(value)))
 		: 4096;
 }
 
 /**
  * Effective autonomy level: per-provider override, then legacy global.
+ * "auto" (the highest autonomy) is a Premium perk — free accounts run at
+ * "safe" even when a stored pref says otherwise.
  * @param {string} providerId
  * @returns {"ask" | "safe" | "auto"}
  */
 export function resolveAutonomy(providerId) {
 	const value =
 		getProviderPrefs(providerId).autonomy || settings.value?.aiAutonomy;
+	if (value === "auto" && !isPremium()) return "safe";
 	return value === "ask" || value === "auto" ? value : "safe";
 }
 

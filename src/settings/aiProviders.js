@@ -37,6 +37,7 @@ import {
 	setProviderEnabled,
 	updateProviderPrefs,
 } from "lib/ai/providers";
+import { maxTokensLimit, requirePremium } from "lib/premium";
 import settings from "lib/settings";
 import helpers from "utils/helpers";
 
@@ -207,11 +208,11 @@ export default function aiProviders() {
 					type="number"
 					className="ai-pnum"
 					min={256}
-					max={8192}
+					max={maxTokensLimit()}
 					step={128}
 					value={effectiveTokens}
-					onchange={(e) => {
-						const value = clampTokens(e.target.value, effectiveTokens);
+					onchange={async (e) => {
+						const value = await applyTokens(e.target.value, effectiveTokens);
 						e.target.value = String(value);
 						const $range = $card.get("input[type=range]");
 						if ($range) $range.value = String(value);
@@ -226,14 +227,14 @@ export default function aiProviders() {
 					type="range"
 					className="ai-pslider"
 					min={256}
-					max={8192}
+					max={maxTokensLimit()}
 					step={128}
 					value={effectiveTokens}
 					oninput={(e) => {
 						$num.value = e.target.value;
 					}}
-					onchange={(e) => {
-						const value = clampTokens(e.target.value, effectiveTokens);
+					onchange={async (e) => {
+						const value = await applyTokens(e.target.value, effectiveTokens);
 						updateProviderPrefs(id, { maxTokens: value }).catch((error) =>
 							helpers.error(error),
 						);
@@ -486,6 +487,8 @@ export default function aiProviders() {
 					["auto", autonomyLabel("auto"), "auto"],
 				]);
 				if (!choice) return;
+				// the highest autonomy level is a Premium perk
+				if (choice === "auto" && !(await requirePremium())) return;
 				await updateProviderPrefs(id, { autonomy: choice });
 				render();
 			}
@@ -564,6 +567,23 @@ export default function aiProviders() {
 		const num = Number.parseInt(value, 10);
 		if (!Number.isFinite(num)) return fallback;
 		return Math.max(256, Math.min(8192, Math.round(num / 128) * 128));
+	}
+
+	/**
+	 * Clamps and applies the premium cap: free accounts top out at
+	 * FREE_MAX_TOKENS (requirePremium() toasts when the cap bites).
+	 * @param {string} value
+	 * @param {number} fallback
+	 * @returns {Promise<number>}
+	 */
+	async function applyTokens(value, fallback) {
+		let result = clampTokens(value, fallback);
+		const limit = maxTokensLimit();
+		if (result > limit) {
+			result = limit;
+			await requirePremium();
+		}
+		return result;
 	}
 
 	/**

@@ -376,7 +376,7 @@ export async function syncCloudPremium() {
 		const rows = await supabase.default
 			.from("premium_grants")
 			.select(
-				`select=kind,expires_at&user_id=eq.${encodeURIComponent(user.id)}`,
+				`select=kind,expires_at&or=(user_id.eq.${encodeURIComponent(user.id)},email.eq.${encodeURIComponent(String(user.email || "").toLowerCase())})&limit=1`,
 			);
 		const grant = Array.isArray(rows) ? rows[0] : null;
 		if (!grant) return isPremium();
@@ -434,6 +434,53 @@ export function canUseTheme(id) {
 	return isPremium() || !isThemePremium(id);
 }
 
+// --------------------------------------------------------------- feature gates
+
+/** Cap of the AI "Max tokens" slider for free accounts. */
+export const FREE_MAX_TOKENS = 4096;
+/** Slider cap once Premium is active. */
+export const PREMIUM_MAX_TOKENS = 8192;
+
+/**
+ * Effective slider max for the AI max-tokens setting.
+ * @returns {number}
+ */
+export function maxTokensLimit() {
+	return isPremium() ? PREMIUM_MAX_TOKENS : FREE_MAX_TOKENS;
+}
+
+/**
+ * Alias kept for readable call sites ("may I use a premium feature?").
+ * @returns {boolean}
+ */
+export function hasPremium() {
+	return isPremium();
+}
+
+/**
+ * Friendly gate: answers whether a premium feature may be used and, when
+ * denied, points the user to the site account / support dialog. The toast
+ * is imported lazily so this module stays JSX/SCSS-free for unit tests.
+ * @param {boolean} [silent] when true, nothing is shown
+ * @returns {Promise<boolean>} true when the feature may be used
+ */
+export async function requirePremium(silent = false) {
+	if (isPremium()) return true;
+	if (!silent) {
+		try {
+			const { default: toast } = await import("components/toast");
+			toast(
+				strings["premium required"] ||
+					"Recurso Premium — apoie o projeto para desbloquear (conta do site)",
+				3500,
+			);
+		} catch {
+			/* non-DOM environment (tests) */
+		}
+	}
+	return false;
+}
+
 export default {
 	isPremium,
 	getPremiumStatus,
@@ -445,6 +492,9 @@ export default {
 	agentTurnsLeft,
 	isThemePremium,
 	canUseTheme,
+	maxTokensLimit,
+	hasPremium,
+	requirePremium,
 	PREMIUM_THEMES,
 	FREE_AGENT_DAILY_LIMIT,
 	supportInfo,
