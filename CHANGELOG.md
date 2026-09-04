@@ -3,6 +3,18 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.16] - 2026-09-04
+
+### Added
+- Token/autonomy gates + e-mail grant lookup
+
+### Fixed
+- V1.4.14 baseline, Built-in providers, PayPal e-mail, Dependabot daily
+
+### Maintenance
+- Updating the version
+
+
 ## [1.4.15] - 2026-09-04
 
 ### Added
