@@ -21,7 +21,7 @@ import settings from "lib/settings";
 export const DEFAULT_PROVIDER_ID = "pollinations";
 
 export const GROUPS = /** @type {const} */ ({
-	free: "Free",
+	free: "Built-in",
 	freetier: "Paid (free tier available)",
 	premium: "Premium",
 });
@@ -54,7 +54,7 @@ export const PROVIDERS = [
 		// "inválido" errors on the free provider.
 		models: ["openai-fast", "openai"],
 		docs: "https://pollinations.ai",
-		note: "Grátis e SEM API key — funciona de cara. Modelo anônimo: openai-fast (GPT-OSS 20B, com raciocínio). Limitado a ~1 req/s e os prompts passam por um serviço público.",
+		note: "Built-in: sem API key — funciona de cara. Modelo anônimo: openai-fast (GPT-OSS 20B, com raciocínio). NÃO é ilimitado: ~1 req/s e os prompts passam por um serviço público.",
 		noKeyRequired: true,
 	},
 	{
@@ -292,7 +292,7 @@ export function byGroup(group) {
 }
 
 const BADGE_FALLBACKS = /** @type {const} */ ({
-	free: "Free",
+	free: "Built-in",
 	freetier: "Free tier",
 	premium: "Premium",
 });

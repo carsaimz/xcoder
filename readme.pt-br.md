@@ -199,6 +199,9 @@ O XCoder se apoia em gigantes:
 [MIT](license.txt) — baseado no excelente trabalho open-source do projeto
 Acode (© Foxdebug / Ajit Kumar).
 
+XCoder é desenvolvido e mantido por **Carsai Mozambique**
+([@carsaimz](https://github.com/carsaimz)).
+
 <div align="center">
 
 [🇺🇸 English](readme.md) | [🇧🇷 Português (Brasil)](readme.pt-br.md)

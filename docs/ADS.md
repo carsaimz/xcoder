@@ -36,11 +36,14 @@ uma linha do app** (ver abaixo).
 
 ### Gerenciar os anúncios da casa
 
-1. Configure o Supabase do site (README do xcoder-web) e rode o schema.
-2. Insira linhas na tabela `ads`:
+1. Configure o Supabase do site (ou use o assistente `/setup`) e rode o schema.
+2. No site, entre em **/admin › Anúncios (app)** e crie/edite os anúncios:
    `format` (`banner`|`interstitial`), `title`, `body`, `url`, `cta`,
-   `active`. As caps de frequência ficam em `/api/app/ads` (env
-   `XCODER_ADS_EVERY_OPENS`, `XCODER_ADS_MIN_GAP_HOURS`).
+   `active` — CRUD completo, sem tocar no banco. (Alternativa: inserir
+   linhas direto na tabela `ads` via Studio.)
+3. As caps de frequência ficam em `/api/app/ads` (env
+   `XCODER_ADS_EVERY_OPENS`, `XCODER_ADS_MIN_GAP_HOURS`) e podem ser
+   ajustadas em **/admin › Configurações**.
 
 ## Como ativar o Unity Ads depois (quando houver volume)
 

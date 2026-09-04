@@ -194,6 +194,9 @@ XCoder stands on the shoulders of giants:
 [MIT](license.txt) — based on the excellent open-source work of the Acode
 project (© Foxdebug / Ajit Kumar).
 
+XCoder is developed and maintained by **Carsai Mozambique**
+([@carsaimz](https://github.com/carsaimz)).
+
 <div align="center">
 
 [🇺🇸 English](readme.md) | [🇧🇷 Português (Brasil)](readme.pt-br.md)

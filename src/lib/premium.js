@@ -41,9 +41,10 @@ export const FREE_AGENT_DAILY_LIMIT = 20;
  */
 const SUPPORT_LINKS = {
 	sponsors: "https://github.com/sponsors/carsaimz",
-	paypal: "https://www.paypal.me/carsaimz",
 	coffee: "https://www.buymeacoffee.com/carsaimz",
 };
+/** PayPal receives to this e-mail (account method — value is copied). */
+const PAYPAL_EMAIL = "carimosaidempinda@gmail.com";
 
 const FALLBACK_METHODS = [
 	{
@@ -56,7 +57,12 @@ const FALLBACK_METHODS = [
 		label: "Buy Me a Coffee",
 		url: SUPPORT_LINKS.coffee,
 	},
-	{ method: "paypal", label: "PayPal", url: SUPPORT_LINKS.paypal },
+	{
+		method: "paypal",
+		label: "PayPal",
+		account: PAYPAL_EMAIL,
+		accountLabel: "E-mail PayPal",
+	},
 ];
 
 /**
