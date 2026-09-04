@@ -7,8 +7,8 @@
     <description>
         Fast, offline-first code editor and web IDE for Android.
     </description>
-    <author email="carsaimz@users.noreply.github.com" href="https://github.com/carsaimz">
-        carsaimz
+    <author email="carsaimozambique@gmail.com" href="https://github.com/carsaimz">
+        Carsai Mozambique
     </author>
     <content src="index.html" />
     <access launch-external="yes" origin="*" />
