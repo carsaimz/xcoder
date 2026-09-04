@@ -3,6 +3,12 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.15] - 2026-09-04
+
+### Added
+- Per-provider model picker, SweetAlert2, mandatory notifications, word-wrap everywhere
+
+
 ## [1.4.14] - 2026-09-03
 
 ### Added
