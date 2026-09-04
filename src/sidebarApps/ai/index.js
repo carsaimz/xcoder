@@ -10,7 +10,7 @@ import {
 	collectArtifacts,
 	formatTokenCount,
 } from "lib/ai/artifacts";
-import { listModels, resolveBaseURL } from "lib/ai/client";
+import { explainError, listModels, resolveBaseURL } from "lib/ai/client";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
 import {
 	highlightMarkdownCode,
@@ -181,12 +181,20 @@ export async function askAI(text, opts = {}) {
 		setRunning(true);
 		await agent.run(message);
 	} catch (error) {
-		handleEvent({ type: "error", payload: error.message || String(error) });
+		handleEvent({
+			type: "error",
+			payload: explainError(error, activeProviderId()),
+		});
 	} finally {
 		setRunning(false);
 		persist();
 	}
 	return true;
+}
+
+/** Provider id used for error explanations (falls back to the default). */
+function activeProviderId() {
+	return settings.value.aiProvider || DEFAULT_PROVIDER_ID;
 }
 
 function onSelected(el) {
@@ -462,7 +470,10 @@ async function send() {
 		setRunning(true);
 		await agent.run(text, { attachments: pending });
 	} catch (error) {
-		handleEvent({ type: "error", payload: error.message || String(error) });
+		handleEvent({
+			type: "error",
+			payload: explainError(error, activeProviderId()),
+		});
 	} finally {
 		setRunning(false);
 		persist();
@@ -898,9 +909,15 @@ function handleEvent(event) {
 			toolCalls: event.toolCalls,
 		});
 	} else if (event.type === "reasoning") {
+		// thinking toggle — when off, the agent never sends these,
+		// but older persisted transcripts still render correctly
+		if (settings.value.aiShowThinking === false) return;
 		events.push({ type: "reasoning", payload: event.payload });
 	} else if (event.type === "error") {
-		events.push({ type: "error", payload: event.payload });
+		events.push({
+			type: "error",
+			payload: explainError(event.payload, activeProviderId()),
+		});
 	}
 
 	// the live bubble already shows this answer — finalize it in place

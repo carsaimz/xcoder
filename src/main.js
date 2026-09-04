@@ -47,6 +47,7 @@ import lang from "lib/lang";
 import loadPlugins from "lib/loadPlugins";
 import Logger from "lib/logger";
 import notificationManager from "lib/notificationManager";
+import { registerOAuthIntentHandler } from "lib/oauthIntent";
 import openFolder, { addedFolder } from "lib/openFolder";
 import { registerPrettierFormatter } from "lib/registerPrettierFormatter";
 import restoreFiles from "lib/restoreFiles";
@@ -599,6 +600,7 @@ async function loadApp() {
 	navigator.app.overrideButton("menubutton", true);
 	system.setIntentHandler(intentHandler, intentHandler.onError);
 	system.getCordovaIntent(intentHandler, intentHandler.onError);
+	registerOAuthIntentHandler();
 	settings.on("update:openFileListPos", () => {
 		setMainMenu();
 		setFileMenu();

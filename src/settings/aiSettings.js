@@ -17,6 +17,15 @@ import settings from "lib/settings";
 import helpers from "utils/helpers";
 import aiProviders from "./aiProviders";
 
+/** Short summary shown as the value of the Skills row. */
+function skillsSummary(values) {
+	const disabled = Array.isArray(values.aiDisabledSkills)
+		? values.aiDisabledSkills.length
+		: 0;
+	if (!disabled) return strings["ai skills all on"] || "todas ativas";
+	return `${disabled} ${strings["ai skills off"] || "desativada(s)"}`;
+}
+
 /**
  * XCoder AI assistant settings page.
  */
@@ -98,6 +107,23 @@ export default function aiSettings() {
 				"Let the main agent spawn read-only research subagents.",
 		},
 		{
+			key: "aiShowThinking",
+			text: strings["ai thinking toggle"] || "Show thinking process",
+			checkbox: values.aiShowThinking !== false,
+			info:
+				strings["settings-info-ai-thinking"] ||
+				"Display the model's reasoning steps (when the provider sends them). Turn off for cleaner answers.",
+		},
+		{
+			key: "aiSkills",
+			text: strings["ai skills"] || "Skills",
+			value: skillsSummary(values),
+			chevron: true,
+			info:
+				strings["settings-info-ai-skills"] ||
+				"Bundled and user skills (markdown playbooks) the agent can load on demand.",
+		},
+		{
 			key: "aiSystemPrompt",
 			text: strings["ai system prompt"] || "System prompt",
 			value: values.aiSystemPrompt || "",
@@ -140,6 +166,17 @@ export default function aiSettings() {
 				}
 				if (key === "aiSubagents") {
 					await settings.update({ aiSubagents: Boolean(value) });
+					return;
+				}
+				if (key === "aiShowThinking") {
+					await settings.update({ aiShowThinking: Boolean(value) });
+					return;
+				}
+				if (key === "aiSkills") {
+					const { default: showSkillsSettings } = await import(
+						"./aiSkillsSettings"
+					);
+					showSkillsSettings();
 					return;
 				}
 				if (key === "aiModel") {

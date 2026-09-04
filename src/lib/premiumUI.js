@@ -170,6 +170,14 @@ function renderMethod(method) {
 			{method.instructions && (
 				<p className="xcoder-support-instructions">{method.instructions}</p>
 			)}
+			{method.qr_image_url && (
+				<img
+					className="xcoder-support-qr"
+					src={method.qr_image_url}
+					alt={`${method.label} QR`}
+					loading="lazy"
+				/>
+			)}
 		</div>
 	);
 }
@@ -262,6 +270,52 @@ function renderAccountSection(user, premium) {
 							)}
 						</p>
 					)}
+					<div className="xcoder-support-auth-row">
+						{supabase.OAUTH_PROVIDERS.map((provider) => (
+							<button
+								key={provider}
+								className="xcoder-support-link"
+								onclick={async () => {
+									try {
+										await supabase.signInWithOAuth(provider);
+										toast(
+											t(
+												"oauth browser hint",
+												"Conclua o login no navegador — você volta ao app automaticamente",
+											),
+											6000,
+										);
+									} catch (error) {
+										toast(String(error.message || error), 4000);
+									}
+								}}
+							>
+								<span
+									className={`icon ${provider === "google" ? "public" : "code"}`}
+								/>
+								{provider === "google"
+									? t("continue google", "Continuar com Google")
+									: t("continue github", "Continuar com GitHub")}
+							</button>
+						))}
+						<button
+							className="xcoder-support-link"
+							onclick={async () => {
+								const ok = await supabase.completeOAuthFromPaste();
+								if (ok) {
+									toast(t("signed in", "Sessão iniciada ✓"), 3000);
+									await syncCloudPremium().catch(() => undefined);
+									document.dispatchEvent(new CustomEvent("premiumchange"));
+									$section.replaceWith(
+										renderAccountSection(supabase.getUser(), isPremium()),
+									);
+								}
+							}}
+						>
+							<span className="icon content_paste" />
+							{t("oauth paste", "Já entrei — colar link de retorno")}
+						</button>
+					</div>
 				</div>
 			)}
 		</div>

@@ -266,6 +266,55 @@ export async function streamChatCompletion({
 }
 
 /**
+ * Turns raw provider errors ("401: ...", timeouts, CORS TypeErrors) into
+ * actionable messages for the chat UI. Auth errors name the provider and
+ * where to fix the key — no raw stack/config detail.
+ * @param {Error | string} error
+ * @param {string} [providerId]
+ * @returns {string}
+ */
+export function explainError(error, providerId) {
+	const message = String(error?.message || error || "");
+	const provider = providerId ? PROVIDER_NAMES[providerId] || providerId : "";
+	const status = /^(\d{3}):/.exec(message)?.[1];
+	if (status === "401" || status === "403") {
+		return (
+			`${provider ? `${provider}: ` : ""}Chave de API inválida, expirada ou sem permissão (${status}). ` +
+			`Abra Configurações › IA › Provedores e verifique/renove a chave deste provedor.`
+		);
+	}
+	if (status === "402") {
+		return `${provider ? `${provider}: ` : ""}Saldo/credito insuficiente na conta do provedor (402).`;
+	}
+	if (status === "404") {
+		return `${provider ? `${provider}: ` : ""}Modelo ou endpoint não encontrado (404). Confirme o nome do modelo nas configurações do provedor.`;
+	}
+	if (status === "429") {
+		return `${provider ? `${provider}: ` : ""}Limite de requisições atingido (429) — aguarde alguns segundos e tente de novo. Provedores gratuitos são compartilhados e limitados (~1 req/s).`;
+	}
+	if (/^5\d\d:/.test(message)) {
+		return `${provider ? `${provider}: ` : ""}O servidor do provedor falhou (${message.slice(0, 3)}). Tente novamente ou troque de modelo.`;
+	}
+	if (/timeout|timed out/i.test(message)) {
+		return `${provider ? `${provider}: ` : ""}Tempo esgotado (timeout). Verifique a conexão e tente novamente.`;
+	}
+	return message;
+}
+
+/** Display names for error messages (subset — falls back to the id). */
+const PROVIDER_NAMES = {
+	groq: "Groq",
+	"openrouter-free": "OpenRouter (free)",
+	"openrouter-paid": "OpenRouter",
+	gemini: "Google Gemini",
+	mistral: "Mistral",
+	together: "Together AI",
+	cerebras: "Cerebras",
+	chutes: "Chutes",
+	pollinations: "Built-in",
+};
+
+/**
  * Runs a (non-streaming) chat completion.
  * @param {object} opts
  * @param {string} opts.baseURL
@@ -499,5 +548,6 @@ export default {
 	endpoint,
 	buildHeaders,
 	sanitizeApiKey,
+	explainError,
 	Url,
 };

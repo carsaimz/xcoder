@@ -162,6 +162,18 @@
                 color: var(--secondary-text-color);
         }
 
+        // QR image for methods validated manually (M-Pesa, e-Mola, bank…)
+        .xcoder-support-qr {
+                display: block;
+                width: 148px;
+                height: auto;
+                margin: 0.3rem auto 0;
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+                background: #fff;
+                padding: 4px;
+        }
+
         // XCoder account (Supabase) — sign in / sign up / status
         .xcoder-support-account {
                 margin-top: 0.9rem;

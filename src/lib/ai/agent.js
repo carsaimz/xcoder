@@ -23,6 +23,7 @@ import {
 	resolveMaxTokens,
 	resolveModel,
 } from "./providers";
+import { buildSkillsSection, listSkills } from "./skills";
 import { executeTool, toolSchemas } from "./tools";
 import vshell from "./vshell";
 
@@ -82,6 +83,11 @@ export class Agent {
 		}
 		const root = vshell.getRoot();
 		const context = await workspaceContext();
+		const skills = await listSkills();
+		const skillsSection = buildSkillsSection(
+			skills,
+			settings.value.aiDisabledSkills,
+		);
 		const parts = [
 			"You are the XCoder coding agent, embedded in the XCoder mobile code editor (Android).",
 			`Current workspace root: ${root || "(no folder open)"}.`,
@@ -101,6 +107,7 @@ export class Agent {
 			"- BACKGROUND WORK: write code through the file tools (create_file, edit_file, apply_to_editor) — the chat renders every file write as an artifact automatically. NEVER paste whole file contents or large code blocks into your reply; a short summary of what changed (file, lines, reason) is enough.",
 			"- IMAGES (OCR): when the user attaches images, read text in them (vision models do OCR automatically). For image files in the workspace, mention they need attaching — or read bytes yourself only when needed.",
 			"- PDFs: read_file returns binary garbage for .pdf. Extract text via run_command when a tool exists (e.g. 'pdftotext file.pdf -' or python with pypdf — install it if missing), then read the extracted text.",
+			skillsSection,
 			"- If a task is ambiguous, ask the user.",
 		];
 		if (settings.value.aiSystemPrompt) {
@@ -243,7 +250,7 @@ export class Agent {
 			}
 
 			this.messages.push({ role: "assistant", content: content || "" });
-			if (response.reasoning) {
+			if (response.reasoning && settings.value.aiShowThinking !== false) {
 				this.onEvent({
 					type: "reasoning",
 					payload: response.reasoning,
@@ -371,6 +378,10 @@ export class Agent {
 			return await streamChatCompletion({
 				...common,
 				onDelta: (delta) => {
+					// thinking toggle: drop reasoning deltas when disabled
+					if (delta?.reasoning && settings.value.aiShowThinking === false) {
+						return;
+					}
 					this.onEvent({ type: "delta", payload: delta });
 				},
 			});
@@ -386,7 +397,11 @@ export class Agent {
 			// reasoning models also report thoughts in the plain body
 			const message = result.raw?.choices?.[0]?.message;
 			const thought = message?.reasoning_content ?? message?.reasoning ?? null;
-			if (typeof thought === "string" && thought) {
+			if (
+				typeof thought === "string" &&
+				thought &&
+				settings.value.aiShowThinking !== false
+			) {
 				result.reasoning = thought;
 				this.onEvent({ type: "reasoning", payload: thought });
 			}

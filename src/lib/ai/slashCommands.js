@@ -99,6 +99,47 @@ export const SLASH_COMMANDS = [
 				.join("\n\n"),
 	},
 	{
+		id: "analyse",
+		descriptionKey: "ai cmd analyse",
+		fallbackDescription: "Deep analysis of the project or selection",
+		build: ({ text, ctx }) =>
+			[
+				"Analyse the code below (or the workspace if no target is set): architecture and main flows, dependencies and coupling, potential bugs, performance hotspots and security risks.",
+				"Return a structured report with severity tags and concrete file/line references. End with the 3 highest-impact improvements.",
+				codeRef(ctx),
+				text ? `Focus: ${text}` : "",
+				codeBlock(ctx),
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
+		id: "read",
+		descriptionKey: "ai cmd read",
+		fallbackDescription: "Read a file into context (/read path/to/file)",
+		build: ({ text }) =>
+			[
+				`Read the file "${text.trim() || "(the user will name it)"}" with read_file and summarize it: purpose, key functions/classes, exports and anything unusual. Keep the summary under 15 lines, then wait for follow-up questions.`,
+				text ? "" : "No path given — ask the user which file to read.",
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
+		id: "skill",
+		descriptionKey: "ai cmd skill",
+		fallbackDescription: "Follow a skill playbook (/skill debug-build)",
+		build: ({ text }) =>
+			[
+				`Load the skill "${text.trim()}" with load_skill and follow it step by step for the current task.`,
+				text
+					? ""
+					: "No skill given — list the available skills from the system prompt and ask the user to pick one.",
+			]
+				.filter(Boolean)
+				.join("\n\n"),
+	},
+	{
 		id: "commit",
 		descriptionKey: "ai cmd commit",
 		fallbackDescription: "Commit a workspace snapshot via vcs",

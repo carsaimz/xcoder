@@ -386,6 +386,33 @@ export const TOOLS = [
 			return readUrl(String(args?.url || ""));
 		},
 	},
+	{
+		name: "load_skill",
+		description:
+			"Load a skill: a short markdown playbook with step-by-step guidance (debug-build, code-review, write-tests, git-hygiene, refactor-safe, plus workspace .xcoder/skills). Load it when its description matches the task, follow it, then continue the task.",
+		danger: "read",
+		parameters: {
+			type: "object",
+			properties: {
+				name: {
+					type: "string",
+					description: "skill name as listed in the system prompt",
+				},
+			},
+			required: ["name"],
+		},
+		async run(args) {
+			const { findSkill, listSkills, enabledSkills } = await import("./skills");
+			const skills = await listSkills();
+			const usable = enabledSkills(skills);
+			const skill = findSkill(usable, String(args?.name || ""));
+			if (!skill) {
+				const known = usable.map((entry) => entry.name).join(", ");
+				return `ERROR: skill "${args?.name}" not found or disabled. Available: ${known || "none"}.`;
+			}
+			return skill.body;
+		},
+	},
 ];
 
 export const TOOL_MAP = Object.fromEntries(

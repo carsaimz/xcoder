@@ -6,7 +6,7 @@ import { backendConfig } from "lib/backend";
  * The editor stays 100% free. People who donate unlock "Premium", which:
  *  - removes house ads completely (ads.js checks isPremium()),
  *  - unlocks exclusive premium themes (theme list),
- *  - lifts the daily AI agent turn limit (free: 20 runs/day),
+ *  - lifts the daily AI agent turn limit (free: 25 runs/day),
  *  - shows a supporter badge (About + welcome).
  *
  * Donations are collected through the payment methods stored in the
@@ -33,7 +33,7 @@ const PREMIUM_KEY = "xcoder.premium";
 const AGENT_USE_KEY = "xcoder.premium.agent";
 
 /** Free tier: AI agent runs per calendar day. Premium: unlimited. */
-export const FREE_AGENT_DAILY_LIMIT = 20;
+export const FREE_AGENT_DAILY_LIMIT = 25;
 
 /**
  * Fallback donation methods (used when the site hasn't served the

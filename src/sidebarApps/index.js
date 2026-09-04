@@ -88,6 +88,7 @@ async function loadApps() {
 	add(...(await import("./ai")).default);
 	add(...(await import("./git")).default);
 	add(...(await import("./notification")).default);
+	add(...(await import("./profile")).default);
 	add(...(await import("./settings")).default);
 	add(...(await import("./about")).default);
 	// NOTE: the "updates" launcher app was removed on purpose — the

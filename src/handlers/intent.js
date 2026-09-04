@@ -15,73 +15,75 @@ const pendingIntents = [];
  * @param {Intent} intent
  */
 export default async function HandleIntent(intent = {}) {
-        const type = intent.action?.split(".").slice(-1)[0];
+	const type = intent.action?.split(".").slice(-1)[0];
 
-        if (["SEND", "VIEW", "EDIT"].includes(type)) {
-                /**@type {string} */
-                const url =
-                        intent.fileUri ||
-                        intent.data ||
-                        intent.extras?.["android.intent.extra.STREAM"];
-                if (!url) return;
+	if (["SEND", "VIEW", "EDIT"].includes(type)) {
+		/**@type {string} */
+		const url =
+			intent.fileUri ||
+			intent.data ||
+			intent.extras?.["android.intent.extra.STREAM"];
+		if (!url) return;
 
-                if (url.startsWith("xcoder://")) {
-                        const path = url.replace("xcoder://", "");
-                        const [module, action, value] = path.split("/");
+		if (url.startsWith("xcoder://")) {
+			const path = url.replace("xcoder://", "").split("#")[0];
+			const [module, action, value] = path.split("/");
 
-                        let defaultPrevented = false;
-                        const event = new IntentEvent(module, action, value);
-                        for (const handler of handlers) {
-                                handler(event);
-                                if (event.defaultPrevented) defaultPrevented = true;
-                                if (event.propagationStopped) break;
-                        }
+			let defaultPrevented = false;
+			const event = new IntentEvent(module, action, value);
+			// full raw URL (incl. fragment) for handlers such as OAuth
+			event.url = url;
+			for (const handler of handlers) {
+				handler(event);
+				if (event.defaultPrevented) defaultPrevented = true;
+				if (event.propagationStopped) break;
+			}
 
-                        if (defaultPrevented) return;
+			if (defaultPrevented) return;
 
-                        if (module === "plugin" && action === "install") {
-                                const { default: Plugin } = await import("pages/plugin");
+			if (module === "plugin" && action === "install") {
+				const { default: Plugin } = await import("pages/plugin");
 
-                                if (!value || !/^([a-z0-9\.]+)$/.test(value)) {
-                                        return;
-                                }
+				if (!value || !/^([a-z0-9\.]+)$/.test(value)) {
+					return;
+				}
 
-                                const installed = await fsOperation(PLUGIN_DIR, value).exists();
-                                Plugin({ id: value, installed, install: action === "install" });
-                        }
+				const installed = await fsOperation(PLUGIN_DIR, value).exists();
+				Plugin({ id: value, installed, install: action === "install" });
+			}
 
-                        return;
-                }
+			return;
+		}
 
-                const options = {
-                        mode: "single",
-                        render: true,
-                        persistInSession: false,
-                };
+		const options = {
+			mode: "single",
+			render: true,
+			persistInSession: false,
+		};
 
-                if (sessionStorage.getItem("isfilesRestored") === "true") {
-                        await openFile(url, options);
-                } else {
-                        // Store the intent for later processing when files are restored
-                        pendingIntents.push({
-                                url,
-                                options,
-                        });
-                }
-        }
+		if (sessionStorage.getItem("isfilesRestored") === "true") {
+			await openFile(url, options);
+		} else {
+			// Store the intent for later processing when files are restored
+			pendingIntents.push({
+				url,
+				options,
+			});
+		}
+	}
 }
 
 HandleIntent.onError = (error) => {
-        helpers.error(error);
+	helpers.error(error);
 };
 
 export function addIntentHandler(handler) {
-        handlers.push(handler);
+	handlers.push(handler);
 }
 
 export function removeIntentHandler(handler) {
-        const index = handlers.indexOf(handler);
-        if (index > -1) handlers.splice(index, 1);
+	const index = handlers.indexOf(handler);
+	if (index > -1) handlers.splice(index, 1);
 }
 
 /**
@@ -90,52 +92,52 @@ export function removeIntentHandler(handler) {
  * @returns {Promise<void>}
  */
 export async function processPendingIntents() {
-        if (sessionStorage.getItem("isfilesRestored") !== "true") return;
+	if (sessionStorage.getItem("isfilesRestored") !== "true") return;
 
-        // Process all pending intents
-        while (pendingIntents.length > 0) {
-                const pendingIntent = pendingIntents.shift();
-                try {
-                        await openFile(pendingIntent.url, pendingIntent.options);
-                } catch (error) {
-                        helpers.error(error);
-                }
-        }
+	// Process all pending intents
+	while (pendingIntents.length > 0) {
+		const pendingIntent = pendingIntents.shift();
+		try {
+			await openFile(pendingIntent.url, pendingIntent.options);
+		} catch (error) {
+			helpers.error(error);
+		}
+	}
 }
 
 class IntentEvent {
-        module;
-        action;
-        value;
+	module;
+	action;
+	value;
 
-        #defaultPrevented = false;
-        #propagationStopped = false;
+	#defaultPrevented = false;
+	#propagationStopped = false;
 
-        /**
-         * Creates an instance of IntentEvent.
-         * @param {string} module
-         * @param {string} action
-         * @param {string} value
-         */
-        constructor(module, action, value) {
-                this.module = module;
-                this.action = action;
-                this.value = value;
-        }
+	/**
+	 * Creates an instance of IntentEvent.
+	 * @param {string} module
+	 * @param {string} action
+	 * @param {string} value
+	 */
+	constructor(module, action, value) {
+		this.module = module;
+		this.action = action;
+		this.value = value;
+	}
 
-        preventDefault() {
-                this.#defaultPrevented = true;
-        }
+	preventDefault() {
+		this.#defaultPrevented = true;
+	}
 
-        stopPropagation() {
-                this.#propagationStopped = true;
-        }
+	stopPropagation() {
+		this.#propagationStopped = true;
+	}
 
-        get defaultPrevented() {
-                return this.#defaultPrevented;
-        }
+	get defaultPrevented() {
+		return this.#defaultPrevented;
+	}
 
-        get propagationStopped() {
-                return this.#propagationStopped;
-        }
+	get propagationStopped() {
+		return this.#propagationStopped;
+	}
 }

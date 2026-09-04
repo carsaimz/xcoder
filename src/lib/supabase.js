@@ -1,3 +1,4 @@
+import prompt from "dialogs/prompt";
 import { backendConfig } from "lib/backend";
 import config from "lib/config";
 import settings from "lib/settings";
@@ -128,6 +129,119 @@ export async function signUpWithPassword(email, password) {
 		user,
 		needsEmailConfirmation: !response?.access_token && Boolean(user),
 	};
+}
+
+// -------------------------------------------------------------------- oauth
+
+/** Providers supported by the community project's auth settings. */
+export const OAUTH_PROVIDERS = ["google", "github"];
+
+/**
+ * The site page that receives the OAuth redirect and hands the tokens
+ * back to the app (xcoder://auth/oauth#…).
+ * @returns {string}
+ */
+export function oauthCallbackUrl() {
+	return `${String(config.WEBSITE_URL || "").replace(/\/+$/, "")}/auth/app-callback`;
+}
+
+/**
+ * Builds the Supabase authorize URL (implicit flow — tokens come back in
+ * the redirect fragment, so no code exchange is needed on a device).
+ * @param {"google" | "github" | string} provider
+ * @returns {string}
+ */
+export function buildOAuthUrl(provider) {
+	return (
+		`${supabaseUrl()}/auth/v1/authorize?provider=${encodeURIComponent(provider)}` +
+		`&redirect_to=${encodeURIComponent(oauthCallbackUrl())}`
+	);
+}
+
+/**
+ * Signs in with a federated provider (Google/GitHub). Opens the system
+ * browser; the site callback page redirects into the app via
+ * xcoder://auth/oauth#…, handled by lib/oauthIntent (with a paste-link
+ * fallback in completeOAuthFromPaste).
+ * @param {"google" | "github" | string} provider
+ * @returns {Promise<string>} the authorize URL that was opened
+ */
+export async function signInWithOAuth(provider) {
+	if (!supabaseConfigured()) throw new Error("Supabase is not configured");
+	const url = buildOAuthUrl(provider);
+	try {
+		system.openInBrowser(url);
+	} catch {
+		window.open(url, "_blank", "noopener");
+	}
+	return url;
+}
+
+/**
+ * Completes an OAuth sign-in from a callback URL/fragment
+ * (`xcoder://auth/oauth#access_token=…` or the raw site callback URL).
+ * Pure parsing so it is unit-testable.
+ * @param {string} rawUrl URL containing the fragment/query params
+ * @returns {boolean} true when a session was stored
+ */
+export function applyOAuthTokens(rawUrl) {
+	const value = String(rawUrl || "");
+	if (!value) return false;
+	const fragment = value.includes("#")
+		? value.slice(value.indexOf("#") + 1)
+		: "";
+	const queryStart = value.indexOf("?");
+	const query =
+		queryStart > -1 ? value.slice(queryStart + 1).split("#")[0] : "";
+	const params = new URLSearchParams(fragment || query);
+	const accessToken = params.get("access_token");
+	if (!accessToken) return false;
+	session = {
+		access_token: accessToken,
+		refresh_token: params.get("refresh_token") || "",
+		user: session?.user || null,
+		expires_at: Date.now() + Number(params.get("expires_in") || 3600) * 1000,
+	};
+	writeSession(session);
+	// the implicit flow does not include the profile — fetch it now
+	fetchProfile().catch(() => undefined);
+	return true;
+}
+
+/**
+ * Fetches the profile for the stored access token and persists it.
+ * @returns {Promise<object | null>} the Supabase user (or null)
+ */
+export async function fetchProfile() {
+	if (!session?.access_token) return null;
+	try {
+		const user = await request("/auth/v1/user");
+		if (user?.id) {
+			session.user = user;
+			writeSession(session);
+			document.dispatchEvent(new CustomEvent("authchange"));
+		}
+		return user || null;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Paste-link fallback for devices where the xcoder:// redirect does not
+ * reach the app: the user copies the callback URL from the site page and
+ * pastes it here.
+ * @returns {Promise<boolean>} true when the sign-in completed
+ */
+export async function completeOAuthFromPaste() {
+	const link = await prompt(
+		strings["oauth paste hint"] ||
+			"Cole aqui o link de retorno copiado do navegador",
+		"",
+		"text",
+	);
+	if (!link) return false;
+	return applyOAuthTokens(String(link).trim());
 }
 
 /**
@@ -357,6 +471,13 @@ export default {
 	supabaseAnonKey,
 	signInWithPassword,
 	signUpWithPassword,
+	OAUTH_PROVIDERS,
+	oauthCallbackUrl,
+	buildOAuthUrl,
+	signInWithOAuth,
+	applyOAuthTokens,
+	fetchProfile,
+	completeOAuthFromPaste,
 	refreshSession,
 	signOut,
 	getUser,

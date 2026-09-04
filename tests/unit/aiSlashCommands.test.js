@@ -14,6 +14,9 @@ describe("slash commands", () => {
 			"refactor",
 			"tests",
 			"review",
+			"analyse",
+			"read",
+			"skill",
 			"commit",
 		]);
 	});
