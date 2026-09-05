@@ -4,8 +4,9 @@ import Sidebar from "components/sidebar";
 import toast from "components/toast";
 import loader from "dialogs/loader";
 import actionStack from "lib/actionStack";
+import logger from "lib/logger";
 import { getPremiumStatus, isPremium, syncCloudPremium } from "lib/premium";
-import { showSupportDialog } from "lib/premiumUI";
+import { openSupportPage } from "lib/premiumUI";
 import supabase, {
 	completeOAuthFromPaste,
 	OAUTH_PROVIDERS,
@@ -23,6 +24,25 @@ import supabase, {
 const t = (key, fallback) => strings[key] || fallback;
 
 export default function renderProfile() {
+	// Guard the WHOLE render (not only the chunk import): a synchronous
+	// error inside the page body used to leave a blank screen and make
+	// the sidebar icon feel dead ("Ícone de conta não funciona").
+	try {
+		renderProfilePage();
+	} catch (error) {
+		logger.log(
+			"error",
+			`Profile page render failed: ${error?.message || error}`,
+		);
+		toast(
+			strings["account page error"] ||
+				"Não foi possível abrir a conta — reinicie o app e tente de novo.",
+			4000,
+		);
+	}
+}
+
+function renderProfilePage() {
 	Sidebar.hide();
 
 	const user = supabase.getUser();
@@ -69,10 +89,7 @@ export default function renderProfile() {
 
 			{user ? (
 				<section className="profile-section">
-					<button
-						className="profile-action"
-						onclick={() => showSupportDialog()}
-					>
+					<button className="profile-action" onclick={() => openSupportPage()}>
 						<span className="icon favorite" />
 						{t("support the project", "Apoie o XCoder")}
 					</button>

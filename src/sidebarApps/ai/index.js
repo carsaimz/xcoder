@@ -362,14 +362,22 @@ function buildUi() {
 
 	$attachRow = <div className="ai-attach-row" style="display:none" />;
 
+	// Claude/DeepSeek-style composer: the message field is a CARD and the
+	// send button sits IN FRONT of it (bottom-right, inside the card);
+	// every other control lives BELOW the field (attach + mode switch).
+	// Above the field stay the header actions, provider strip and
+	// artifacts bar — nothing else crowds the input row.
 	const $composer = (
 		<div className="ai-composer">
 			{$slashMenu}
 			{$attachRow}
-			<div className="ai-composer-row">
-				{$attachBtn}
+			<div className="ai-composer-card">
 				{$input}
-				{$send}
+				<div className="ai-composer-foot">{$send}</div>
+			</div>
+			<div className="ai-composer-below">
+				{$attachBtn}
+				{$modeFooter}
 			</div>
 		</div>
 	);
@@ -383,7 +391,6 @@ function buildUi() {
 			{$artifactsPanel}
 			{$messages}
 			{$status}
-			{$modeFooter}
 			{$composer}
 		</div>
 	);
@@ -1080,8 +1087,13 @@ function appendEvent(event, opts = {}) {
 		const $chips = renderAttachmentChips(event.attachments);
 		$messages.append(
 			<div className="ai-msg user">
-				<div className="ai-bubble">{event.payload}</div>
-				{$chips}
+				<div className="ai-body">
+					<div className="ai-bubble">{event.payload}</div>
+					{$chips}
+				</div>
+				<div className="ai-avatar user-avatar">
+					<span className="icon person" />
+				</div>
 			</div>,
 		);
 		return;

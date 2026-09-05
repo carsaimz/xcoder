@@ -33,6 +33,97 @@ const KEYLESS_PROVIDERS = new Set(["pollinations", "duckduckgo"]);
 const KEYLESS_RETRY_STATUSES = new Set(["429", "500", "502", "503", "504"]);
 
 /**
+ * NEW (2026) Pollinations API. The legacy text API still serves the
+ * anonymous tier, but it answers 402 "deprecated" to AUTHENTICATED
+ * requests, and the new gen API only streams with a valid key — so:
+ *  - keyless  → legacy endpoint (streams fine, referrer etiquette)
+ *  - with key → gen endpoint directly (legacy would 402)
+ *  - legacy 402/404/"deprecated" → automatic one-shot fallback to the
+ *    gen API without a key (non-streaming; the only keyless mode there).
+ * @type {string}
+ */
+export const POLLINATIONS_GEN_BASE = "https://gen.pollinations.ai/v1";
+
+/**
+ * @param {string} baseURL
+ * @returns {boolean} whether the URL points at the legacy text API
+ */
+function isLegacyPollinations(baseURL) {
+	return /text\.pollinations\.ai/i.test(String(baseURL || ""));
+}
+
+/**
+ * Detects the deprecation/payment-required failure mode of the legacy
+ * Pollinations API — it can arrive as HTTP 402 OR as an HTTP 500 whose
+ * body says "402 Payment required" / "depreciation_notice".
+ * @param {string} message
+ * @returns {boolean}
+ */
+function isPollinationsDeprecation(message) {
+	return /402 payment required|deprecat|legacy text api/i.test(
+		String(message || ""),
+	);
+}
+
+/**
+ * The gen API's keyless catalog exposes "openai" (GPT-5.4 Nano); the
+ * legacy aliases (openai-fast, gpt-oss…) map onto it. Unknown models are
+ * passed through so real keys keep choosing paid models.
+ * @param {string} model
+ * @returns {string}
+ */
+function normalizeGenModel(model) {
+	const value = String(model || "").trim();
+	return /^(openai-fast|openai|gpt-oss|gpt-oss-20b)$/i.test(value)
+		? "openai"
+		: value;
+}
+
+/**
+ * Resolves the effective Pollinations route for a request.
+ * @param {object} opts
+ * @param {string} opts.baseURL
+ * @param {string} opts.apiKey
+ * @param {string} [opts.providerId]
+ * @param {string} opts.model
+ * @returns {{baseURL: string, model: string}}
+ */
+function pollinationsRoute({ baseURL, apiKey, providerId, model }) {
+	if (providerId !== "pollinations" || !isLegacyPollinations(baseURL)) {
+		return { baseURL, model };
+	}
+	if (sanitizeApiKey(apiKey)) {
+		return {
+			baseURL: POLLINATIONS_GEN_BASE,
+			model: normalizeGenModel(model),
+		};
+	}
+	return { baseURL, model };
+}
+
+/**
+ * Whether a failed legacy-Pollinations request should be retried against
+ * the new gen API right away (deprecation 402 — as HTTP status or inside
+ * the error body — plus hard 402/404 endpoint failures).
+ * @param {string} baseURL original request baseURL
+ * @param {string} apiKey
+ * @param {string} [providerId]
+ * @param {Error} error
+ * @param {AbortSignal} [signal]
+ * @returns {boolean}
+ */
+function shouldFallbackToGen(baseURL, apiKey, providerId, error, signal) {
+	return (
+		providerId === "pollinations" &&
+		isLegacyPollinations(baseURL) &&
+		!sanitizeApiKey(apiKey) &&
+		!signal?.aborted &&
+		(isPollinationsDeprecation(error?.message) ||
+			/^40[24]:/.test(String(error?.message || "")))
+	);
+}
+
+/**
  * Whether this request runs against a keyless shared provider (eligible
  * for the automatic retry below).
  */
@@ -84,6 +175,9 @@ async function withKeylessRetry(run, providerId, apiKey, signal) {
 			if (
 				attempt >= maxRetries ||
 				!KEYLESS_RETRY_STATUSES.has(status) ||
+				// a deprecation 402 wrapped in a 500 never heals with
+				// retries — fail fast so the gen-API fallback kicks in
+				isPollinationsDeprecation(error?.message) ||
 				signal?.aborted
 			) {
 				throw error;
@@ -165,9 +259,13 @@ export function buildHeaders(baseURL, apiKey, providerId) {
  */
 export async function listModels({ baseURL, apiKey, providerId, strict }) {
 	try {
+		// Pollinations: authenticated lists come from the new API —
+		// the legacy one is deprecated for authenticated users.
+		const route = pollinationsRoute({ baseURL, apiKey, providerId, model: "" });
+		const effBaseURL = route.baseURL;
 		const json = await nativeOrFetchJson({
-			url: endpoint(baseURL, "models"),
-			headers: buildHeaders(baseURL, apiKey, providerId),
+			url: endpoint(effBaseURL, "models"),
+			headers: buildHeaders(effBaseURL, apiKey, providerId),
 			method: "GET",
 		});
 		const data = json?.data || json?.models || [];
@@ -218,8 +316,13 @@ export async function streamChatCompletion({
 	if (providerId === "duckduckgo") {
 		throw new Error("streaming not supported");
 	}
+	// Pollinations migration (see POLLINATIONS_GEN_BASE): authenticated
+	// requests go straight to the new API; keyless stays on legacy.
+	const route = pollinationsRoute({ baseURL, apiKey, providerId, model });
+	const effBaseURL = route.baseURL;
+	const effModel = route.model;
 	const body = {
-		model,
+		model: effModel,
 		messages,
 		stream: true,
 	};
@@ -236,33 +339,61 @@ export async function streamChatCompletion({
 	if (!tools?.length) body.stream_options = { include_usage: true };
 	applyProviderBodyEtiquette(providerId, body);
 
-	const response = await withKeylessRetry(
-		async () => {
-			const res = await fetch(endpoint(baseURL, "chat/completions"), {
-				method: "POST",
-				headers: buildHeaders(baseURL, apiKey, providerId),
-				body: JSON.stringify(body),
+	let response;
+	try {
+		response = await withKeylessRetry(
+			async () => {
+				const res = await fetch(endpoint(effBaseURL, "chat/completions"), {
+					method: "POST",
+					headers: buildHeaders(effBaseURL, apiKey, providerId),
+					body: JSON.stringify(body),
+					signal,
+				});
+				if (!res.ok) {
+					const text = await res.text().catch(() => "");
+					let json = {};
+					try {
+						json = text ? JSON.parse(text) : {};
+					} catch {
+						/* non-JSON error body */
+					}
+					const detail =
+						json?.error?.message ||
+						String(text || res.statusText || "request failed").slice(0, 200);
+					throw new Error(`${res.status}: ${detail}`);
+				}
+				return res;
+			},
+			providerId,
+			apiKey,
+			signal,
+		);
+	} catch (error) {
+		if (shouldFallbackToGen(baseURL, apiKey, providerId, error, signal)) {
+			// legacy is done for this request — the new API has no
+			// keyless streaming, so fetch the whole answer and emit
+			// it as a single delta (the UI renders it the same)
+			const result = await chatCompletion({
+				baseURL: POLLINATIONS_GEN_BASE,
+				apiKey,
+				providerId,
+				model: normalizeGenModel(model),
+				messages,
+				tools,
+				temperature,
+				maxTokens,
 				signal,
 			});
-			if (!res.ok) {
-				const text = await res.text().catch(() => "");
-				let json = {};
-				try {
-					json = text ? JSON.parse(text) : {};
-				} catch {
-					/* non-JSON error body */
-				}
-				const detail =
-					json?.error?.message ||
-					String(text || res.statusText || "request failed").slice(0, 200);
-				throw new Error(`${res.status}: ${detail}`);
-			}
-			return res;
-		},
-		providerId,
-		apiKey,
-		signal,
-	);
+			if (result.content) onDelta?.({ content: result.content });
+			return {
+				content: result.content,
+				toolCalls: result.toolCalls,
+				raw: result.raw,
+				reasoning: "",
+			};
+		}
+		throw error;
+	}
 
 	if (!response.body || typeof response.body.getReader !== "function") {
 		throw new Error("streaming not supported");
@@ -346,7 +477,7 @@ export async function streamChatCompletion({
 	}));
 
 	const raw = {
-		model,
+		model: effModel,
 		choices: [
 			{
 				finish_reason: finishReason,
@@ -380,7 +511,14 @@ export function explainError(error, providerId) {
 			`Abra Configurações › IA › Provedores e verifique/renove a chave deste provedor.`
 		);
 	}
-	if (status === "402") {
+	if (status === "402" || isPollinationsDeprecation(message)) {
+		if (providerId === "pollinations" || !providerId) {
+			return (
+				"Built-in (Pollinations): a API legada foi descontinuada para pedidos autenticados. " +
+				"O app já usa a nova API automaticamente — se o erro persistir, REMOVA a chave do " +
+				"provedor Built-in (não é necessária) ou gere uma nova em enter.pollinations.ai/keys."
+			);
+		}
 		return `${provider ? `${provider}: ` : ""}Saldo/credito insuficiente na conta do provedor (402).`;
 	}
 	if (status === "404") {
@@ -449,8 +587,13 @@ export async function chatCompletion({
 	if (providerId === "duckduckgo") {
 		return duckChatCompletion({ model, messages, signal });
 	}
+	// Pollinations migration: with a key go straight to the new API —
+	// the legacy text API answers 402 "deprecated" to authenticated users.
+	const route = pollinationsRoute({ baseURL, apiKey, providerId, model });
+	const effBaseURL = route.baseURL;
+	const effModel = route.model;
 	const body = {
-		model,
+		model: effModel,
 		messages,
 	};
 	if (tools?.length) {
@@ -463,19 +606,45 @@ export async function chatCompletion({
 	}
 	applyProviderBodyEtiquette(providerId, body);
 
-	const json = await withKeylessRetry(
-		() =>
-			nativeOrFetchJson({
-				url: endpoint(baseURL, "chat/completions"),
-				headers: buildHeaders(baseURL, apiKey, providerId),
-				method: "POST",
-				body,
+	let json;
+	try {
+		json = await withKeylessRetry(
+			() =>
+				nativeOrFetchJson({
+					url: endpoint(effBaseURL, "chat/completions"),
+					headers: buildHeaders(effBaseURL, apiKey, providerId),
+					method: "POST",
+					body,
+					signal,
+				}),
+			providerId,
+			apiKey,
+			signal,
+		);
+	} catch (error) {
+		if (shouldFallbackToGen(baseURL, apiKey, providerId, error, signal)) {
+			// one-shot migration: retry against the new gen API
+			// (keyless, non-streaming)
+			json = await withKeylessRetry(
+				() =>
+					nativeOrFetchJson({
+						url: endpoint(POLLINATIONS_GEN_BASE, "chat/completions"),
+						headers: buildHeaders(POLLINATIONS_GEN_BASE, "", providerId),
+						method: "POST",
+						body: {
+							...body,
+							model: normalizeGenModel(model),
+						},
+						signal,
+					}),
+				providerId,
+				"",
 				signal,
-			}),
-		providerId,
-		apiKey,
-		signal,
-	);
+			);
+		} else {
+			throw error;
+		}
+	}
 
 	if (json?.error) {
 		const message =

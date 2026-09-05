@@ -3,7 +3,7 @@ import confirm from "dialogs/confirm";
 import actionStack from "lib/actionStack";
 import openFile from "lib/openFile";
 import { getPremiumStatus } from "lib/premium";
-import { showSupportDialog } from "lib/premiumUI";
+import { openSupportPage } from "lib/premiumUI";
 import appSettings from "lib/settings";
 import settings from "lib/settings";
 import Changelog from "pages/changelog/changelog";
@@ -207,7 +207,7 @@ export default function mainSettings() {
 				break;
 
 			case "support":
-				showSupportDialog().catch(() => {});
+				openSupportPage();
 				break;
 
 			case "theme":

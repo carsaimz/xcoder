@@ -51,9 +51,13 @@ export const PROVIDERS = [
 		// (mistral, qwen-coder, openai-large, z-ai…) answers 404
 		// "Model not found" — that was the source of the
 		// "inválido" errors on the free provider.
+		// MIGRATION (2026-09): Pollinations is deprecating the
+		// legacy text API for authenticated users (402) — client.js
+		// routes keyed requests to the new gen.pollinations.ai API
+		// and falls back to it automatically when legacy fails.
 		models: ["openai-fast", "openai"],
 		docs: "https://pollinations.ai",
-		note: "Built-in: sem API key, funciona de cara (GPT-OSS 20B com raciocínio). NÃO é ilimitado: ~1 req/s por IP — erros 429 são repetidos automaticamente. Para qualidade melhor e de graça, adicione uma chave Groq (llama-3.3-70b).",
+		note: "Built-in: sem API key, funciona de cara (GPT-OSS 20B com raciocínio). NÃO é ilimitado: ~1 req/s por IP — erros 429 são repetidos automaticamente. NÃO adicione chave aqui: a API legada rejeita pedidos autenticados (402) e o app passa a usar a nova API sozinho. Para qualidade melhor e de graça, adicione uma chave Groq (llama-3.3-70b).",
 		noKeyRequired: true,
 	},
 	{

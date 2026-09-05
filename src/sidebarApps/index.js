@@ -1,3 +1,5 @@
+import toast from "components/toast";
+import logger from "lib/logger";
 import appSettings from "lib/settings";
 import SidebarApp from "./sidebarApp";
 
@@ -175,15 +177,29 @@ function pulseApp(id) {
 	const app = apps.find((app) => app.id === id);
 	if (!app) return;
 
-	if (app.launcher) {
-		app.launch();
-		return;
+	// Guard: any synchronous throw inside launch()/pulse()/activate()
+	// used to bubble to the click handler and kill the icon silently
+	// ("Ícone de conta não funciona"). Now it becomes a visible toast.
+	try {
+		if (app.launcher) {
+			app.launch();
+			return;
+		}
+		if (app.tabbed) {
+			app.pulse();
+			return;
+		}
+		setActiveApp(id);
+	} catch (error) {
+		logger.log(
+			"error",
+			`Sidebar app "${id}" failed: ${error?.message || error}`,
+		);
+		toast(
+			`${strings["sidebar app error"] || "Não foi possível abrir"}: ${app.title || id}`,
+			3500,
+		);
 	}
-	if (app.tabbed) {
-		app.pulse();
-		return;
-	}
-	setActiveApp(id);
 }
 
 export default {

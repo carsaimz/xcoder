@@ -150,3 +150,116 @@ describe("keyless provider retry (built-in AI hardening)", () => {
                 expect(sent.referrer).toBe("xcoder");
         }, 15000);
 });
+
+describe("Pollinations legacy→gen migration (402 deprecation)", () => {
+        it("falls back to the new gen API when legacy answers 402 (non-streaming)", async () => {
+                const { fetchMock, calls } = mockFetchQueue([
+                        fetchResponse({
+                                ok: false,
+                                status: 500,
+                                body: JSON.stringify({
+                                        error: "402 Payment required",
+                                        status: 500,
+                                        depreciation_notice:
+                                                "NOTICE: Pollinations legacy text API is being deprecated for authenticated users. Please migrate to https://pollinations.ai",
+                                }),
+                        }),
+                        fetchResponse({
+                                ok: true,
+                                status: 200,
+                                body: JSON.stringify({
+                                        choices: [
+                                                {
+                                                        index: 0,
+                                                        message: { role: "assistant", content: "migrated!" },
+                                                        finish_reason: "stop",
+                                                },
+                                        ],
+                                }),
+                        }),
+                ]);
+
+                const result = await chatCompletion({
+                        baseURL: "https://text.pollinations.ai/openai",
+                        apiKey: "",
+                        providerId: "pollinations",
+                        model: "openai-fast",
+                        messages: [{ role: "user", content: "hi" }],
+                });
+
+                expect(result.content).toBe("migrated!");
+                expect(fetchMock).toHaveBeenCalledTimes(2);
+                // second call hits the new gen API with the normalized model
+                expect(calls[1].url).toBe(
+                        "https://gen.pollinations.ai/v1/chat/completions",
+                );
+                expect(JSON.parse(calls[1].init.body).model).toBe("openai");
+        }, 15000);
+
+        it("routes keyed requests straight to the new gen API", async () => {
+                const { calls } = mockFetchQueue([
+                        fetchResponse({
+                                ok: true,
+                                status: 200,
+                                body: JSON.stringify({
+                                        choices: [
+                                                {
+                                                        index: 0,
+                                                        message: { role: "assistant", content: "gen key" },
+                                                        finish_reason: "stop",
+                                                },
+                                        ],
+                                }),
+                        }),
+                ]);
+
+                const result = await chatCompletion({
+                        baseURL: "https://text.pollinations.ai/openai",
+                        apiKey: "plln_test_key",
+                        providerId: "pollinations",
+                        model: "openai-fast",
+                        messages: [{ role: "user", content: "hi" }],
+                });
+
+                expect(result.content).toBe("gen key");
+                expect(calls[0].url).toBe("https://gen.pollinations.ai/v1/chat/completions");
+                expect(JSON.parse(calls[0].init.body).model).toBe("openai");
+        });
+
+        it("falls back to a single-delta non-streamed answer when streaming hits 402", async () => {
+                const deltas = [];
+                const { fetchMock } = mockFetchQueue([
+                        fetchResponse({
+                                ok: false,
+                                status: 402,
+                                body: "Payment required",
+                        }),
+                        fetchResponse({
+                                ok: true,
+                                status: 200,
+                                body: JSON.stringify({
+                                        choices: [
+                                                {
+                                                        index: 0,
+                                                        message: { role: "assistant", content: "whole answer" },
+                                                        finish_reason: "stop",
+                                                },
+                                        ],
+                                }),
+                        }),
+                ]);
+
+                const result = await streamChatCompletion({
+                        baseURL: "https://text.pollinations.ai/openai",
+                        apiKey: "",
+                        providerId: "pollinations",
+                        model: "openai-fast",
+                        messages: [{ role: "user", content: "hi" }],
+                        onDelta: (delta) => deltas.push(delta),
+                });
+
+                expect(result.content).toBe("whole answer");
+                expect(deltas).toEqual([{ content: "whole answer" }]);
+                expect(fetchMock).toHaveBeenCalledTimes(2);
+        }, 15000);
+});

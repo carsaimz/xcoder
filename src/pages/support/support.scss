@@ -1,0 +1,181 @@
+/* Support page — a real page (not a dialog). Follows the app's card
+ * design language (see profile.scss) using theme variables only. */
+
+.support-page {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+}
+
+.support-status {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        padding: 1rem;
+        border-radius: 8px;
+        background: var(--secondary-color);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+
+        > .icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                font-size: 26px;
+                color: #fff;
+                background: rgba(255, 255, 255, 0.08);
+                flex-shrink: 0;
+        }
+
+        &.is-premium > .icon {
+                background: linear-gradient(135deg, #f5b544, #f08c2e);
+                color: #201503;
+        }
+}
+
+.support-status-title {
+        font-weight: 700;
+        font-size: 1rem;
+}
+
+.support-status-sub {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        overflow-wrap: anywhere;
+}
+
+.support-pitch {
+        margin: 0 0.25rem;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        opacity: 0.75;
+}
+
+.support-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 1rem;
+        border-radius: 8px;
+        background: var(--secondary-color);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.support-section-title {
+        margin: 0;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.6;
+}
+
+.support-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 44px;
+        padding: 0 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--primary-text-color);
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: background 0.15s ease, transform 0.1s ease;
+
+        &:active {
+                transform: scale(0.98);
+        }
+
+        .icon {
+                font-size: 20px;
+        }
+
+        &.is-primary {
+                background: var(--active-color);
+                border-color: transparent;
+                color: #fff;
+        }
+}
+
+.support-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+}
+
+.support-method {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.15);
+}
+
+.support-method-main {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        min-height: 40px;
+        padding: 0 4px;
+        background: transparent;
+        border: none;
+        color: var(--primary-text-color);
+        font-size: 0.9rem;
+        font-weight: 600;
+}
+
+.support-method-label {
+        overflow-wrap: anywhere;
+        text-align: left;
+}
+
+.support-method-copy {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-height: 38px;
+        padding: 0 10px;
+        border-radius: 6px;
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: var(--primary-text-color);
+        font-size: 0.8rem;
+
+        .icon {
+                font-size: 16px;
+                opacity: 0.8;
+        }
+}
+
+.support-method-value {
+        margin-left: auto;
+        opacity: 0.65;
+        font-size: 0.75rem;
+        overflow-wrap: anywhere;
+}
+
+.support-method-instructions {
+        margin: 0;
+        font-size: 0.75rem;
+        line-height: 1.45;
+        opacity: 0.7;
+        overflow-wrap: anywhere;
+}
+
+.support-method-qr {
+        align-self: center;
+        width: 148px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #fff;
+        padding: 4px;
+}

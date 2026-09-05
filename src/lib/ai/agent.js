@@ -7,7 +7,7 @@ import {
 	FREE_AGENT_DAILY_LIMIT,
 	trackAgentTurn,
 } from "lib/premium";
-import { showSupportDialog } from "lib/premiumUI";
+import { openSupportPage } from "lib/premiumUI";
 import settings from "lib/settings";
 import Url from "utils/Url";
 import { buildUserContent } from "./artifacts";
@@ -192,7 +192,7 @@ export class Agent {
 		if (!canUseAgentTurn()) {
 			const message = `Limite diário do agente atingido (${FREE_AGENT_DAILY_LIMIT} execuções). Apoie o projeto para desbloquear o agente ilimitado.`;
 			this.onEvent({ type: "error", payload: message });
-			showSupportDialog().catch(() => {});
+			openSupportPage();
 			return message;
 		}
 		trackAgentTurn();
