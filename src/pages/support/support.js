@@ -108,7 +108,12 @@ export default function renderSupport() {
 			actionStack.remove("support");
 		},
 	});
-	$page.show();
+	// WCPage has no show() — pages become visible when connected to the
+	// app root (same as About/Plugins/Profile). `$page.show()` threw
+	// TypeError on every tap, so this page never opened either.
+	app.append($page);
+
+	return $page;
 
 	function openWebsite(path) {
 		const url = `${String(config.WEBSITE_URL || "").replace(/\/+$/, "")}${path}`;
@@ -202,7 +207,8 @@ function renderMethod(method) {
 						{method.accountLabel || t("copy account", "copiar conta")}
 					</span>
 					<span className="support-method-value">
-						{maskAccount(method.account)}
+						{/* full value — payment accounts must be readable/typeable */}
+						{method.account}
 					</span>
 				</button>
 			)}

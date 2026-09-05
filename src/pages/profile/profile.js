@@ -181,11 +181,11 @@ function renderProfilePage() {
 	// TypeError on every tap and the account page never opened.
 	app.append($page);
 
-	return $page;
-
 	// Hide federated providers that are not enabled in the project —
 	// tapping a button that always fails is worse than not showing it.
 	updateOAuthAvailability();
+
+	return $page;
 
 	async function refreshPage() {
 		const { default: render } = await import("./profile");

@@ -156,9 +156,11 @@ describe("account page (sidebar profile icon)", () => {
         test("renders and attaches to the DOM without throwing (no $page.show)", async () => {
                 const renderProfile = (await import("pages/profile/profile")).default;
                 // the old bug: TypeError "$page.show is not a function" — would fail here
-                const $page = renderProfile();
-                assert.ok($page, "profile page element is returned");
-                assert.ok($page.isConnected, "profile page is attached to the document");
+                renderProfile();
+                const $page = document
+                        .querySelector("wc-page .profile-page")
+                        ?.closest("wc-page");
+                assert.ok($page, "profile page is attached to the document");
                 assert.ok(
                         document.querySelector(".profile-page"),
                         "profile body is rendered",
@@ -169,7 +171,9 @@ describe("account page (sidebar profile icon)", () => {
                         "e-mail field rendered for signed-out user",
                 );
                 // animate() never settles under happy-dom — detach synchronously
-                $page.remove();
+                document
+                        .querySelectorAll("wc-page")
+                        ?.forEach(($p) => $p.remove());
         });
 
         test("signed-in view exposes support + sign out", async () => {
@@ -181,7 +185,9 @@ describe("account page (sidebar profile icon)", () => {
                 assert.match(text, /test@example\.com/);
                 assert.match(text, /Apoie/i);
                 // animate() never settles under happy-dom — detach synchronously
-                $page.remove();
+                document
+                        .querySelectorAll("wc-page")
+                        ?.forEach(($p) => $p.remove());
                 state.user = null;
         });
 });
@@ -205,8 +211,8 @@ describe("support page (Apoie o projeto — página própria, não modal)", () =
 
         test("renders fallback methods when remote list is empty", async () => {
                 state.methods = [];
-                const { openSupportPage } = await import("lib/premiumUI");
-                await openSupportPage();
+                const { showSupportDialog } = await import("lib/premiumUI");
+                await showSupportDialog();
                 assert.ok(
                         document.querySelector(".support-page"),
                         "support page exists with fallback methods",
