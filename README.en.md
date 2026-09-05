@@ -9,7 +9,7 @@
 
 🤖 Built-in AI agent • 🐧 Real Linux terminal • 🧠 LSP support • 🚫 No ads • 🔒 No account
 
-[🇺🇸 English](readme.md) | [🇧🇷 Português (Brasil)](readme.pt-br.md)
+[🇺🇸 English](README.en.md) | [🇧🇷 Português (Brasil)](README.md)
 
 ### Build status
 
@@ -22,7 +22,7 @@
 ### Repository
 
 [![Latest release](https://img.shields.io/github/v/release/carsaimz/xcoder?include_prereleases&sort=semver&display_name=tag&logo=github)](https://github.com/carsaimz/xcoder/releases)
-[![License](https://img.shields.io/github/license/carsaimz/xcoder?logo=open-source-initiative)](license.txt)
+[![License](https://img.shields.io/github/license/carsaimz/xcoder?logo=open-source-initiative)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/carsaimz/xcoder?style=social)](https://github.com/carsaimz/xcoder/stargazers)
 [![Forks](https://img.shields.io/github/forks/carsaimz/xcoder?style=social)](https://github.com/carsaimz/xcoder/network/members)
 [![Contributors](https://img.shields.io/github/contributors/carsaimz/xcoder?logo=people)](https://github.com/carsaimz/xcoder/graphs/contributors)
@@ -52,10 +52,16 @@ account, showing ads or sending telemetry.
   spawn read-only subagents for research tasks. You approve every sensitive
   action.
 - 🔌 **AI provider manager** — presets in three groups:
-  - *Free*: Groq, OpenRouter (free models), Cerebras, Hugging Face, Cloudflare Workers AI
+  - *Built-in (keyless, free)*: Pollinations (text + **image generation**
+    via `/image`) and DuckDuckGo AI (experimental)
+  - *Free with key*: Groq, OpenRouter (free models), Cerebras, Hugging Face, Cloudflare Workers AI
   - *Paid with free tier*: Google Gemini, OpenAI, Mistral, DeepSeek, Together, Cohere, GitHub Models, Fireworks
-  - *Premium*: Anthropic, xAI, Perplexity, Azure OpenAI, NVIDIA NIM, OpenRouter
+  - *Premium*: Anthropic, xAI, Perplexity, Azure OpenAI, NVIDIA NIM
   - Or point to **any OpenAI-compatible endpoint** (Ollama, LM Studio, vLLM, LiteLLM).
+- 💬 **Claude/DeepSeek-style chat** — user & AI avatars, send/attach buttons
+  on a dedicated row below the input, live streaming with an expandable
+  thought process, and **long-press message actions**: copy, regenerate,
+  explain in detail, summarize, continue and insert into the editor.
 - ✍️ **Editor**: CodeMirror 6 core, 100+ languages, autocompletion, folding,
   multi-cursor, quick tools, 20+ editor themes, customizable fonts.
 - 🧠 **LSP**: TypeScript, JavaScript, Python, HTML, CSS, JSON, Tailwind and
@@ -88,16 +94,14 @@ every push — open the
 [Debug APK workflow](https://github.com/carsaimz/xcoder/actions/workflows/debug.yml),
 pick the latest run and download the artifact.
 
-<!-- TODO: add real app screenshots here once new ones are captured -->
-
 ## 📸 Screenshots
 
-| Editor + AI | Terminal | Git |
-| :---: | :---: | :---: |
-| ![Editor](docs/screenshots/editor.png) | ![Terminal](docs/screenshots/terminal.png) | ![Git](docs/screenshots/git.png) |
+> Illustrative renders of the UI (Dark+ theme). Real device captures are
+> welcome via PR — add them in [`docs/screenshots/`](docs/screenshots).
 
-> Screenshots live in [`docs/screenshots/`](docs/screenshots) — PRs adding
-> fresh captures are welcome!
+| Editor + AI agent | Alpine terminal | AI chat (actions) |
+| :---: | :---: | :---: |
+| ![Editor with AI panel](docs/screenshots/editor-ai.svg) | ![Alpine terminal](docs/screenshots/terminal.svg) | ![AI chat with actions](docs/screenshots/chat-ia.svg) |
 
 ## 🛠️ Build
 
@@ -127,10 +131,12 @@ npm test
 
 1. Open a project folder.
 2. Tap the **AI** tab in the sidebar.
-3. Open *Settings → AI assistant*, pick a provider (e.g. **Groq** — free),
-   paste your API key and pick a model.
+3. Start chatting — the **Built-in** provider (Pollinations) works with
+   **no key and no account**. For more power open *Settings → AI assistant*
+   and pick a provider (e.g. **Groq** — free) with your API key.
 4. Ask anything: "explain this project", "add a dark mode toggle", "find all
-   uses of X and refactor".
+   uses of X and refactor". Use `/image` to generate images, and long-press
+   a message to copy, regenerate, expand or summarize it.
 
 The agent asks before modifying anything unless you raise its autonomy level.
 
@@ -156,6 +162,18 @@ utils/               build/dev scripts
 res/                 Android icons and resources
 .github/             CI, release automation and bot configs
 ```
+
+## 🆓 Free, Premium and support
+
+**Every XCoder feature is free.** The optional Premium only exists to reward
+supporters: it removes house ads and raises the AI limits (unlimited agent
+turns, 8k-token answers, "auto" autonomy). Themes, plugins, the terminal, Git
+and the full editor remain free for everyone.
+
+Donations happen on the **Support the project** page (in the app or at
+[xcoderapp.vercel.app/sponsor](https://xcoderapp.vercel.app/sponsor)) —
+M-Pesa, e-Mola, PayPal, GitHub Sponsors and more. A donation becomes Premium
+on your site account automatically.
 
 ## 🔒 Privacy
 
@@ -191,7 +209,7 @@ XCoder stands on the shoulders of giants:
 
 ## 📄 License
 
-[MIT](license.txt) — based on the excellent open-source work of the Acode
+[MIT](LICENSE) — based on the excellent open-source work of the Acode
 project (© Foxdebug / Ajit Kumar).
 
 XCoder is developed and maintained by **Carsai Mozambique**
@@ -199,6 +217,6 @@ XCoder is developed and maintained by **Carsai Mozambique**
 
 <div align="center">
 
-[🇺🇸 English](readme.md) | [🇧🇷 Português (Brasil)](readme.pt-br.md)
+[🇺🇸 English](README.en.md) | [🇧🇷 Português (Brasil)](README.md)
 
 </div>

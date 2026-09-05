@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <!-- XCoder — mockup ilustrativo: Terminal Alpine Linux (proot) -->
+  <rect width="640" height="400" rx="18" fill="#0b0e12"/>
+  <rect width="640" height="42" rx="18" fill="#171d24"/>
+  <rect y="24" width="640" height="18" fill="#171d24"/>
+  <circle cx="24" cy="21" r="6" fill="#e5484d"/><circle cx="44" cy="21" r="6" fill="#e3b341"/><circle cx="64" cy="21" r="6" fill="#46a758"/>
+  <text x="320" y="26" fill="#9fb0c0" font-size="13" text-anchor="middle">Terminal — Alpine Linux (proot)</text>
+
+  <g font-family="'JetBrains Mono',Consolas,monospace" font-size="13.5">
+    <text x="24" y="76" fill="#46a758">localhost:~#</text><text x="150" y="76" fill="#e6edf3">apk add nodejs npm</text>
+    <text x="24" y="102" fill="#7d8b99">(1/6) Instalando libgcc (13.2.0)</text>
+    <text x="24" y="124" fill="#7d8b99">(2/6) Instalando nodejs (22.14.0-r0)</text>
+    <text x="24" y="146" fill="#7d8b99">(3/6) Instalando npm (10.9.2-r0)</text>
+    <text x="24" y="168" fill="#46a758">OK: 148 MiB em 32 pacotes</text>
+    <text x="24" y="206" fill="#46a758">localhost:~#</text><text x="150" y="206" fill="#e6edf3">node -v</text>
+    <text x="24" y="230" fill="#e6edf3">v22.14.0</text>
+    <text x="24" y="268" fill="#46a758">localhost:~#</text><text x="150" y="268" fill="#e6edf3">git status</text>
+    <text x="24" y="292" fill="#e3b341">On branch main</text>
+    <text x="24" y="314" fill="#7d8b99">nothing to commit, working tree clean</text>
+    <text x="24" y="352" fill="#46a758">localhost:~#</text>
+    <rect x="150" y="340" width="10" height="16" fill="#e6edf3"><animate attributeName="opacity" values="1;0;1" dur="1.1s" repeatCount="indefinite"/></rect>
+  </g>
+</svg>

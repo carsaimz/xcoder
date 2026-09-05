@@ -39,7 +39,11 @@ async function checkForUpdates() {
 	}
 }
 
-const DEV_TAP_COUNT = 7;
+// 2 taps (user request: "Menu dev deve precisar 2 cliques (não 7)") —
+// still outside the settings UI, but reachable without a tap marathon
+const DEV_TAP_COUNT = 2;
+/** Window within which the taps must happen. */
+const DEV_TAP_WINDOW_MS = 1500;
 
 /**
  * Hidden developer menu — opens after tapping the version number
@@ -317,13 +321,13 @@ export default function AboutInclude() {
 		.querySelector("#check-updates-item")
 		?.addEventListener("click", checkForUpdates);
 
-	// Hidden developer menu: tap the version number 7 times (resets after 3s)
+	// Hidden developer menu: tap the version number 2 times (1.5s window)
 	$page.body.querySelector("#version-number")?.addEventListener("click", () => {
 		devTaps += 1;
 		clearTimeout(devTapTimer);
 		devTapTimer = setTimeout(() => {
 			devTaps = 0;
-		}, 3000);
+		}, DEV_TAP_WINDOW_MS);
 		if (devTaps >= DEV_TAP_COUNT) {
 			devTaps = 0;
 			clearTimeout(devTapTimer);

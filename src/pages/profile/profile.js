@@ -176,7 +176,12 @@ function renderProfilePage() {
 			actionStack.remove("profile");
 		},
 	});
-	$page.show();
+	// WCPage has no show() - a page becomes visible when connected to
+	// the app root (same as About/Plugins). The old `$page.show()` threw
+	// TypeError on every tap and the account page never opened.
+	app.append($page);
+
+	return $page;
 
 	// Hide federated providers that are not enabled in the project —
 	// tapping a button that always fails is worse than not showing it.

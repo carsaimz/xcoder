@@ -21,8 +21,65 @@
 const STATUS_URL = "https://duckduckgo.com/duckchat/v1/status";
 const CHAT_URL = "https://duckduckgo.com/duckchat/v1/chat";
 
+// duck.ai validates a browser-like client: consistent UA + client hints,
+// a static anti-bot header (x-vqd-hash-1, base64 JSON captured from real
+// traffic — see reverse/README of duckduckgo-chat-cli) and frontend
+// signal headers. The dynamic token still comes from /status.
 const BROWSER_UA =
-	"Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36";
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36";
+const SEC_CH_UA = '"Not)A;Brand";v="8", "Chromium";v="138", "Brave";v="138"';
+
+/** Minimal cookies duck.ai expects on the session domain. */
+const DUCK_COOKIES = "5=1; dcm=3; dcs=1";
+
+/**
+ * Static anti-bot header (base64 JSON with server/client hashes and
+ * challenge metadata captured from real browser traffic). duck.ai keeps
+ * accepting it even after the frontend version moves on — when it stops,
+ * the adapter fails soft with an actionable message.
+ */
+const STATIC_VQD_HASH_1 =
+	"eyJzZXJ2ZXJfaGFzaGVzIjpbImRQSlJJTWczZnFYQXIvaStaa3c2cEpFVzEwckdTdmxJVlVkNlFsOVRGWXc9IiwiMUN3Qzg3N0Q3WXE1dzlEeTc4UjhBVi9qZVZWaUlYbmV0Q0xvckx3c01QZz0iLCJQSzc3TGc2L25weDdWQ2J2UWxsTEhBR3cyenJIVmEvQUFBRFBhQTl1ekVRPSJdLCJjbGllbnRfaGFzaGVzIjpbImxWblI0MStCMVFWZ0o4d0hhMUdBNmdxR0JoSjlWdjN5K0dISkdGekJmTGM9IiwiVS9RRUc2RE1qdEU4V2hHU1FxOUU1Z0VGNmw1SWJrNk9NVlBuY01DU1licz0iLCJ6SURsYUNvZG9JUjNwbTNSVTlWOUJXaUJkZDJqenRMODAyN0VYTHhkWll3PSJdLCJzaWduYWxzIjp7fSwibWV0YSI6eyJ2IjoiNCIsImNoYWxsZW5nZV9pZCI6ImM4M2Q0ZTc5NTU2MjJmZjU3Mzc0ZDUzOTk2ZjliMmJhZGE2ZDQxZTMzNDM1ZjVlNzMyYjFmNmZjNmQ0ZTE1NzVoOGpidCIsInRpbWVzdGFtcCI6IjE3NTIxNTU3Nzc4NjYiLCJvcmlnaW4iOiJodHRwczovL2R1Y2tkdWNrZ28uY29tIiwic3RhY2siOiJFcnJvclxuYXQgRSAoaHR0cHM6Ly9kdWNrZHVja2dvLmNvbS9kaXN0L3dwbS5jaGF0LjcwZWFjYTZhZWEyOTQ4YjBiYjYwLmpzOjE6MTQ4MjUpXG5hdCBhc3luYyBodHRwczovL2R1Y2tkdWNrZ28uY29tL2Rpc3Qvd3BtLmNoYXQuNzBlYWNhNmFlYTI5NDhiMGJiNjAuanM6MToxNjk4NSIsImR1cmF0aW9uIjoiNTgifX0=";
+/** Frontend signal/version headers captured with the hash above. */
+const FE_SIGNALS =
+	"eyJzdGFydCI6MTc1MjE1NTc3NzQ4MCwiZXZlbnRzIjpbeyJuYW1lIjoic3RhcnROZXdDaGF0IiwiZGVsdGEiOjc1fSx7Im5hbWUiOiJyZWNlbnRDaGF0c0xpc3RJbXByZXNzaW9uIiwiZGVsdGEiOjEyNH1dLCJlbmQiOjQzNDN9";
+const FE_VERSION = "serp_20250710_090702_ET-70eaca6aea2948b0bb60";
+
+/** Browser-identical headers for both duck.ai endpoints. */
+function duckHeaders(extra = {}) {
+	return {
+		Accept: "*/*",
+		"Accept-Language": "en-US,en;q=0.9",
+		"Cache-Control": "no-store",
+		"Sec-CH-UA": SEC_CH_UA,
+		"Sec-CH-UA-Mobile": "?0",
+		"Sec-CH-UA-Platform": '"Windows"',
+		"Sec-Fetch-Dest": "empty",
+		"Sec-Fetch-Mode": "cors",
+		"Sec-Fetch-Site": "same-origin",
+		"User-Agent": BROWSER_UA,
+		Origin: "https://duckduckgo.com",
+		Referer: "https://duckduckgo.com/",
+		...(extra || {}),
+	};
+}
+
+/**
+ * Feeds the essential duck.ai cookies through the native http plugin when
+ * available (fetch cannot set the Cookie header; the browser build just
+ * skips this — duck.ai mainly enforces cookies against plain HTTP bots).
+ */
+function injectDuckCookies() {
+	try {
+		if (typeof cordova !== "undefined" && cordova.plugin?.http?.setCookie) {
+			for (const cookie of DUCK_COOKIES.split("; ")) {
+				cordova.plugin.http.setCookie("https://duckduckgo.com", cookie);
+			}
+		}
+	} catch {
+		/* best-effort */
+	}
+}
 
 /** VQD token cache (module-level, short TTL — they rotate often). */
 let vqdCache = { token: "", at: 0 };
@@ -169,22 +226,26 @@ function headerValue(headers, name) {
 async function ensureVqd(signal) {
 	const cached = cachedVqd();
 	if (cached) return cached;
+	injectDuckCookies();
 	const response = await rawRequest({
 		url: STATUS_URL,
 		method: "GET",
-		headers: {
-			Accept: "*/*",
+		headers: duckHeaders({
 			"x-vqd-accept": "1",
-			"User-Agent": BROWSER_UA,
-			Origin: "https://duckduckgo.com",
-			Referer: "https://duckduckgo.com/",
-		},
+			...(typeof fetch === "function" && typeof cordova === "undefined"
+				? { Cookie: DUCK_COOKIES }
+				: {}),
+		}),
 		signal,
 	});
-	const token = headerValue(response.headers, "x-vqd-4");
+	// duck.ai normally answers x-vqd-4; some builds answer with
+	// x-vqd-hash-1 carrying the session value instead — accept both
+	const token =
+		headerValue(response.headers, "x-vqd-4") ||
+		headerValue(response.headers, "x-vqd-hash-1");
 	if (!token) {
 		throw new Error(
-			"503: DuckDuckGo AI não respondeu com sessão (x-vqd-4). Serviço indisponível ou bloqueado nesta rede — troque de provedor.",
+			"503: DuckDuckGo AI não respondeu com sessão (x-vqd-4). Serviço indisponível, instável ou bloqueado nesta rede — troque de provedor (o Integrado continua funcionando).",
 		);
 	}
 	rememberVqd(token);
@@ -247,6 +308,18 @@ export async function duckChatCompletion({ model, messages, signal }) {
 	const body = {
 		model: String(model || "gpt-4o-mini"),
 		messages: normalizeDuckMessages(messages),
+		// current duck.ai payloads carry tool-choice metadata; the
+		// adapter has no tools — everything off, keys may be omitted
+		metadata: {
+			toolChoice: {
+				NewsSearch: false,
+				VideosSearch: false,
+				LocalSearch: false,
+				WeatherForecast: false,
+			},
+		},
+		canUseTools: false,
+		canUseApproxLocation: false,
 	};
 	if (!body.messages.length) {
 		throw new Error("empty conversation");
@@ -259,14 +332,14 @@ export async function duckChatCompletion({ model, messages, signal }) {
 			const response = await rawRequest({
 				url: CHAT_URL,
 				method: "POST",
-				headers: {
+				headers: duckHeaders({
 					"Content-Type": "application/json",
 					Accept: "text/event-stream",
-					"User-Agent": BROWSER_UA,
 					"x-vqd-4": vqd,
-					Origin: "https://duckduckgo.com",
-					Referer: "https://duckduckgo.com/",
-				},
+					"x-vqd-hash-1": STATIC_VQD_HASH_1,
+					"x-fe-signals": FE_SIGNALS,
+					"x-fe-version": FE_VERSION,
+				}),
 				body,
 				signal,
 			});
@@ -287,12 +360,14 @@ export async function duckChatCompletion({ model, messages, signal }) {
 					"502: DuckDuckGo AI devolveu uma resposta vazia — tente novamente ou troque de modelo.",
 				);
 			}
-			// token expired / throttled → refresh and retry once
+			// token expired / anti-bot / throttled → refresh & retry once
 			forgetVqd();
 			lastError = new Error(
 				response.status === 429
 					? "429: DuckDuckGo AI atingiu o limite por IP — aguarde alguns segundos e reenvie."
-					: `${response.status}: DuckDuckGo AI recusou o pedido. O serviço é experimental — use o provedor Integrado ou adicione uma chave Groq gratuita.`,
+					: response.status === 418
+						? "418: DuckDuckGo AI recusou o desafio anti-bot. O serviço é experimental e muda com frequência — use o provedor Integrado (Integrado → Pollinations) ou adicione uma chave Groq gratuita."
+						: `${response.status}: DuckDuckGo AI recusou o pedido. O serviço é experimental — use o provedor Integrado ou adicione uma chave Groq gratuita.`,
 			);
 		} catch (error) {
 			if (signal?.aborted) throw error;

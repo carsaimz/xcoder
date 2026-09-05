@@ -176,34 +176,45 @@
         .ai-msg {
                 display: flex;
 
-                // shared avatar base — both sides get the same footprint
-                .ai-avatar {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        flex: none;
-                        width: 26px;
-                        height: 26px;
-                        margin-top: 2px;
-                        border-radius: 50%;
-                }
-
                 &.user {
                         justify-content: flex-end;
                         align-items: flex-start;
                         gap: 8px;
 
-                        // Claude-style flat warm panel instead of a loud gradient
+                        // user avatar (person) mirrored to the right of the bubble
+                        .ai-avatar.user {
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex: none;
+                                width: 26px;
+                                height: 26px;
+                                margin-top: 2px;
+                                border-radius: 50%;
+                                background: color-mix(
+                                        in srgb,
+                                        var(--active-color) 24%,
+                                        var(--secondary-color)
+                                );
+                                color: var(--primary-text-color, inherit);
+                                border: 1px solid color-mix(in srgb, var(--active-color) 30%, transparent);
+
+                                .icon {
+                                        font-size: 15px;
+                                }
+                        }
+
+                        // body holds bubble + attachment chips, right-aligned
                         .ai-body {
                                 flex: 1;
                                 min-width: 0;
-                                max-width: 88%;
                                 display: flex;
                                 flex-direction: column;
                                 align-items: flex-end;
                                 gap: 4px;
                         }
 
+                        // Claude-style flat warm panel instead of a loud gradient
                         .ai-bubble {
                                 background: color-mix(
                                         in srgb,
@@ -215,22 +226,6 @@
                                 border: 1px solid color-mix(in srgb, var(--active-color) 26%, transparent);
                                 box-shadow: none;
                         }
-
-                        // user avatar (right side) — neutral tint, distinct from
-                        // the accent-colored bot avatar
-                        .ai-avatar.user-avatar {
-                                background: color-mix(
-                                        in srgb,
-                                        var(--primary-text-color) 18%,
-                                        var(--secondary-color)
-                                );
-                                color: var(--primary-text-color, inherit);
-                                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-
-                                .icon {
-                                        font-size: 15px;
-                                }
-                        }
                 }
 
                 // ChatGPT/DeepSeek style: the assistant speaks in the panel —
@@ -241,6 +236,14 @@
                         gap: 8px;
 
                         .ai-avatar {
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex: none;
+                                width: 26px;
+                                height: 26px;
+                                margin-top: 2px;
+                                border-radius: 50%;
                                 background: linear-gradient(
                                         135deg,
                                         var(--button-background-color, var(--active-color)),
@@ -500,55 +503,45 @@
                 border-top: 1px solid var(--border-color);
                 background: color-mix(in srgb, var(--secondary-color) 45%, transparent);
 
-                // Claude-style card: the message field is a rounded shell and
-                // the send button lives IN FRONT of it (bottom-right inside)
-                .ai-composer-card {
-                        display: flex;
-                        flex-direction: column;
+                // Full-width pill: the textarea owns the whole row — the
+                // attach/send buttons moved to their own fixed row below so
+                // typing gets maximum space (user request)
+                > .ai-input {
+                        width: 100%;
+                        box-sizing: border-box;
+                        flex: none;
+                        resize: none;
                         border: 1px solid var(--border-color);
-                        border-radius: 18px;
+                        outline: none;
                         background: color-mix(in srgb, var(--primary-color) 78%, transparent);
-                        padding: 4px 8px;
+                        color: var(--primary-text-color, inherit);
+                        border-radius: 18px;
+                        padding: 10px 15px;
+                        font-size: 13px;
+                        max-height: 160px;
+                        min-height: 42px;
+                        font-family: inherit;
+                        line-height: 1.45;
                         transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-                        &:focus-within {
+                        &:focus {
                                 border-color: color-mix(in srgb, var(--active-color) 70%, var(--border-color));
                                 box-shadow: 0 0 0 3px color-mix(in srgb, var(--active-color) 14%, transparent);
                         }
                 }
 
-                > .ai-input {
-                        flex: 1;
-                        resize: none;
-                        border: none;
-                        outline: none;
-                        background: transparent;
-                        color: var(--primary-text-color, inherit);
-                        border-radius: 14px;
-                        padding: 8px 8px 2px;
-                        font-size: 13px;
-                        max-height: 140px;
-                        font-family: inherit;
-                        line-height: 1.45;
-                }
-
-                .ai-composer-foot {
+                // fixed second row: attach on the left, send on the right,
+                // always the same height — no reflow when typing/attaching
+                .ai-composer-actions {
                         display: flex;
                         align-items: center;
-                        justify-content: flex-end;
-                        padding: 2px 2px 4px;
-                }
-
-                .ai-composer-below {
-                        display: flex;
-                        align-items: center;
-                        gap: 6px;
-                        padding: 0 2px;
+                        justify-content: space-between;
+                        gap: 8px;
                 }
 
                 .ai-send {
-                        width: 34px;
-                        height: 34px;
+                        width: 38px;
+                        height: 38px;
                         border: none;
                         border-radius: 50%;
                         background: linear-gradient(
@@ -574,7 +567,7 @@
                         }
 
                         .icon {
-                                font-size: 17px;
+                                font-size: 18px;
                         }
 
                         &.running {
@@ -588,15 +581,13 @@
 /* ---------------- mode switch / slash menu ---------------- */
 
 .ai-chat {
-        // centered Agent/Chat switch BELOW the message field (inside the
-        // composer's "below" row, next to the attach button)
+        // centered Agent/Chat switch above the composer (iOS/VS Code style)
         .ai-modebar {
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 gap: 10px;
-                flex: 1;
-                padding: 2px 0;
+                padding: 5px 12px 7px;
                 user-select: none;
 
                 .ai-mode-label {

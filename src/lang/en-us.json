@@ -1223,5 +1223,17 @@
 	"ai cmd image": "Generate an image from a description (/image sunset over the sea)",
 	"ai image need prompt": "Describe the image: /image sunset at the beach 768x768",
 	"ai image saved": "Image saved at",
-	"ai status image": "Generating image..."
+	"ai status image": "Generating image...",
+	"ai act regenerate": "Regenerate",
+	"ai act detail": "Explain in detail",
+	"ai act summarize": "Summarize",
+	"ai act continue": "Continue",
+	"ai act insert": "Insert into editor",
+	"ai act detail prompt": "Explain the previous answer in more detail, step by step, with examples.",
+	"ai act summarize prompt": "Summarize the previous answer in a few short bullets.",
+	"ai act continue prompt": "Continue exactly where you left off.",
+	"ai act no editor": "Open a file to insert the text",
+	"ai act inserted": "Text inserted into the editor ✓",
+	"ai act no source": "No source message to regenerate",
+	"copy failed": "Could not copy"
 }

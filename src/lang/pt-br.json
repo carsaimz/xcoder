@@ -1340,5 +1340,17 @@
 	"ai cmd image": "Gera uma imagem a partir de uma descrição (/image pôr do sol no mar)",
 	"ai image need prompt": "Descreva a imagem: /image pôr do sol na praia 768x768",
 	"ai image saved": "Imagem salva em",
-	"ai status image": "Gerando imagem..."
+	"ai status image": "Gerando imagem...",
+	"ai act regenerate": "Regenerar",
+	"ai act detail": "Detalhar",
+	"ai act summarize": "Resumir",
+	"ai act continue": "Continuar",
+	"ai act insert": "Inserir no editor",
+	"ai act detail prompt": "Explique em mais detalhes a resposta anterior, com exemplos e passo a passo.",
+	"ai act summarize prompt": "Resuma a resposta anterior em poucos pontos curtos.",
+	"ai act continue prompt": "Continue exatamente de onde parou.",
+	"ai act no editor": "Abra um arquivo para inserir o texto",
+	"ai act inserted": "Texto inserido no editor ✓",
+	"ai act no source": "Nenhuma mensagem de origem para regenerar",
+	"copy failed": "Não foi possível copiar"
 }

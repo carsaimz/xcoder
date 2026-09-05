@@ -37,7 +37,8 @@ const keys = {
 	46: "Delete",
 };
 
-const initKeyboardEventType = (function (event) {
+let initKeyboardEventType = 9;
+(function (event) {
 	try {
 		event.initKeyboardEvent(
 			"keyup", // in DOMString typeArg
@@ -53,7 +54,7 @@ const initKeyboardEventType = (function (event) {
 			false, // altGraphKey
 		);
 
-		return (
+		initKeyboardEventType =
 			((((event["keyIdentifier"] || event["key"]) === "+" &&
 				event["location"]) ||
 				event["keyLocation"] === 3) &&
@@ -66,12 +67,11 @@ const initKeyboardEventType = (function (event) {
 						? 2
 						: // webkit
 							4)) || // IE9
-			9
-		); // FireFox|w3c
+			9; // FireFox|w3c
 	} catch (error) {
 		initKeyboardEventType = 0;
 	}
-})(document.createEvent("KeyboardEvent"));
+})(document.createEvent ? document.createEvent("KeyboardEvent") : {});
 
 const keyboardEventPropertiesDictionary = {
 	char: "",

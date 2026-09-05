@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <!-- XCoder — mockup ilustrativo: Editor + agente IA (tema Dark+) -->
+  <defs>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e6fd9"/><stop offset="1" stop-color="#2b8cf0"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" rx="18" fill="#141a21"/>
+  <rect width="640" height="44" rx="18" fill="url(#hdr)"/>
+  <rect y="26" width="640" height="18" fill="url(#hdr)"/>
+  <text x="20" y="29" fill="#ffffff" font-size="17" font-weight="700">index.html</text>
+  <text x="596" y="29" fill="#dbeafe" font-size="15">⋮</text>
+
+  <!-- lista de abas/arquivos -->
+  <rect x="0" y="44" width="150" height="312" fill="#0e1318"/>
+  <rect x="0" y="52" width="150" height="30" fill="#1e6fd9" opacity="0.25"/>
+  <circle cx="24" cy="67" r="5" fill="#e37933"/><text x="38" y="72" fill="#cfd8e3" font-size="13">index.html</text>
+  <circle cx="24" cy="97" r="5" fill="#4f9cf0"/><text x="38" y="102" fill="#9fb0c0" font-size="13">main.js</text>
+  <circle cx="24" cy="127" r="5" fill="#e3b341"/><text x="38" y="132" fill="#9fb0c0" font-size="13">style.css</text>
+  <circle cx="24" cy="157" r="5" fill="#8bc34a"/><text x="38" y="162" fill="#9fb0c0" font-size="13">app.py</text>
+  <circle cx="24" cy="187" r="5" fill="#c160d0"/><text x="38" y="192" fill="#9fb0c0" font-size="13">README.md</text>
+
+  <!-- editor -->
+  <g font-family="'JetBrains Mono',Consolas,monospace" font-size="13">
+    <text x="165" y="78" fill="#6b7a89">1</text><text x="185" y="78" fill="#c160d0">&lt;!DOCTYPE</text><text x="278" y="78" fill="#e06c75">html</text><text x="316" y="78" fill="#c160d0">&gt;</text>
+    <text x="165" y="100" fill="#6b7a89">2</text><text x="185" y="100" fill="#c160d0">&lt;html</text><text x="230" y="100" fill="#e5c07b">lang</text><text x="264" y="100" fill="#98c379">="pt-br"</text><text x="330" y="100" fill="#c160d0">&gt;</text>
+    <text x="165" y="122" fill="#6b7a89">3</text><text x="185" y="122" fill="#c160d0">&lt;body&gt;</text>
+    <text x="165" y="144" fill="#6b7a89">4</text><text x="200" y="144" fill="#c160d0">&lt;h1&gt;</text><text x="253" y="144" fill="#d7dee6">Olá, XCoder!</text><text x="360" y="144" fill="#c160d0">&lt;/h1&gt;</text>
+    <text x="165" y="166" fill="#6b7a89">5</text><text x="200" y="166" fill="#c160d0">&lt;script</text><text x="278" y="166" fill="#e5c07b">src</text><text x="312" y="166" fill="#98c379">="main.js"</text><text x="388" y="166" fill="#c160d0">&gt;&lt;/script&gt;</text>
+    <text x="165" y="188" fill="#6b7a89">6</text><text x="185" y="188" fill="#c160d0">&lt;/body&gt;</text>
+    <rect x="183" y="200" width="2" height="16" fill="#4f9cf0"><animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/></rect>
+  </g>
+
+  <!-- painel IA -->
+  <rect x="440" y="58" width="186" height="298" rx="10" fill="#0e1318"/>
+  <rect x="440" y="58" width="186" height="26" rx="10" fill="#1b232c"/>
+  <text x="452" y="76" fill="#9fb0c0" font-size="12" font-weight="700">✦ Agente IA — Integrado</text>
+  <rect x="452" y="96" width="150" height="44" rx="9" fill="#22303e"/>
+  <text x="462" y="113" fill="#cfd8e3" font-size="11">Adicione um botão de</text>
+  <text x="462" y="128" fill="#cfd8e3" font-size="11">tema escuro</text>
+  <rect x="470" y="152" width="144" height="58" rx="9" fill="#173a2a"/>
+  <text x="480" y="169" fill="#7bd9a2" font-size="11">✓ main.js editado</text>
+  <text x="480" y="184" fill="#7bd9a2" font-size="11">✓ style.css criado</text>
+  <text x="480" y="199" fill="#7bd9a2" font-size="11">✓ preview atualizado</text>
+
+  <!-- barra inferior -->
+  <rect x="0" y="356" width="640" height="44" fill="#0a0e12"/>
+  <circle cx="590" cy="378" r="15" fill="#2b8cf0"/>
+  <path d="M585 373l12 5-12 5 3-5z" fill="#fff"/>
+  <text x="20" y="383" fill="#5b6b7b" font-size="11">Ln 4, Col 8   UTF-8   HTML   ✦ IA pronta</text>
+</svg>

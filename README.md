@@ -9,7 +9,7 @@
 
 🤖 Agente de IA integrado • 🐧 Terminal Linux real • 🧠 Suporte a LSP • 🚫 Sem anúncios • 🔒 Sem conta
 
-[🇺🇸 English](readme.md) | [🇧🇷 Português (Brasil)](readme.pt-br.md)
+[🇧🇷 Português (Brasil)](README.md) | [🇺🇸 English](README.en.md)
 
 ### Status de build
 
@@ -22,7 +22,7 @@
 ### Repositório
 
 [![Última release](https://img.shields.io/github/v/release/carsaimz/xcoder?include_prereleases&sort=semver&display_name=tag&logo=github)](https://github.com/carsaimz/xcoder/releases)
-[![Licença](https://img.shields.io/github/license/carsaimz/xcoder?logo=open-source-initiative)](license.txt)
+[![Licença](https://img.shields.io/github/license/carsaimz/xcoder?logo=open-source-initiative)](LICENSE)
 [![Estrelas](https://img.shields.io/github/stars/carsaimz/xcoder?style=social)](https://github.com/carsaimz/xcoder/stargazers)
 [![Forks](https://img.shields.io/github/forks/carsaimz/xcoder?style=social)](https://github.com/carsaimz/xcoder/network/members)
 [![Contribuidores](https://img.shields.io/github/contributors/carsaimz/xcoder?logo=people)](https://github.com/carsaimz/xcoder/graphs/contributors)
@@ -46,16 +46,23 @@ pré-visualização — **sem** exigir conta, exibir anúncios ou enviar telemet
 
 ## ✨ Destaques
 
-- 🤖 **Assistente de IA com agentes e subagentes** — traga sua própria chave. O
-  agente pode ler e analisar seu projeto, criar/editar/excluir arquivos,
-  executar JavaScript em um sandbox isolado, usar um shell virtual (com VCS de
-  snapshots local) e criar subagentes somente leitura para tarefas de pesquisa.
-  Você aprova cada ação sensível.
+- 🤖 **Assistente de IA com agentes e subagentes** — traga sua própria chave
+  **ou use o provedor Integrado sem chave**. O agente pode ler e analisar seu
+  projeto, criar/editar/excluir arquivos, executar JavaScript em um sandbox
+  isolado, usar um shell virtual (com VCS de snapshots local) e criar
+  subagentes somente leitura para tarefas de pesquisa. Você aprova cada ação
+  sensível.
 - 🔌 **Gerenciador de provedores de IA** — presets em três grupos:
-  - *Grátis*: Groq, OpenRouter (modelos gratuitos), Cerebras, Hugging Face, Cloudflare Workers AI
+  - *Integrado (sem chave, grátis)*: Pollinations (texto + **geração de
+    imagens** com `/image`) e DuckDuckGo AI (experimental)
+  - *Grátis com chave*: Groq, OpenRouter (modelos gratuitos), Cerebras, Hugging Face, Cloudflare Workers AI
   - *Pagos com nível gratuito*: Google Gemini, OpenAI, Mistral, DeepSeek, Together, Cohere, GitHub Models, Fireworks
-  - *Premium*: Anthropic, xAI, Perplexity, Azure OpenAI, NVIDIA NIM, OpenRouter
+  - *Premium*: Anthropic, xAI, Perplexity, Azure OpenAI, NVIDIA NIM
   - Ou aponte para **qualquer endpoint compatível com OpenAI** (Ollama, LM Studio, vLLM, LiteLLM).
+- 💬 **Chat moderno estilo Claude/DeepSeek** — avatares de usuário e IA,
+  botões de enviar/anexar abaixo da caixa de texto, streaming ao vivo com
+  "pensamento" expansível e **ações ao pressionar uma mensagem**: copiar,
+  regenerar, detalhar, resumir, continuar e inserir no editor.
 - ✍️ **Editor**: núcleo CodeMirror 6, mais de 100 linguagens, autocompletar,
   dobramento, múltiplos cursores, ferramentas rápidas, mais de 20 temas de
   editor, fontes personalizáveis.
@@ -69,13 +76,16 @@ pré-visualização — **sem** exigir conta, exibir anúncios ou enviar telemet
   navegador do app e console.
 - ☁️ **Sincronização em nuvem opcional**: backend no GitHub ou Firebase para
   backup de configurações e conversas de IA.
+- 🛰️ **Site embutido**: aba lateral "Website" abre a documentação, o
+  marketplace e a página de patrocínios dentro do próprio app.
 - 🔄 **Verificador de atualizações**: consulta opcional aos GitHub Releases
   (perguntado na primeira execução; também disponível em *Sobre → Verificar
   atualizações*).
-- 🔌 **Plugins**: instale plugins da comunidade por URL ou arquivos locais,
-  com um template de desenvolvimento.
-- 🔒 **Núcleo 100% offline**: sem conta, sem anúncios, sem compras no app, sem
-  rastreamento.
+- 🔌 **Plugins**: marketplace com mais de 16 plugins da comunidade (toggle de
+  comentários, ferramentas JSON, gerador de UUID, emojis, cores, sumário de
+  Markdown e mais) — instale por URL ou arquivos locais.
+- 🆓 **Tudo grátis** — nenhum recurso é bloqueado. Doar só remove os anúncios
+  e amplia os limites de IA (Premium opcional).
 - 🌍 **30 idiomas de interface** — segue o idioma do dispositivo (Português
   como padrão de fallback).
 
@@ -90,16 +100,15 @@ abra o
 [workflow Debug APK](https://github.com/carsaimz/xcoder/actions/workflows/debug.yml),
 escolha a execução mais recente e baixe o artefato.
 
-<!-- TODO: adicionar capturas de tela reais do app quando forem capturadas -->
-
 ## 📸 Capturas de tela
 
-| Editor + IA | Terminal | Git |
-| :---: | :---: | :---: |
-| ![Editor](docs/screenshots/editor.png) | ![Terminal](docs/screenshots/terminal.png) | ![Git](docs/screenshots/git.png) |
+> Renderizações ilustrativas da interface (tema Dark+). Capturas reais de
+> dispositivo são bem-vindas via PR — adicione em
+> [`docs/screenshots/`](docs/screenshots).
 
-> As capturas ficam em [`docs/screenshots/`](docs/screenshots) — PRs com
-> capturas novas são bem-vindos!
+| Editor + agente IA | Terminal Alpine | Chat IA (ações) |
+| :---: | :---: | :---: |
+| ![Editor com painel IA](docs/screenshots/editor-ai.svg) | ![Terminal Alpine](docs/screenshots/terminal.svg) | ![Chat IA com menu de ações](docs/screenshots/chat-ia.svg) |
 
 ## 🛠️ Build
 
@@ -129,10 +138,14 @@ npm test
 
 1. Abra uma pasta de projeto.
 2. Toque na aba **IA** na barra lateral.
-3. Abra *Configurações → Assistente de IA*, escolha um provedor (ex.:
-   **Groq** — grátis), cole sua chave de API e escolha um modelo.
+3. Comece a conversar — o provedor **Integrado** (Pollinations) funciona
+   **sem chave e sem conta**. Para mais poder, abra *Configurações →
+   Assistente de IA* e escolha um provedor (ex.: **Groq** — grátis) com a sua
+   chave de API.
 4. Pergunte qualquer coisa: "explique este projeto", "adicione um toggle de
-   dark mode", "encontre todos os usos de X e refatore".
+   dark mode", "encontre todos os usos de X e refatore". Use `/image` para
+   gerar imagens e pressione uma mensagem para copiar, regenerar, detalhar
+   ou resumir a resposta.
 
 O agente pergunta antes de modificar qualquer coisa, a menos que você aumente
 o nível de autonomia dele.
@@ -160,6 +173,19 @@ utils/               scripts de build/desenvolvimento
 res/                 ícones e recursos Android
 .github/             CI, automação de releases e configuração de bots
 ```
+
+## 🆓 Grátis, Premium e apoio
+
+**Todos os recursos do XCoder são livres.** O Premium opcional existe apenas
+para apoiadores e faz duas coisas: remove os anúncios de casa e amplia os
+limites de IA (agente ilimitado, respostas de até 8k tokens, autonomia
+"automática"). Nada mais muda — temas, plugins, terminal, Git e o editor
+completo são grátis para todo mundo.
+
+Doações são feitas pela página **Apoie o projeto** (dentro do app ou em
+[xcoderapp.vercel.app/sponsor](https://xcoderapp.vercel.app/sponsor)) — com
+M-Pesa, e-Mola, PayPal, GitHub Sponsors e mais. A doação vira Premium
+automaticamente na sua conta do site.
 
 ## 🔒 Privacidade
 
@@ -196,7 +222,7 @@ O XCoder se apoia em gigantes:
 
 ## 📄 Licença
 
-[MIT](license.txt) — baseado no excelente trabalho open-source do projeto
+[MIT](LICENSE) — baseado no excelente trabalho open-source do projeto
 Acode (© Foxdebug / Ajit Kumar).
 
 XCoder é desenvolvido e mantido por **Carsai Mozambique**
@@ -204,6 +230,6 @@ XCoder é desenvolvido e mantido por **Carsai Mozambique**
 
 <div align="center">
 
-[🇺🇸 English](readme.md) | [🇧🇷 Português (Brasil)](readme.pt-br.md)
+[🇧🇷 Português (Brasil)](README.md) | [🇺🇸 English](README.en.md)
 
 </div>

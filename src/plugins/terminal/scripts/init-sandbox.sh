@@ -73,17 +73,25 @@ if [ -e "/proc/self/fd" ]; then
   ARGS="$ARGS -b /proc/self/fd:/dev/fd"
 fi
 
-if [ -e "/proc/self/fd/0" ]; then
-  ARGS="$ARGS -b /proc/self/fd/0:/dev/stdin"
-fi
-
-if [ -e "/proc/self/fd/1" ]; then
-  ARGS="$ARGS -b /proc/self/fd/1:/dev/stdout"
-fi
-
-if [ -e "/proc/self/fd/2" ]; then
-  ARGS="$ARGS -b /proc/self/fd/2:/dev/stderr"
-fi
+# Bind stdin/stdout/stderr ONLY when they resolve to a real file/device.
+# When the app launches the sandbox with pipes (installations, command
+# output capture), /proc/self/fd/N points to a virtual "pipe:[…]" target
+# that proot cannot sanitize — it printed three scary
+#   proot warning: can't sanitize binding "/proc/self/fd/N"
+# lines during installation while everything still worked. Skipping the
+# binding in that case silences the warnings; the guest still reaches the
+# fds through the bound /proc and /dev (fd 0/1/2 pass through natively).
+for sandbox_fd in 0 1 2; do
+  fd_target=$(readlink -f "/proc/self/fd/$sandbox_fd" 2>/dev/null || true)
+  if [ -n "$fd_target" ] && [ -e "$fd_target" ]; then
+    case "$sandbox_fd" in
+      0) ARGS="$ARGS -b /proc/self/fd/0:/dev/stdin" ;;
+      1) ARGS="$ARGS -b /proc/self/fd/1:/dev/stdout" ;;
+      2) ARGS="$ARGS -b /proc/self/fd/2:/dev/stderr" ;;
+    esac
+  fi
+done
+unset sandbox_fd fd_target
 
 
 ARGS="$ARGS -r $PREFIX/alpine"

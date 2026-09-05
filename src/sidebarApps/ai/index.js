@@ -1,5 +1,6 @@
 import "./style.scss";
 import fsOperation from "fileSystem";
+import Contextmenu from "components/contextmenu";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
@@ -362,22 +363,18 @@ function buildUi() {
 
 	$attachRow = <div className="ai-attach-row" style="display:none" />;
 
-	// Claude/DeepSeek-style composer: the message field is a CARD and the
-	// send button sits IN FRONT of it (bottom-right, inside the card);
-	// every other control lives BELOW the field (attach + mode switch).
-	// Above the field stay the header actions, provider strip and
-	// artifacts bar — nothing else crowds the input row.
+	// Claude/DeepSeek-style composer: the textarea gets the full width
+	// and the action buttons (attach · send) sit on a SEPARATE FIXED
+	// row BELOW it — more room to type, buttons never reflow when
+	// attachments appear (user request: "por baixo, separados e fixos").
 	const $composer = (
 		<div className="ai-composer">
 			{$slashMenu}
 			{$attachRow}
-			<div className="ai-composer-card">
-				{$input}
-				<div className="ai-composer-foot">{$send}</div>
-			</div>
-			<div className="ai-composer-below">
+			{$input}
+			<div className="ai-composer-actions">
 				{$attachBtn}
-				{$modeFooter}
+				{$send}
 			</div>
 		</div>
 	);
@@ -391,6 +388,7 @@ function buildUi() {
 			{$artifactsPanel}
 			{$messages}
 			{$status}
+			{$modeFooter}
 			{$composer}
 		</div>
 	);
@@ -1085,17 +1083,21 @@ function updateToolRow(event) {
 function appendEvent(event, opts = {}) {
 	if (event.type === "user") {
 		const $chips = renderAttachmentChips(event.attachments);
-		$messages.append(
+		const $wrap = (
 			<div className="ai-msg user">
 				<div className="ai-body">
 					<div className="ai-bubble">{event.payload}</div>
 					{$chips}
 				</div>
-				<div className="ai-avatar user-avatar">
+				<div className="ai-avatar user">
 					<span className="icon person" />
 				</div>
-			</div>,
+			</div>
 		);
+		const idx = opts.evIdx ?? events.indexOf(event);
+		if (idx >= 0) $wrap.dataset.evIdx = String(idx);
+		addMessageActions($wrap, "user");
+		$messages.append($wrap);
 		return;
 	}
 
@@ -1122,6 +1124,9 @@ function appendEvent(event, opts = {}) {
 			$body.append(toolCallView(call));
 		}
 
+		const idx = opts.evIdx ?? events.indexOf(event);
+		if (idx >= 0) $wrap.dataset.evIdx = String(idx);
+		addMessageActions($wrap, "assistant");
 		$messages.append($wrap);
 		return;
 	}
@@ -1153,6 +1158,255 @@ function appendEvent(event, opts = {}) {
 
 /** Reasoning text waiting to be rendered with the next assistant row. */
 let pendingReasoning = null;
+
+// ---------------------------------------------------------------------------
+// Message actions — long-press (or right-click) any bubble for Copy /
+// Regenerate / Detail / Summarize / Continue / Insert into editor.
+// ---------------------------------------------------------------------------
+
+/**
+ * Extracts the visible text of a message row for copy/insert actions.
+ * @param {HTMLElement} $wrap .ai-msg row
+ * @returns {string}
+ */
+function messageText($wrap) {
+	return ($wrap.querySelector(".ai-bubble")?.innerText || "").trim();
+}
+
+/**
+ * Copies text to the clipboard with a toast confirmation.
+ * @param {string} text
+ */
+async function copyMessageText(text) {
+	try {
+		await navigator.clipboard.writeText(text);
+		toast(strings.copied || "Copiado ✓", 1500);
+	} catch {
+		toast(strings["copy failed"] || "Não foi possível copiar", 2500);
+	}
+}
+
+/**
+ * Inserts text at the cursor of the active editor (CodeMirror 6 view).
+ * @param {string} text
+ */
+function insertIntoEditor(text) {
+	const editor = window.editorManager?.editor;
+	if (!editor?.dispatch || !editor?.state) {
+		toast(
+			strings["ai act no editor"] || "Abra um arquivo para inserir o texto",
+			3000,
+		);
+		return;
+	}
+	const sel = editor.state.selection.main;
+	editor.dispatch({ changes: { from: sel.to, insert: text } });
+	toast(strings["ai act inserted"] || "Texto inserido no editor ✓", 2000);
+}
+
+/**
+ * Runs a canned follow-up prompt (Detail / Summarize / Continue) on top
+ * of the current conversation.
+ * @param {'detail'|'summarize'|'continue'} kind
+ * @param {string} sourceText the answer being referenced
+ */
+async function runQuickPrompt(kind, sourceText) {
+	if (running) {
+		toast(strings["ai busy"] || "AI is still working — wait or stop it first");
+		return;
+	}
+	const snippet = String(sourceText || "").slice(0, 800);
+	let promptText;
+	if (kind === "detail") {
+		promptText =
+			(strings["ai act detail prompt"] ||
+				"Explique em mais detalhes a resposta anterior, com exemplos e passo a passo.") +
+			(snippet ? `\n\n"""\n${snippet}\n"""` : "");
+	} else if (kind === "summarize") {
+		promptText =
+			(strings["ai act summarize prompt"] ||
+				"Resuma a resposta anterior em poucos pontos curtos.") +
+			(snippet ? `\n\n"""\n${snippet}\n"""` : "");
+	} else {
+		promptText =
+			strings["ai act continue prompt"] || "Continue exatamente de onde parou.";
+	}
+
+	await openAiChat();
+	if (!agent) {
+		agent = new Agent({ onEvent: handleEvent });
+		agent.restore(events);
+	}
+	try {
+		setRunning(true);
+		await agent.run(promptText);
+	} catch (error) {
+		handleEvent({
+			type: "error",
+			payload: explainError(error, activeProviderId()),
+		});
+	} finally {
+		setRunning(false);
+		persist();
+		updateArtifactsBar();
+	}
+}
+
+/**
+ * Regenerates an assistant answer: rewinds the conversation to the user
+ * message it replied to and runs the agent again from there.
+ * @param {HTMLElement} $wrap the assistant .ai-msg row
+ */
+async function regenerateMessage($wrap) {
+	if (running) {
+		toast(strings["ai busy"] || "AI is still working — wait or stop it first");
+		return;
+	}
+	const idx = Number($wrap.dataset.evIdx);
+	if (!Number.isFinite(idx) || idx < 0) return;
+
+	let userIdx = -1;
+	for (let i = idx - 1; i >= 0; i--) {
+		if (events[i]?.type === "user") {
+			userIdx = i;
+			break;
+		}
+	}
+	if (userIdx < 0) {
+		toast(
+			strings["ai act no source"] ||
+				"Nenhuma mensagem de origem para regenerar",
+			3000,
+		);
+		return;
+	}
+
+	const userEvent = events[userIdx];
+	await openAiChat();
+	// drop the old answer (and everything after it) — run() re-adds the
+	// user message itself, and a fresh agent rebuilds the transcript
+	events = events.slice(0, userIdx);
+	agent = new Agent({ onEvent: handleEvent });
+	agent.restore(events);
+	renderMessages();
+	persist();
+
+	try {
+		setRunning(true);
+		await agent.run(String(userEvent.payload || ""), {
+			attachments: Array.isArray(userEvent.attachments)
+				? userEvent.attachments
+				: [],
+		});
+	} catch (error) {
+		handleEvent({
+			type: "error",
+			payload: explainError(error, activeProviderId()),
+		});
+	} finally {
+		setRunning(false);
+		persist();
+		updateArtifactsBar();
+	}
+}
+
+/**
+ * Wires the long-press / right-click action menu into a message row.
+ * @param {HTMLElement} $wrap .ai-msg row
+ * @param {'user'|'assistant'} kind
+ */
+function addMessageActions($wrap, kind) {
+	const $bubble = $wrap.querySelector(".ai-bubble");
+	if (!$bubble) return;
+
+	let timer = 0;
+	let startX = 0;
+	let startY = 0;
+
+	const open = (x, y) => {
+		// native text selection in progress — don't hijack it
+		const sel = window.getSelection?.();
+		if (sel && !sel.isCollapsed && $bubble.contains(sel.anchorNode)) return;
+
+		const items = [[strings.copy || "Copiar", "copy"]];
+		if (kind === "assistant") {
+			items.push(
+				[strings["ai act regenerate"] || "Regenerar", "regenerate"],
+				[strings["ai act detail"] || "Detalhar", "detail"],
+				[strings["ai act summarize"] || "Resumir", "summarize"],
+				[strings["ai act continue"] || "Continuar", "continue"],
+			);
+		}
+		items.push([strings["ai act insert"] || "Inserir no editor", "insert"]);
+
+		Contextmenu({
+			toggler: $bubble,
+			top: `${Math.max(8, y - 8)}px`,
+			left: `${Math.max(8, x - 12)}px`,
+			items,
+			async onselect(action) {
+				const text = messageText($wrap);
+				if (action === "copy") {
+					await copyMessageText(text);
+				} else if (action === "insert") {
+					insertIntoEditor(text);
+				} else if (action === "regenerate") {
+					await regenerateMessage($wrap);
+				} else if (action === "detail") {
+					await runQuickPrompt("detail", text);
+				} else if (action === "summarize") {
+					await runQuickPrompt("summarize", text);
+				} else if (action === "continue") {
+					await runQuickPrompt("continue", "");
+				}
+			},
+		});
+	};
+
+	$bubble.addEventListener(
+		"touchstart",
+		(e) => {
+			const t = e.touches?.[0];
+			if (!t) return;
+			startX = t.clientX;
+			startY = t.clientY;
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				timer = 0;
+				hapticTick();
+				open(startX, startY);
+			}, 480);
+		},
+		{ passive: true },
+	);
+	$bubble.addEventListener(
+		"touchmove",
+		(e) => {
+			if (!timer) return;
+			const t = e.touches?.[0];
+			if (
+				t &&
+				(Math.abs(t.clientX - startX) > 12 || Math.abs(t.clientY - startY) > 12)
+			) {
+				clearTimeout(timer);
+				timer = 0;
+			}
+		},
+		{ passive: true },
+	);
+	$bubble.addEventListener("touchend", () => {
+		clearTimeout(timer);
+		timer = 0;
+	});
+	$bubble.addEventListener("touchcancel", () => {
+		clearTimeout(timer);
+		timer = 0;
+	});
+	$bubble.addEventListener("contextmenu", (e) => {
+		e.preventDefault();
+		open(e.clientX, e.clientY);
+	});
+}
 
 /**
  * Renders a pending reasoning payload as a collapsible block inside the
@@ -1312,6 +1566,13 @@ function finalizeLiveStream(payload, toolCalls = []) {
 	for (const call of toolCalls) {
 		live.body?.append(toolCallView(call));
 	}
+	// the finalized answer is a regular assistant event — give it the
+	// long-press actions too (the live wrap skipped appendEvent)
+	const evIdx = events.findIndex(
+		(e) => e.type === "assistant" && e.payload === payload,
+	);
+	if (evIdx >= 0) live.wrap.dataset.evIdx = String(evIdx);
+	addMessageActions(live.wrap, "assistant");
 	liveStream = null;
 }
 
@@ -1366,8 +1627,8 @@ function renderMessages() {
 		);
 		return;
 	}
-	for (const event of events) {
-		appendEvent(event);
+	for (let i = 0; i < events.length; i++) {
+		appendEvent(events[i], { evIdx: i });
 	}
 	renderPendingReasoning();
 	scrollToEnd();
