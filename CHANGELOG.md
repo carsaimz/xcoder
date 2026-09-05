@@ -6,12 +6,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 ## [1.4.16] - 2026-09-05
 
 ### Added
-- Sponsorship: /sponsor page on the site (tiers, payment methods from the database, FAQ) — the app support dialog and About page now link to it
-- Login providers (Google/GitHub) are hidden on the app profile and the website until they are actually enabled in the project (Supabase /auth/v1/settings, cached 30 min); the site gained a GitHub sign-in button next to Google
-- Upstream Acode ports: SFTP profile migration v2 (recovers unsaved remote tabs instead of failing boot, sanitised failure report), missing write capability now opens files as editable, translucent active-line colors in 5 editor themes so selections stay visible, search progress caps at 99% and completes at 100%
-
-### Security
-- SFTP migration failures no longer block startup; credentials are redacted in the report
+- /sponsor links, provider-gated OAuth sign-in, Acode ports (v1.4.16)
 
 ## [1.4.15] - 2026-09-05
 
