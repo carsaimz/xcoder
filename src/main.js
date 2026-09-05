@@ -28,6 +28,7 @@ import Contextmenu from "components/contextmenu";
 import Sidebar from "components/sidebar";
 import tile from "components/tile";
 import toast from "components/toast";
+import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import intentHandler, { processPendingIntents } from "handlers/intent";
 import keyboardHandler, { keydownState } from "handlers/keyboard";
@@ -291,7 +292,13 @@ async function onDeviceReady() {
 	await lang.set(settings.value.lang);
 
 	xcoder.setLoadingMessage("Securing SFTP profiles...");
-	await migrateLegacySftpProfiles();
+	const sftpMigration = await migrateLegacySftpProfiles();
+	for (const failure of sftpMigration.failures) {
+		logger.log(
+			"error",
+			`SFTP profile migration failed for ${failure.username}@${failure.hostname}: ${failure.message}`,
+		);
+	}
 
 	if (settings.value.developerMode) {
 		try {
@@ -304,6 +311,9 @@ async function onDeviceReady() {
 
 	try {
 		await loadApp();
+		if (sftpMigration.failures.length) {
+			showSftpMigrationReport(sftpMigration);
+		}
 	} catch (error) {
 		window.log("error", error);
 		toast(`Error: ${error.message}`);
@@ -451,6 +461,42 @@ function getUpdateMessage(count) {
 	return count === 1
 		? strings["plugin updates singular"]
 		: strings["plugin updates plural"].replace(/\{count\}/, count);
+}
+
+function showSftpMigrationReport({
+	failures,
+	removedReferences,
+	recoveredFiles,
+}) {
+	const details = failures
+		.map(
+			({ username, hostname, message }) =>
+				`${escapeHtml(username)}@${escapeHtml(hostname)}: ${escapeHtml(message)}`,
+		)
+		.join("<br>");
+	const recoveryMessage = recoveredFiles
+		? `<br><br>${recoveredFiles} unsaved remote file${recoveredFiles === 1 ? " was" : "s were"} kept as a recovery tab.`
+		: "";
+
+	alert(
+		strings["sftp migration title"] || "Some SFTP connections were removed",
+		(
+			strings["sftp migration message"] ||
+			"XCoder could not move {count} saved SFTP connection(s) into encrypted storage. The affected connection data and {references} saved reference(s) were removed so the app could start safely. Please add the connection(s) again."
+		)
+			.replace(/\{count\}/, failures.length)
+			.replace(/\{references\}/, removedReferences) +
+			`<br><br>${details}${recoveryMessage}`,
+	);
+}
+
+function escapeHtml(value) {
+	return String(value)
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#039;");
 }
 
 async function promptUpdateCheckConsent() {

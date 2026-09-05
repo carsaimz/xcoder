@@ -1,5 +1,6 @@
 import toast from "components/toast";
 import prompt from "dialogs/prompt";
+import config from "lib/config";
 import {
 	getPremiumStatus,
 	isPremium,
@@ -60,6 +61,20 @@ export async function showSupportDialog() {
 			<div className="xcoder-support-links">
 				{info.methods.map((method) => renderMethod(method))}
 			</div>
+			<button
+				className="xcoder-support-redeem"
+				onclick={() => {
+					const url = `${String(config.WEBSITE_URL || "").replace(/\/+$/, "")}/sponsor`;
+					try {
+						system.openInBrowser(url);
+					} catch {
+						window.open(url, "_blank", "noopener");
+					}
+				}}
+			>
+				<span className="icon favorite" />
+				{t("become sponsor", "Quero patrocinar — abrir no site")}
+			</button>
 			{$account}
 			{premium ? (
 				<div className="xcoder-support-status is-active">

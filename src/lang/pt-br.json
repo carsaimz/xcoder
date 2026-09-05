@@ -1319,5 +1319,11 @@
 	"ai skill disabled": "Skill desativada",
 	"ai cmd analyse": "Análise profunda do projeto ou da seleção",
 	"ai cmd read": "Lê um arquivo no contexto (/read caminho/do/arquivo)",
-	"ai cmd skill": "Segue um playbook de skill (/skill debug-build)"
+	"ai cmd skill": "Segue um playbook de skill (/skill debug-build)",
+	"become sponsor": "Quero patrocinar — abrir no site",
+	"about sponsor": "Patrocinar o projeto",
+	"account sign in unavailable": "A área de conta não está ativa neste dispositivo — configure a Backend URL nas definições ou entre pelo site oficial.",
+	"provider not configured": "O login com {provider} não está configurado neste projeto.",
+	"sftp migration title": "Algumas ligações SFTP foram removidas",
+	"sftp migration message": "O XCoder não conseguiu mover {count} ligação(ões) SFTP guardada(s) para o armazenamento encriptado. Os dados afetados e {references} referência(s) guardada(s) foram removidos para o app poder iniciar em segurança. Adicione a(s) ligação(ões) novamente."
 }

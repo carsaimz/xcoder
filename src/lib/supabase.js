@@ -158,6 +158,60 @@ export function buildOAuthUrl(provider) {
 	);
 }
 
+// ------------------------------------------------------- provider availability
+
+/** @type {{settings: Record<string, boolean> | null, at: number}} */
+let authSettingsCache = { settings: null, at: 0 };
+const AUTH_SETTINGS_TTL = 30 * 60 * 1000;
+
+/**
+ * Fetches the Supabase Auth public settings (`/auth/v1/settings`) to learn
+ * which federated providers the project actually enables. Cached for 30
+ * minutes; on failure the stale cache is returned so the UI degrades
+ * gracefully instead of locking users out.
+ * @param {{force?: boolean}} [opts]
+ * @returns {Promise<Record<string, boolean> | null>} the `external` block
+ */
+export async function fetchAuthSettings({ force = false } = {}) {
+	if (!supabaseConfigured()) return null;
+	if (
+		!force &&
+		authSettingsCache.settings &&
+		Date.now() - authSettingsCache.at < AUTH_SETTINGS_TTL
+	) {
+		return authSettingsCache.settings;
+	}
+	try {
+		const response = await withTimeout(
+			fetch(`${supabaseUrl()}/auth/v1/settings`, {
+				headers: { apikey: supabaseAnonKey() },
+			}),
+		);
+		if (!response.ok) throw new Error(`HTTP ${response.status}`);
+		const json = await response.json();
+		authSettingsCache = {
+			settings: json?.external || {},
+			at: Date.now(),
+		};
+		return authSettingsCache.settings;
+	} catch {
+		return authSettingsCache.settings;
+	}
+}
+
+/**
+ * Whether a federated provider is usable right now: the project must expose
+ * it as enabled in its public auth settings. When the settings cannot be
+ * fetched (offline, misconfigured) the provider is assumed enabled so the
+ * sign-in attempt decides with a real error instead of a hidden button.
+ * @param {"google" | "github" | string} provider
+ * @returns {Promise<boolean>}
+ */
+export async function oauthProviderEnabled(provider) {
+	const external = await fetchAuthSettings();
+	return external ? Boolean(external[provider]) : true;
+}
+
 /**
  * Signs in with a federated provider (Google/GitHub). Opens the system
  * browser; the site callback page redirects into the app via
@@ -474,6 +528,8 @@ export default {
 	OAUTH_PROVIDERS,
 	oauthCallbackUrl,
 	buildOAuthUrl,
+	fetchAuthSettings,
+	oauthProviderEnabled,
 	signInWithOAuth,
 	applyOAuthTokens,
 	fetchProfile,

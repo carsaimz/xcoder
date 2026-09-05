@@ -9,7 +9,9 @@ import { showSupportDialog } from "lib/premiumUI";
 import supabase, {
 	completeOAuthFromPaste,
 	OAUTH_PROVIDERS,
+	oauthProviderEnabled,
 	signInWithOAuth,
+	supabaseConfigured,
 } from "lib/supabase";
 
 /**
@@ -79,7 +81,7 @@ export default function renderProfile() {
 						{t("sign out", "Terminar sessão")}
 					</button>
 				</section>
-			) : (
+			) : supabaseConfigured() ? (
 				<section className="profile-section">
 					<p className="profile-hint">
 						{t(
@@ -118,6 +120,7 @@ export default function renderProfile() {
 						<button
 							key={provider}
 							className="profile-action"
+							data-oauth-provider={provider}
 							onclick={() => onOAuth(provider)}
 						>
 							<span
@@ -132,6 +135,15 @@ export default function renderProfile() {
 						<span className="icon content_paste" />
 						{t("oauth paste", "Já entrei — colar link de retorno")}
 					</button>
+				</section>
+			) : (
+				<section className="profile-section">
+					<p className="profile-hint">
+						{t(
+							"account sign in unavailable",
+							"A área de conta não está ativa neste dispositivo — configure a Backend URL nas definições ou entre pelo site oficial.",
+						)}
+					</p>
 				</section>
 			)}
 		</div>
@@ -149,10 +161,31 @@ export default function renderProfile() {
 	});
 	$page.show();
 
+	// Hide federated providers that are not enabled in the project —
+	// tapping a button that always fails is worse than not showing it.
+	updateOAuthAvailability();
+
 	async function refreshPage() {
 		const { default: render } = await import("./profile");
 		$page.hide();
 		render();
+	}
+
+	async function updateOAuthAvailability() {
+		try {
+			const buttons = [...$page.body.querySelectorAll("[data-oauth-provider]")];
+			for (const button of buttons) {
+				const provider = button.getAttribute("data-oauth-provider");
+				if (!(await oauthProviderEnabled(provider))) {
+					button.remove();
+				}
+			}
+			if (!$page.body.querySelector("[data-oauth-provider]")) {
+				$page.body.querySelector(".profile-divider")?.remove();
+			}
+		} catch {
+			/* availability is best-effort — keep buttons visible */
+		}
 	}
 
 	async function onSignIn() {
@@ -214,6 +247,23 @@ export default function renderProfile() {
 
 	async function onOAuth(provider) {
 		try {
+			if (!(await oauthProviderEnabled(provider))) {
+				toast(
+					t(
+						"provider not configured",
+						"O login com {provider} não está configurado neste projeto.",
+					).replace(
+						"{provider}",
+						provider === "google"
+							? "Google"
+							: provider === "github"
+								? "GitHub"
+								: provider,
+					),
+					4000,
+				);
+				return;
+			}
 			await signInWithOAuth(provider);
 			toast(
 				t(

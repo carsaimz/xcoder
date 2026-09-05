@@ -183,6 +183,17 @@ export default function AboutInclude() {
 						</div>
 					</div>
 				</a>
+				<a href={`${config.WEBSITE_URL}/sponsor`} className="info-item">
+					<div className="info-item-icon">
+						<span className="icon favorite"></span>
+					</div>
+					<div className="info-item-text">
+						{strings["about sponsor"] || "Sponsor the project"}
+						<div className="info-item-subtext">
+							{`${config.WEBSITE_URL}/sponsor`}
+						</div>
+					</div>
+				</a>
 				<a href={config.GITHUB_URL} className="info-item">
 					<div className="info-item-icon">
 						<span className="icon github"></span>
