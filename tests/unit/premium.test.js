@@ -87,25 +87,20 @@ describe("feature gates", () => {
 	});
 });
 
-describe("premium themes", () => {
-	it("marks the supporter themes", () => {
-		expect(PREMIUM_THEMES.length).toBeGreaterThan(0);
-		for (const id of PREMIUM_THEMES) {
-			expect(isThemePremium(id)).toBe(true);
+describe("themes are free (v1.4.18)", () => {
+	it("no theme requires premium anymore", () => {
+		expect(PREMIUM_THEMES).toEqual([]);
+		for (const id of ["neon", "sunset", "obsidian", "dark", "xcoder"]) {
+			expect(isThemePremium(id)).toBe(false);
+			// even a previously "premium" id must stay free
 		}
-		expect(isThemePremium("dark")).toBe(false);
 	});
 
-	it("blocks premium themes for free accounts and allows the rest", () => {
-		const premium = PREMIUM_THEMES[0];
-		expect(canUseTheme(premium)).toBe(false);
-		expect(canUseTheme("dark")).toBe(true);
-	});
-
-	it("unlocks premium themes for supporters", () => {
-		setState({ active: true, kind: "lifetime", expiresAt: 0 });
-		for (const id of PREMIUM_THEMES) {
+	it("allows every theme with and without premium", () => {
+		for (const id of ["neon", "sunset", "obsidian", "dark"]) {
 			expect(canUseTheme(id)).toBe(true);
 		}
+		setState({ active: true, kind: "lifetime", expiresAt: 0 });
+		expect(canUseTheme("neon")).toBe(true);
 	});
 });

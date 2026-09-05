@@ -26,6 +26,14 @@ const MAX_INLINE_SELECTION = 8000;
 /** @type {SlashCommand[]} */
 export const SLASH_COMMANDS = [
 	{
+		// direct command — handled by the chat UI (imageGen.js),
+		// never expanded into a text prompt
+		id: "image",
+		descriptionKey: "ai cmd image",
+		fallbackDescription: "Generate an image from a description (/image sunset over the sea)",
+		build: ({ text }) => text || "",
+	},
+	{
 		id: "explain",
 		descriptionKey: "ai cmd explain",
 		fallbackDescription: "Explain the selected code or the active file",

@@ -9,6 +9,7 @@ describe("slash commands", () => {
 	it("exposes the full command catalog", () => {
 		const ids = SLASH_COMMANDS.map((command) => command.id);
 		expect(ids).toEqual([
+			"image",
 			"explain",
 			"fix",
 			"refactor",

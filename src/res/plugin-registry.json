@@ -177,6 +177,232 @@
 			"downloads": 470,
 			"supported_editor": "all",
 			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.toggle-comment",
+			"name": "Toggle Comment",
+			"version": "1.0.0",
+			"description": "Comment or uncomment the current line/selection with the right token for the file type.\n\n**Toggle Comment** comments or uncomments the current line or the whole selection with one command (`Ctrl-/`). The comment token matches the file you are editing: `//` for JavaScript, TypeScript, Java, Go, Rust…; `#` for Python, Ruby, YAML, Shell; `--` for SQL and Lua; `/* */` for CSS; `<!-- -->` for HTML and Markdown. Multi-line selections are commented at the shared indentation level, and running it again removes the comments cleanly.\n\n## Usage\nPlace the cursor on a line (or select a block) and run **Toggle comment** from the command palette (`Ctrl-/`). Inspired by the classic desktop editors' Ctrl-/ behaviour.\n\n## Português\n**Toggle Comment**: comenta/descomenta a linha atual ou a seleção com o token certo para o tipo de arquivo (`//`, `#`, `--`, `/* */`, `<!-- -->`). Atalho `Ctrl-/`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/toggle-comment/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/toggle-comment/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/toggle-comment/icon.png",
+			"keywords": [
+				"comment",
+				"toggle",
+				"code",
+				"editor",
+				"productivity"
+			],
+			"downloads": 390,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.json-tools",
+			"name": "JSON Tools",
+			"version": "1.0.0",
+			"description": "Pretty print, minify, escape, unescape and validate JSON with friendly errors.\n\n**JSON Tools** turns messy JSON into readable form in one tap: pretty print with 2 or 4 spaces, minify, escape a text into a JSON string, unescape it back, and a dedicated validator. Syntax errors report the approximate position so you can fix broken payloads quickly. Works on the selection or the whole document.\n\n## Usage\nSelect the JSON (or leave the whole document), open the command palette and run **JSON tools** (`Ctrl-Alt-J`) — then pick the action. **JSON: validate** (`json-tools:validate`) only checks and reports.\n\n## Português\n**Ferramentas JSON**: formata (2/4 espaços), minifica, escapa, desescapa e valida JSON da seleção ou do documento, com erros que apontam a posição. Atalho `Ctrl-Alt-J`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/json-tools/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/json-tools/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/json-tools/icon.png",
+			"keywords": [
+				"json",
+				"format",
+				"minify",
+				"validate",
+				"escape"
+			],
+			"downloads": 355,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.uuid-generator",
+			"name": "UUID Generator",
+			"version": "1.0.0",
+			"description": "Generate UUID v4, short ids and random hex ids straight into the editor.\n\n**UUID Generator** creates identifiers with cryptographically strong randomness (Web Crypto when available) and inserts them at the cursor: UUID v4 in upper/lowercase, without dashes, 12/16-char short ids (alphanumeric) and 16-digit hex ids. Perfect for test fixtures, database seeds, request ids and mock data.\n\n## Usage\nOpen the command palette and run **UUID Generator** (`Ctrl-Alt-U`), pick the format — done. **Quick UUID** inserts a lowercase v4 instantly without any dialog.\n\n## Português\n**Gerador de UUID**: cria e insere UUID v4 (maiúsculas/minúsculas, sem traços), short ids e ids hex na posição do cursor, com aleatoriedade criptográfica. Atalho `Ctrl-Alt-U`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/uuid-generator/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/uuid-generator/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/uuid-generator/icon.png",
+			"keywords": [
+				"uuid",
+				"guid",
+				"id",
+				"random",
+				"generator"
+			],
+			"downloads": 310,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.emoji-picker",
+			"name": "Emoji Picker",
+			"version": "1.0.0",
+			"description": "Browse a curated emoji set in six categories and insert it at the cursor.\n\n**Emoji Picker** brings a lightweight emoji browser into the editor: six curated categories (smileys, gestures, status symbols, tech, nature & food and objects) with the emojis that actually matter for documentation, commit messages and UI copy. No heavy emoji database — a hand-picked set that loads instantly.\n\n## Usage\nOpen the command palette and run **Emoji Picker** (`Ctrl-Alt-E`), choose a category, then tap the emoji to insert it. Works everywhere the editor accepts text.\n\n## Português\n**Seletor de emojis**: escolha entre seis categorias curadas (carinhas, gestos, status, tecnologia, natureza e objetos) e insira o emoji no cursor. Atalho `Ctrl-Alt-E`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/emoji-picker/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/emoji-picker/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/emoji-picker/icon.png",
+			"keywords": [
+				"emoji",
+				"picker",
+				"unicode",
+				"insert",
+				"fun"
+			],
+			"downloads": 280,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.color-insert",
+			"name": "Color Insert",
+			"version": "1.0.0",
+			"description": "Pick a color from a palette or paste a hex and insert it as HEX, RGB or HSL.\n\n**Color Insert** speeds up styling work: choose a color from a curated 24-tone palette (or type any hex) and insert it in HEX, `rgb()` or `hsl()` notation — the conversions happen for you. Great for CSS, Compose, SVG and design tokens.\n\n## Usage\nOpen the command palette and run **Color picker** (`Ctrl-Alt-H`), pick a color, choose the notation. 3-digit hex shorthands are accepted and normalized.\n\n## Português\n**Inserir cor**: escolha uma cor da paleta ou digite um hex e insira como HEX, `rgb()` ou `hsl()` — a conversão é automática. Atalho `Ctrl-Alt-H`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/color-insert/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-insert/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-insert/icon.png",
+			"keywords": [
+				"color",
+				"hex",
+				"rgb",
+				"hsl",
+				"css",
+				"design"
+			],
+			"downloads": 245,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.markdown-toc",
+			"name": "Markdown TOC",
+			"version": "1.0.0",
+			"description": "Generate or refresh a GitHub-style table of contents from your Markdown headings.\n\n**Markdown TOC** scans the document for `#`…`######` headings (skipping fenced code blocks) and builds a GitHub-style table of contents with correct anchor slugs — including duplicate heading disambiguation. If a `<!-- TOC -->` block already exists it is refreshed in place; otherwise the TOC is inserted right after the first H1.\n\n## Usage\nOpen a Markdown file, run **Markdown: generate TOC** (`Ctrl-Alt-G`). Re-run any time after editing — the markers `<!-- TOC -->` / `<!-- /TOC -->` keep the section updated.\n\n## Português\n**Sumário Markdown**: gera/atualiza um sumário no estilo GitHub a partir dos títulos (ignorando blocos de código), com âncoras corretas. Atalho `Ctrl-Alt-G`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/markdown-toc/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/markdown-toc/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/markdown-toc/icon.png",
+			"keywords": [
+				"markdown",
+				"toc",
+				"table of contents",
+				"headings",
+				"docs"
+			],
+			"downloads": 210,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.indent-switch",
+			"name": "Indent Switch",
+			"version": "1.0.0",
+			"description": "Convert the document between tabs and spaces (2, 4 or the detected width).\n\n**Indent Switch** detects the dominant indentation style of the document (tabs vs. spaces and the space width) and converts the whole file in one command. Mixed indentation is a classic source of diff noise and Python errors — this fixes it in a tap.\n\n## Usage\nOpen the command palette and run **Convert indentation** (`Ctrl-Alt-I`). The dialog shows what was detected and offers spaces→tabs or tabs→spaces conversions (2, 4 or the detected width). A toast reports how many lines changed.\n\n## Português\n**Alternar indentação**: detecta o estilo do documento e converte entre tabulações e espaços (2, 4 ou a largura detectada). Atalho `Ctrl-Alt-I`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/indent-switch/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/indent-switch/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/indent-switch/icon.png",
+			"keywords": [
+				"indent",
+				"tabs",
+				"spaces",
+				"format",
+				"whitespace"
+			],
+			"downloads": 180,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.remove-duplicates",
+			"name": "Remove Duplicates",
+			"version": "1.0.0",
+			"description": "Remove duplicated lines from the selection or document, keeping the first occurrence.\n\n**Remove Duplicates** cleans lists, logs and generated data: it removes every repeated line (keeping the first), only consecutive repeats, or repeats compared after trimming whitespace. Works on the selection or the whole document and reports how many lines were removed.\n\n## Usage\nSelect the text (or use the whole file), open the command palette and run **Remove duplicated lines** (`Ctrl-Alt-B`), then pick the mode. Pair it with *Sort Lines* for tidy lists.\n\n## Português\n**Remover duplicadas**: remove linhas repetidas da seleção ou do documento (mantém a primeira), com modo só-sequenciais e comparação ignorando espaços. Atalho `Ctrl-Alt-B`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/remove-duplicates/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/remove-duplicates/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/remove-duplicates/icon.png",
+			"keywords": [
+				"dedupe",
+				"duplicates",
+				"lines",
+				"clean",
+				"text"
+			],
+			"downloads": 165,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.hash-generator",
+			"name": "Hash Generator",
+			"version": "1.0.0",
+			"description": "Hash the selection or document with SHA-1/256/384/512 and copy or insert the digest.\n\n**Hash Generator** computes SHA digests with the platform's Web Crypto (fast and offline): SHA-256, SHA-512, SHA-384 and legacy SHA-1. Copy the digest as hex or Base64, insert it at the cursor, or drop it as a `// sha256: …` comment next to the selection. Ideal for verifying payloads, caching keys and committing integrity checks.\n\n## Usage\nSelect the text to hash (or hash the whole document), open the command palette and run **Hash generator** (`Ctrl-Alt-K`), pick the algorithm and the output action.\n\n## Português\n**Gerador de hash**: calcula SHA-256/512/384/SHA-1 da seleção ou do documento com Web Crypto (offline) e copia (hex/Base64) ou insere o resultado. Atalho `Ctrl-Alt-K`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/hash-generator/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/hash-generator/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/hash-generator/icon.png",
+			"keywords": [
+				"hash",
+				"sha256",
+				"sha512",
+				"checksum",
+				"security"
+			],
+			"downloads": 140,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
 		}
 	]
 }

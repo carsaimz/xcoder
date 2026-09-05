@@ -1209,5 +1209,14 @@
 	"account sign in unavailable": "The account area is not active on this device — set the Backend URL in the settings or sign in from the official site.",
 	"provider not configured": "{provider} sign-in is not configured on this project.",
 	"sftp migration title": "Some SFTP connections were removed",
-	"sftp migration message": "XCoder could not move {count} saved SFTP connection(s) into encrypted storage. The affected connection data and {references} saved reference(s) were removed so the app could start safely. Please add the connection(s) again."
+	"sftp migration message": "XCoder could not move {count} saved SFTP connection(s) into encrypted storage. The affected connection data and {references} saved reference(s) were removed so the app could start safely. Please add the connection(s) again.",
+	"website": "Website",
+	"website offline": "No connection — check your internet and try again.",
+	"retry": "Retry",
+	"back": "Back",
+	"open external": "Open in browser",
+	"ai cmd image": "Generate an image from a description (/image sunset over the sea)",
+	"ai image need prompt": "Describe the image: /image sunset at the beach 768x768",
+	"ai image saved": "Image saved at",
+	"ai status image": "Generating image..."
 }

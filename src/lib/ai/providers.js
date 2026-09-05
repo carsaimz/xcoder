@@ -19,7 +19,6 @@ import settings from "lib/settings";
 
 /** Provider used when the user never picked one (zero-config chat). */
 export const DEFAULT_PROVIDER_ID = "pollinations";
-
 export const GROUPS = /** @type {const} */ ({
 	free: "Built-in",
 	freetier: "Paid (free tier available)",
@@ -55,6 +54,23 @@ export const PROVIDERS = [
 		models: ["openai-fast", "openai"],
 		docs: "https://pollinations.ai",
 		note: "Built-in: sem API key, funciona de cara (GPT-OSS 20B com raciocínio). NÃO é ilimitado: ~1 req/s por IP — erros 429 são repetidos automaticamente. Para qualidade melhor e de graça, adicione uma chave Groq (llama-3.3-70b).",
+		noKeyRequired: true,
+	},
+	{
+		id: "duckduckgo",
+		name: "DuckDuckGo AI (experimental)",
+		group: "free",
+		baseURL: "https://duckduckgo.com/duckchat/v1",
+		// duck.ai rotates its anonymous catalog — these four have been
+		// stable; unknown ids fall back server-side to gpt-4o-mini.
+		models: [
+			"gpt-4o-mini",
+			"claude-3-haiku-20240307",
+			"llama-3.3-70b",
+			"mistral-small-3-24b-instruct-2501",
+		],
+		docs: "https://duck.ai",
+		note: "Experimental e sem key: GPT-4o-mini, Claude Haiku, Llama 3.3 70B e Mistral via duck.ai. A disponibilidade dos modelos gira sem aviso e há limite por IP — se falhar, use o Integrado (Pollinations) ou uma chave Groq grátis. Só chat (sem ferramentas/imagens).",
 		noKeyRequired: true,
 	},
 	{
@@ -514,11 +530,15 @@ const NO_TOOLS_PATTERNS = ["gemma", "deepseek-reasoner"];
  * Best-effort capability map for a provider/model pair. Unknown models
  * fall back to text + agents (the common case for chat endpoints).
  * @param {string} providerId
- * @param {string} [model]
+ * @param {string} model
  * @returns {ModelCapabilities}
  */
 export function modelCapabilities(providerId, model) {
 	const id = String(model || resolveModel(providerId) || "").toLowerCase();
+	// duck.ai is text-only chat: no vision and no tool calling
+	if (providerId === "duckduckgo") {
+		return { text: true, image: false, video: false, agents: false };
+	}
 	const image = VISION_PATTERNS.some((pattern) => id.includes(pattern));
 	const video = VIDEO_PATTERNS.some((pattern) => id.includes(pattern));
 	const noTools = NO_TOOLS_PATTERNS.some((pattern) => id.includes(pattern));
@@ -634,6 +654,11 @@ export function isCatalogModel(providerId, model) {
 		return true;
 	if (providerId === "pollinations") {
 		return ["openai", "openai-fast", "gpt-oss", "gpt-oss-20b"].includes(value);
+	}
+	if (providerId === "duckduckgo") {
+		// duck.ai accepts its known aliases and falls back
+		// to the default model for anything else
+		return true;
 	}
 	return true; // unknown to the catalog but let the provider decide
 }

@@ -3,11 +3,14 @@ import { backendConfig } from "lib/backend";
 /**
  * XCoder support & premium system.
  *
- * The editor stays 100% free. People who donate unlock "Premium", which:
+ * The editor stays 100% free — and since v1.4.18 EVERY feature is free
+ * too. People who donate unlock "Premium", which only:
  *  - removes house ads completely (ads.js checks isPremium()),
- *  - unlocks exclusive premium themes (theme list),
- *  - lifts the daily AI agent turn limit (free: 25 runs/day),
+ *  - lifts the AI usage limits (daily agent turns 25→unlimited, max
+ *    tokens 4096→8192, agent autonomy "auto" allowed),
  *  - shows a supporter badge (About + welcome).
+ *
+ * Themes used to be premium — they are free for everyone now.
  *
  * Donations are collected through the payment methods stored in the
  * project database (PayPal, Stripe, Buy Me a Coffee, M-Pesa, e-Mola,
@@ -421,23 +424,30 @@ export async function syncCloudPremium() {
 
 // --------------------------------------------------------------- themes
 
-/** App themes reserved for supporters (free users keep every other one). */
-export const PREMIUM_THEMES = ["neon", "sunset", "obsidian"];
+/**
+ * Legacy list of the old supporter-only themes. Kept only for
+ * compatibility — since v1.4.18 every theme is free (see showSupportDialog
+ * pitch text) and these functions always answer "not premium / allowed".
+ */
+export const PREMIUM_THEMES = Object.freeze([]);
 
 /**
- * Whether the theme id requires premium.
- * @param {string} id
+ * Whether the theme id requires premium — always false now.
+ * @param {string} [id]
+ * @returns {boolean}
  */
 export function isThemePremium(id) {
-	return PREMIUM_THEMES.includes(String(id || "").toLowerCase());
+	return false;
 }
 
 /**
- * Whether the user may apply that theme right now.
- * @param {string} id
+ * Whether the user may apply that theme right now — always true now
+ * (every feature is free; premium only touches ads and AI limits).
+ * @param {string} [id]
+ * @returns {boolean}
  */
 export function canUseTheme(id) {
-	return isPremium() || !isThemePremium(id);
+	return true;
 }
 
 // --------------------------------------------------------------- feature gates

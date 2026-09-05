@@ -13,8 +13,6 @@ import alert from "dialogs/alert";
 import Ref from "html-tag-js/ref";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
-import { canUseTheme, isThemePremium } from "lib/premium";
-import { showSupportDialog } from "lib/premiumUI";
 import appSettings from "lib/settings";
 import CustomTheme from "pages/customTheme";
 import { updateActiveTerminals } from "settings/terminalSettings";
@@ -126,7 +124,6 @@ export default function () {
 					name={themeSummary.name}
 					isCurrent={isCurrentTheme}
 					swatches={getAppThemeSwatches(theme)}
-					isPremium={isThemePremium(theme.id)}
 					onclick={() => setAppTheme(theme)}
 				/>
 			);
@@ -320,17 +317,6 @@ export default function () {
 			return;
 		}
 
-		// supporter-only themes: nudge to the support dialog instead
-		if (!canUseTheme(theme.id)) {
-			toast(
-				strings["premium theme locked"] ||
-					"Tema exclusivo de apoiadores — doe para desbloquear ♥",
-				4000,
-			);
-			showSupportDialog().catch(() => {});
-			return;
-		}
-
 		themes.apply(theme.id, true);
 		updateCheckedItem(theme.name);
 	}
@@ -375,9 +361,8 @@ export default function () {
 		list.get(`[theme="${theme}"]`)?.check();
 	}
 
-	function Item({ name, swatches, onclick, isCurrent, isPremium }) {
+	function Item({ name, swatches, onclick, isCurrent }) {
 		const check = <span className="icon check"></span>;
-		const star = <span className="icon stars"></span>;
 
 		const $el = (
 			<div
@@ -391,7 +376,6 @@ export default function () {
 					<span className="text">{name}</span>
 				</div>
 				{isCurrent && check}
-				{isPremium && star}
 			</div>
 		);
 

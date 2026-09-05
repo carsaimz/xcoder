@@ -87,6 +87,8 @@ async function loadApps() {
 	add(...(await import("./extensions")).default);
 	add(...(await import("./ai")).default);
 	add(...(await import("./git")).default);
+	// embedded webview of the official site (docs/marketplace/sponsor)
+	add(...(await import("./website")).default);
 	add(...(await import("./notification")).default);
 	add(...(await import("./profile")).default);
 	add(...(await import("./settings")).default);

@@ -1326,5 +1326,14 @@
 	"account sign in unavailable": "A área de conta não está ativa neste dispositivo — configure a Backend URL nas definições ou entre pelo site oficial.",
 	"provider not configured": "O login com {provider} não está configurado neste projeto.",
 	"sftp migration title": "Algumas ligações SFTP foram removidas",
-	"sftp migration message": "O XCoder não conseguiu mover {count} ligação(ões) SFTP guardada(s) para o armazenamento encriptado. Os dados afetados e {references} referência(s) guardada(s) foram removidos para o app poder iniciar em segurança. Adicione a(s) ligação(ões) novamente."
+	"sftp migration message": "O XCoder não conseguiu mover {count} ligação(ões) SFTP guardada(s) para o armazenamento encriptado. Os dados afetados e {references} referência(s) guardada(s) foram removidos para o app poder iniciar em segurança. Adicione a(s) ligação(ões) novamente.",
+	"website": "Site",
+	"website offline": "Sem conexão — verifique a internet e tente de novo.",
+	"retry": "Tentar novamente",
+	"back": "Voltar",
+	"open external": "Abrir no navegador",
+	"ai cmd image": "Gera uma imagem a partir de uma descrição (/image pôr do sol no mar)",
+	"ai image need prompt": "Descreva a imagem: /image pôr do sol na praia 768x768",
+	"ai image saved": "Imagem salva em",
+	"ai status image": "Gerando imagem..."
 }

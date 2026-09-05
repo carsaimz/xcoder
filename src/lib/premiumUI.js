@@ -51,11 +51,11 @@ export async function showSupportDialog() {
 				{premium
 					? t(
 							"support thanks",
-							"Obrigado por apoiar o XCoder! Você tem Premium ativo: sem anúncios, temas exclusivos e agente IA ilimitado.",
+							"Obrigado por apoiar o XCoder! Você tem Premium ativo: sem anúncios e IA com limites maiores (agente ilimitado, 8k tokens, autonomia total).",
 						)
 					: t(
 							"support pitch",
-							"O XCoder é gratuito e open source. Doando você ativa o Premium: sem anúncios, temas exclusivos, agente IA ilimitado e badge de apoiador.",
+							"O XCoder é gratuito — TODOS os recursos são livres. Doando você ativa o Premium: remove anúncios, libera os limites de IA (agente ilimitado, 8k tokens, autonomia total) e dá o badge de apoiador.",
 						)}
 			</p>
 			<div className="xcoder-support-links">
@@ -386,22 +386,24 @@ async function handleAuth($section, signIn) {
 // --------------------------------------------------------------- themes
 
 /** App themes reserved for supporters (free users keep every other one). */
-export const PREMIUM_THEMES = ["neon", "sunset", "obsidian"];
+export const PREMIUM_THEMES = Object.freeze([]);
 
 /**
- * Whether the theme id requires premium.
- * @param {string} id
+ * Always false now — themes are free since v1.4.18 (legacy export).
+ * @param {string} [id]
+ * @returns {boolean}
  */
 export function isThemePremium(id) {
-	return PREMIUM_THEMES.includes(String(id || "").toLowerCase());
+	return false;
 }
 
 /**
- * Whether the user may apply that theme right now.
- * @param {string} id
+ * Always true now — themes are free since v1.4.18 (legacy export).
+ * @param {string} [id]
+ * @returns {boolean}
  */
 export function canUseTheme(id) {
-	return isPremium() || !isThemePremium(id);
+	return true;
 }
 
 export default { showSupportDialog };

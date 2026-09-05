@@ -1,4 +1,5 @@
 import Url from "utils/Url";
+import { duckChatCompletion } from "./duck";
 
 /**
  * OpenAI-compatible chat client.
@@ -26,7 +27,7 @@ const EXTRA_AUTH_HEADERS = /** @type {const} */ ({
  * calls, long chats) trip the limit constantly, which users experience as
  * "a IA integrada não é boa". These get automatic retries with backoff.
  */
-const KEYLESS_PROVIDERS = new Set(["pollinations"]);
+const KEYLESS_PROVIDERS = new Set(["pollinations", "duckduckgo"]);
 
 /** HTTP statuses worth retrying for keyless shared instances. */
 const KEYLESS_RETRY_STATUSES = new Set(["429", "500", "502", "503", "504"]);
@@ -212,6 +213,11 @@ export async function streamChatCompletion({
 	signal,
 	onDelta,
 }) {
+	// duck.ai has no OpenAI-compatible SSE endpoint — the plain adapter
+	// handles it (this error makes streamOrRequest fall back instantly)
+	if (providerId === "duckduckgo") {
+		throw new Error("streaming not supported");
+	}
 	const body = {
 		model,
 		messages,
@@ -411,6 +417,7 @@ const PROVIDER_NAMES = {
 	cerebras: "Cerebras",
 	chutes: "Chutes",
 	pollinations: "Built-in",
+	duckduckgo: "DuckDuckGo AI",
 };
 
 /**
@@ -438,6 +445,10 @@ export async function chatCompletion({
 	maxTokens,
 	signal,
 }) {
+	// keyless duck.ai speaks its own protocol — dedicated adapter
+	if (providerId === "duckduckgo") {
+		return duckChatCompletion({ model, messages, signal });
+	}
 	const body = {
 		model,
 		messages,

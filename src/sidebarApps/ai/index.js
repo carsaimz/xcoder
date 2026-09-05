@@ -13,6 +13,11 @@ import {
 import { explainError, listModels, resolveBaseURL } from "lib/ai/client";
 import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
 import {
+	generateImage,
+	parseImageArgs,
+	saveGeneratedImage,
+} from "lib/ai/imageGen";
+import {
 	highlightMarkdownCode,
 	markdownToHtml,
 	renderMarkdownElement,
@@ -394,6 +399,45 @@ function onSendClick() {
 }
 
 /**
+ * Handles the "/image <description>" chat command — generates an image
+ * with the keyless Pollinations endpoint, saves it next to the active
+ * file (or the workspace root) and posts a preview bubble.
+ * @param {string} raw full input starting with /image
+ */
+async function handleImageCommand(raw) {
+	const parsed = parseImageArgs(String(raw || "").replace(/^\/image\b/i, ""));
+	if (!parsed.prompt) {
+		toast(
+			strings["ai image need prompt"] ||
+				"Descreva a imagem: /image pôr do sol na praia 768x768",
+			4000,
+		);
+		return;
+	}
+
+	handleEvent({ type: "user", payload: raw, attachments: [] });
+	ensureTitle(parsed.prompt);
+	setRunning(true);
+	handleEvent({ type: "status", payload: { action: "image" } });
+	try {
+		const { blob } = await generateImage(parsed);
+		const { path, dataUrl } = await saveGeneratedImage(blob);
+		handleEvent({ type: "status", payload: { action: "done" } });
+		handleEvent({
+			type: "assistant",
+			payload: `${strings["ai image saved"] || "Imagem salva em"} \`${path}\`\n\n![${parsed.prompt.replace(/[\[\]()]/g, "")}](${dataUrl})`,
+		});
+	} catch (error) {
+		handleEvent({ type: "status", payload: { action: "done" } });
+		handleEvent({ type: "error", payload: error?.message || String(error) });
+	} finally {
+		setRunning(false);
+		persist();
+		updateArtifactsBar();
+	}
+}
+
+/**
  * Shows/hides the slash command popup as the user types.
  * @param {InputEvent} e
  */
@@ -435,6 +479,17 @@ function updateSlashMenu(value) {
 async function send() {
 	const raw = ($input.value || "").trim();
 	if (!raw || running) return;
+
+	// /image generates directly via the keyless Pollinations image API —
+	// it never reaches the text agent
+	if (/^\/image\b/i.test(raw)) {
+		$input.value = "";
+		autosize();
+		$slashMenu.style.display = "none";
+		$slashMenu.content = "";
+		await handleImageCommand(raw);
+		return;
+	}
 
 	// image attachments need a vision-capable model
 	let pending = [...attachments];
@@ -971,6 +1026,7 @@ function renderStatus(payload) {
 		subagents: "ai status subagents",
 		web: "ai status web",
 		fetch: "ai status fetch",
+		image: "ai status image",
 		tool: "ai status tool",
 	};
 	const fallbacks = {
@@ -986,6 +1042,7 @@ function renderStatus(payload) {
 		subagents: "Running subagents in parallel...",
 		web: "Searching the web...",
 		fetch: "Fetching page...",
+		image: "Generating image...",
 		tool: "Running tool...",
 	};
 	const label = strings[LABELS[action]] || fallbacks[action] || `${action}...`;
