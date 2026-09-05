@@ -21,6 +21,89 @@ const EXTRA_AUTH_HEADERS = /** @type {const} */ ({
 });
 
 /**
+ * Providers that work without ANY API key — shared public instances with
+ * per-IP rate limits (~1 req/s on Pollinations). Bursts of requests (tool
+ * calls, long chats) trip the limit constantly, which users experience as
+ * "a IA integrada não é boa". These get automatic retries with backoff.
+ */
+const KEYLESS_PROVIDERS = new Set(["pollinations"]);
+
+/** HTTP statuses worth retrying for keyless shared instances. */
+const KEYLESS_RETRY_STATUSES = new Set(["429", "500", "502", "503", "504"]);
+
+/**
+ * Whether this request runs against a keyless shared provider (eligible
+ * for the automatic retry below).
+ */
+function isKeylessRequest(providerId, apiKey) {
+	return KEYLESS_PROVIDERS.has(providerId) && !sanitizeApiKey(apiKey);
+}
+
+/**
+ * @param {number} ms
+ * @param {AbortSignal} [signal]
+ */
+function sleep(ms, signal) {
+	return new Promise((resolve, reject) => {
+		if (signal?.aborted) {
+			reject(new Error("aborted"));
+			return;
+		}
+		const timer = setTimeout(resolve, ms);
+		signal?.addEventListener(
+			"abort",
+			() => {
+				clearTimeout(timer);
+				reject(new Error("aborted"));
+			},
+			{ once: true },
+		);
+	});
+}
+
+/**
+ * Runs a request, retrying up to 2× on rate-limit/server errors for the
+ * keyless (built-in) providers. The shared Pollinations instance answers
+ * 429 as soon as two requests land within the same second — retrying with
+ * a small backoff turns most of those failures into successful answers.
+ * @template T
+ * @param {() => Promise<T>} run request thunk (throws "<status>: detail")
+ * @param {string} providerId
+ * @param {string} apiKey
+ * @param {AbortSignal} [signal]
+ * @returns {Promise<T>}
+ */
+async function withKeylessRetry(run, providerId, apiKey, signal) {
+	const maxRetries = isKeylessRequest(providerId, apiKey) ? 2 : 0;
+	for (let attempt = 0; ; attempt++) {
+		try {
+			return await run();
+		} catch (error) {
+			const status = /^(\d{3}):/.exec(String(error?.message || ""))?.[1];
+			if (
+				attempt >= maxRetries ||
+				!KEYLESS_RETRY_STATUSES.has(status) ||
+				signal?.aborted
+			) {
+				throw error;
+			}
+			await sleep(1200 * (attempt + 1), signal);
+		}
+	}
+}
+
+/**
+ * Pollinations asks apps to identify themselves via a `referrer` body
+ * field (their etiquette docs) — harmless on other providers because we
+ * only add it for ours.
+ * @param {string} providerId
+ * @param {object} body
+ */
+function applyProviderBodyEtiquette(providerId, body) {
+	if (providerId === "pollinations") body.referrer = "xcoder";
+}
+
+/**
  * @param {string} baseURL
  * @param {string} path
  */
@@ -145,27 +228,35 @@ export async function streamChatCompletion({
 	// ask providers to report usage in the final chunk (OpenAI spec;
 	// unknown fields are ignored by providers that don't support it)
 	if (!tools?.length) body.stream_options = { include_usage: true };
+	applyProviderBodyEtiquette(providerId, body);
 
-	const response = await fetch(endpoint(baseURL, "chat/completions"), {
-		method: "POST",
-		headers: buildHeaders(baseURL, apiKey, providerId),
-		body: JSON.stringify(body),
+	const response = await withKeylessRetry(
+		async () => {
+			const res = await fetch(endpoint(baseURL, "chat/completions"), {
+				method: "POST",
+				headers: buildHeaders(baseURL, apiKey, providerId),
+				body: JSON.stringify(body),
+				signal,
+			});
+			if (!res.ok) {
+				const text = await res.text().catch(() => "");
+				let json = {};
+				try {
+					json = text ? JSON.parse(text) : {};
+				} catch {
+					/* non-JSON error body */
+				}
+				const detail =
+					json?.error?.message ||
+					String(text || res.statusText || "request failed").slice(0, 200);
+				throw new Error(`${res.status}: ${detail}`);
+			}
+			return res;
+		},
+		providerId,
+		apiKey,
 		signal,
-	});
-
-	if (!response.ok) {
-		const text = await response.text().catch(() => "");
-		let json = {};
-		try {
-			json = text ? JSON.parse(text) : {};
-		} catch {
-			/* non-JSON error body */
-		}
-		const detail =
-			json?.error?.message ||
-			String(text || response.statusText || "request failed").slice(0, 200);
-		throw new Error(`${response.status}: ${detail}`);
-	}
+	);
 
 	if (!response.body || typeof response.body.getReader !== "function") {
 		throw new Error("streaming not supported");
@@ -290,6 +381,14 @@ export function explainError(error, providerId) {
 		return `${provider ? `${provider}: ` : ""}Modelo ou endpoint não encontrado (404). Confirme o nome do modelo nas configurações do provedor.`;
 	}
 	if (status === "429") {
+		if (providerId === "pollinations") {
+			return (
+				"Built-in atingiu o limite público do serviço (~1 req/s por IP). " +
+				"Aguarde alguns segundos e reenvie — ou adicione uma chave GRATUITA " +
+				"para qualidade melhor: Groq (llama-3.3-70b) ou Cerebras em " +
+				"Configurações › IA › Provedores."
+			);
+		}
 		return `${provider ? `${provider}: ` : ""}Limite de requisições atingido (429) — aguarde alguns segundos e tente de novo. Provedores gratuitos são compartilhados e limitados (~1 req/s).`;
 	}
 	if (/^5\d\d:/.test(message)) {
@@ -351,14 +450,21 @@ export async function chatCompletion({
 	if (typeof maxTokens === "number" && maxTokens > 0) {
 		body.max_tokens = maxTokens;
 	}
+	applyProviderBodyEtiquette(providerId, body);
 
-	const json = await nativeOrFetchJson({
-		url: endpoint(baseURL, "chat/completions"),
-		headers: buildHeaders(baseURL, apiKey, providerId),
-		method: "POST",
-		body,
+	const json = await withKeylessRetry(
+		() =>
+			nativeOrFetchJson({
+				url: endpoint(baseURL, "chat/completions"),
+				headers: buildHeaders(baseURL, apiKey, providerId),
+				method: "POST",
+				body,
+				signal,
+			}),
+		providerId,
+		apiKey,
 		signal,
-	});
+	);
 
 	if (json?.error) {
 		const message =

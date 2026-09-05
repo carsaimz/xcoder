@@ -43,7 +43,7 @@ export const PROVIDERS = [
 	// ---------------------------------------------------------------- free
 	{
 		id: "pollinations",
-		name: "Pollinations (sem chave)",
+		name: "Built-in (Pollinations)",
 		group: "free",
 		baseURL: "https://text.pollinations.ai/openai",
 		// VERIFIED (2026-09): the legacy API exposes exactly one
@@ -54,7 +54,7 @@ export const PROVIDERS = [
 		// "inválido" errors on the free provider.
 		models: ["openai-fast", "openai"],
 		docs: "https://pollinations.ai",
-		note: "Built-in: sem API key — funciona de cara. Modelo anônimo: openai-fast (GPT-OSS 20B, com raciocínio). NÃO é ilimitado: ~1 req/s e os prompts passam por um serviço público.",
+		note: "Built-in: sem API key, funciona de cara (GPT-OSS 20B com raciocínio). NÃO é ilimitado: ~1 req/s por IP — erros 429 são repetidos automaticamente. Para qualidade melhor e de graça, adicione uma chave Groq (llama-3.3-70b).",
 		noKeyRequired: true,
 	},
 	{

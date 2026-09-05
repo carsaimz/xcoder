@@ -1179,6 +1179,7 @@
 	"ai status tool": "Running tool...",
 	"premium required": "Premium feature — support the project to unlock (site account)",
 	"profile": "Profile",
+	"account page error": "Could not open the account page — restart the app and try again.",
 	"guest": "Guest",
 	"free badge": "Free",
 	"profile account hint": "Use the same account as the site — login is shared between site and app, and donations become Premium automatically.",

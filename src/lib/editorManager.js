@@ -1110,6 +1110,34 @@ async function EditorManager($header, $body) {
 		);
 	}
 
+	/**
+	 * CodeMirror's Android EditContext input path misbehaves on several
+	 * Chromium/WebView builds (scroll jumps when tapping empty lines,
+	 * crbug.com/40848803). Port of Acode PR 2258: keep it OFF unless the
+	 * user explicitly opts in via the `useEditContext` setting. Must run
+	 * BEFORE the first EditorView is constructed.
+	 */
+	function applyEditContextSetting() {
+		try {
+			if (appSettings?.value?.useEditContext === true) {
+				if (
+					Object.prototype.hasOwnProperty.call(EditorView, "EDIT_CONTEXT") &&
+					EditorView.EDIT_CONTEXT === false
+				) {
+					delete EditorView.EDIT_CONTEXT;
+				}
+			} else {
+				EditorView.EDIT_CONTEXT = false;
+			}
+		} catch (error) {
+			warnRecoverable(
+				"Failed to apply CodeMirror EditContext setting.",
+				error,
+				"edit-context-setting",
+			);
+		}
+	}
+
 	function createConfiguredBaseExtensions() {
 		return createBaseExtensions(getBaseExtensionOptions());
 	}
@@ -1692,6 +1720,8 @@ async function EditorManager($header, $body) {
 			}),
 		});
 	}
+
+	applyEditContextSetting();
 
 	const editorState = createEmptyEditorState();
 
@@ -2660,6 +2690,7 @@ async function EditorManager($header, $body) {
 			useEmmet: appSettings.value.useEmmet !== false,
 			colorPreview: !!appSettings.value.colorPreview,
 			autoCloseTags: appSettings.value.autoCloseTags !== false,
+			useEditContext: appSettings.value.useEditContext === true,
 			baseExtensions: getBaseExtensionSignature(),
 		});
 	}
@@ -3583,6 +3614,11 @@ async function EditorManager($header, $body) {
 	});
 
 	appSettings.on("update:autoCloseTags", function () {
+		recreateActiveEditorState();
+	});
+
+	appSettings.on("update:useEditContext", function () {
+		applyEditContextSetting();
 		recreateActiveEditorState();
 	});
 
