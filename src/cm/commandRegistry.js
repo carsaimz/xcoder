@@ -82,7 +82,6 @@ import {
 	toCodeMirrorKey,
 } from "cm/keyBindingUtils";
 import {
-	renameSymbol as xcoderRenameSymbol,
 	clearDiagnosticsEffect,
 	clientManager,
 	jumpToDeclaration as lspJumpToDeclaration,
@@ -92,6 +91,7 @@ import {
 	nextSignature as lspNextSignature,
 	prevSignature as lspPrevSignature,
 	showSignatureHelp as lspShowSignatureHelp,
+	renameSymbol as xcoderRenameSymbol,
 } from "cm/lsp";
 import {
 	closeReferencesPanel as xcoderCloseReferencesPanel,

@@ -209,7 +209,13 @@ export async function fetchAuthSettings({ force = false } = {}) {
  */
 export async function oauthProviderEnabled(provider) {
 	const external = await fetchAuthSettings();
-	return external ? Boolean(external[provider]) : true;
+	// v1.4.19: DEFAULT-DENY when the project settings are unreachable.
+	// The old "assume true" fallback kept the "Continuar com Google/GitHub"
+	// buttons visible even with the providers off (users tapped them and
+	// got an opaque failure). If the settings request fails we hide the
+	// buttons — e-mail sign-in and the paste-return-link flow still work,
+	// and a retry happens every time the profile page opens.
+	return external ? Boolean(external[provider]) : false;
 }
 
 /**

@@ -115,6 +115,14 @@ export default function aiSettings() {
 				"Display the model's reasoning steps (when the provider sends them). Turn off for cleaner answers.",
 		},
 		{
+			key: "aiWebTools",
+			text: strings["ai web tools"] || "Web search (agent tools)",
+			checkbox: values.aiWebTools !== false,
+			info:
+				strings["settings-info-ai-web-tools"] ||
+				"Let the assistant search the web (web_search / read_url). Also available as a quick toggle in the chat.",
+		},
+		{
 			key: "aiSkills",
 			text: strings["ai skills"] || "Skills",
 			value: skillsSummary(values),

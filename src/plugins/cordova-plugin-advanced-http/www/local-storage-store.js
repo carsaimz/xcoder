@@ -40,11 +40,28 @@ module.exports = function init(ToughCookie, _) {
 
   WebStorageCookieStore.prototype = Object.create(ToughCookie.Store);
 
+  // XCoder patch (v1.4.19): a corrupted entry in the localStorage cookie
+  // store used to make ToughCookie.Cookie.fromJSON return null, which then
+  // crashed EVERY request inside the jar with
+  // "TypeError: Cannot read properties of null (reading 'hostOnly')" —
+  // the app surfaced it as a DuckDuckGo AI failure. Corrupted entries are
+  // now skipped instead of returned.
+  function parseCookie(json) {
+    try {
+      if (!json) return null;
+      var cookie = ToughCookie.Cookie.fromJSON(json);
+      if (!cookie || !cookie.key || !cookie.domain) return null;
+      return cookie;
+    } catch (e) {
+      return null;
+    }
+  }
+
   WebStorageCookieStore.prototype.findCookie = function (domain, path, key, callback) {
     var store = this._readStore();
     var cookie = _.get(store, [domain, path, key], null);
 
-    callback(null, ToughCookie.Cookie.fromJSON(cookie));
+    callback(null, parseCookie(cookie));
   };
 
   WebStorageCookieStore.prototype.findCookies = function (domain, path, callback) {
@@ -76,9 +93,13 @@ module.exports = function init(ToughCookie, _) {
       });
     });
 
-    cookies = cookies.map(function (cookie) {
-      return ToughCookie.Cookie.fromJSON(cookie);
-    });
+    cookies = cookies
+      .map(function (cookie) {
+        return parseCookie(cookie);
+      })
+      .filter(function (cookie) {
+        return !!cookie;
+      });
 
     callback(null, cookies);
   };
@@ -150,9 +171,13 @@ module.exports = function init(ToughCookie, _) {
       });
     });
 
-    cookies = cookies.map(function (cookie) {
-      return ToughCookie.Cookie.fromJSON(cookie);
-    });
+    cookies = cookies
+      .map(function (cookie) {
+        return parseCookie(cookie);
+      })
+      .filter(function (cookie) {
+        return !!cookie;
+      });
 
     cookies.sort(function (c1, c2) {
       return (c1.creationIndex || 0) - (c2.creationIndex || 0);

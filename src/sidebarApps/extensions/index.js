@@ -87,10 +87,6 @@ document.addEventListener("pluginregistryupdate", () => {
 	}
 });
 
-const $style = <style></style>;
-/** @type {Set<HTMLElement>} */
-const $scrollableLists = new Set();
-
 let searchTimeout = null;
 let installedPlugins = [];
 
@@ -143,13 +139,17 @@ function initApp(el) {
 	}
 
 	Sidebar.on("show", onSelected);
-	document.head.append($style);
 }
 
 async function handleScroll(e) {
 	if (isLoading || !hasMore) return;
 
-	const { scrollTop, scrollHeight, clientHeight } = e.target;
+	// collapsableList invokes onscroll with `this` = <ul> and NO event
+	// (e is undefined) — the old `e.target` threw on every scroll and
+	// silently killed the infinite loading of the plugins list.
+	const $list = e?.target || this;
+	if (!$list) return;
+	const { scrollTop, scrollHeight, clientHeight } = $list;
 
 	if (scrollTop + clientHeight >= scrollHeight - 50) {
 		await loadMorePlugins();
@@ -159,7 +159,9 @@ async function handleScroll(e) {
 async function handleFilterScroll(e) {
 	if (isFilterLoading || !filterHasMore || !currentFilter) return;
 
-	const { scrollTop, scrollHeight, clientHeight } = e.target;
+	const $list = e?.target || this;
+	if (!$list) return;
+	const { scrollTop, scrollHeight, clientHeight } = $list;
 
 	if (scrollTop + clientHeight >= scrollHeight - 50) {
 		await loadFilteredPlugins(currentFilter, false);
@@ -346,7 +348,7 @@ async function filterPlugins() {
 		"attribute:keywords": { type: "keywords", baseLabel: keywordsLabel },
 	};
 
-	const selection = await select("Filter", filterItems);
+	const selection = await select(strings.filter || "Filter", filterItems);
 	if (!selection) return;
 
 	const option = filterConfig[selection];
@@ -430,7 +432,10 @@ async function addSource(sourceType, value = "https://") {
 			["remote", strings.remote],
 			["local", strings.local],
 		];
-		sourceType = await select("Select Source", sourceOption);
+		sourceType = await select(
+			strings["select source"] || "Select Source",
+			sourceOption,
+		);
 	}
 
 	if (!sourceType) return;
@@ -438,7 +443,12 @@ async function addSource(sourceType, value = "https://") {
 	if (sourceType === "remote") {
 		source = await prompt(strings["enter plugin source"], value, "url");
 	} else {
-		source = (await FileBrowser("file", "Select plugin source")).url;
+		source = (
+			await FileBrowser(
+				"file",
+				strings["select plugin source"] || "Select plugin source",
+			)
+		).url;
 	}
 
 	if (!source) return;
@@ -621,70 +631,30 @@ function stopLoading($list) {
 }
 
 /**
- * Update the height of the element
+ * Marks the given list as "the one taking the panel space" — every other
+ * collapsible list collapses (the panel holds at most one open list).
+ *
+ * Layout itself is pure flexbox (style.scss): the expanded list gets
+ * `flex: 1; min-height: 0` and its <ul> has `flex: 1; min-height: 0;
+ * overflow-y: auto`, so the list ALWAYS fits the visible panel and its
+ * content scrolls. The old JS-injected `max-height: calc(100% - Xpx)`
+ * fought those flex rules and could size the list taller than the panel —
+ * the container has overflow: hidden, so the bottom of the list became
+ * unreachable and scrolling appeared broken ("não dá scroll nos plugins").
  * @param {HTMLElement} $el
  */
 function updateHeight($el) {
 	removeHeight($installed, $el !== $installed);
 	removeHeight($explore, $el !== $explore);
-
-	try {
-		let height = $header?.getBoundingClientRect().height;
-		const tileHeight = $el.get(":scope>.tile")?.getBoundingClientRect().height;
-		if ($el === $searchResult) {
-			height += 60;
-		} else {
-			height += $searchResult?.getBoundingClientRect().height + tileHeight;
-		}
-
-		setHeight($el, height);
-	} catch (error) {
-		console.error(error);
-	}
 }
 
 /**
- * Remove height styles from an element
+ * Collapse helper kept for readability.
  * @param {HTMLElement} $el
  * @param {Boolean} collapse
  */
 function removeHeight($el, collapse = false) {
 	if (collapse) $el.collapse?.();
-
-	$scrollableLists.delete($el);
-	updateStyle();
-}
-
-/**
- * Change the height of an element
- * @param {HTMLElement} $el
- * @param {Number} height
- */
-function setHeight($el, height) {
-	$scrollableLists.add($el);
-
-	const calcHeight = height ? `calc(100% - ${height}px)` : "100%";
-	$el.dataset.height = calcHeight;
-	if ($el === $searchResult) {
-		$el.style.height = "fit-content";
-		return;
-	}
-
-	updateStyle();
-}
-
-function updateStyle() {
-	let style = "";
-
-	$scrollableLists.forEach(($el) => {
-		style += `
-                        .list.collapsible[data-id="${$el.dataset.id}"] {
-                                max-height: ${$el.dataset.height} !important;
-                        }
-                `;
-	});
-
-	$style.innerHTML = style;
 }
 
 function getLocalRes(id, name) {

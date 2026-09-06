@@ -365,17 +365,17 @@ export default function PluginsInclude(updates) {
 	}
 
 	async function searchRemotely(query) {
-	if (!query) return [];
-	try {
-		const found = await pluginRegistry.search(query);
-		return found.map((plugin) => <Item {...plugin} />);
-	} catch (error) {
-		$list.all.setAttribute("empty-msg", strings["error"]);
-		window.log("error", "Failed to search plugins:");
-		window.log("error", error);
-		return [];
+		if (!query) return [];
+		try {
+			const found = await pluginRegistry.search(query);
+			return found.map((plugin) => <Item {...plugin} />);
+		} catch (error) {
+			$list.all.setAttribute("empty-msg", strings["error"]);
+			window.log("error", "Failed to search plugins:");
+			window.log("error", error);
+			return [];
+		}
 	}
-}
 
 	async function getFilteredPlugins(filterState, isInitial = false) {
 		if (!filterState) return;
@@ -446,7 +446,9 @@ export default function PluginsInclude(updates) {
 
 		// XCoder: registry is local — filter the registry list at once.
 		const registry = await pluginRegistry.list();
-		const items = registry.filter((plugin) => matchesFilter(plugin, filterState));
+		const items = registry.filter((plugin) =>
+			matchesFilter(plugin, filterState),
+		);
 		return { items, hasMore: false };
 	}
 

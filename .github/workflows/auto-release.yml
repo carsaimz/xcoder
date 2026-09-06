@@ -1,0 +1,63 @@
+name: Auto release (tag on version bump)
+
+# "Release automático a cada push" — the SAFE version of it:
+#
+# When a push to main carries a version bump in package.json (the standard
+# "chore(release): vX.Y.Z" flow), this workflow creates the matching vX.Y.Z
+# tag — which automatically triggers the existing
+# "Release (signed APK + AAB)" workflow (release.yml).
+#
+# Pushes that do NOT change the version are ignored, so everyday pushes
+# never spam GitHub Releases with duplicate artifacts.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Tag new version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create and push the version tag (only when new + higher)
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          VERSION="v$(node -p "require('./package.json').version")"
+          echo "package.json version: ${VERSION}"
+
+          if git rev-parse -q --verify "refs/tags/${VERSION}" >/dev/null; then
+            echo "Tag ${VERSION} already exists — nothing to release."
+            exit 0
+          fi
+
+          # Safety net: only tag versions HIGHER than the newest existing
+          # tag (protects force-pushes and renamed branches).
+          LATEST="$(git tag -l 'v*' --sort=-v:refname | head -n1 || true)"
+          if [ -n "${LATEST}" ]; then
+            HIGHEST="$(printf '%s\n%s\n' "${LATEST#v}" "${VERSION#v}" | sort -V | tail -n1)"
+            if [ "${HIGHEST}" != "${VERSION#v}" ]; then
+              echo "Version ${VERSION} is not higher than the latest tag ${LATEST} — skipping."
+              exit 0
+            fi
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${VERSION}"
+          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${VERSION}"
+          echo "Tag ${VERSION} pushed — the signed release workflow takes over."

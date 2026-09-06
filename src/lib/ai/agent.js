@@ -24,7 +24,8 @@ import {
 	resolveModel,
 } from "./providers";
 import { buildSkillsSection, listSkills } from "./skills";
-import { executeTool, toolSchemas } from "./tools";
+import { executeTool, TOOL_MAP, toolSchemas } from "./tools";
+import { applyWebToolsToggle } from "./toolToggle";
 import vshell from "./vshell";
 
 /**
@@ -42,6 +43,11 @@ const MAX_STEPS = 25;
  * @typedef {object} ChatEvent
  * @property {"user"|"assistant"|"tool"|"error"|"status"} type
  * @property {any} [payload]
+ */
+
+/**
+ * XCoder AI agent — an OpenAI tool-calling loop with a permission system.
+ * The web-tools rule lives in ./toolToggle (shared with the chat UI).
  */
 
 export class Agent {
@@ -290,7 +296,9 @@ export class Agent {
 		const provider = PROVIDER_MAP[config.providerId];
 		const fallbackModel = provider?.models?.[0] || "";
 		/** current tools payload; emptied if the endpoint rejects tools */
-		let tools = toolSchemas(this.toolAllowlist);
+		let tools = toolSchemas(
+			applyWebToolsToggle(this.toolAllowlist, Object.keys(TOOL_MAP)),
+		);
 		let model = config.model;
 
 		for (let attempt = 0; attempt < 3; attempt++) {

@@ -150,8 +150,25 @@ export function normalizeDuckMessages(messages) {
 }
 
 /**
+ * Matches the advanced-http/tough-cookie crash on a corrupted cookie jar
+ * ("Cannot read properties of null (reading 'hostOnly')") — the plugin's
+ * localStorage cookie store can end up with a broken entry and then EVERY
+ * request through it dies before reaching the network. Clearing the jar
+ * heals it (duck.ai's real session lives in the x-vqd-4 header, not in
+ * cookies).
+ * @param {unknown} error
+ * @returns {boolean}
+ */
+function isCookieJarError(error) {
+	return /hostOnly|hostcookie|cookiejar|tough-cookie/i.test(
+		String(error?.message || error || ""),
+	);
+}
+
+/**
  * Low-level request that returns {status, headers, text} through the
- * native http plugin when available, else fetch.
+ * native http plugin when available, else fetch. A corrupted native
+ * cookie jar is cleared once and the request retried.
  * @param {object} opts
  * @param {string} opts.url
  * @param {Record<string, string>} opts.headers
@@ -161,43 +178,57 @@ export function normalizeDuckMessages(messages) {
  */
 async function rawRequest({ url, headers, method, body, signal }) {
 	if (typeof cordova !== "undefined" && cordova.plugin?.http?.sendRequest) {
-		return await new Promise((resolve, reject) => {
-			try {
-				cordova.plugin.http.sendRequest(
-					url,
-					{
-						method,
-						headers,
-						...(body ? { data: body, serializer: "json" } : {}),
-						responseType: "text",
-						timeout: 120000,
-					},
-					(response) => {
-						resolve({
-							status: Number(response.status) || 200,
-							headers: response.headers || {},
-							text:
-								typeof response.data === "string"
-									? response.data
-									: JSON.stringify(response.data ?? ""),
-						});
-					},
-					(error) => {
-						reject(
-							new Error(
-								`${error?.status || "Network"}: ${
-									(typeof error?.error === "string" && error.error) ||
-									error?.statusText ||
-									"request failed"
-								}`,
-							),
-						);
-					},
-				);
-			} catch (error) {
-				reject(error);
+		const send = () =>
+			new Promise((resolve, reject) => {
+				try {
+					cordova.plugin.http.sendRequest(
+						url,
+						{
+							method,
+							headers,
+							...(body ? { data: body, serializer: "json" } : {}),
+							responseType: "text",
+							timeout: 120000,
+						},
+						(response) => {
+							resolve({
+								status: Number(response.status) || 200,
+								headers: response.headers || {},
+								text:
+									typeof response.data === "string"
+										? response.data
+										: JSON.stringify(response.data ?? ""),
+							});
+						},
+						(error) => {
+							reject(
+								new Error(
+									`${error?.status || "Network"}: ${
+										(typeof error?.error === "string" && error.error) ||
+										error?.statusText ||
+										"request failed"
+									}`,
+								),
+							);
+						},
+					);
+				} catch (error) {
+					reject(error);
+				}
+			});
+		try {
+			return await send();
+		} catch (error) {
+			if (isCookieJarError(error)) {
+				try {
+					cordova.plugin?.http?.clearCookies?.();
+				} catch {
+					/* best effort */
+				}
+				return send();
 			}
-		});
+			throw error;
+		}
 	}
 
 	const response = await fetch(url, {

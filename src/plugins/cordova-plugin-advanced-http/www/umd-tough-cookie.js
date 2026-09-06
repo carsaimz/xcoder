@@ -1199,6 +1199,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var store = this.store;
 
 	  function matchingCookie(c) {
+	    // XCoder patch (v1.4.19): skip corrupted store entries — a null
+	    // cookie here used to crash the whole request with
+	    // "Cannot read properties of null (reading 'hostOnly')".
+	    if (!c) return false;
 	    // "Either:
 	    //   The cookie's host-only-flag is true and the canonicalized
 	    //   request-host is identical to the cookie's domain.

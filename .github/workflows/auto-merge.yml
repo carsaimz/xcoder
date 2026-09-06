@@ -1,7 +1,8 @@
-name: Renovate auto-merge
+name: Dependencies auto-merge
 
-# Enables GitHub native auto-merge on Renovate PRs so they merge as soon as
-# every required check (build/test) passes.
+# Enables GitHub native auto-merge on dependency-update PRs (Dependabot,
+# Renovate and our own deps-update bot) so they merge as soon as every
+# required check (build/test) passes.
 #
 # Requirements on GitHub:
 #   1. Settings > General > Pull Requests > check "Allow auto-merge"
@@ -10,7 +11,7 @@ name: Renovate auto-merge
 #      it would merge immediately after approval rules are satisfied).
 #
 # Major bumps (label "dependencies-major") are never auto-merged here —
-# that matches renovate.json, where majors set automerge: false.
+# majors always get a human review.
 
 on:
   pull_request_target:
@@ -25,7 +26,11 @@ jobs:
     name: Enable auto-merge (squash)
     runs-on: ubuntu-latest
     if: >-
-      github.actor == 'renovate[bot]' &&
+      github.actor == 'renovate[bot]' ||
+      github.actor == 'dependabot[bot]' ||
+      github.actor == 'github-actions[bot]' ||
+      startsWith(github.actor, 'carsaimz') &&
+      contains(github.event.pull_request.labels.*.name, 'dependencies') &&
       !contains(github.event.pull_request.labels.*.name, 'dependencies-major')
 
     steps:

@@ -30,7 +30,8 @@ export const SLASH_COMMANDS = [
 		// never expanded into a text prompt
 		id: "image",
 		descriptionKey: "ai cmd image",
-		fallbackDescription: "Generate an image from a description (/image sunset over the sea)",
+		fallbackDescription:
+			"Generate an image from a description (/image sunset over the sea)",
 		build: ({ text }) => text || "",
 	},
 	{

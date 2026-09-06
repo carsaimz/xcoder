@@ -5,6 +5,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
  *  - requests against the keyless providers are retried on 429/5xx
  *  - keyed providers are NOT retried (their errors surface immediately)
  *  - Pollinations requests carry the `referrer` etiquette field
+ *  - Pollinations/duck.ai are NON-streaming (the legacy SSE API answers
+ *    "500: 402 Payment Required" for anonymous requests) — streaming
+ *    throws "streaming not supported" so the agent falls back silently
  */
 
 const clientModuleUrl = "lib/ai/client";
@@ -61,28 +64,45 @@ afterEach(() => {
 });
 
 describe("keyless provider retry (built-in AI hardening)", () => {
-        it("retries a 429 from pollinations and succeeds on the 2nd attempt", async () => {
-                const okBody =
-                        'data: {"choices":[{"delta":{"content":"hi"},"index":0}]}\n\ndata: [DONE]\n\n';
-                const { fetchMock } = mockFetchQueue([
-                        fetchResponse({
-                                ok: false,
-                                status: 429,
-                                body: "rate limited",
-                        }),
-                        fetchResponse({ ok: true, status: 200, body: okBody, stream: true }),
+        it("does not stream pollinations (legacy SSE is rejected) — non-streaming is used instead", async () => {
+                const okBody = JSON.stringify({
+                        choices: [
+                                {
+                                        message: {
+                                                role: "assistant",
+                                                content: "hi",
+                                        },
+                                },
+                        ],
+                });
+                const { fetchMock, calls } = mockFetchQueue([
+                        fetchResponse({ ok: true, status: 200, body: okBody }),
                 ]);
 
-                const result = await streamChatCompletion({
+                // streaming MUST be refused for the built-in provider...
+                await expect(
+                        streamChatCompletion({
+                                baseURL: "https://text.pollinations.ai/openai",
+                                apiKey: "",
+                                providerId: "pollinations",
+                                model: "openai-fast",
+                                messages: [{ role: "user", content: "hi" }],
+                        }),
+                ).rejects.toThrow(/streaming not supported/);
+
+                // ...and the plain request keeps working (with referrer)
+                const result = await chatCompletion({
                         baseURL: "https://text.pollinations.ai/openai",
                         apiKey: "",
                         providerId: "pollinations",
                         model: "openai-fast",
                         messages: [{ role: "user", content: "hi" }],
                 });
-
-                expect(fetchMock).toHaveBeenCalledTimes(2);
                 expect(result.content).toBe("hi");
+                expect(fetchMock).toHaveBeenCalledTimes(1);
+                const sent = JSON.parse(calls[0].init.body);
+                expect(sent.referrer).toBe("xcoder");
+                expect(sent.stream).toBeUndefined();
         }, 15000);
 
         it("does NOT retry keyed requests (real provider errors surface fast)", async () => {
@@ -131,23 +151,27 @@ describe("keyless provider retry (built-in AI hardening)", () => {
 
                 expect(fetchMock).toHaveBeenCalledTimes(1);
         });
-        it("adds the referrer etiquette field for pollinations requests", async () => {
-                const okBody =
-                        'data: {"choices":[{"delta":{"content":"ok"},"index":0}]}\n\ndata: [DONE]\n\n';
-                const { calls } = mockFetchQueue([
-                        fetchResponse({ ok: true, status: 200, body: okBody, stream: true }),
+        it("retries a 429 for the keyed-less non-streaming pollinations request and succeeds", async () => {
+                const okBody = JSON.stringify({
+                        choices: [
+                                { message: { role: "assistant", content: "ok" } },
+                        ],
+                });
+                const { fetchMock } = mockFetchQueue([
+                        fetchResponse({ ok: false, status: 429, body: "rate limited" }),
+                        fetchResponse({ ok: true, status: 200, body: okBody }),
                 ]);
 
-                await streamChatCompletion({
+                const result = await chatCompletion({
                         baseURL: "https://text.pollinations.ai/openai",
                         apiKey: "",
                         providerId: "pollinations",
                         model: "openai-fast",
-                        messages: [{ role: "user", content: "hello" }],
+                        messages: [{ role: "user", content: "say ok" }],
                 });
 
-                const sent = JSON.parse(calls[0].init.body);
-                expect(sent.referrer).toBe("xcoder");
+                expect(fetchMock).toHaveBeenCalledTimes(2);
+                expect(result.content).toBe("ok");
         }, 15000);
 });
 

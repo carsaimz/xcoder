@@ -304,6 +304,68 @@ export const PROVIDER_MAP = Object.fromEntries(
 );
 
 /**
+ * Visual identity for each provider: an emoji/letter glyph plus a brand
+ * color. Used by the chat strip (logo + model), the model picker headers
+ * and the provider cards. Custom endpoints fall back to the 🤖 robot, as
+ * promised — they have no brand.
+ * @type {Record<string, {glyph: string, color: string}>}
+ */
+const PROVIDER_ICONS = {
+	pollinations: { glyph: "🌼", color: "#e8a33d" },
+	duckduckgo: { glyph: "🦆", color: "#de5833" },
+	groq: { glyph: "⚡", color: "#f55036" },
+	zai: { glyph: "🚀", color: "#4f46e5" },
+	"openrouter-free": { glyph: "🌐", color: "#6467f2" },
+	"openrouter-paid": { glyph: "🌐", color: "#6467f2" },
+	cerebras: { glyph: "🧠", color: "#f97316" },
+	huggingface: { glyph: "🤗", color: "#ffd21e" },
+	cloudflare: { glyph: "☁️", color: "#f6821f" },
+	google: { glyph: "✨", color: "#4285f4" },
+	openai: { glyph: "🌀", color: "#10a37f" },
+	mistral: { glyph: "M", color: "#fa520f" },
+	deepseek: { glyph: "🐳", color: "#4d6bfe" },
+	together: { glyph: "T", color: "#0f6fff" },
+	cohere: { glyph: "C", color: "#39594d" },
+	"github-models": { glyph: "🐙", color: "#24292f" },
+	fireworks: { glyph: "🎆", color: "#ef4444" },
+	anthropic: { glyph: "A", color: "#d97757" },
+	xai: { glyph: "X", color: "#111111" },
+	perplexity: { glyph: "🔮", color: "#20808d" },
+	"azure-openai": { glyph: "A", color: "#0078d4" },
+	nvidia: { glyph: "N", color: "#76b900" },
+	custom: { glyph: "🤖", color: "#8b5cf6" },
+};
+
+/** Fallback for providers without a brand entry: first letter badge. */
+const DEFAULT_ICON_COLOR = "#8b5cf6";
+
+/**
+ * @param {string} providerId
+ * @returns {{glyph: string, color: string}} glyph is an emoji or a single
+ *          letter (letters render on a colored round badge)
+ */
+export function providerIcon(providerId) {
+	const known = PROVIDER_ICONS[providerId];
+	if (known) return known;
+	const letter =
+		String(providerId || "?")
+			.trim()
+			.charAt(0)
+			.toUpperCase() || "?";
+	return { glyph: letter, color: DEFAULT_ICON_COLOR };
+}
+
+/**
+ * Whether the glyph is a plain letter (needs the colored badge treatment)
+ * rather than a self-colored emoji.
+ * @param {string} glyph
+ * @returns {boolean}
+ */
+export function isLetterGlyph(glyph) {
+	return /^[A-Z]$/i.test(String(glyph || ""));
+}
+
+/**
  * @param {keyof typeof GROUPS} group
  * @returns {AIProvider[]}
  */

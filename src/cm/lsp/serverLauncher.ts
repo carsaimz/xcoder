@@ -738,7 +738,9 @@ export async function installServer(
 
   if (!command) {
     throw new Error(
-      `${displayLabel} has no ${actionLabel.toLowerCase()} command.`,
+      strings["lsp no command"]
+        ? strings["lsp no command"].replace("{server}", displayLabel)
+        : `${displayLabel} has no ${actionLabel.toLowerCase()} command.`,
     );
   }
 
@@ -781,7 +783,12 @@ export async function installServer(
       icon: "zap",
       loading: () => loading,
       title: displayLabel,
-      message: `${actionLabel}ing ${displayLabel}...`,
+      message: strings[isUpdate ? "lsp-updating" : "lsp-installing"]
+        ? (strings[isUpdate ? "lsp-updating" : "lsp-installing"] as string).replace(
+            "{server}",
+            displayLabel,
+          )
+        : `${actionLabel}ing ${displayLabel}...`,
     });
     await runForegroundCommand(command);
     resetInstallState(server.id);
@@ -793,8 +800,15 @@ export async function installServer(
 
     toast(
       result.status === "present"
-        ? `${displayLabel} ${isUpdate ? "updated" : "installed"}`
-        : `${displayLabel} ${actionLabel.toLowerCase()} finished`,
+        ? strings[isUpdate ? "lsp-updated" : "lsp-installed"]
+          ? (strings[isUpdate ? "lsp-updated" : "lsp-installed"] as string).replace(
+              "{server}",
+              displayLabel,
+            )
+          : `${displayLabel} ${isUpdate ? "updated" : "installed"}`
+        : strings["lsp-finished"]
+          ? (strings["lsp-finished"] as string).replace("{server}", displayLabel)
+          : `${displayLabel} ${actionLabel.toLowerCase()} finished`,
     );
     return true;
   } catch (error) {
@@ -824,7 +838,11 @@ export async function uninstallServer(
   const command = getUninstallCommand(server);
 
   if (!command) {
-    throw new Error(`${displayLabel} has no uninstall command.`);
+    throw new Error(
+      strings["lsp no uninstall command"]
+        ? strings["lsp no uninstall command"].replace("{server}", displayLabel)
+        : `${displayLabel} has no uninstall command.`,
+    );
   }
 
   if (promptConfirm) {

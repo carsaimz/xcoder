@@ -210,5 +210,4 @@ function focusBlurEditor(keyboardHidden) {
  * Show ad if keyboard is hidden and ad is active, hide ad otherwise.
  * @param {boolean} keyboardHidden
  */
-function toggleBannerAd(keyboardHidden) {
-}
+function toggleBannerAd(keyboardHidden) {}

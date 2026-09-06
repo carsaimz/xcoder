@@ -93,7 +93,12 @@
   }
 
   .list.search-result {
-    flex-shrink: 0;
+    // shrinkable scroll area: long search/filter result lists must scroll
+    // INSIDE the panel instead of pushing the explore/installed lists (or
+    // themselves) out of the container's overflow:hidden viewport
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: 60%;
     overflow-y: auto;
 
     &:empty {

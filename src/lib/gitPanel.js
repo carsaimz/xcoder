@@ -1,6 +1,6 @@
 import fsOperation from "fileSystem";
-import Url from "utils/Url";
 import vshell, { exec as shellExec } from "lib/ai/vshell";
+import Url from "utils/Url";
 
 /**
  * Git panel logic — built on top of the local snapshot VCS stored in
@@ -197,9 +197,7 @@ export async function restore(id) {
  */
 export function preparedCommands(remoteUrl, message = "update") {
 	const repo = String(remoteUrl || "").trim();
-	const ghRepo = repo
-		.replace(/^https?:\/\/[^/]+\//, "")
-		.replace(/\.git$/, "");
+	const ghRepo = repo.replace(/^https?:\/\/[^/]+\//, "").replace(/\.git$/, "");
 	const commitMsg = message.replace(/"/g, '\\"');
 
 	const commands = [

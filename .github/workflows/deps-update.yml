@@ -1,0 +1,72 @@
+name: Dependencies update bot
+
+# Self-contained dependency bot — does NOT depend on the Dependabot
+# repository toggles, so it keeps working even when "Dependabot não
+# funciona". Every Monday it bumps minor/patch npm dependencies, runs the
+# full test suite + typecheck and opens ONE pull request with everything
+# that still passes. If any check fails, no PR is created.
+#
+# One-time repo setup (Settings):
+#   1. Actions > General > Workflow permissions:
+#      check "Allow GitHub Actions to create and approve pull requests"
+#   2. Settings > General > Pull Requests: check "Allow auto-merge"
+#      (then .github/workflows/auto-merge.yml merges the PR when CI passes)
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays 04:00 UTC = 06:00 Africa/Maputo
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: deps-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: npm minor/patch updates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Bump minor/patch dependencies
+        run: |
+          npm install
+          npx --yes npm-check-updates --target minor --upgrade
+          npm install
+
+      - name: Verify (tests + typecheck)
+        run: |
+          npm test
+          npm run typecheck
+
+      - name: Create or update the pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(deps): weekly minor/patch updates"
+          title: "chore(deps): weekly minor/patch updates"
+          body: |
+            Automated weekly dependency update (minor + patch only).
+
+            - [x] Full test suite passes (`npm test`)
+            - [x] Typecheck passes (`npm run typecheck`)
+            - Auto-merges automatically when CI is green.
+
+            Major bumps are intentionally left out — they are reviewed
+            manually.
+          branch: "deps/weekly-updates"
+          delete-branch: true
+          labels: |
+            dependencies
+          add-paths: |
+            package.json
+            package-lock.json

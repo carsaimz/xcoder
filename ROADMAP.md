@@ -1,57 +1,71 @@
-# Roadmap do XCoder
+# ROADMAP — XCoder
 
-> Onde o XCoder está indo. Tudo aqui é **gratuito** — o Premium continua
-> limitado a remover anúncios e ampliar os limites de IA.
-> Itens marcados com 💡 vêm da comparação contínua com o upstream
-> [Acode](https://github.com/Acode-Foundation/Acode) (CHANGELOG lido por
-> completo até a v1.13.3).
+> Onde o projeto está e para onde vai. Actualizado em **Setembro de 2026** (v1.4.19).
+> Itens marcados com ✅ estão feitos e publicados; 🔜 são os próximos passos;
+> 💡 são ideias avaliadas para depois.
 
-## ✅ Concluído até a v1.4.19
+---
 
-- Agente de IA com ferramentas, subagentes e streaming (pensamento expansível)
-- Provedores **Integrados sem chave**: Pollinations (texto + imagem `/image`),
-  DuckDuckGo AI (protocolo novo x-vqd-hash-1 + cookies)
-- Chat estilo Claude/DeepSeek: avatares, botões abaixo do input, ações por
-  pressionamento longo (copiar, regenerar, detalhar, resumir, continuar,
-  inserir no editor)
-- Página de apoio própria (não modal) + conta compartilhada com o site
-- Site embutido (aba lateral Website), marketplace com 16+ plugins
-- Terminal Alpine (proot) sem warnings de binding, menu dev em 2 toques
-- CI com checagem de traduções e typos; Dependabot daily
+## ✅ Concluído (até v1.4.19)
 
-## 🎯 Próximo (v1.5.x)
+### Núcleo / Editor
+- ✅ Editor CodeMirror 6 com 23+ linguagens, temas (Dark+/Light/Solarized + construtor), multi-janela.
+- ✅ Sistema de ficheiros multi-backend: local (Cordova), memória, navegador (IndexedDB), WebDAV/SFTP/FTP.
+- ✅ Terminal virtual integrado (proot/Alpine), execução de JS e shell sandboxed.
+- ✅ Git simplificado: snapshots, restauro, GitHub OAuth Device Flow, comandos preparados.
+- ✅ Markdown, busca global, substituição, formatação de código.
 
-1. **CLI `acode` no terminal** 💡 — `acode open <arquivo>` dentro do proot
-   abre o arquivo no editor (ponte terminal ↔ editor, estilo Acode v1.11.8).
-2. **Rolagem de histórico de abas** — voltar/avançar entre abas recentes
-   (atalho + botões) 💡 (Acode v1.12.7).
-3. **Guia de indentação estilo VSCode** e **scroll-past-end configurável** 💡
-   (extensões CM6 — Acode v1.11.5/v1.12.6).
-4. **Traduções do site em pt/en** com fallback automático do Google Tradutor
-   para outros idiomas (já lançado: menu 🌐 no site).
-5. **Automação de release**: anúncio de releases para a comunidade (site +
-   fórum), build de preview por label em PRs 💡.
+### IA (integrada e gratuita por defeito)
+- ✅ Chat + Agente (ferramentas: ler/escrever ficheiros, comandos, subagentes).
+- ✅ Provedores keyless (sem chave): **Integrado (Pollinations)** e **DuckDuckGo AI**.
+- ✅ **v1.4.19 — correções de fiabilidade:** Pollinations volta ao modo não-streaming (a API legacy rejeitou SSE anónimo com "402"); chave Pollinations expirada é ignorada automaticamente (retry anónimo) e o erro passa a explicar o que fazer; crash de cookies do plugin HTTP (`hostOnly`) corrigido na raiz (parche no plugin + auto-limpeza).
+- ✅ **v1.4.19 — controlo rápido no chat:** botões "Pensar" (raciocínio) e "Buscar" (busca na web) junto ao campo de mensagem; ao pensar aparece só "Pensando..." (o processo completo fica recolhido num bloco opcional).
+- ✅ **v1.4.19 — logotipos dos provedores:** logo + modelo seleccionado na faixa do chat (nome completo no tooltip); logos também no seletor de modelos; provedores personalizados usam 🤖.
+- ✅ **v1.4.19 — acções nas mensagens:** toque longo / 2 toques / botão direito abre o menu completo: copiar, inserir no editor, partilhar, regenerar, explicar melhor e resumir.
+- ✅ Geração de imagens por comando (`/image`), artefactos, sessões múltiplas, slash commands, skills.
+- ✅ Scroll automático para a última mensagem ao entrar no chat.
 
-## 🚀 Depois (v1.6+)
+### Plugins
+- ✅ 16 plugins próprios no marketplace (toggle-comment, json-tools, uuid, emoji, cores, TOC, indent, dedupe, hash, …).
+- ✅ **v1.4.19 — scroll do painel de plugins corrigido** (layout flexbox em vez do max-height injectado; scroll infinito deixa de falhar).
+- ✅ Fontes remotas: registry GitHub + jsDelivr com cache offline no app.
 
-6. **Editor multi-painel (split view)** 💡 — dividir a área do editor lado a
-   lado com abas arrastáveis (Acode v1.12.7 #2416) — o maior salto de UX.
-7. **Terminal SSH integrado** 💡 — sessões remotas salvas ao lado do SFTP
-   (Acode v1.13.2 #2694).
-8. **Console REPL JS isolado** 💡 — Web Worker sandbox com UX mobile
-   (Acode v1.13.2 #2808).
-9. **Gerenciador de fontes** 💡 — instalar fontes customizadas com atribuição
-   separada editor/app (Acode v1.11.6/v1.12.0).
-10. **Mais plugins portados do Acode** 💡 — linter, formatter (Prettier/Ruff),
-    compilador Sass ao vivo, runner avançado, visualizador de documentos.
-11. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar, segredos
-    seguros, ratings, exposição de pacotes CM6.
-12. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
-    anúncios; horário silencioso (Acode v1.12.0 #1918 / v1.11.8 #1779).
+### Conta / Site / Pagamentos
+- ✅ Conta única partilhada entre app e site (Supabase) com Premium por doação.
+- ✅ Página /sponsor no site e "Apoie o projecto" no app.
+- ✅ **v1.4.19 — OAuth:** Google/GitHub só aparecem quando estão activos no projecto (verificação antes de renderizar, sem "flash"), agora com os logos reais das marcas.
+- ✅ Premium simplificado: apenas remove anúncios e aumenta limites de IA — todas as outras funcionalidades são livres.
 
-## 🧭 Direção contínua
+### Infra / Bots / Release
+- ✅ CI (vitest + typecheck + biome + build), CodeQL diário, dependency-review.
+- ✅ **v1.4.19 — release automático:** um push em `main` que sobe a versão gera a tag e publica o release assinado automaticamente (workflow `auto-release.yml`).
+- ✅ **v1.4.19 — bot de dependências próprio:** `deps-update.yml` corre semanalmente, testa tudo e abre 1 PR com updates minor/patch (independente dos toggles da Dependabot) + auto-merge configurado para bots.
+- ✅ Dependabot (diário) mantido; instruções de ativação nos cabeçalhos dos workflows.
+- ✅ i18n: pt-br 100% (idioma principal de UX), notificações LSP traduzidas, diálogos de plugins traduzidos.
 
-- Manter o CI verde e a pt-br 100% traduzida (`npm run lang:check`).
-- Verificar o CHANGELOG do Acode a cada release upstream e portar o que for
-  útil (workflows, plugins, IA, editor).
-- Nunca travar recursos atrás do Premium — doar é opcional.
+---
+
+## 🔜 Próximos passos (curto prazo)
+
+1. **i18n completa do site** — dicionário EN para toda a interface do site (este release traz a infra-estrutura e a UI principal); docs/blog podem seguir para EN aos poucos.
+2. **Publicar v1.4.19** nas lojas/releases com as notas de correção dos provedores de IA.
+3. **Verificar o DuckDuckGo AI em dispositivo real** (o erro `hostOnly` foi corrigido na raiz, mas falta confirmação em rede móvel).
+4. **Pagamentos:** PIX/QR Code e SDK de pagamento no site (junto com o painel admin de pagamentos).
+5. **Migração Pollinations para enter.pollinations.ai** quando a API legacy for desligada — a camada `client.js` já isola os provedores, a troca é pontual.
+
+## 💡 Ideias avaliadas (médio prazo)
+
+- 💡 Mais provedores keyless à medida que surgirem serviços verificáveis (critério: funcionar sem chave, sem CORS no app e com limite razoável por IP).
+- 💡 Port de mais plugins open-source do Acode (o fluxo de port já está dominado — 16 publicados).
+- 💡 Colaboração em tempo real (CRDT) para partilhar projectos entre dispositivos.
+- 💡 Assistant offline (modelos GGUF via webview) para dispositivos topo de gama.
+- 💡 Deep links do site para o app (abrir ficheiro/repo directamente no XCoder).
+
+---
+
+## Como acompanhar
+
+- **Releases assinados:** <https://github.com/carsaimz/xcoder/releases>
+- **Marketplace de plugins:** <https://github.com/carsaimz/xcoder-plugins>
+- **Site:** <https://xcoderapp.vercel.app>
+- Votos e sugestões de prioridade: discussões do repositório.
