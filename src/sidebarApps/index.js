@@ -82,21 +82,44 @@ function init($el) {
 
 /**
  * Loads all sidebar apps.
+ *
+ * Each registration is isolated: a throw inside one app's module evaluation
+ * or init function used to reject the whole loadApps() promise, which — via
+ * the unguarded `await sidebarApps.loadApps()` in main.js — aborted the rest
+ * of the boot chain (editorManager.onupdate, quicktools visibility, folder/
+ * file restore, welcome tab, terminal...). That is how a single missing
+ * `import Sidebar` in the AI app froze the entire editor at startup
+ * ("Sidebar is not defined", v1.4.19 → v1.5.0). Now a failing app is logged
+ * and skipped; the remaining apps still register.
  */
 async function loadApps() {
-	add(...(await import("./files")).default);
-	add(...(await import("./searchInFiles")).default);
-	add(...(await import("./extensions")).default);
-	add(...(await import("./ai")).default);
-	add(...(await import("./git")).default);
-	// embedded webview of the official site (docs/marketplace/sponsor)
-	add(...(await import("./website")).default);
-	add(...(await import("./notification")).default);
-	add(...(await import("./profile")).default);
-	add(...(await import("./settings")).default);
-	add(...(await import("./about")).default);
+	const loaders = [
+		["files", () => import("./files")],
+		["searchInFiles", () => import("./searchInFiles")],
+		["extensions", () => import("./extensions")],
+		["ai", () => import("./ai")],
+		["git", () => import("./git")],
+		// embedded webview of the official site (docs/marketplace/sponsor)
+		["websiteApp", () => import("./website")],
+		["notification", () => import("./notification")],
+		["profileApp", () => import("./profile")],
+		["settingsApp", () => import("./settings")],
+		["aboutApp", () => import("./about")],
+	];
 	// NOTE: the "updates" launcher app was removed on purpose — the
 	// changelog stays reachable from About ("Actualizações").
+
+	for (const [id, loader] of loaders) {
+		try {
+			add(...(await loader()).default);
+		} catch (error) {
+			logger.log(
+				"error",
+				`Failed to register sidebar app "${id}": ${error?.message || error}\n${error?.stack || ""}`,
+			);
+			toast(`${strings["sidebar app error"] || "App indisponível"}: ${id}`, 3500);
+		}
+	}
 }
 
 /**

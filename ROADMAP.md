@@ -31,6 +31,13 @@
   abrir o chat; i18n das notificações LSP e dos diálogos de plugins;
   release automático por bump de versão (auto-release.yml) + bot semanal
   de dependências independente da Dependabot (deps-update.yml)
+- **v1.5.1 — hotfix do boot:** crash "Sidebar is not defined" ao iniciar
+  (import faltando no app de IA — v1.4.19 → v1.5.0) matava a cadeia de init
+  inteira: sidebar só com pasta/busca/plugins, header sem ícones, quicktools
+  invisíveis, terminal morto e arquivos nunca restaurados. Fix de 1 linha +
+  blindagem (`loadApps()` isola cada app; guard em `themes.apply()`);
+  +12 testes de regressão (541 → 553) e validação end-to-end com harness
+  de boot em bundle de produção (10/10 apps registrados)
 - **Pós-v1.4.22 (CI):** build de preview por rótulo espelhado no **site**
   (`preview-build.yml` no xcoder-web — typecheck + `next build` nos PRs
   rotulados `build`, com comentário fixo bilíngue no PR); CodeQL do site

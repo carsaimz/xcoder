@@ -95,6 +95,17 @@ export async function apply(id, init) {
 
 	themeApplied = true;
 	const theme = get(id);
+
+	// The saved theme may belong to a theme plugin that is not registered
+	// yet (plugins load after applySettings.beforeRender) or was
+	// uninstalled. Without this guard apply() rejects with
+	// "Cannot read properties of undefined (reading 'primaryColor')"
+	// on every boot; add() re-applies the theme once it registers.
+	if (!theme) {
+		console.warn(`Theme "${id}" is not registered (yet) — skipped.`);
+		return;
+	}
+
 	const $style = document.head.get("style#app-theme") ?? (
 		<style id="app-theme"></style>
 	);

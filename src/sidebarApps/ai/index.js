@@ -1,4 +1,5 @@
 import "./style.scss";
+import Sidebar from "components/sidebar";
 import fsOperation from "fileSystem";
 import Contextmenu from "components/contextmenu";
 import toast from "components/toast";

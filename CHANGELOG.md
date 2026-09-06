@@ -4,6 +4,37 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.5.1] - 2026-09-07
+
+### Fixed
+- **Boot crash "Sidebar is not defined" — o app inteiro morria ao iniciar**
+  (v1.4.19 → v1.5.0). Causa raiz: `src/sidebarApps/ai/index.js` usava
+  `Sidebar.on("show", ...)` no `initApp` SEM o import top-level de
+  `components/sidebar`; o identificador livre só explodia em RUNTIME, quando
+  `loadApps()` registrava o 4º app (ai) — tsc não pega (checkJs:false) e o
+  biome não tem regra de variável não-declarada. A rejeição abortava TODA a
+  cadeia depois de `await sidebarApps.loadApps()` no main.js: apps git/
+  website/notificações/conta/configurações/sobre nunca registravam (sidebar
+  só com pasta+busca+plugins), `editorManager.onupdate` ficava sem ligar
+  (header sem lápis/terminal/paleta/arquivos abertos), quicktools invisíveis,
+  terminal morto, pastas/arquivos nunca restaurados e sem aba de boas-vindas
+- **Blindagem do boot**: `loadApps()` agora isola o registro de cada app
+  (try/catch por app) — um app quebrado é logado + toast e o boot continua;
+  nunca mais um único módulo ruim congela o editor inteiro
+- **Guard no `themes.apply()`**: tema salvo que pertence a plugin ainda não
+  registrado (ou desinstalado) não gera mais rejeição flutuante
+  "reading 'primaryColor'" a cada boot; `add()` reaplica quando registrar
+
+### Tests
+- +12 testes (541 → 553): `sidebarAppImports` — varredura source-level que
+  garante que TODO uso do identificador livre `Sidebar` tem import válido
+  (top-level ou local antes do uso), avaliação ao vivo dos 10 descritores de
+  apps do sidebar e guard estrutural do try/catch por app no `loadApps()`
+- Validado end-to-end com harness de boot (bundle de produção em DOM
+  simulado com cordova/memfs stubados): 10/10 apps registrados, aba de
+  boas-vindas aberta, "Started app and its services" no log
+
+
 ## [1.5.0] - 2026-09-06
 
 ### Added
