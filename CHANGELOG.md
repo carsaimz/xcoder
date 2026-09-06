@@ -3,29 +3,69 @@
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
-## [1.4.19] - 2026-09-06
+
+## [1.4.21] - 2026-09-06
 
 ### Fixed
-- Built-in AI (Pollinations) "IA request failed": the legacy text API now rejects streaming for anonymous users ("402 Payment Required" / deprecation) — chat answers come from the non-streaming path again (verified live), transparently
-- Built-in AI "403: invalid API key requested": a stale/expired Pollinations token is now ignored automatically (anonymous retry) and the error message explains how to remove/renew it
-- DuckDuckGo AI "cannot read properties of null (reading 'hostOnly')": patched the advanced-http cookie store (corrupted entries are skipped, null-safe) and added an automatic cookie-jar clear + retry on the AI request path
 - Plugins sidebar could not scroll: the JS-injected max-height fought the flexbox layout and the infinite-scroll handler crashed on every scroll event — pure flexbox now, handler fixed, search results scroll inside the panel
 - "Continuar com Google/GitHub" appeared even with the providers off: the app now defaults to HIDE when the project settings are unreachable, renders the buttons only after the check (no flash) and shows the real Google/GitHub brand marks
+- Pollinations hardening on top of the gen-API migration: a stale/expired key that still answers "403: invalid API key requested" is ignored automatically (anonymous retry) and the error explains how to remove/renew it
+- Native cookie-jar crashes ("cannot read properties of null (reading 'hostOnly')"): the advanced-http cookie store is now null-safe and the AI client self-heals (clearCookies + retry); duck.ai keeps its new protocol headers
 
 ### Added
-- Quick toggles in the chat composer: "Pensar" (reasoning) and "Buscar" (web search) — persisted settings, web toggle also makes web tools available in chat mode
-- While the model thinks, the chat shows only "Pensando..." — the full reasoning stays available collapsed ("Processo de pensamento") after the answer
-- Message actions: long-press / double-tap / right-click on any message opens the full menu — copy, insert at cursor, share, regenerate, explain better, summarize
-- Provider logos: the chat strip now shows the brand logo + selected model (full name in the tooltip); logos in the model picker too; custom providers use 🤖
-- Auto-scroll to the latest message whenever the chat is opened
-- ROADMAP.md with the completed work and the next steps (pt-br)
+- Quick pills in the chat composer: "Pensar" (reasoning display) and "Buscar" (web search) — persisted settings; web search also unlocks web_search/read_url in chat mode (toolToggle.js, shared rule with the agent)
+- While the model thinks, the chat shows only "Pensando..." — the full reasoning stays collapsed in "Processo de pensamento" after the answer
+- Provider logos: the chat strip shows the brand glyph + selected model (name in the tooltip); logos in the model picker too; custom providers use 🤖
+- Auto-scroll to the latest message whenever the chat is opened (robust double-rAF + sidebar "show" hook)
 
 ### Improved
-- i18n: LSP install/update notifications and toasts translated, plugins panel dialogs translated, plus the new chat strings (en-us + pt-br 100%)
-- Release automation: push to main with a version bump now tags and publishes the signed release automatically (auto-release.yml)
-- Dependency bots: self-contained weekly deps bot (tests everything, opens one PR, independent of Dependabot settings), Dependabot auto-merge extended, bot setup documented in the workflows
+- i18n: LSP install/update notifications and toasts translated, plugins panel dialogs translated, plus all new chat strings (pt-br 100%)
+- Release automation: auto-release.yml tags and publishes the signed release when a push to main bumps the version; self-contained weekly deps bot (deps-update.yml) independent of Dependabot settings; auto-merge extended to Dependabot/deps-bot PRs
 
+## [1.4.20] - 2026-09-06
 
+### Fixed
+- **Account icon (3rd report — root cause found):** `pages/profile/profile.js` called `$page.show()`, a method that does not exist on WCPage, so the account page threw a TypeError on every tap and never opened. Pages become visible via `app.append()` (About/Plugins pattern) — plus a happy-dom regression test that renders the real page so this can never silently break again
+- **"Apoie o projeto" did nothing:** every failure inside the support dialog was swallowed (`.catch(() => {})`). The support surface is now a proper FULL PAGE (`pages/support`) — no modal — and `openSupportPage()` logs + toasts any failure visibly. The support page shows the FULL PayPal e-mail (no masking) and re-renders after sign in/sign up/redeem
+- proot terminal: `can't sanitize binding "/proc/self/fd/{0,1,2}"` warnings during install — stdio bindings are now only added when the fds resolve to a real path (pipes skip them; the guest still reaches fds through the bound /proc and /dev)
+- DuckDuckGo AI 503 (x-vqd-4 missing): the adapter now speaks the current duck.ai protocol — `x-vqd-hash-1` + `x-fe-signals` + `x-fe-version` headers, browser client-hints and the essential cookies (`5`, `dcm`, `dcs`), accepting the session from either `x-vqd-4` or `x-vqd-hash-1`; clearer 418/429 messages
+- legacy `keyboardEvent.js` TDZ crash on environments where `initKeyboardEvent` is absent
+
+### Changed
+- Chat composer redesigned (Claude/DeepSeek style): the textarea gets the FULL width and attach/send buttons sit on a separate fixed row BELOW it — more typing space, no reflow when attachments appear
+- User messages now have an avatar (mirrored person icon); assistant messages keep the bot avatar
+- Long-press (or right-click) any chat message for actions: Copiar, Regenerar, Detalhar, Resumir, Continuar and Inserir no editor (assistant messages get all; user messages get copy/insert). Regenerate rewinds the conversation to the source question and runs it again
+- Dev menu: version-number tap requirement reduced from 7 to 2 taps (1.5 s window)
+- GitHub settings page: sign in/logout buttons are now compact pills instead of full-width bars
+- vitest now transforms JSX modules through the production html-tag-js loader (tests can render real pages/dialogs)
+
+### Docs
+- `readme.pt-br.md` → **README.md** (Portuguese is the standard), English version → `README.en.md`, `license.txt` → **LICENSE**; both READMEs rewritten to the current reality (keyless AI, image generation, chat actions, embedded website, plugins marketplace, free-for-all features)
+- New `ROADMAP.md` (Acode upstream sweep: split panes, SSH terminal, REPL, `acode` CLI, font manager, rewarded ads…)
+- Illustrative UI mockups added to `docs/screenshots/` (editor-ai, terminal, chat-ia)
+- CI now runs `lang:check` (pt-br 100%) and spell check (typos)
+
+### Site (xcoder-web)
+- Sponsor tiers lowered: Apoiador 2 USD/mês, Patrocinador 5 USD/mês, Parceiro 10 USD/mês
+- Language menu (🌐) on the site header: pt-BR is the original; other languages fall back to instant Google Translate — exactly as requested (fallback for languages the site does not ship)
+
+## [1.4.19] - 2026-09-05
+
+### Added
+- Proper Support PAGE (no more modal): premium status, payment methods from the project database (URL/account/QR), sponsor link and the unlock code live in a real page reachable from Settings, Profile, and the agent daily-limit notice
+- Account creation is now fully independent: sign in/sign up (e-mail + Google/GitHub OAuth) live exclusively in the Profile page — the support page links to it instead of embedding login forms
+- User avatars in the AI chat: user messages show a person avatar (right side) and the assistant keeps its accent bot avatar (left) — Claude/DeepSeek-style
+- Marketplace submissions carry the login token (site): the author's e-mail is attached via `Authorization: Bearer`, CORS now allows it, and /user/plugins gained an EDIT form (version/contact/description) for pending submissions
+
+### Changed
+- AI chat composer redesigned (Claude/DeepSeek/GPT-inspired): the message field is a rounded card with the send button IN FRONT of it (bottom-right inside), attach (+) and the Chat/Agent switch moved BELOW the field, header/provider/artifacts stay ABOVE
+- GitHub settings page now follows the app theme strictly: flat card surface + status chips blended with the theme text color (readable on all 30 themes, light included)
+- Built-in AI (Pollinations) migrated to the new gen.pollinations.ai API: keyed requests go straight to the new API (the legacy text API answers 402 "deprecated" to authenticated users), keyless requests stay on the legacy endpoint and AUTOMATICALLY fall back to the new API (non-streaming, single-delta) when it returns 402/404/deprecation — the "AI request failed: 500 402 Payment required" error is gone; fail-fast skips useless retries on deprecation
+- 402/deprecation errors now explain the migration in plain pt-br instead of "saldo insuficiente"
+
+### Fixed
+- Sidebar icons can no longer die silently: `pulseApp` wraps launch/pulse/activate in a guard that logs and toasts on any synchronous error ("Ícone de conta não funciona")
+- Profile page render is fully guarded: a synchronous error inside the page body shows a visible toast instead of a blank screen
 ## [1.4.18] - 2026-09-05
 
 ### Added

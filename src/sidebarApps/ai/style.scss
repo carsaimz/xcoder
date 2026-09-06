@@ -101,17 +101,6 @@
                         background: color-mix(in srgb, var(--active-color) 10%, transparent);
                 }
 
-                .ai-strip-model {
-                        font-size: 11px;
-                        font-weight: 600;
-                        color: var(--primary-text-color, inherit);
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        min-width: 0;
-                        flex-shrink: 1;
-                }
-
                 // brand logo of the provider (emoji glyph or colored letter)
                 .ai-strip-logo {
                         display: inline-flex;
@@ -130,8 +119,25 @@
                                 color: #fff;
                                 font-size: 10px;
                                 font-weight: 800;
-                                font-family: var(--font-family, sans-serif);
                         }
+                }
+
+                .ai-strip-provider {
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: var(--active-color);
+                        white-space: nowrap;
+                        flex-shrink: 0;
+                }
+
+                .ai-strip-model {
+                        font-size: 10.5px;
+                        color: var(--secondary-text-color, #999);
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        min-width: 0;
+                        flex-shrink: 1;
                 }
 
                 .ai-strip-multi {
@@ -193,6 +199,41 @@
 
                 &.user {
                         justify-content: flex-end;
+                        align-items: flex-start;
+                        gap: 8px;
+
+                        // user avatar (person) mirrored to the right of the bubble
+                        .ai-avatar.user {
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex: none;
+                                width: 26px;
+                                height: 26px;
+                                margin-top: 2px;
+                                border-radius: 50%;
+                                background: color-mix(
+                                        in srgb,
+                                        var(--active-color) 24%,
+                                        var(--secondary-color)
+                                );
+                                color: var(--primary-text-color, inherit);
+                                border: 1px solid color-mix(in srgb, var(--active-color) 30%, transparent);
+
+                                .icon {
+                                        font-size: 15px;
+                                }
+                        }
+
+                        // body holds bubble + attachment chips, right-aligned
+                        .ai-body {
+                                flex: 1;
+                                min-width: 0;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: flex-end;
+                                gap: 4px;
+                        }
 
                         // Claude-style flat warm panel instead of a loud gradient
                         .ai-bubble {
@@ -478,13 +519,41 @@
         .ai-composer {
                 display: flex;
                 flex-direction: column;
-                align-items: stretch;
                 gap: 6px;
-                padding: 6px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+                padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
                 border-top: 1px solid var(--border-color);
                 background: color-mix(in srgb, var(--secondary-color) 45%, transparent);
 
-                // quick capability pills above the input (think / web search)
+                // Full-width pill: the textarea owns the whole row — the
+                // attach/send buttons moved to their own fixed row below so
+                // typing gets maximum space (user request)
+                > .ai-input {
+                        width: 100%;
+                        box-sizing: border-box;
+                        flex: none;
+                        resize: none;
+                        border: 1px solid var(--border-color);
+                        outline: none;
+                        background: color-mix(in srgb, var(--primary-color) 78%, transparent);
+                        color: var(--primary-text-color, inherit);
+                        border-radius: 18px;
+                        padding: 10px 15px;
+                        font-size: 13px;
+                        max-height: 160px;
+                        min-height: 42px;
+                        font-family: inherit;
+                        line-height: 1.45;
+                        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+                        &:focus {
+                                border-color: color-mix(in srgb, var(--active-color) 70%, var(--border-color));
+                                box-shadow: 0 0 0 3px color-mix(in srgb, var(--active-color) 14%, transparent);
+                        }
+                }
+
+                // fixed second row: attach on the left, send on the right,
+                // always the same height — no reflow when typing/attaching
+                // quick capability pills above the input (Pensar / Buscar)
                 .ai-toggles {
                         display: flex;
                         align-items: center;
@@ -525,33 +594,11 @@
                         }
                 }
 
-                // input + buttons row (attach · input · send)
-                .ai-composer-row {
+                .ai-composer-actions {
                         display: flex;
-                        align-items: flex-end;
+                        align-items: center;
+                        justify-content: space-between;
                         gap: 8px;
-                        width: 100%;
-                }
-
-                .ai-input {
-                        flex: 1;
-                        resize: none;
-                        border: 1px solid var(--border-color);
-                        outline: none;
-                        background: color-mix(in srgb, var(--primary-color) 78%, transparent);
-                        color: var(--primary-text-color, inherit);
-                        border-radius: 22px;
-                        padding: 10px 15px;
-                        font-size: 13px;
-                        max-height: 140px;
-                        font-family: inherit;
-                        line-height: 1.45;
-                        transition: border-color 0.15s ease, box-shadow 0.15s ease;
-
-                        &:focus {
-                                border-color: color-mix(in srgb, var(--active-color) 70%, var(--border-color));
-                                box-shadow: 0 0 0 3px color-mix(in srgb, var(--active-color) 14%, transparent);
-                        }
                 }
 
                 .ai-send {

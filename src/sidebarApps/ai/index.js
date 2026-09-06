@@ -1,5 +1,6 @@
 import "./style.scss";
 import fsOperation from "fileSystem";
+import Contextmenu from "components/contextmenu";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
@@ -112,7 +113,7 @@ let $artifactsBar = null;
 let $artifactsPanel = null;
 /** @type {HTMLElement | null} */
 let $attachRow = null;
-/** @type {HTMLElement | null} quick toggles row (thinking / web search) */
+/** @type {HTMLElement | null} quick pills row (thinking / web search) */
 let $toggles = null;
 /** @type {Array<import("lib/ai/artifacts").Attachment>} */
 let attachments = [];
@@ -233,7 +234,7 @@ function initApp(el) {
 	updateToggles();
 
 	// re-entering the chat (sidebar reopened with the AI app already
-	// active) must land on the latest message, not on the top
+	// active) must land on the latest message — request: scroll auto
 	Sidebar.on("show", onSelected);
 
 	return () => {
@@ -377,8 +378,12 @@ function buildUi() {
 
 	$attachRow = <div className="ai-attach-row" style="display:none" />;
 
-	// Quick capability pills (DeepSeek/GPT style): thinking and web
-	// search, persisted in settings — see setQuickToggle
+	// Claude/DeepSeek-style composer: the textarea gets the full width
+	// and the action buttons (attach · send) sit on a SEPARATE FIXED
+	// row BELOW it — more room to type, buttons never reflow when
+	// attachments appear (user request: "por baixo, separados e fixos").
+	// Quick capability pills (DeepSeek/GPT style): thinking + web search,
+	// persisted in settings — see setQuickToggle
 	$toggles = (
 		<div className="ai-toggles">
 			<button
@@ -389,7 +394,7 @@ function buildUi() {
 			>
 				<span className="icon brain" />
 				<span className="ai-toggle-label">
-					{strings["ai toggle thinking"] || "Think"}
+					{strings["ai toggle thinking"] || "Pensar"}
 				</span>
 			</button>
 			<button
@@ -400,7 +405,7 @@ function buildUi() {
 			>
 				<span className="icon public" />
 				<span className="ai-toggle-label">
-					{strings["ai toggle web"] || "Search"}
+					{strings["ai toggle web"] || "Buscar"}
 				</span>
 			</button>
 		</div>
@@ -411,9 +416,9 @@ function buildUi() {
 			{$slashMenu}
 			{$attachRow}
 			{$toggles}
-			<div className="ai-composer-row">
+			{$input}
+			<div className="ai-composer-actions">
 				{$attachBtn}
-				{$input}
 				{$send}
 			</div>
 		</div>
@@ -1022,9 +1027,7 @@ function handleEvent(event) {
 
 	// the live bubble already shows this answer — finalize it in place
 	if (event.type === "assistant" && liveStream?.wrap?.isConnected) {
-		const $liveWrap = liveStream.wrap;
 		finalizeLiveStream(event.payload, event.toolCalls || []);
-		bindMessageActions($liveWrap, event);
 		scrollToEnd();
 		persist();
 		return;
@@ -1127,11 +1130,18 @@ function appendEvent(event, opts = {}) {
 		const $chips = renderAttachmentChips(event.attachments);
 		const $wrap = (
 			<div className="ai-msg user">
-				<div className="ai-bubble">{event.payload}</div>
-				{$chips}
+				<div className="ai-body">
+					<div className="ai-bubble">{event.payload}</div>
+					{$chips}
+				</div>
+				<div className="ai-avatar user">
+					<span className="icon person" />
+				</div>
 			</div>
 		);
-		bindMessageActions($wrap, event);
+		const idx = opts.evIdx ?? events.indexOf(event);
+		if (idx >= 0) $wrap.dataset.evIdx = String(idx);
+		addMessageActions($wrap, "user");
 		$messages.append($wrap);
 		return;
 	}
@@ -1159,7 +1169,9 @@ function appendEvent(event, opts = {}) {
 			$body.append(toolCallView(call));
 		}
 
-		bindMessageActions($wrap, event);
+		const idx = opts.evIdx ?? events.indexOf(event);
+		if (idx >= 0) $wrap.dataset.evIdx = String(idx);
+		addMessageActions($wrap, "assistant");
 		$messages.append($wrap);
 		return;
 	}
@@ -1191,6 +1203,255 @@ function appendEvent(event, opts = {}) {
 
 /** Reasoning text waiting to be rendered with the next assistant row. */
 let pendingReasoning = null;
+
+// ---------------------------------------------------------------------------
+// Message actions — long-press (or right-click) any bubble for Copy /
+// Regenerate / Detail / Summarize / Continue / Insert into editor.
+// ---------------------------------------------------------------------------
+
+/**
+ * Extracts the visible text of a message row for copy/insert actions.
+ * @param {HTMLElement} $wrap .ai-msg row
+ * @returns {string}
+ */
+function messageText($wrap) {
+	return ($wrap.querySelector(".ai-bubble")?.innerText || "").trim();
+}
+
+/**
+ * Copies text to the clipboard with a toast confirmation.
+ * @param {string} text
+ */
+async function copyMessageText(text) {
+	try {
+		await navigator.clipboard.writeText(text);
+		toast(strings.copied || "Copiado ✓", 1500);
+	} catch {
+		toast(strings["copy failed"] || "Não foi possível copiar", 2500);
+	}
+}
+
+/**
+ * Inserts text at the cursor of the active editor (CodeMirror 6 view).
+ * @param {string} text
+ */
+function insertIntoEditor(text) {
+	const editor = window.editorManager?.editor;
+	if (!editor?.dispatch || !editor?.state) {
+		toast(
+			strings["ai act no editor"] || "Abra um arquivo para inserir o texto",
+			3000,
+		);
+		return;
+	}
+	const sel = editor.state.selection.main;
+	editor.dispatch({ changes: { from: sel.to, insert: text } });
+	toast(strings["ai act inserted"] || "Texto inserido no editor ✓", 2000);
+}
+
+/**
+ * Runs a canned follow-up prompt (Detail / Summarize / Continue) on top
+ * of the current conversation.
+ * @param {'detail'|'summarize'|'continue'} kind
+ * @param {string} sourceText the answer being referenced
+ */
+async function runQuickPrompt(kind, sourceText) {
+	if (running) {
+		toast(strings["ai busy"] || "AI is still working — wait or stop it first");
+		return;
+	}
+	const snippet = String(sourceText || "").slice(0, 800);
+	let promptText;
+	if (kind === "detail") {
+		promptText =
+			(strings["ai act detail prompt"] ||
+				"Explique em mais detalhes a resposta anterior, com exemplos e passo a passo.") +
+			(snippet ? `\n\n"""\n${snippet}\n"""` : "");
+	} else if (kind === "summarize") {
+		promptText =
+			(strings["ai act summarize prompt"] ||
+				"Resuma a resposta anterior em poucos pontos curtos.") +
+			(snippet ? `\n\n"""\n${snippet}\n"""` : "");
+	} else {
+		promptText =
+			strings["ai act continue prompt"] || "Continue exatamente de onde parou.";
+	}
+
+	await openAiChat();
+	if (!agent) {
+		agent = new Agent({ onEvent: handleEvent });
+		agent.restore(events);
+	}
+	try {
+		setRunning(true);
+		await agent.run(promptText);
+	} catch (error) {
+		handleEvent({
+			type: "error",
+			payload: explainError(error, activeProviderId()),
+		});
+	} finally {
+		setRunning(false);
+		persist();
+		updateArtifactsBar();
+	}
+}
+
+/**
+ * Regenerates an assistant answer: rewinds the conversation to the user
+ * message it replied to and runs the agent again from there.
+ * @param {HTMLElement} $wrap the assistant .ai-msg row
+ */
+async function regenerateMessage($wrap) {
+	if (running) {
+		toast(strings["ai busy"] || "AI is still working — wait or stop it first");
+		return;
+	}
+	const idx = Number($wrap.dataset.evIdx);
+	if (!Number.isFinite(idx) || idx < 0) return;
+
+	let userIdx = -1;
+	for (let i = idx - 1; i >= 0; i--) {
+		if (events[i]?.type === "user") {
+			userIdx = i;
+			break;
+		}
+	}
+	if (userIdx < 0) {
+		toast(
+			strings["ai act no source"] ||
+				"Nenhuma mensagem de origem para regenerar",
+			3000,
+		);
+		return;
+	}
+
+	const userEvent = events[userIdx];
+	await openAiChat();
+	// drop the old answer (and everything after it) — run() re-adds the
+	// user message itself, and a fresh agent rebuilds the transcript
+	events = events.slice(0, userIdx);
+	agent = new Agent({ onEvent: handleEvent });
+	agent.restore(events);
+	renderMessages();
+	persist();
+
+	try {
+		setRunning(true);
+		await agent.run(String(userEvent.payload || ""), {
+			attachments: Array.isArray(userEvent.attachments)
+				? userEvent.attachments
+				: [],
+		});
+	} catch (error) {
+		handleEvent({
+			type: "error",
+			payload: explainError(error, activeProviderId()),
+		});
+	} finally {
+		setRunning(false);
+		persist();
+		updateArtifactsBar();
+	}
+}
+
+/**
+ * Wires the long-press / right-click action menu into a message row.
+ * @param {HTMLElement} $wrap .ai-msg row
+ * @param {'user'|'assistant'} kind
+ */
+function addMessageActions($wrap, kind) {
+	const $bubble = $wrap.querySelector(".ai-bubble");
+	if (!$bubble) return;
+
+	let timer = 0;
+	let startX = 0;
+	let startY = 0;
+
+	const open = (x, y) => {
+		// native text selection in progress — don't hijack it
+		const sel = window.getSelection?.();
+		if (sel && !sel.isCollapsed && $bubble.contains(sel.anchorNode)) return;
+
+		const items = [[strings.copy || "Copiar", "copy"]];
+		if (kind === "assistant") {
+			items.push(
+				[strings["ai act regenerate"] || "Regenerar", "regenerate"],
+				[strings["ai act detail"] || "Detalhar", "detail"],
+				[strings["ai act summarize"] || "Resumir", "summarize"],
+				[strings["ai act continue"] || "Continuar", "continue"],
+			);
+		}
+		items.push([strings["ai act insert"] || "Inserir no editor", "insert"]);
+
+		Contextmenu({
+			toggler: $bubble,
+			top: `${Math.max(8, y - 8)}px`,
+			left: `${Math.max(8, x - 12)}px`,
+			items,
+			async onselect(action) {
+				const text = messageText($wrap);
+				if (action === "copy") {
+					await copyMessageText(text);
+				} else if (action === "insert") {
+					insertIntoEditor(text);
+				} else if (action === "regenerate") {
+					await regenerateMessage($wrap);
+				} else if (action === "detail") {
+					await runQuickPrompt("detail", text);
+				} else if (action === "summarize") {
+					await runQuickPrompt("summarize", text);
+				} else if (action === "continue") {
+					await runQuickPrompt("continue", "");
+				}
+			},
+		});
+	};
+
+	$bubble.addEventListener(
+		"touchstart",
+		(e) => {
+			const t = e.touches?.[0];
+			if (!t) return;
+			startX = t.clientX;
+			startY = t.clientY;
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				timer = 0;
+				hapticTick();
+				open(startX, startY);
+			}, 480);
+		},
+		{ passive: true },
+	);
+	$bubble.addEventListener(
+		"touchmove",
+		(e) => {
+			if (!timer) return;
+			const t = e.touches?.[0];
+			if (
+				t &&
+				(Math.abs(t.clientX - startX) > 12 || Math.abs(t.clientY - startY) > 12)
+			) {
+				clearTimeout(timer);
+				timer = 0;
+			}
+		},
+		{ passive: true },
+	);
+	$bubble.addEventListener("touchend", () => {
+		clearTimeout(timer);
+		timer = 0;
+	});
+	$bubble.addEventListener("touchcancel", () => {
+		clearTimeout(timer);
+		timer = 0;
+	});
+	$bubble.addEventListener("contextmenu", (e) => {
+		e.preventDefault();
+		open(e.clientX, e.clientY);
+	});
+}
 
 /**
  * Renders a pending reasoning payload as a collapsible block inside the
@@ -1305,16 +1566,16 @@ function updateLiveStream(delta) {
 	if (!delta) return;
 	const live = ensureLiveStream();
 	if (typeof delta.reasoning === "string" && delta.reasoning) {
-		// accumulate silently — while ONLY thoughts are arriving the
-		// UI shows a compact "Pensando..." chip instead of dumping
-		// the whole raw process (the full reasoning stays available
-		// afterwards in the collapsed "Thought process" block)
+		// accumulate silently — while ONLY thoughts arrive the UI shows
+		// a compact "Pensando..." chip instead of dumping the raw
+		// process (the full reasoning stays available afterwards in the
+		// collapsed "Processo de pensamento" block)
 		live.reasoningText += delta.reasoning;
 		if (!live.content) renderStatus({ action: "thinking" });
 	}
 	if (typeof delta.content === "string" && delta.content) {
 		live.content += delta.content;
-		// answer started — the thinking chip goes away immediately
+		// the answer started — the thinking chip goes away immediately
 		$status.textContent = "";
 		if (!live.timer) {
 			live.timer = setTimeout(() => {
@@ -1345,7 +1606,6 @@ function finalizeLiveStream(payload, toolCalls = []) {
 	}
 	if (live.reasoningText && live.reasoning) {
 		live.reasoning.style.display = "";
-		live.reasoning.open = false; // request: keep the process collapsed
 		live.reasoningBody.innerHTML = markdownToHtml(live.reasoningText);
 		highlightMarkdownCode(live.reasoningBody);
 	} else {
@@ -1354,6 +1614,13 @@ function finalizeLiveStream(payload, toolCalls = []) {
 	for (const call of toolCalls) {
 		live.body?.append(toolCallView(call));
 	}
+	// the finalized answer is a regular assistant event — give it the
+	// long-press actions too (the live wrap skipped appendEvent)
+	const evIdx = events.findIndex(
+		(e) => e.type === "assistant" && e.payload === payload,
+	);
+	if (evIdx >= 0) live.wrap.dataset.evIdx = String(evIdx);
+	addMessageActions(live.wrap, "assistant");
 	liveStream = null;
 }
 
@@ -1408,8 +1675,8 @@ function renderMessages() {
 		);
 		return;
 	}
-	for (const event of events) {
-		appendEvent(event);
+	for (let i = 0; i < events.length; i++) {
+		appendEvent(events[i], { evIdx: i });
 	}
 	renderPendingReasoning();
 	scrollToEnd();
@@ -1427,6 +1694,48 @@ function renderSessionTitle() {
 /**
  * Renders the Agent/Chat footer switch from settings.aiMode.
  */
+/**
+ * Syncs the quick pills (thinking / web search) with settings. Called on
+ * init, on app (re)selection and after each flip.
+ */
+function updateToggles() {
+	if (!$toggles) return;
+	const thinkingOn = settings.value.aiShowThinking !== false;
+	const webOn = settings.value.aiWebTools !== false;
+	const $thinking = $toggles.querySelector('[data-toggle="thinking"]');
+	const $web = $toggles.querySelector('[data-toggle="web"]');
+	$thinking?.classList.toggle("on", thinkingOn);
+	$web?.classList.toggle("on", webOn);
+	if ($thinking) {
+		$thinking.title = thinkingOn
+			? strings["ai thinking on"] ||
+				"Pensamento visível: o raciocínio aparece recolhido abaixo da resposta"
+			: strings["ai thinking off"] || "Pensamento oculto";
+	}
+	if ($web) {
+		$web.title = webOn
+			? strings["ai web on"] ||
+				"Busca na web ativa: o modelo pode pesquisar e ler páginas"
+			: strings["ai web off"] || "Busca na web desativada";
+	}
+}
+
+/**
+ * Flips a quick pill and persists it.
+ * @param {"thinking"|"web"} kind
+ */
+async function setQuickToggle(kind) {
+	if (kind === "thinking") {
+		const next = settings.value.aiShowThinking === false;
+		await settings.update({ aiShowThinking: next });
+	} else {
+		const next = settings.value.aiWebTools === false;
+		await settings.update({ aiWebTools: next });
+	}
+	updateToggles();
+	hapticTick();
+}
+
 function updateModeSwitch() {
 	if (!$modeTrack || !$modeFooter) return;
 	const mode = settings.value.aiMode === "chat" ? "chat" : "agent";
@@ -1481,48 +1790,6 @@ function hapticTick() {
 }
 
 /**
- * Syncs the quick-toggle pills (thinking / web search) with settings.
- * Called on init, on app (re)selection and after each flip.
- */
-function updateToggles() {
-	if (!$toggles) return;
-	const thinkingOn = settings.value.aiShowThinking !== false;
-	const webOn = settings.value.aiWebTools !== false;
-	const $thinking = $toggles.querySelector('[data-toggle="thinking"]');
-	const $web = $toggles.querySelector('[data-toggle="web"]');
-	$thinking?.classList.toggle("on", thinkingOn);
-	$web?.classList.toggle("on", webOn);
-	if ($thinking) {
-		$thinking.title = thinkingOn
-			? strings["ai thinking on"] ||
-				"Thoughts visible: the reasoning appears collapsed below the answer"
-			: strings["ai thinking off"] || "Thoughts hidden";
-	}
-	if ($web) {
-		$web.title = webOn
-			? strings["ai web on"] ||
-				"Web search enabled: the model can search and read pages"
-			: strings["ai web off"] || "Web search disabled";
-	}
-}
-
-/**
- * Flips a quick-toggle pill and persists it.
- * @param {"thinking"|"web"} kind
- */
-async function setQuickToggle(kind) {
-	if (kind === "thinking") {
-		const next = settings.value.aiShowThinking === false;
-		await settings.update({ aiShowThinking: next });
-	} else {
-		const next = settings.value.aiWebTools === false;
-		await settings.update({ aiWebTools: next });
-	}
-	updateToggles();
-	hapticTick();
-}
-
-/**
  * Renders the provider · model strip (with capability chips) under the
  * session bar and keeps the model button tooltip in sync. If more than
  * one provider is enabled the strip says so — the picker lists each
@@ -1539,8 +1806,7 @@ function updateModelButton() {
 
 	if (!$providerStrip) return;
 	const caps = modelCapabilities(providerId, model);
-	// brand logo + selected model — the provider NAME only appears in
-	// the tooltip (the logo identifies it at a glance)
+	// brand logo for the active provider (emoji glyph or colored letter)
 	const logo = providerIcon(providerId);
 	const isLetter = isLetterGlyph(logo.glyph);
 	const chip = (key, ok, icon) => (
@@ -1622,10 +1888,8 @@ async function openModelPicker() {
 	const meta = new Map();
 	for (const provider of order) {
 		const ok = usable(provider);
-		// brand glyph in the picker too — instant recognition
-		const glyph = providerIcon(provider.id).glyph;
 		items.push({
-			text: `${glyph} ${provider.name}${ok ? "" : ` — ${keyNeeded}`}`,
+			text: `${provider.name}${ok ? "" : ` — ${keyNeeded}`}`,
 			className: "group-header",
 		});
 		for (const model of modelsOf(provider).slice(0, 12)) {
@@ -2005,7 +2269,7 @@ function scrollToEnd() {
 		$messages.scrollTop = $messages.scrollHeight;
 		// second pass + short delay: on app switch the container is
 		// swapped into the sidebar and a single rAF can run BEFORE
-		// layout — the “enter the chat” jump then never happened
+		// layout — the "entrar no chat" jump then never happened
 		requestAnimationFrame(() => {
 			if ($messages) $messages.scrollTop = $messages.scrollHeight;
 		});
@@ -2021,239 +2285,7 @@ function autosize() {
 }
 
 function handleTouch() {
-	/* reserved: long-press actions on the list itself (bubbles have their own) */
-}
-
-// ---------------------------------------------------------------------------
-// Message actions — long-press / double-tap / right-click on any bubble
-// ---------------------------------------------------------------------------
-
-/**
- * Wires the interaction on a message row: long-press (480 ms), double-tap,
- * double-click and context-menu all open the message action menu.
- * @param {HTMLElement} $wrap .ai-msg row
- * @param {object} event the chat event behind the bubble
- */
-function bindMessageActions($wrap, event) {
-	if (!$wrap || event?.type === "error" || event?.type === "notice") return;
-
-	let pressTimer = 0;
-	let lastTap = 0;
-	let lastOpen = 0;
-
-	const open = () => {
-		const now = Date.now();
-		// contextmenu + long-press fire together on some webviews
-		if (now - lastOpen < 700) return;
-		lastOpen = now;
-		openMessageMenu(event);
-	};
-
-	$wrap.addEventListener(
-		"touchstart",
-		() => {
-			clearTimeout(pressTimer);
-			pressTimer = setTimeout(open, 480);
-		},
-		{ passive: true },
-	);
-	$wrap.addEventListener("touchmove", () => clearTimeout(pressTimer), {
-		passive: true,
-	});
-	$wrap.addEventListener("touchcancel", () => clearTimeout(pressTimer), {
-		passive: true,
-	});
-	$wrap.addEventListener(
-		"touchend",
-		() => {
-			clearTimeout(pressTimer);
-			// double-tap opens the menu too ("funciona com 2 cliques")
-			const now = Date.now();
-			if (now - lastTap < 320) {
-				lastTap = 0;
-				open();
-			} else {
-				lastTap = now;
-			}
-		},
-		{ passive: true },
-	);
-	$wrap.addEventListener("dblclick", open);
-	$wrap.addEventListener("contextmenu", (e) => {
-		e.preventDefault();
-		open();
-	});
-}
-
-/**
- * Full action menu for a user or assistant message.
- * @param {object} event chat event ({type, payload})
- */
-async function openMessageMenu(event) {
-	const isAssistant = event?.type === "assistant";
-	const text = String(event?.payload ?? "");
-
-	const items = [
-		{
-			value: "copy",
-			text: strings["ai copy message"] || "Copiar mensagem",
-			icon: "content_copy",
-		},
-		{
-			value: "insert",
-			text: strings["insert at cursor"] || "Inserir no editor",
-			icon: "content_paste",
-		},
-	];
-	if (typeof navigator.share === "function") {
-		items.push({
-			value: "share",
-			text: strings["ai share message"] || "Partilhar",
-			icon: "share",
-		});
-	}
-	if (isAssistant) {
-		items.push(
-			{
-				value: "regenerate",
-				text: strings["ai regenerate"] || "Regenerar resposta",
-				icon: "replay",
-			},
-			{
-				value: "explain",
-				text: strings["ai explain more"] || "Explicar melhor",
-				icon: "psychology",
-			},
-			{
-				value: "summarize",
-				text: strings["ai summarize"] || "Resumir",
-				icon: "subject",
-			},
-		);
-	}
-
-	const choice = await select(
-		strings["ai message actions"] || "Mensagem",
-		items,
-	);
-	switch (choice) {
-		case "copy":
-			await copyToClipboard(text);
-			toast(strings["message copied"] || "Mensagem copiada");
-			break;
-		case "insert":
-			insertCode(text, false);
-			break;
-		case "share":
-			await shareText(text);
-			break;
-		case "regenerate":
-			await regenerateLast();
-			break;
-		case "explain":
-			await followUp(
-				strings["ai explain more prompt"] ||
-					"Explique melhor a resposta anterior, com mais detalhes e exemplos.",
-			);
-			break;
-		case "summarize":
-			await followUp(
-				strings["ai summarize prompt"] ||
-					"Resuma a conversa até agora em tópicos curtos.",
-			);
-			break;
-	}
-}
-
-/**
- * Shares a message via the system share sheet (clipboard fallback).
- * @param {string} text
- */
-async function shareText(text) {
-	try {
-		if (typeof navigator.share === "function") {
-			await navigator.share({ text });
-			return;
-		}
-	} catch {
-		/* cancelled or unsupported — fall back to the clipboard */
-	}
-	await copyToClipboard(text);
-	toast(strings["message copied"] || "Mensagem copiada");
-}
-
-/**
- * Sends a follow-up prompt (explain better / summarize) through the
- * current agent — same pipeline as the composer's send.
- * @param {string} text
- */
-async function followUp(text) {
-	const message = String(text || "").trim();
-	if (!message) return;
-	if (running) {
-		toast(strings["ai busy"] || "AI is still working — wait or stop it first");
-		return;
-	}
-	ensureTitle(message);
-	if (!agent) {
-		agent = new Agent({ onEvent: handleEvent });
-		agent.restore(events);
-	}
-	try {
-		setRunning(true);
-		await agent.run(message);
-	} catch (error) {
-		handleEvent({
-			type: "error",
-			payload: explainError(error, activeProviderId()),
-		});
-	} finally {
-		setRunning(false);
-		persist();
-		updateArtifactsBar();
-	}
-}
-
-/**
- * Drops the last answer (and everything after the question it answers)
- * and re-runs the last user message — "Regenerar resposta".
- */
-async function regenerateLast() {
-	if (running) {
-		toast(strings["ai busy"] || "AI is still working — wait or stop it first");
-		return;
-	}
-	let index = -1;
-	for (let i = events.length - 1; i >= 0; i--) {
-		if (events[i].type === "user") {
-			index = i;
-			break;
-		}
-	}
-	if (index < 0) return;
-
-	const target = events[index];
-	events = events.slice(0, index);
-	persist();
-	renderMessages();
-
-	agent = new Agent({ onEvent: handleEvent });
-	agent.restore(events);
-	try {
-		setRunning(true);
-		await agent.run(target.payload, {
-			attachments: target.attachments || [],
-		});
-	} catch (error) {
-		handleEvent({
-			type: "error",
-			payload: explainError(error, activeProviderId()),
-		});
-	} finally {
-		setRunning(false);
-		persist();
-		updateArtifactsBar();
-	}
+	/* reserved: long-press actions */
 }
 
 /**
