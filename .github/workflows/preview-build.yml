@@ -1,0 +1,129 @@
+name: Preview build (PR label)
+
+# Builds an installable DEBUG APK for pull requests labeled `build`.
+#
+# Usage:
+#   1. Add the `build` label to a pull request (or push new commits to a
+#      PR that already has it).
+#   2. The workflow builds an unsigned debug APK and uploads it as a run
+#      artifact, then leaves a sticky comment on the PR with the link.
+#
+# The APK is signed with the debug key — installable for testing, never
+# published as a release. Remove the label or close the PR to stop builds.
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Debug APK preview
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.action == 'labeled' && github.event.label.name == 'build') ||
+      (github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'build'))
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" >/dev/null
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Add Android platform
+        run: npx cordova platform add android@15 || true
+
+      - name: Build web bundle
+        run: |
+          node utils/config.js p
+          npx rspack --mode production
+
+      - name: Build debug APK
+        run: npx cordova build android --debug
+
+      - name: Collect artifact
+        id: artifact
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          OUT="XCoder-v${VERSION}-${SHORT_SHA}-debug.apk"
+          cp platforms/android/app/build/outputs/apk/debug/app-debug.apk "$OUT"
+          echo "file=$OUT" >> "$GITHUB_OUTPUT"
+          echo "name=$OUT" >> "$GITHUB_OUTPUT"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          path: ${{ steps.artifact.outputs.file }}
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Comment on the PR (sticky)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = "<!-- preview-build -->";
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}?pr=${context.payload.pull_request.number}`;
+            const name = `${{ steps.artifact.outputs.name }}`;
+            const body = [
+              marker,
+              "📱 **Preview build pronto / Preview build ready**",
+              "",
+              `APK de teste (debug, não assinado para release): **${name}**`,
+              `Test APK (debug, not release-signed): **${name}**`,
+              "",
+              `⬇️ Baixe em / Download from: [Artifacts desta run / this run's artifacts](${runUrl}) — seção *Artifacts*.`,
+              "",
+              "_Comentário automático do workflow `preview-build.yml` — remova o rótulo `build` para desativar._",
+              "_Automatic comment from `preview-build.yml` — remove the `build` label to disable._",
+            ].join("\n");
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+            const existing = comments.find((c) => c.body?.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+            }

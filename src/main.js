@@ -19,10 +19,10 @@ import sidebarApps from "sidebarApps";
 import { setKeyBindings } from "cm/commandRegistry";
 import { hasConnectedServers } from "cm/lsp/connectionState";
 import {
-	getModeForPath,
-	getModes,
-	getModesByName,
-	initModes,
+        getModeForPath,
+        getModes,
+        getModesByName,
+        initModes,
 } from "cm/modelist";
 import Contextmenu from "components/contextmenu";
 import Sidebar from "components/sidebar";
@@ -72,19 +72,19 @@ const previousVersionCode = Number.parseInt(localStorage.versionCode, 10);
 const logger = new Logger();
 
 ajax.response = (xhr) => {
-	return xhr.response;
+        return xhr.response;
 };
 
 ajax.configure = (xhr, url) => {
-	if (url.includes("xcoder.app/api")) {
-		xhr.withCredentials = true;
-	}
+        if (url.includes("xcoder.app/api")) {
+                xhr.withCredentials = true;
+        }
 };
 
 TouchEvent.prototype.preventDefault = function () {
-	if (this.cancelable) {
-		oldPreventDefault.bind(this)();
-	}
+        if (this.cancelable) {
+                oldPreventDefault.bind(this)();
+        }
 };
 
 loadPolyFill.apply(window);
@@ -97,918 +97,956 @@ document.addEventListener("backbutton", backButtonHandler);
 document.addEventListener("menubutton", menuButtonHandler);
 
 async function ensurePermission(permission) {
-	try {
-		const granted = await helpers.promisify(system.hasPermission, permission);
-		if (!granted) {
-			await helpers.promisify(system.requestPermission, permission);
-		}
-	} catch (error) {
-		logger.log(
-			"error",
-			`Failed to request permission ${permission}: ${error.message || error}`,
-		);
-	}
+        try {
+                const granted = await helpers.promisify(system.hasPermission, permission);
+                if (!granted) {
+                        await helpers.promisify(system.requestPermission, permission);
+                }
+        } catch (error) {
+                logger.log(
+                        "error",
+                        `Failed to request permission ${permission}: ${error.message || error}`,
+                );
+        }
 }
 
 async function onDeviceReady() {
-	await initEncodings(); // important to load encodings before anything else
+        await initEncodings(); // important to load encodings before anything else
 
-	initRippleFeedback();
+        initRippleFeedback();
 
-	const oldResolveURL = window.resolveLocalFileSystemURL;
-	const {
-		externalCacheDirectory, //
-		externalDataDirectory,
-		cacheDirectory,
-		dataDirectory,
-	} = cordova.file;
+        const oldResolveURL = window.resolveLocalFileSystemURL;
+        const {
+                externalCacheDirectory, //
+                externalDataDirectory,
+                cacheDirectory,
+                dataDirectory,
+        } = cordova.file;
 
-	async function resolveStorageDir(preferred, fallback) {
-		if (!preferred) return fallback;
-		const fs = fsOperation(preferred);
-		if (!fs) return fallback;
-		try {
-			await fs.stat();
-			return preferred;
-		} catch (error) {
-			logger.log(
-				"warn",
-				`Storage dir unavailable (${preferred}), falling back to ${fallback}: ${error.message || error}`,
-			);
-			return fallback;
-		}
-	}
+        async function resolveStorageDir(preferred, fallback) {
+                if (!preferred) return fallback;
+                const fs = fsOperation(preferred);
+                if (!fs) return fallback;
+                try {
+                        await fs.stat();
+                        return preferred;
+                } catch (error) {
+                        logger.log(
+                                "warn",
+                                `Storage dir unavailable (${preferred}), falling back to ${fallback}: ${error.message || error}`,
+                        );
+                        return fallback;
+                }
+        }
 
-	window.app = document.body;
-	window.root = tag.get("#root");
-	window.addedFolder = addedFolder;
-	window.editorManager = null;
-	window.toast = toast;
-	window.ASSETS_DIRECTORY = Url.join(cordova.file.applicationDirectory, "www");
-	window.DATA_STORAGE = await resolveStorageDir(
-		externalDataDirectory,
-		dataDirectory,
-	);
-	window.CACHE_STORAGE = await resolveStorageDir(
-		externalCacheDirectory,
-		cacheDirectory,
-	);
+        window.app = document.body;
+        window.root = tag.get("#root");
+        window.addedFolder = addedFolder;
+        window.editorManager = null;
+        window.toast = toast;
+        window.ASSETS_DIRECTORY = Url.join(cordova.file.applicationDirectory, "www");
+        window.DATA_STORAGE = await resolveStorageDir(
+                externalDataDirectory,
+                dataDirectory,
+        );
+        window.CACHE_STORAGE = await resolveStorageDir(
+                externalCacheDirectory,
+                cacheDirectory,
+        );
 
-	window.PLUGIN_DIR = Url.join(DATA_STORAGE, "plugins");
-	window.KEYBINDING_FILE = Url.join(DATA_STORAGE, ".key-bindings.json");
-	window.log = logger.log.bind(logger);
+        window.PLUGIN_DIR = Url.join(DATA_STORAGE, "plugins");
+        window.KEYBINDING_FILE = Url.join(DATA_STORAGE, ".key-bindings.json");
+        window.log = logger.log.bind(logger);
 
-	config.HAS_PRO = true; // all features unlocked
+        config.HAS_PRO = true; // all features unlocked
 
-	// Capture synchronous errors
-	window.addEventListener("error", (event) => {
-		const errorMsg = `Error: ${event.message}, Source: ${event.filename}, Line: ${event.lineno}, Column: ${event.colno}, Stack: ${event.error?.stack || "N/A"}`;
-		window.log("error", errorMsg);
-	});
-	// Capture unhandled promise rejections
-	window.addEventListener("unhandledrejection", (event) => {
-		window.log(
-			"error",
-			`Unhandled rejection: ${event.reason ? event.reason.message : "Unknown reason"}\nStack: ${event.reason ? event.reason.stack : "No stack available"}`,
-		);
-	});
+        // Capture synchronous errors
+        window.addEventListener("error", (event) => {
+                const errorMsg = `Error: ${event.message}, Source: ${event.filename}, Line: ${event.lineno}, Column: ${event.colno}, Stack: ${event.error?.stack || "N/A"}`;
+                window.log("error", errorMsg);
+        });
+        // Capture unhandled promise rejections
+        window.addEventListener("unhandledrejection", (event) => {
+                window.log(
+                        "error",
+                        `Unhandled rejection: ${event.reason ? event.reason.message : "Unknown reason"}\nStack: ${event.reason ? event.reason.stack : "No stack available"}`,
+                );
+        });
 
-	let installSource = INSTALL_SOURCE_PLAY;
+        let installSource = INSTALL_SOURCE_PLAY;
 
-	try {
-		installSource = await helpers.promisify(system.getInstaller);
-	} catch (error) {
-		console.error(error);
-	}
+        try {
+                installSource = await helpers.promisify(system.getInstaller);
+        } catch (error) {
+                console.error(error);
+        }
 
-	Object.defineProperty(window, "appInstallSource", {
-		get() {
-			return installSource;
-		},
-		set() {
-			console.warn("appInstallSource is readonly");
-		},
-		configurable: false,
-		enumerable: false,
-	});
+        Object.defineProperty(window, "appInstallSource", {
+                get() {
+                        return installSource;
+                },
+                set() {
+                        console.warn("appInstallSource is readonly");
+                },
+                configurable: false,
+                enumerable: false,
+        });
 
-	try {
-		window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
-			system.getAndroidVersion(resolve, reject),
-		);
-	} catch (error) {
-		window.ANDROID_SDK_INT = Number.parseInt(device.version);
-	}
-	window.DOES_SUPPORT_THEME = (() => {
-		const $testEl = (
-			<div
-				style={{
-					height: "var(--test-height)",
-					width: "var(--test-height)",
-				}}
-			/>
-		);
-		document.body.append($testEl);
-		const client = $testEl.getBoundingClientRect();
+        try {
+                window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
+                        system.getAndroidVersion(resolve, reject),
+                );
+        } catch (error) {
+                window.ANDROID_SDK_INT = Number.parseInt(device.version);
+        }
+        window.DOES_SUPPORT_THEME = (() => {
+                const $testEl = (
+                        <div
+                                style={{
+                                        height: "var(--test-height)",
+                                        width: "var(--test-height)",
+                                }}
+                        />
+                );
+                document.body.append($testEl);
+                const client = $testEl.getBoundingClientRect();
 
-		$testEl.remove();
+                $testEl.remove();
 
-		if (client.height === 0) return false;
-		return true;
-	})();
-	window.xcoder = xcoder;
-	ensureAceCompatApi();
+                if (client.height === 0) return false;
+                return true;
+        })();
+        window.xcoder = xcoder;
+        ensureAceCompatApi();
 
-	if (Number.isInteger(window.ANDROID_SDK_INT) && window.ANDROID_SDK_INT < 33) {
-		await ensurePermission("android.permission.READ_EXTERNAL_STORAGE");
-		await ensurePermission("android.permission.WRITE_EXTERNAL_STORAGE");
-	}
-	await ensurePermission("android.permission.POST_NOTIFICATIONS");
+        if (Number.isInteger(window.ANDROID_SDK_INT) && window.ANDROID_SDK_INT < 33) {
+                await ensurePermission("android.permission.READ_EXTERNAL_STORAGE");
+                await ensurePermission("android.permission.WRITE_EXTERNAL_STORAGE");
+        }
+        await ensurePermission("android.permission.POST_NOTIFICATIONS");
 
-	const { versionCode } = BuildInfo;
+        const { versionCode } = BuildInfo;
 
-	if (
-		previousVersionCode != null &&
-		!Number.isNaN(previousVersionCode) &&
-		previousVersionCode !== versionCode
-	) {
-		system.clearCache();
-	}
+        if (
+                previousVersionCode != null &&
+                !Number.isNaN(previousVersionCode) &&
+                previousVersionCode !== versionCode
+        ) {
+                system.clearCache();
+        }
 
-	if (!(await fsOperation(PLUGIN_DIR).exists())) {
-		try {
-			await fsOperation(DATA_STORAGE).createDirectory("plugins");
-		} catch (error) {
-			logger.log(
-				"error",
-				`Failed to create plugins directory, falling back to internal storage: ${error.message || error}`,
-			);
-			window.DATA_STORAGE = dataDirectory;
-			window.CACHE_STORAGE = cacheDirectory;
-			window.PLUGIN_DIR = Url.join(window.DATA_STORAGE, "plugins");
-			window.KEYBINDING_FILE = Url.join(
-				window.DATA_STORAGE,
-				".key-bindings.json",
-			);
-			await fsOperation(window.DATA_STORAGE).createDirectory("plugins");
-		}
-	}
+        if (!(await fsOperation(PLUGIN_DIR).exists())) {
+                try {
+                        await fsOperation(DATA_STORAGE).createDirectory("plugins");
+                } catch (error) {
+                        logger.log(
+                                "error",
+                                `Failed to create plugins directory, falling back to internal storage: ${error.message || error}`,
+                        );
+                        window.DATA_STORAGE = dataDirectory;
+                        window.CACHE_STORAGE = cacheDirectory;
+                        window.PLUGIN_DIR = Url.join(window.DATA_STORAGE, "plugins");
+                        window.KEYBINDING_FILE = Url.join(
+                                window.DATA_STORAGE,
+                                ".key-bindings.json",
+                        );
+                        await fsOperation(window.DATA_STORAGE).createDirectory("plugins");
+                }
+        }
 
-	localStorage.versionCode = versionCode;
+        localStorage.versionCode = versionCode;
 
-	try {
-		await setDebugInfo();
-	} catch (e) {
-		console.error(e);
-	}
+        try {
+                await setDebugInfo();
+        } catch (e) {
+                console.error(e);
+        }
 
-	xcoder.setLoadingMessage("Loading settings...");
+        xcoder.setLoadingMessage("Loading settings...");
 
-	window.resolveLocalFileSystemURL = function (url, ...args) {
-		oldResolveURL.call(this, Url.safe(url), ...args);
-	};
+        window.resolveLocalFileSystemURL = function (url, ...args) {
+                oldResolveURL.call(this, Url.safe(url), ...args);
+        };
 
-	setTimeout(async () => {
-		if (document.body.classList.contains("loading")) {
-			window.log("warn", "App is taking unexpectedly long time!");
-			document.body.setAttribute(
-				"data-small-msg",
-				"This is taking unexpectedly long time!",
-			);
-		}
-	}, 1000 * 10);
+        setTimeout(async () => {
+                if (document.body.classList.contains("loading")) {
+                        window.log("warn", "App is taking unexpectedly long time!");
+                        document.body.setAttribute(
+                                "data-small-msg",
+                                "This is taking unexpectedly long time!",
+                        );
+                }
+        }, 1000 * 10);
 
-	xcoder.setLoadingMessage("Loading settings...");
-	await settings.init();
-	themes.init();
-	initHighlighting();
+        xcoder.setLoadingMessage("Loading settings...");
+        await settings.init();
+        themes.init();
+        initHighlighting();
 
-	// Inject default terminal font face early so browser preloads it
-	fonts.injectFontFace("MesloLGS NF Regular");
+        // Inject default terminal font face early so browser preloads it
+        fonts.injectFontFace("MesloLGS NF Regular");
 
-	registerPrettierFormatter();
+        registerPrettierFormatter();
 
-	xcoder.setLoadingMessage("Loading language...");
-	await lang.set(settings.value.lang);
+        xcoder.setLoadingMessage("Loading language...");
+        await lang.set(settings.value.lang);
 
-	xcoder.setLoadingMessage("Securing SFTP profiles...");
-	const sftpMigration = await migrateLegacySftpProfiles();
-	for (const failure of sftpMigration.failures) {
-		logger.log(
-			"error",
-			`SFTP profile migration failed for ${failure.username}@${failure.hostname}: ${failure.message}`,
-		);
-	}
+        xcoder.setLoadingMessage("Securing SFTP profiles...");
+        const sftpMigration = await migrateLegacySftpProfiles();
+        for (const failure of sftpMigration.failures) {
+                logger.log(
+                        "error",
+                        `SFTP profile migration failed for ${failure.username}@${failure.hostname}: ${failure.message}`,
+                );
+        }
 
-	if (settings.value.developerMode) {
-		try {
-			const devTools = (await import("lib/devTools")).default;
-			await devTools.init(false);
-		} catch (error) {
-			console.error("Failed to initialize developer tools", error);
-		}
-	}
+        if (settings.value.developerMode) {
+                try {
+                        const devTools = (await import("lib/devTools")).default;
+                        await devTools.init(false);
+                } catch (error) {
+                        console.error("Failed to initialize developer tools", error);
+                }
+        }
 
-	try {
-		await loadApp();
-		if (sftpMigration.failures.length) {
-			showSftpMigrationReport(sftpMigration);
-		}
-	} catch (error) {
-		window.log("error", error);
-		toast(`Error: ${error.message}`);
-	} finally {
-		setTimeout(async () => {
-			document.body.removeAttribute("data-small-msg");
-			app.classList.remove("loading", "splash");
+        try {
+                await loadApp();
+                if (sftpMigration.failures.length) {
+                        showSftpMigrationReport(sftpMigration);
+                }
+        } catch (error) {
+                window.log("error", error);
+                toast(`Error: ${error.message}`);
+        } finally {
+                setTimeout(async () => {
+                        document.body.removeAttribute("data-small-msg");
+                        app.classList.remove("loading", "splash");
 
-			// load plugins
-			try {
-				await loadPlugins();
-				// Ensure at least one sidebar app is active after all plugins are loaded
-				// This handles cases where the stored section was from an uninstalled plugin
-				sidebarApps.ensureActiveApp();
+                        // load plugins
+                        try {
+                                await loadPlugins();
+                                // Ensure at least one sidebar app is active after all plugins are loaded
+                                // This handles cases where the stored section was from an uninstalled plugin
+                                sidebarApps.ensureActiveApp();
 
-				// Re-emit events for active file after plugins are loaded
-				const { activeFile } = editorManager;
-				for (const file of editorManager.files) {
-					if (file?.type === "editor") {
-						file.setMode();
-					}
-				}
-				editorManager.reapplyActiveFile();
-				if (activeFile?.uri) {
-					// Re-emit file-loaded event
-					editorManager.emit("file-loaded", activeFile);
-					// Re-emit switch-file event
-					editorManager.emit("switch-file", activeFile);
-				}
-			} catch (error) {
-				window.log("error", "Failed to load plugins!");
-				window.log("error", error);
-				toast("Failed to load plugins!");
-			}
-			applySettings.afterRender();
-		}, 500);
-	}
+                                // Re-emit events for active file after plugins are loaded
+                                const { activeFile } = editorManager;
+                                for (const file of editorManager.files) {
+                                        if (file?.type === "editor") {
+                                                file.setMode();
+                                        }
+                                }
+                                editorManager.reapplyActiveFile();
+                                if (activeFile?.uri) {
+                                        // Re-emit file-loaded event
+                                        editorManager.emit("file-loaded", activeFile);
+                                        // Re-emit switch-file event
+                                        editorManager.emit("switch-file", activeFile);
+                                }
+                        } catch (error) {
+                                window.log("error", "Failed to load plugins!");
+                                window.log("error", error);
+                                toast("Failed to load plugins!");
+                        }
+                        applySettings.afterRender();
+                }, 500);
+        }
 
-	await promptUpdateCheckConsent();
+        await promptUpdateCheckConsent();
 
-	// Site notifications (poll the community site like an FCM replacement)
-	// and the ads open counter — both are lazy imports so they never block
-	// boot and silently no-op offline.
-	import(/* webpackChunkName: "siteNotifications" */ "lib/siteNotifications")
-		.then(({ startNotificationPolling }) => {
-			startNotificationPolling();
-		})
-		.catch(() => {});
-	import(/* webpackChunkName: "ads" */ "lib/ads")
-		.then(({ trackAppOpen }) => {
-			trackAppOpen();
-		})
-		.catch(() => {});
+        // Site notifications (poll the community site like an FCM replacement)
+        // and the ads open counter — both are lazy imports so they never block
+        // boot and silently no-op offline.
+        import(/* webpackChunkName: "siteNotifications" */ "lib/siteNotifications")
+                .then(({ startNotificationPolling }) => {
+                        startNotificationPolling();
+                })
+                .catch(() => {});
+        import(/* webpackChunkName: "ads" */ "lib/ads")
+                .then(({ trackAppOpen }) => {
+                        trackAppOpen();
+                })
+                .catch(() => {});
 
-	// Cloud premium sync: when a Supabase session was restored from a
-	// previous run, pull the premium_grants entitlement (donation →
-	// premium on every device). Lazy + silent: never blocks boot.
-	import(/* webpackChunkName: "premium" */ "lib/premium")
-		.then(({ syncCloudPremium }) => syncCloudPremium())
-		.catch(() => {});
+        // Cloud premium sync: when a Supabase session was restored from a
+        // previous run, pull the premium_grants entitlement (donation →
+        // premium on every device). Lazy + silent: never blocks boot.
+        import(/* webpackChunkName: "premium" */ "lib/premium")
+                .then(({ syncCloudPremium }) => syncCloudPremium())
+                .catch(() => {});
 
-	// Check for app updates
-	if (
-		!isPlayStoreInstall() &&
-		settings.value.checkForAppUpdates &&
-		navigator.onLine
-	) {
-		const { checkAppUpdate } = await import(
-			/* webpackChunkName: "checkAppUpdate" */ "lib/checkAppUpdate"
-		);
-		checkAppUpdate()
-			.then((update) => {
-				if (!update?.hasUpdate) return;
-				xcoder.pushNotification(
-					strings["update available"],
-					strings["update available info"].replace(/\{version\}/, update.tag),
-					{
-						icon: "update",
-						type: "warning",
-						action: () => {
-							system.openInBrowser(update.url);
-						},
-					},
-				);
-			})
-			.catch((error) => {
-				window.log("error", "Failed to check for updates");
-				window.log("error", error);
-			});
-	}
-	const { default: checkPluginsUpdate } = await import(
-		/* webpackChunkName: "checkPluginsUpdate" */ "lib/checkPluginsUpdate"
-	);
-	checkPluginsUpdate()
-		.then((updates) => {
-			if (!updates.length) return;
-			xcoder.pushNotification(
-				strings["plugin updates"],
-				getUpdateMessage(updates.length),
-				{
-					icon: "extension",
-					action: async () => {
-						const { default: plugins } = await import(
-							/* webpackChunkName: "plugins" */ "pages/plugins"
-						);
-						plugins(updates);
-					},
-				},
-			);
-		})
-		.catch(console.error);
+        // Check for app updates
+        if (
+                !isPlayStoreInstall() &&
+                settings.value.checkForAppUpdates &&
+                navigator.onLine
+        ) {
+                const { checkAppUpdate } = await import(
+                        /* webpackChunkName: "checkAppUpdate" */ "lib/checkAppUpdate"
+                );
+                checkAppUpdate()
+                        .then((update) => {
+                                if (!update?.hasUpdate) return;
+                                xcoder.pushNotification(
+                                        strings["update available"],
+                                        strings["update available info"].replace(/\{version\}/, update.tag),
+                                        {
+                                                icon: "update",
+                                                type: "warning",
+                                                action: () => {
+                                                        system.openInBrowser(update.url);
+                                                },
+                                        },
+                                );
+                        })
+                        .catch((error) => {
+                                window.log("error", "Failed to check for updates");
+                                window.log("error", error);
+                        });
+        }
+        const { default: checkPluginsUpdate } = await import(
+                /* webpackChunkName: "checkPluginsUpdate" */ "lib/checkPluginsUpdate"
+        );
+        checkPluginsUpdate()
+                .then((updates) => {
+                        if (!updates.length) return;
+                        xcoder.pushNotification(
+                                strings["plugin updates"],
+                                getUpdateMessage(updates.length),
+                                {
+                                        icon: "extension",
+                                        action: async () => {
+                                                const { default: plugins } = await import(
+                                                        /* webpackChunkName: "plugins" */ "pages/plugins"
+                                                );
+                                                plugins(updates);
+                                        },
+                                },
+                        );
+                })
+                .catch(console.error);
 }
 
 async function setDebugInfo() {
-	const { version, versionCode } = BuildInfo;
+        const { version, versionCode } = BuildInfo;
 
-	const userAgent = navigator.userAgent;
-	const language = navigator.language;
+        const userAgent = navigator.userAgent;
+        const language = navigator.language;
 
-	// Extract Android version
-	const androidMatch = userAgent.match(/Android\s([0-9.]+)/);
-	const androidVersion = androidMatch ? androidMatch[1] : "Unknown";
+        // Extract Android version
+        const androidMatch = userAgent.match(/Android\s([0-9.]+)/);
+        const androidVersion = androidMatch ? androidMatch[1] : "Unknown";
 
-	// Extract Chrome/WebView version
-	const chromeMatch = userAgent.match(/Chrome\/([0-9.]+)/);
-	const webviewVersion = chromeMatch ? chromeMatch[1] : "Unknown";
-	const webviewMajor = Number.parseInt(webviewVersion, 10);
-	const minWebviewMajor = window.__XCODER_MIN_WEBVIEW_MAJOR__ || 84;
-	const webviewStatus =
-		Number.isFinite(webviewMajor) && webviewMajor < minWebviewMajor
-			? ` (minimum supported: ${minWebviewMajor})`
-			: "";
+        // Extract Chrome/WebView version
+        const chromeMatch = userAgent.match(/Chrome\/([0-9.]+)/);
+        const webviewVersion = chromeMatch ? chromeMatch[1] : "Unknown";
+        const webviewMajor = Number.parseInt(webviewVersion, 10);
+        const minWebviewMajor = window.__XCODER_MIN_WEBVIEW_MAJOR__ || 84;
+        const webviewStatus =
+                Number.isFinite(webviewMajor) && webviewMajor < minWebviewMajor
+                        ? ` (minimum supported: ${minWebviewMajor})`
+                        : "";
 
-	const info = [
-		`App: v${version} (${versionCode})`,
-		`Android: ${androidVersion}`,
-		`WebView: ${webviewVersion}${webviewStatus}`,
-		`Language: ${language}`,
-	].join("\n");
+        const info = [
+                `App: v${version} (${versionCode})`,
+                `Android: ${androidVersion}`,
+                `WebView: ${webviewVersion}${webviewStatus}`,
+                `Language: ${language}`,
+        ].join("\n");
 
-	document.body.setAttribute("data-version", info);
+        document.body.setAttribute("data-version", info);
 }
 
 function getUpdateMessage(count) {
-	return count === 1
-		? strings["plugin updates singular"]
-		: strings["plugin updates plural"].replace(/\{count\}/, count);
+        return count === 1
+                ? strings["plugin updates singular"]
+                : strings["plugin updates plural"].replace(/\{count\}/, count);
 }
 
 function showSftpMigrationReport({
-	failures,
-	removedReferences,
-	recoveredFiles,
+        failures,
+        removedReferences,
+        recoveredFiles,
 }) {
-	const details = failures
-		.map(
-			({ username, hostname, message }) =>
-				`${escapeHtml(username)}@${escapeHtml(hostname)}: ${escapeHtml(message)}`,
-		)
-		.join("<br>");
-	const recoveryMessage = recoveredFiles
-		? `<br><br>${recoveredFiles} unsaved remote file${recoveredFiles === 1 ? " was" : "s were"} kept as a recovery tab.`
-		: "";
+        const details = failures
+                .map(
+                        ({ username, hostname, message }) =>
+                                `${escapeHtml(username)}@${escapeHtml(hostname)}: ${escapeHtml(message)}`,
+                )
+                .join("<br>");
+        const recoveryMessage = recoveredFiles
+                ? `<br><br>${recoveredFiles} unsaved remote file${recoveredFiles === 1 ? " was" : "s were"} kept as a recovery tab.`
+                : "";
 
-	alert(
-		strings["sftp migration title"] || "Some SFTP connections were removed",
-		(
-			strings["sftp migration message"] ||
-			"XCoder could not move {count} saved SFTP connection(s) into encrypted storage. The affected connection data and {references} saved reference(s) were removed so the app could start safely. Please add the connection(s) again."
-		)
-			.replace(/\{count\}/, failures.length)
-			.replace(/\{references\}/, removedReferences) +
-			`<br><br>${details}${recoveryMessage}`,
-	);
+        alert(
+                strings["sftp migration title"] || "Some SFTP connections were removed",
+                (
+                        strings["sftp migration message"] ||
+                        "XCoder could not move {count} saved SFTP connection(s) into encrypted storage. The affected connection data and {references} saved reference(s) were removed so the app could start safely. Please add the connection(s) again."
+                )
+                        .replace(/\{count\}/, failures.length)
+                        .replace(/\{references\}/, removedReferences) +
+                        `<br><br>${details}${recoveryMessage}`,
+        );
 }
 
 function escapeHtml(value) {
-	return String(value)
-		.replaceAll("&", "&amp;")
-		.replaceAll("<", "&lt;")
-		.replaceAll(">", "&gt;")
-		.replaceAll('"', "&quot;")
-		.replaceAll("'", "&#039;");
+        return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
 }
 
 async function promptUpdateCheckConsent() {
-	try {
-		if (isPlayStoreInstall()) {
-			localStorage.setItem("checkForUpdatesPrompted", "true");
+        try {
+                if (isPlayStoreInstall()) {
+                        localStorage.setItem("checkForUpdatesPrompted", "true");
 
-			if (settings.value.checkForAppUpdates) {
-				await settings.update({ checkForAppUpdates: false }, false);
-			}
+                        if (settings.value.checkForAppUpdates) {
+                                await settings.update({ checkForAppUpdates: false }, false);
+                        }
 
-			return;
-		}
+                        return;
+                }
 
-		if (Boolean(localStorage.getItem("checkForUpdatesPrompted"))) return;
+                if (Boolean(localStorage.getItem("checkForUpdatesPrompted"))) return;
 
-		if (settings.value.checkForAppUpdates) {
-			localStorage.setItem("checkForUpdatesPrompted", "true");
-			return;
-		}
+                if (settings.value.checkForAppUpdates) {
+                        localStorage.setItem("checkForUpdatesPrompted", "true");
+                        return;
+                }
 
-		const message = strings["prompt update check consent message"];
-		const shouldEnable = await confirm(strings?.confirm, message);
+                const message = strings["prompt update check consent message"];
+                const shouldEnable = await confirm(strings?.confirm, message);
 
-		localStorage.setItem("checkForUpdatesPrompted", "true");
-		if (shouldEnable) {
-			await settings.update({ checkForAppUpdates: true }, false);
-		}
-	} catch (error) {
-		console.error("Failed to prompt for update check consent", error);
-	}
+                localStorage.setItem("checkForUpdatesPrompted", "true");
+                if (shouldEnable) {
+                        await settings.update({ checkForAppUpdates: true }, false);
+                }
+        } catch (error) {
+                console.error("Failed to prompt for update check consent", error);
+        }
 }
 
 async function loadApp() {
-	let $mainMenu;
-	let $fileMenu;
-	const $editMenuToggler = (
-		<span
-			className="icon edit"
-			attr-action="toggle-edit-menu"
-			style={{ fontSize: "1.2em" }}
-		/>
-	);
-	const $terminalToggler = (
-		<span
-			id="header-terminal-btn"
-			className="icon terminal"
-			title={strings["terminal"] || "Terminal"}
-			attr-action="toggle-terminal"
-			style={{ fontSize: "1.2em" }}
-			onclick={() => xcoder.exec("new-terminal")}
-		/>
-	);
-	const $paletteToggler = (
-		<span
-			id="header-palette-btn"
-			className="icon code"
-			title={strings["command palette"] || "Command palette"}
-			attr-action="toggle-command-palette"
-			style={{ fontSize: "1.2em" }}
-			onclick={() => xcoder.exec("command-palette")}
-		/>
-	);
-	const $navToggler = (
-		<span className="icon menu" attr-action="toggle-sidebar" />
-	);
-	const $menuToggler = (
-		<span className="icon more_vert" attr-action="toggle-menu" />
-	);
-	const $header = tile({
-		type: "header",
-		text: "XCoder",
-		lead: $navToggler,
-		tail: $menuToggler,
-	});
-	const $main = <main />;
-	const $sidebar = <Sidebar container={$main} toggler={$navToggler} />;
-	const $runBtn = (
-		<span
-			style={{ fontSize: "1.2em" }}
-			className="icon play_arrow"
-			attr-action="run"
-			onclick={() => xcoder.exec("run")}
-			oncontextmenu={() => xcoder.exec("run-file")}
-		/>
-	);
-	const $floatingNavToggler = (
-		<span
-			id="sidebar-toggler"
-			className="floating icon menu"
-			onclick={() => xcoder.exec("toggle-sidebar")}
-		/>
-	);
-	const $headerToggler = (
-		<span className="floating icon keyboard_arrow_left" id="header-toggler" />
-	);
-	const folders = helpers.parseJSON(localStorage.folders);
-	const files = helpers.parseJSON(localStorage.files) || [];
-	const editorManager = await EditorManager($header, $main);
+        let $mainMenu;
+        let $fileMenu;
+        const $editMenuToggler = (
+                <span
+                        className="icon edit"
+                        attr-action="toggle-edit-menu"
+                        style={{ fontSize: "1.2em" }}
+                />
+        );
+        const $terminalToggler = (
+                <span
+                        id="header-terminal-btn"
+                        className="icon terminal"
+                        title={strings["terminal"] || "Terminal"}
+                        attr-action="toggle-terminal"
+                        style={{ fontSize: "1.2em" }}
+                        onclick={() => xcoder.exec("new-terminal")}
+                />
+        );
+        const $paletteToggler = (
+                <span
+                        id="header-palette-btn"
+                        className="icon code"
+                        title={strings["command palette"] || "Command palette"}
+                        attr-action="toggle-command-palette"
+                        style={{ fontSize: "1.2em" }}
+                        onclick={() => xcoder.exec("command-palette")}
+                />
+        );
+        const $tabBackBtn = (
+                <span
+                        id="header-tab-back-btn"
+                        className="icon arrow_back"
+                        title={strings["previous tab"] || "Previous tab"}
+                        style={{ fontSize: "1.2em" }}
+                        onclick={() => xcoder.exec("prev-file-history")}
+                />
+        );
+        const $tabFwdBtn = (
+                <span
+                        id="header-tab-fwd-btn"
+                        className="icon arrow_forward"
+                        title={strings["next tab"] || "Next tab"}
+                        style={{ fontSize: "1.2em" }}
+                        onclick={() => xcoder.exec("next-file-history")}
+                />
+        );
+        const $navToggler = (
+                <span className="icon menu" attr-action="toggle-sidebar" />
+        );
+        const $menuToggler = (
+                <span className="icon more_vert" attr-action="toggle-menu" />
+        );
+        const $header = tile({
+                type: "header",
+                text: "XCoder",
+                lead: $navToggler,
+                tail: $menuToggler,
+        });
+        const $main = <main />;
+        const $sidebar = <Sidebar container={$main} toggler={$navToggler} />;
+        const $runBtn = (
+                <span
+                        style={{ fontSize: "1.2em" }}
+                        className="icon play_arrow"
+                        attr-action="run"
+                        onclick={() => xcoder.exec("run")}
+                        oncontextmenu={() => xcoder.exec("run-file")}
+                />
+        );
+        const $floatingNavToggler = (
+                <span
+                        id="sidebar-toggler"
+                        className="floating icon menu"
+                        onclick={() => xcoder.exec("toggle-sidebar")}
+                />
+        );
+        const $headerToggler = (
+                <span className="floating icon keyboard_arrow_left" id="header-toggler" />
+        );
+        const folders = helpers.parseJSON(localStorage.folders);
+        const files = helpers.parseJSON(localStorage.files) || [];
+        const editorManager = await EditorManager($header, $main);
 
-	const setMainMenu = () => {
-		if ($mainMenu) {
-			$mainMenu.removeEventListener("click", handleMenu);
-			$mainMenu.destroy();
-		}
-		$mainMenu = createMainMenu({ top: "6px", toggler: $menuToggler });
-		$mainMenu.addEventListener("click", handleMenu);
-	};
+        const setMainMenu = () => {
+                if ($mainMenu) {
+                        $mainMenu.removeEventListener("click", handleMenu);
+                        $mainMenu.destroy();
+                }
+                $mainMenu = createMainMenu({ top: "6px", toggler: $menuToggler });
+                $mainMenu.addEventListener("click", handleMenu);
+        };
 
-	const setFileMenu = () => {
-		if ($fileMenu) {
-			$fileMenu.removeEventListener("click", handleMenu);
-			$fileMenu.destroy();
-		}
-		$fileMenu = createFileMenu({ top: "6px", toggler: $editMenuToggler });
-		$fileMenu.addEventListener("click", handleMenu);
-	};
+        const setFileMenu = () => {
+                if ($fileMenu) {
+                        $fileMenu.removeEventListener("click", handleMenu);
+                        $fileMenu.destroy();
+                }
+                $fileMenu = createFileMenu({ top: "6px", toggler: $editMenuToggler });
+                $fileMenu.addEventListener("click", handleMenu);
+        };
 
-	xcoder.$headerToggler = $headerToggler;
-	window.actionStack = actionStack.windowCopy();
-	window.editorManager = editorManager;
-	setMainMenu(settings.value.openFileListPos);
-	setFileMenu(settings.value.openFileListPos);
-	actionStack.onCloseApp = () => xcoder.exec("save-state");
-	$headerToggler.onclick = function () {
-		root.classList.toggle("show-header");
-		this.classList.toggle("keyboard_arrow_left");
-		this.classList.toggle("keyboard_arrow_right");
-	};
+        xcoder.$headerToggler = $headerToggler;
+        window.actionStack = actionStack.windowCopy();
+        window.editorManager = editorManager;
+        setMainMenu(settings.value.openFileListPos);
+        setFileMenu(settings.value.openFileListPos);
+        actionStack.onCloseApp = () => xcoder.exec("save-state");
+        $headerToggler.onclick = function () {
+                root.classList.toggle("show-header");
+                this.classList.toggle("keyboard_arrow_left");
+                this.classList.toggle("keyboard_arrow_right");
+        };
 
-	//#region rendering
-	applySettings.beforeRender();
-	root.appendOuter($header, $main, $floatingNavToggler, $headerToggler);
-	//#endregion
+        //#region rendering
+        applySettings.beforeRender();
+        root.appendOuter($header, $main, $floatingNavToggler, $headerToggler);
+        //#endregion
 
-	//#region Add event listeners
-	initModes();
-	quickToolsInit();
-	sidebarApps.init($sidebar);
-	await sidebarApps.loadApps();
-	editorManager.onupdate = onEditorUpdate;
-	root.on("show", mainPageOnShow);
-	app.addEventListener("click", onClickApp);
-	editorManager.on("rename-file", onFileUpdate);
-	editorManager.on("switch-file", onFileUpdate);
-	editorManager.on("file-loaded", onFileUpdate);
-	navigator.app.overrideButton("menubutton", true);
-	system.setIntentHandler(intentHandler, intentHandler.onError);
-	system.getCordovaIntent(intentHandler, intentHandler.onError);
-	registerOAuthIntentHandler();
-	settings.on("update:openFileListPos", () => {
-		setMainMenu();
-		setFileMenu();
-	});
-	settings.on("update:fullscreen", () => {
-		setMainMenu();
-		setFileMenu();
-	});
+        //#region Add event listeners
+        initModes();
+        quickToolsInit();
+        sidebarApps.init($sidebar);
+        await sidebarApps.loadApps();
+        editorManager.onupdate = onEditorUpdate;
+        root.on("show", mainPageOnShow);
+        app.addEventListener("click", onClickApp);
+        editorManager.on("rename-file", onFileUpdate);
+        editorManager.on("switch-file", onFileUpdate);
+        editorManager.on("file-loaded", onFileUpdate);
+        navigator.app.overrideButton("menubutton", true);
+        system.setIntentHandler(intentHandler, intentHandler.onError);
+        system.getCordovaIntent(intentHandler, intentHandler.onError);
+        registerOAuthIntentHandler();
+        settings.on("update:openFileListPos", () => {
+                setMainMenu();
+                setFileMenu();
+        });
+        settings.on("update:fullscreen", () => {
+                setMainMenu();
+                setFileMenu();
+        });
 
-	$sidebar.onshow = () => {
-		const activeFile = editorManager.activeFile;
-		if (activeFile) editorManager.editor.contentDOM.blur();
-	};
-	sdcard.watchFile(KEYBINDING_FILE, async () => {
-		const conflicts = await setKeyBindings(editorManager.editor);
-		if (conflicts.length) {
-			const conflict = conflicts[0];
-			console.warn("Ignored conflicting key bindings", conflicts);
-			toast(
-				`Keybinding conflict: ${conflict.key} is already used by ${conflict.shadowedBy}`,
-			);
-			return;
-		}
-		toast(strings["key bindings updated"]);
-	});
-	//#endregion
+        $sidebar.onshow = () => {
+                const activeFile = editorManager.activeFile;
+                if (activeFile) editorManager.editor.contentDOM.blur();
+        };
+        sdcard.watchFile(KEYBINDING_FILE, async () => {
+                const conflicts = await setKeyBindings(editorManager.editor);
+                if (conflicts.length) {
+                        const conflict = conflicts[0];
+                        console.warn("Ignored conflicting key bindings", conflicts);
+                        toast(
+                                `Keybinding conflict: ${conflict.key} is already used by ${conflict.shadowedBy}`,
+                        );
+                        return;
+                }
+                toast(strings["key bindings updated"]);
+        });
+        //#endregion
 
-	notificationManager.init();
-	window.log("info", "Started app and its services...");
+        notificationManager.init();
+        window.log("info", "Started app and its services...");
 
-	if (!files.length) {
-		const { default: openWelcomeTab } = await import(
-			/* webpackChunkName: "welcome" */ "pages/welcome"
-		);
-		openWelcomeTab();
-	}
+        if (!files.length) {
+                const { default: openWelcomeTab } = await import(
+                        /* webpackChunkName: "welcome" */ "pages/welcome"
+                );
+                openWelcomeTab();
+        }
 
-	// load theme plugins
-	try {
-		await loadPlugins(true);
-	} catch (error) {
-		window.log("error", "Failed to load theme plugins!");
-		window.log("error", error);
-		toast("Failed to load theme plugins!");
-	}
+        // load theme plugins
+        try {
+                await loadPlugins(true);
+        } catch (error) {
+                window.log("error", "Failed to load theme plugins!");
+                window.log("error", error);
+                toast("Failed to load theme plugins!");
+        }
 
-	xcoder.setLoadingMessage("Loading folders...");
-	if (Array.isArray(folders)) {
-		for (const folder of folders) {
-			folder.opts.listFiles = !!folder.opts.listFiles;
-			openFolder(folder.url, folder.opts);
-		}
-	}
+        xcoder.setLoadingMessage("Loading folders...");
+        if (Array.isArray(folders)) {
+                for (const folder of folders) {
+                        folder.opts.listFiles = !!folder.opts.listFiles;
+                        openFolder(folder.url, folder.opts);
+                }
+        }
 
-	if (Array.isArray(files) && files.length) {
-		try {
-			await restoreFiles(files);
-		} catch (error) {
-			window.log("error", "File loading failed!");
-			window.log("error", error);
-			toast("File loading failed!");
-		} finally {
-			// Mark restoration complete even after a partial failure so
-			// switch-file persistence and queued intents are not blocked.
-			sessionStorage.setItem("isfilesRestored", true);
-		}
-		// Process any pending intents that were queued before files were restored
-		await processPendingIntents();
-	} else {
-		// Even when no files need to be restored, mark as restored and process pending intents
-		sessionStorage.setItem("isfilesRestored", true);
-		await processPendingIntents();
-		onEditorUpdate(undefined, false);
-	}
+        if (Array.isArray(files) && files.length) {
+                try {
+                        await restoreFiles(files);
+                } catch (error) {
+                        window.log("error", "File loading failed!");
+                        window.log("error", error);
+                        toast("File loading failed!");
+                } finally {
+                        // Mark restoration complete even after a partial failure so
+                        // switch-file persistence and queued intents are not blocked.
+                        sessionStorage.setItem("isfilesRestored", true);
+                }
+                // Process any pending intents that were queued before files were restored
+                await processPendingIntents();
+        } else {
+                // Even when no files need to be restored, mark as restored and process pending intents
+                sessionStorage.setItem("isfilesRestored", true);
+                await processPendingIntents();
+                onEditorUpdate(undefined, false);
+        }
 
-	xcoder.exec("save-state");
-	initFileList();
+        xcoder.exec("save-state");
+        initFileList();
 
-	// Re-open the Welcome tab once per app version so returning users
-	// see the What's New section. Session restore stays untouched: this
-	// runs AFTER files/folders are restored and only opens a tab.
-	try {
-		const WELCOME_VERSION_KEY = "welcome.versionSeen";
-		if (
-			localStorage.getItem(WELCOME_VERSION_KEY) !== BuildInfo.version &&
-			Array.isArray(files) &&
-			files.length
-		) {
-			const { default: openWelcomeTab } = await import(
-				/* webpackChunkName: "welcome" */ "pages/welcome"
-			);
-			openWelcomeTab();
-		}
-		if (BuildInfo.version) {
-			localStorage.setItem(WELCOME_VERSION_KEY, BuildInfo.version);
-		}
-	} catch (error) {
-		window.log("error", "Welcome version check failed");
-		window.log("error", error);
-	}
+        // Re-open the Welcome tab once per app version so returning users
+        // see the What's New section. Session restore stays untouched: this
+        // runs AFTER files/folders are restored and only opens a tab.
+        try {
+                const WELCOME_VERSION_KEY = "welcome.versionSeen";
+                if (
+                        localStorage.getItem(WELCOME_VERSION_KEY) !== BuildInfo.version &&
+                        Array.isArray(files) &&
+                        files.length
+                ) {
+                        const { default: openWelcomeTab } = await import(
+                                /* webpackChunkName: "welcome" */ "pages/welcome"
+                        );
+                        openWelcomeTab();
+                }
+                if (BuildInfo.version) {
+                        localStorage.setItem(WELCOME_VERSION_KEY, BuildInfo.version);
+                }
+        } catch (error) {
+                window.log("error", "Welcome version check failed");
+                window.log("error", error);
+        }
 
-	import(/* webpackChunkName: "terminal" */ "components/terminal").then(
-		({ TerminalManager }) => {
-			TerminalManager.restorePersistedSessions().catch((error) => {
-				console.error("Terminal restoration failed:", error);
-			});
-		},
-		(error) => {
-			console.error("Failed to load terminal module:", error);
-		},
-	);
+        import(/* webpackChunkName: "terminal" */ "components/terminal").then(
+                ({ TerminalManager }) => {
+                        TerminalManager.restorePersistedSessions().catch((error) => {
+                                console.error("Terminal restoration failed:", error);
+                        });
+                },
+                (error) => {
+                        console.error("Failed to load terminal module:", error);
+                },
+        );
 
-	/**
-	 *
-	 * @param {MouseEvent} e
-	 */
-	function handleMenu(e) {
-		const $target = e.target;
-		const action = $target.getAttribute("action");
-		const value = $target.getAttribute("value") || undefined;
-		if (!action) return;
+        /**
+         *
+         * @param {MouseEvent} e
+         */
+        function handleMenu(e) {
+                const $target = e.target;
+                const action = $target.getAttribute("action");
+                const value = $target.getAttribute("value") || undefined;
+                if (!action) return;
 
-		if ($mainMenu.contains($target)) $mainMenu.hide();
-		if ($fileMenu.contains($target)) $fileMenu.hide();
-		xcoder.exec(action, value);
-	}
+                if ($mainMenu.contains($target)) $mainMenu.hide();
+                if ($fileMenu.contains($target)) $fileMenu.hide();
+                xcoder.exec(action, value);
+        }
 
-	function onEditorUpdate(mode, saveState = true) {
-		const { activeFile } = editorManager;
+        function onEditorUpdate(mode, saveState = true) {
+                const { activeFile } = editorManager;
 
-		// if (!$editMenuToggler.isConnected) {
-		//      $header.insertBefore($editMenuToggler, $header.lastChild);
-		// }
-		if (
-			activeFile &&
-			activeFile.type !== "page" &&
-			activeFile.type !== "terminal"
-		) {
-			if (!$editMenuToggler.isConnected) {
-				$header.insertBefore($editMenuToggler, $header.lastChild);
-			}
-		} else {
-			$editMenuToggler.remove();
-		}
+                // if (!$editMenuToggler.isConnected) {
+                //      $header.insertBefore($editMenuToggler, $header.lastChild);
+                // }
+                if (
+                        activeFile &&
+                        activeFile.type !== "page" &&
+                        activeFile.type !== "terminal"
+                ) {
+                        if (!$editMenuToggler.isConnected) {
+                                $header.insertBefore($editMenuToggler, $header.lastChild);
+                        }
+                } else {
+                        $editMenuToggler.remove();
+                }
 
-		// Terminal + command palette buttons live in the header next to
-		// the pencil, always available. Order: [terminal][palette][pencil].
-		if (!$terminalToggler.isConnected) {
-			$header.insertBefore($terminalToggler, $header.lastChild);
-		}
-		if (!$paletteToggler.isConnected) {
-			$header.insertBefore($paletteToggler, $header.lastChild);
-		}
+                // Tab history back/forward buttons — browser-style navigation
+                // through recently used tabs (roadmap v1.5.x item 2). Header order:
+                // [tab-back][tab-fwd][terminal][palette][pencil].
+                if (!$tabBackBtn.isConnected) {
+                        $header.insertBefore($tabBackBtn, $header.lastChild);
+                }
+                if (!$tabFwdBtn.isConnected) {
+                        $header.insertBefore($tabFwdBtn, $header.lastChild);
+                }
 
-		if (mode === "switch-file") {
-			if (settings.value.rememberFiles && activeFile) {
-				localStorage.setItem("lastfile", activeFile.id);
-			}
-			if (saveState && sessionStorage.getItem("isfilesRestored") === "true") {
-				xcoder.exec("save-state");
-			}
-			return;
-		}
+                // Terminal + command palette buttons live in the header next to
+                // the pencil, always available. Order: [terminal][palette][pencil].
+                if (!$terminalToggler.isConnected) {
+                        $header.insertBefore($terminalToggler, $header.lastChild);
+                }
+                if (!$paletteToggler.isConnected) {
+                        $header.insertBefore($paletteToggler, $header.lastChild);
+                }
 
-		if (saveState && sessionStorage.getItem("isfilesRestored") === "true") {
-			xcoder.exec("save-state");
-		}
-	}
+                // Reflect the history cursor: back dies at the oldest entry,
+                // forward at the newest.
+                const history = editorManager.editorHistory || [];
+                const historyIndex = editorManager.editorHistoryIndex ?? -1;
+                $tabBackBtn.classList.toggle("disabled", historyIndex <= 0);
+                $tabFwdBtn.classList.toggle(
+                        "disabled",
+                        historyIndex >= history.length - 1,
+                );
 
-	async function onFileUpdate() {
-		try {
-			const { serverPort, previewPort } = settings.value;
-			let canRun = false;
-			if (serverPort !== previewPort) {
-				canRun = true;
-			} else {
-				const { activeFile } = editorManager;
-				canRun = await activeFile?.canRun();
-			}
+                if (mode === "switch-file") {
+                        if (settings.value.rememberFiles && activeFile) {
+                                localStorage.setItem("lastfile", activeFile.id);
+                        }
+                        if (saveState && sessionStorage.getItem("isfilesRestored") === "true") {
+                                xcoder.exec("save-state");
+                        }
+                        return;
+                }
 
-			if (canRun) {
-				$header.insertBefore($runBtn, $header.lastChild);
-			} else {
-				$runBtn.remove();
-			}
-		} catch (error) {
-			$runBtn.removeAttribute("run-file");
-			$runBtn.remove();
-		}
-	}
+                if (saveState && sessionStorage.getItem("isfilesRestored") === "true") {
+                        xcoder.exec("save-state");
+                }
+        }
+
+        async function onFileUpdate() {
+                try {
+                        const { serverPort, previewPort } = settings.value;
+                        let canRun = false;
+                        if (serverPort !== previewPort) {
+                                canRun = true;
+                        } else {
+                                const { activeFile } = editorManager;
+                                canRun = await activeFile?.canRun();
+                        }
+
+                        if (canRun) {
+                                $header.insertBefore($runBtn, $header.lastChild);
+                        } else {
+                                $runBtn.remove();
+                        }
+                } catch (error) {
+                        $runBtn.removeAttribute("run-file");
+                        $runBtn.remove();
+                }
+        }
 }
 
 function onClickApp(e) {
-	let el = e.target;
-	if (el instanceof HTMLAnchorElement || checkIfInsideAnchor()) {
-		e.preventDefault();
-		e.stopPropagation();
+        let el = e.target;
+        if (el instanceof HTMLAnchorElement || checkIfInsideAnchor()) {
+                e.preventDefault();
+                e.stopPropagation();
 
-		system.openInBrowser(el.href);
-	}
+                system.openInBrowser(el.href);
+        }
 
-	function checkIfInsideAnchor() {
-		const allAs = [...document.body.getAll("a")];
+        function checkIfInsideAnchor() {
+                const allAs = [...document.body.getAll("a")];
 
-		for (const a of allAs) {
-			if (a.contains(el)) {
-				el = a;
-				return true;
-			}
-		}
+                for (const a of allAs) {
+                        if (a.contains(el)) {
+                                el = a;
+                                return true;
+                        }
+                }
 
-		return false;
-	}
+                return false;
+        }
 }
 
 function mainPageOnShow() {
-	const { editor } = editorManager;
-	// TODO : Codemirror
-	//editor.resize(true);
+        const { editor } = editorManager;
+        // TODO : Codemirror
+        //editor.resize(true);
 }
 
 function createMainMenu({ top, bottom, toggler }) {
-	return Contextmenu({
-		right: "6px",
-		top,
-		bottom,
-		toggler,
-		transformOrigin: top ? "top right" : "bottom right",
-		innerHTML: () => {
-			return mustache.render($_menu, {
-				...strings,
-				"running processes":
-					strings["running processes"] || "Running processes",
-				can_save_file: canSaveFile(window.editorManager?.activeFile),
-			});
-		},
-	});
+        return Contextmenu({
+                right: "6px",
+                top,
+                bottom,
+                toggler,
+                transformOrigin: top ? "top right" : "bottom right",
+                innerHTML: () => {
+                        return mustache.render($_menu, {
+                                ...strings,
+                                "running processes":
+                                        strings["running processes"] || "Running processes",
+                                can_save_file: canSaveFile(window.editorManager?.activeFile),
+                        });
+                },
+        });
 }
 
 function createFileMenu({ top, bottom, toggler }) {
-	const $menu = Contextmenu({
-		top,
-		bottom,
-		toggler,
-		transformOrigin: top ? "top right" : "bottom right",
-		innerHTML: () => {
-			const file = window.editorManager?.activeFile;
+        const $menu = Contextmenu({
+                top,
+                bottom,
+                toggler,
+                transformOrigin: top ? "top right" : "bottom right",
+                innerHTML: () => {
+                        const file = window.editorManager?.activeFile;
 
-			if (!file || file.type === "page" || file.type === "terminal") {
-				return "";
-			}
+                        if (!file || file.type === "page" || file.type === "terminal") {
+                                return "";
+                        }
 
-			if (file.loading) {
-				$menu.classList.add("disabled");
-			} else {
-				$menu.classList.remove("disabled");
-			}
+                        if (file.loading) {
+                                $menu.classList.add("disabled");
+                        } else {
+                                $menu.classList.remove("disabled");
+                        }
 
-			const { label: encoding } = getEncoding(file.encoding);
-			const isEditorFile = file.type === "editor";
-			const cmEditor = window.editorManager?.editor;
-			const hasSelection = !!cmEditor && !cmEditor.state.selection.main.empty;
-			return mustache.render($_fileMenu, {
-				...strings,
-				file_id: file.id,
-				toggle_pin_tab_text: file.pinned
-					? strings["unpin tab"] || "Unpin tab"
-					: strings["pin tab"] || "Pin tab",
-				toggle_pin_tab_icon: file.pinned ? "icon pin-off" : "icon pin",
-				close_tabs_to_right_text:
-					strings["close tabs to right"] || "Close Right",
-				close_tabs_to_left_text: strings["close tabs to left"] || "Close Left",
-				close_other_tabs_text: strings["close other tabs"] || "Close Others",
-				// Use CodeMirror mode stored on EditorFile (set in setMode)
-				file_mode: isEditorFile ? file.currentMode || "" : "",
-				file_encoding: isEditorFile ? encoding : "",
-				file_read_only: !file.editable,
-				file_on_disk: !!file.uri,
-				file_eol: isEditorFile ? file.eol : "",
-				copy_text: isEditorFile ? hasSelection : false,
-				is_editor: isEditorFile,
-				has_lsp_servers: isEditorFile && hasConnectedServers(),
-			});
-		},
-	});
+                        const { label: encoding } = getEncoding(file.encoding);
+                        const isEditorFile = file.type === "editor";
+                        const cmEditor = window.editorManager?.editor;
+                        const hasSelection = !!cmEditor && !cmEditor.state.selection.main.empty;
+                        return mustache.render($_fileMenu, {
+                                ...strings,
+                                file_id: file.id,
+                                toggle_pin_tab_text: file.pinned
+                                        ? strings["unpin tab"] || "Unpin tab"
+                                        : strings["pin tab"] || "Pin tab",
+                                toggle_pin_tab_icon: file.pinned ? "icon pin-off" : "icon pin",
+                                close_tabs_to_right_text:
+                                        strings["close tabs to right"] || "Close Right",
+                                close_tabs_to_left_text: strings["close tabs to left"] || "Close Left",
+                                close_other_tabs_text: strings["close other tabs"] || "Close Others",
+                                // Use CodeMirror mode stored on EditorFile (set in setMode)
+                                file_mode: isEditorFile ? file.currentMode || "" : "",
+                                file_encoding: isEditorFile ? encoding : "",
+                                file_read_only: !file.editable,
+                                file_on_disk: !!file.uri,
+                                file_eol: isEditorFile ? file.eol : "",
+                                copy_text: isEditorFile ? hasSelection : false,
+                                is_editor: isEditorFile,
+                                has_lsp_servers: isEditorFile && hasConnectedServers(),
+                        });
+                },
+        });
 
-	return $menu;
+        return $menu;
 }
 
 function backButtonHandler() {
-	if (keydownState.esc) {
-		keydownState.esc = false;
-		return;
-	}
-	actionStack.pop();
+        if (keydownState.esc) {
+                keydownState.esc = false;
+                return;
+        }
+        actionStack.pop();
 }
 
 function menuButtonHandler() {
-	const { xcoder } = window;
-	xcoder?.exec("toggle-sidebar");
+        const { xcoder } = window;
+        xcoder?.exec("toggle-sidebar");
 }
 
 async function pauseHandler() {
-	const { xcoder } = window;
-	await window.editorManager?.flushCacheWrites?.();
-	xcoder?.exec("save-state");
+        const { xcoder } = window;
+        await window.editorManager?.flushCacheWrites?.();
+        xcoder?.exec("save-state");
 }
 
 function resumeHandler() {
-	if (!settings.value.checkFiles) return;
-	checkFiles();
+        if (!settings.value.checkFiles) return;
+        checkFiles();
 }
 
 function createAceModelistCompatModule() {
-	const toAceMode = (mode) => {
-		const resolved = mode || getModeForPath("");
-		if (!resolved) return null;
-		const name = resolved.name || "text";
-		const rawMode = String(resolved.mode || name);
-		const modePath = rawMode.startsWith("ace/mode/")
-			? rawMode
-			: `ace/mode/${rawMode}`;
-		return {
-			...resolved,
-			name,
-			caption: resolved.caption || name,
-			mode: modePath,
-		};
-	};
+        const toAceMode = (mode) => {
+                const resolved = mode || getModeForPath("");
+                if (!resolved) return null;
+                const name = resolved.name || "text";
+                const rawMode = String(resolved.mode || name);
+                const modePath = rawMode.startsWith("ace/mode/")
+                        ? rawMode
+                        : `ace/mode/${rawMode}`;
+                return {
+                        ...resolved,
+                        name,
+                        caption: resolved.caption || name,
+                        mode: modePath,
+                };
+        };
 
-	return {
-		get modes() {
-			return getModes()
-				.map((mode) => toAceMode(mode))
-				.filter(Boolean);
-		},
-		get modesByName() {
-			const source = getModesByName();
-			const result = {};
-			Object.keys(source).forEach((name) => {
-				result[name] = toAceMode(source[name]);
-			});
-			return result;
-		},
-		getModeForPath(path) {
-			return toAceMode(getModeForPath(String(path || "")));
-		},
-	};
+        return {
+                get modes() {
+                        return getModes()
+                                .map((mode) => toAceMode(mode))
+                                .filter(Boolean);
+                },
+                get modesByName() {
+                        const source = getModesByName();
+                        const result = {};
+                        Object.keys(source).forEach((name) => {
+                                result[name] = toAceMode(source[name]);
+                        });
+                        return result;
+                },
+                getModeForPath(path) {
+                        return toAceMode(getModeForPath(String(path || "")));
+                },
+        };
 }
 
 function ensureAceCompatApi() {
-	const ace = window.ace || {};
-	const modelistModule = createAceModelistCompatModule();
-	const originalRequire =
-		typeof ace.require === "function" ? ace.require.bind(ace) : null;
+        const ace = window.ace || {};
+        const modelistModule = createAceModelistCompatModule();
+        const originalRequire =
+                typeof ace.require === "function" ? ace.require.bind(ace) : null;
 
-	ace.require = (moduleId) => {
-		if (moduleId === "ace/ext/modelist" || moduleId === "ace/ext/modelist.js") {
-			return modelistModule;
-		}
-		return originalRequire?.(moduleId);
-	};
+        ace.require = (moduleId) => {
+                if (moduleId === "ace/ext/modelist" || moduleId === "ace/ext/modelist.js") {
+                        return modelistModule;
+                }
+                return originalRequire?.(moduleId);
+        };
 
-	window.ace = ace;
+        window.ace = ace;
 }

@@ -99,24 +99,34 @@ Working with packages:
 EOF
     fi
 
-    # Create xcoder CLI tool
-    if [ ! -e "$PREFIX/alpine/usr/local/bin/xcoder" ]; then
-        mkdir -p "$PREFIX/alpine/usr/local/bin"
-        cat <<'XCODER_CLI' > "$PREFIX/alpine/usr/local/bin/xcoder"
+    # Create xcoder + acode CLI tools.
+    # v2 adds the Acode-compatible "open" subcommand and the "acode" alias.
+    # The scripts are (re)written whenever the version marker differs, so
+    # installs that already extracted v1 get the update too.
+    CLI_VERSION="2"
+    CLI_DIR="$PREFIX/alpine/usr/local/bin"
+    if [ ! -e "$CLI_DIR/xcoder" ] || [ "$(cat "$CLI_DIR/.xcoder-cli-version" 2>/dev/null)" != "$CLI_VERSION" ]; then
+        mkdir -p "$CLI_DIR"
+        cat <<'XCODER_CLI' > "$CLI_DIR/xcoder"
 #!/bin/bash
 # xcoder - Open files/folders in XCoder editor
 # Uses OSC escape sequences to communicate with the XCoder terminal
+# v2: Acode-compatible "open" subcommand + "acode" alias entry point
+
+XCODER_CLI_VERSION="2"
 
 usage() {
-    echo "Usage: xcoder [file/folder...]"
+    echo "Usage: xcoder [open] <file/folder...>   (alias: acode)"
     echo ""
     echo "Open files or folders in XCoder editor."
     echo ""
     echo "Examples:"
-    echo "  xcoder file.txt      # Open a file"
-    echo "  xcoder .             # Open current folder"
-    echo "  xcoder ~/project     # Open a folder"
-    echo "  xcoder -h, --help    # Show this help"
+    echo "  xcoder file.txt        # Open a file"
+    echo "  xcoder .               # Open current folder"
+    echo "  xcoder ~/project       # Open a folder"
+    echo "  acode open src/main.c  # Acode-compatible form"
+    echo "  xcoder -v, --version   # Show CLI version"
+    echo "  xcoder -h, --help      # Show this help"
 }
 
 get_abs_path() {
@@ -160,10 +170,25 @@ if [[ $# -eq 0 ]]; then
     exit 0
 fi
 
+# Acode-compatible subcommand: "acode open <path>" / "xcoder open <path>".
+# Everything after "open" is treated as a path, exactly like Acode v1.11.8.
+if [[ "${1:-}" == "open" ]]; then
+    shift
+    if [[ $# -eq 0 ]]; then
+        echo "Error: 'open' requires a file or folder path" >&2
+        usage
+        exit 1
+    fi
+fi
+
 for arg in "$@"; do
     case "$arg" in
         -h|--help)
             usage
+            exit 0
+            ;;
+        -v|--version)
+            echo "xcoder CLI $XCODER_CLI_VERSION"
             exit 0
             ;;
         *)
@@ -177,7 +202,17 @@ for arg in "$@"; do
     esac
 done
 XCODER_CLI
-        chmod +x "$PREFIX/alpine/usr/local/bin/xcoder"
+        chmod +x "$CLI_DIR/xcoder"
+        cat <<'ACODE_CLI' > "$CLI_DIR/acode"
+#!/bin/bash
+# acode - Acode-compatible alias for the xcoder CLI.
+# Accepts the same forms: acode open <path>, acode <path>, acode --help.
+# Resolves xcoder next to itself (both live in /usr/local/bin).
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+exec "$SCRIPT_DIR/xcoder" "$@"
+ACODE_CLI
+        chmod +x "$CLI_DIR/acode"
+        printf '%s\n' "$CLI_VERSION" > "$CLI_DIR/.xcoder-cli-version"
     fi
 
     # Create initrc if it doesn't exist

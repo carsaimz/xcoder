@@ -610,6 +610,8 @@ declare type LangStrings = {
   "preview port": string;
   "preview settings": string;
   "preview settings note": string;
+  "previous tab": string;
+  "next tab": string;
   "print margin": string;
   "problems": string;
   "product not available": string;
@@ -925,6 +927,8 @@ declare type LangStrings = {
   "terminal": string;
   "terminal first launch prompt": string;
   "terminal not installed prompt": string;
+  "terminal open failed": string;
+  "terminal opened folder": string;
   "terminal settings": string;
   "terminal:bar": string;
   "terminal:block": string;
