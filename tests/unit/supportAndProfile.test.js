@@ -152,33 +152,44 @@ vi.mock("dialogs/loader", () => ({
         },
 }));
 
+// The profile module pulls in the whole page/sidebar stack — importing it
+// inside a test can exceed the 5s default timeout on loaded machines (65
+// files running in parallel), which made this regression test flaky. Resolve
+// it once at file level: vi.mock registrations above are hoisted before any
+// import runs, so the mocks still apply, and the import cost is no longer
+// counted against the per-test timeout.
+const { default: renderProfile } = await import("pages/profile/profile");
+
 describe("account page (sidebar profile icon)", () => {
-        test("renders and attaches to the DOM without throwing (no $page.show)", async () => {
-                const renderProfile = (await import("pages/profile/profile")).default;
-                // the old bug: TypeError "$page.show is not a function" — would fail here
-                renderProfile();
-                const $page = document
-                        .querySelector("wc-page .profile-page")
-                        ?.closest("wc-page");
-                assert.ok($page, "profile page is attached to the document");
-                assert.ok(
-                        document.querySelector(".profile-page"),
-                        "profile body is rendered",
-                );
-                // sign-in section shows because supabaseConfigured() is true and no user
-                assert.ok(
-                        document.querySelector('input[type="email"]'),
-                        "e-mail field rendered for signed-out user",
-                );
-                // animate() never settles under happy-dom — detach synchronously
-                document
-                        .querySelectorAll("wc-page")
-                        ?.forEach(($p) => $p.remove());
-        });
+        test(
+                "renders and attaches to the DOM without throwing (no $page.show)",
+                // heavy first-render under parallel workers — never assume <5s
+                { timeout: 20000 },
+                async () => {
+                        // the old bug: TypeError "$page.show is not a function" — would fail here
+                        renderProfile();
+                        const $page = document
+                                .querySelector("wc-page .profile-page")
+                                ?.closest("wc-page");
+                        assert.ok($page, "profile page is attached to the document");
+                        assert.ok(
+                                document.querySelector(".profile-page"),
+                                "profile body is rendered",
+                        );
+                        // sign-in section shows because supabaseConfigured() is true and no user
+                        assert.ok(
+                                document.querySelector('input[type="email"]'),
+                                "e-mail field rendered for signed-out user",
+                        );
+                        // animate() never settles under happy-dom — detach synchronously
+                        document
+                                .querySelectorAll("wc-page")
+                                ?.forEach(($p) => $p.remove());
+                },
+        );
 
         test("signed-in view exposes support + sign out", async () => {
                 state.user = { email: "test@example.com", id: "u1" };
-                const renderProfile = (await import("pages/profile/profile")).default;
                 const $page = renderProfile();
                 const text =
                         document.querySelector(".profile-page")?.textContent || "";
