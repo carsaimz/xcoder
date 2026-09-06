@@ -4,6 +4,15 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.4.23] - 2026-09-06
+
+### Fixed
+- Typos step — exclude generated icon/registry files and pt-br content, whitelist legitimate Portuguese words
+
+### Documentation
+- V1.5.x item 5 done — preview build mirrored in xcoder-web; CodeQL gated while private; renumber v1.6+ list
+
+
 ## [1.4.22] - 2026-09-06
 
 ### Added

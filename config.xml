@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.carsaimz.xcoder" android-versionCode="10422" version="1.4.22"
+<widget id="com.carsaimz.xcoder" android-versionCode="10423" version="1.4.23"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
