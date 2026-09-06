@@ -4,6 +4,15 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.5.0] - 2026-09-06
+
+### Added
+- V1.4.24 — sidebar globals (fix 'sidebar is not defined') + persistent tab history
+
+### Fixed
+- Expose window.sidebar / $sidebar / sidebarApps — user code no longer throws 'sidebar is not defined'
+
+
 ## [1.4.24] - 2026-09-07
 
 ### Fixed
