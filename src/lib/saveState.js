@@ -1,5 +1,6 @@
 import { getAllFolds, getScrollPosition, getSelection } from "cm/editorUtils";
 import config from "./config";
+import { serializeEditorHistory } from "./editorHistoryState";
 import { addedFolder } from "./openFolder";
 import appSettings from "./settings";
 
@@ -103,6 +104,20 @@ export default () => {
 
 	localStorage.files = JSON.stringify(filesToSave);
 	localStorage.folders = JSON.stringify(folders);
+
+	// Tab navigation history (back/forward) survives restarts —
+	// roadmap v1.5.x item 3. Stored as plain ids; entries whose files
+	// are no longer open are skipped on restore.
+	try {
+		localStorage.tabHistory = JSON.stringify(
+			serializeEditorHistory(
+				editorManager?.editorHistory,
+				editorManager?.editorHistoryIndex,
+			),
+		);
+	} catch (error) {
+		console.warn("Failed to persist tab history:", error);
+	}
 };
 
 function collapseSelectionForRestore(selection) {

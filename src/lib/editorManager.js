@@ -98,6 +98,10 @@ import keyboardHandler, { keydownState } from "handlers/keyboard";
 import { animate } from "motion";
 import config from "./config";
 import EditorFile from "./editorFile";
+import {
+	deserializeEditorHistory,
+	MAX_EDITOR_HISTORY,
+} from "./editorHistoryState";
 import openFile from "./openFile";
 import { addedFolder } from "./openFolder";
 import appSettings from "./settings";
@@ -3234,6 +3238,7 @@ async function EditorManager($header, $body) {
 		header: $header,
 		openPreviousEditorFromHistory,
 		openNextEditorFromHistory,
+		restoreEditorHistory,
 		recordHistory,
 		get editorHistory() {
 			return historyStack;
@@ -5190,6 +5195,26 @@ async function EditorManager($header, $body) {
 			historyIndex--;
 		}
 		return false;
+	}
+
+	/**
+	 * Rebuild the tab history after an app restart (roadmap v1.5.x item 3).
+	 * IDs that no longer resolve (closed files, unsaved temp files) are
+	 * skipped; the cursor lands on the recorded active file or, if it is
+	 * gone, on the most recent surviving entry.
+	 * @param {{ids?: string[], index?: number}|null|undefined} state saved snapshot
+	 * @returns {boolean} true when at least one entry was restored
+	 */
+	function restoreEditorHistory(state) {
+		const { stack, index } = deserializeEditorHistory(
+			state,
+			(id) => getFile(id, "id"),
+			MAX_EDITOR_HISTORY,
+		);
+		if (!stack.length) return false;
+		historyStack = stack;
+		historyIndex = Math.min(Math.max(index, 0), stack.length - 1);
+		return true;
 	}
 
 	/**

@@ -4,6 +4,27 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.4.24] - 2026-09-07
+
+### Fixed
+- **"sidebar is not defined"** — o elemento da sidebar era uma const local
+  dentro do main.js, então qualquer código de usuário (console no contexto
+  da página, plugins, scripts) que referenciasse `sidebar` ou `$sidebar`
+  explodia com ReferenceError. Agora o app expõe `window.sidebar` (API
+  estática: show/hide/toggle/on/off/el), `window.$sidebar` (elemento vivo)
+  e `window.sidebarApps` — mesma convenção do `editorManager`
+
+### Added
+- **Histórico de abas persistente** (roadmap v1.5.x item 3) — a navegação
+  voltar/avançar sobrevive ao reinício do app: o `saveState` grava o
+  histórico como ids em `localStorage.tabHistory` e o boot o restaura
+  ANTES do primeiro save-state; ids cujos arquivos não existem mais são
+  ignorados e o cursor recai no registro mais recente sobrevivente
+
+### Tests
+- +12 testes (529 → 541): sidebarGlobalApi (5) e tabHistoryPersist (7)
+
+
 ## [1.4.23] - 2026-09-06
 
 ### Fixed
