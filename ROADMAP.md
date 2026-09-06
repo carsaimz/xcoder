@@ -31,6 +31,14 @@
   abrir o chat; i18n das notificações LSP e dos diálogos de plugins;
   release automático por bump de versão (auto-release.yml) + bot semanal
   de dependências independente da Dependabot (deps-update.yml)
+- **Pós-v1.4.22 (CI):** build de preview por rótulo espelhado no **site**
+  (`preview-build.yml` no xcoder-web — typecheck + `next build` nos PRs
+  rotulados `build`, com comentário fixo bilíngue no PR); CodeQL do site
+  passa a ser **skip** enquanto o repositório é privado (o upload de code
+  scanning exige Advanced Security, gratuito só em repos públicos — volta
+  sozinho se o repo virar público); typos config corrigido (whitelist de
+  palavras pt-br + exclusão de arquivos gerados) — CI 100% verde nos dois
+  repositórios
 - **v1.4.22 — CLI, histórico e cobertura total de idiomas:** comando
   **`acode` no terminal** (alias Acode-compatível do CLI `xcoder`, com
   subcomando `open <arquivo>`, `--version` e propagação versionada para
@@ -58,22 +66,20 @@
    (hoje o histórico recomeça vazio a cada sessão).
 4. **Anúncio automático de release** — post no site/fórum quando uma
    versão estável é publicada (o release assinado já é automático).
-5. **Cobertura do preview build nos PRs do site** — espelhar o
-   preview-build.yml do app no xcoder-web (build Next.js por rótulo).
 
 ## 🚀 Depois (v1.6+)
 
-6. **Terminal SSH integrado** 💡 — sessões remotas salvas ao lado do SFTP
+5. **Terminal SSH integrado** 💡 — sessões remotas salvas ao lado do SFTP
    (Acode v1.13.2 #2694).
-7. **Console REPL JS isolado** 💡 — Web Worker sandbox com UX mobile
+6. **Console REPL JS isolado** 💡 — Web Worker sandbox com UX mobile
    (Acode v1.13.2 #2808).
-8. **Gerenciador de fontes** 💡 — instalar fontes customizadas com atribuição
+7. **Gerenciador de fontes** 💡 — instalar fontes customizadas com atribuição
    separada editor/app (Acode v1.11.6/v1.12.0).
-9. **Mais plugins portados do Acode** 💡 — linter, formatter (Prettier/Ruff),
+8. **Mais plugins portados do Acode** 💡 — linter, formatter (Prettier/Ruff),
    compilador Sass ao vivo, runner avançado, visualizador de documentos.
-10. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar, segredos
-    seguros, ratings, exposição de pacotes CM6.
-11. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
+9. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar, segredos
+   seguros, ratings, exposição de pacotes CM6.
+10. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
     anúncios; horário silencioso (Acode v1.12.0 #1918 / v1.11.8 #1779).
 
 ## 🧭 Direção contínua
