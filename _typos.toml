@@ -12,6 +12,7 @@ extend-exclude = [
     "*.gradle",
     "plugins",
     "platforms",
+    # --- locales (não-inglês: typos só tem dicionários en) ---
     "src/lang/ar-ye.json",
     "src/lang/be-by.json",
     "src/lang/bn-bd.json",
@@ -41,6 +42,17 @@ extend-exclude = [
     "src/lang/zh-cn.json",
     "src/lang/zh-hant.json",
     "src/lang/zh-tw.json",
+    # --- arquivos gerados (nomes de glifos de fontes / registry com prose pt+en) ---
+    "src/res/iconNames.json",
+    "src/res/plugin-registry.json",
+    # --- conteúdo primário em pt-br (o typos não sabe português; v1.4.19+) ---
+    "wiki",
+    "ROADMAP.md",
+    "CHANGELOG.md",
+    "readme.pt-br.md",
+    "docs/ADS.md",
+    "docs/screenshots",
+    "scripts/add_cmd_translations.mjs",
 ]
 
 [default.extend-words]
@@ -55,3 +67,64 @@ shft = "shft"
 multline = "multline"
 sav = "sav"
 ist = "ist"
+# palavras portuguesas legítimas (strings pt-br no código/testes) — deixar como estão
+Alternar = "Alternar"
+Autorize = "Autorize"
+Auxiliar = "Auxiliar"
+Comandos = "Comandos"
+Confirme = "Confirme"
+Controle = "Controle"
+Copie = "Copie"
+ERRO = "ERRO"
+Erro = "Erro"
+Erros = "Erros"
+Gere = "Gere"
+Hel = "Hel"
+Implemente = "Implemente"
+Instale = "Instale"
+Itens = "Itens"
+Limite = "Limite"
+Problemas = "Problemas"
+Seletor = "Seletor"
+Tema = "Tema"
+adapte = "adapte"
+anual = "anual"
+atual = "atual"
+autor = "autor"
+avatares = "avatares"
+caracteres = "caracteres"
+cliente = "cliente"
+comando = "comando"
+comandos = "comandos"
+componentes = "componentes"
+confirme = "confirme"
+consome = "consome"
+contribuem = "contribuem"
+controles = "controles"
+converte = "converte"
+correspondente = "correspondente"
+deprecat = "deprecat"
+discreto = "discreto"
+eles = "eles"
+erro = "erro"
+erros = "erros"
+exata = "exata"
+exclusivos = "exclusivos"
+gere = "gere"
+independente = "independente"
+informe = "informe"
+inicial = "inicial"
+instale = "instale"
+intervalos = "intervalos"
+leve = "leve"
+limite = "limite"
+momento = "momento"
+oficial = "oficial"
+persistente = "persistente"
+problemas = "problemas"
+respondendo = "respondendo"
+seletor = "seletor"
+ser = "ser"
+tema = "tema"
+unparseable = "unparseable"
+vai = "vai"
