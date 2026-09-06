@@ -636,6 +636,14 @@ async function loadApp() {
         xcoder.$headerToggler = $headerToggler;
         window.actionStack = actionStack.windowCopy();
         window.editorManager = editorManager;
+        // Sidebar API for console (page context), plugins and user scripts —
+        // `sidebar` is the static API (show/hide/toggle/on/off/el) and
+        // `$sidebar` the live element (Acode-style). Without these globals,
+        // any user script referencing `sidebar` threw
+        // "ReferenceError: sidebar is not defined".
+        window.sidebar = Sidebar;
+        window.$sidebar = $sidebar;
+        window.sidebarApps = sidebarApps;
         setMainMenu(settings.value.openFileListPos);
         setFileMenu(settings.value.openFileListPos);
         actionStack.onCloseApp = () => xcoder.exec("save-state");
