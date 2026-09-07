@@ -1290,5 +1290,7 @@
         "ai err network fetch": "Network failure — the request never reached the provider. Check internet, VPN or the provider Base URL.",
         "no tab history next": "No more tabs forward in history",
         "no tab history prev": "No more tabs back in history",
-        "terminal failsafe notice": "[XCoder] FailSafe mode: Android system shell (no Alpine). Turn off 'FailSafe mode' in the terminal settings to use Alpine."
+        "terminal failsafe notice": "[XCoder] FailSafe mode: Android system shell (no Alpine). Turn off 'FailSafe mode' in the terminal settings to use Alpine.",
+        "active indent guide": "Active indent guide",
+        "settings-info-active-indent-guide": "Highlights the indentation guides of the block containing the current line (VSCode style). Requires indent guides; may cost some performance on large files."
 }

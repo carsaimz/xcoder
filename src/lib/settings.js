@@ -208,6 +208,10 @@ class Settings {
 			// existing installs keep their stored choice via the type
 			// back-fill below — only fresh installs get `true`.
 			indentGuides: true,
+			// roadmap v1.5.x item 2 — opt-in: highlight the guides of the
+			// block enclosing the cursor (costs one viewport rebuild per
+			// cursor-line change, so it stays off by default on mobile)
+			activeIndentGuide: false,
 			rainbowBrackets: true,
 			marketplaceUrl: "", // custom plugin marketplace registry URL (empty = default)
 			backendUrl: "", // companion backend (xcoder-backend) providing remote config (empty = off)

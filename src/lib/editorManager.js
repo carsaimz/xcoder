@@ -1206,13 +1206,14 @@ async function EditorManager($header, $body) {
 			},
 		},
 		{
-			keys: ["indentGuides"],
+			keys: ["indentGuides", "activeIndentGuide"],
 			compartments: [indentGuidesCompartment],
 			build() {
 				const enabled = appSettings?.value?.indentGuides ?? false;
 				if (!enabled) return [];
 				return indentGuides({
-					highlightActiveGuide: false,
+					highlightActiveGuide:
+						appSettings?.value?.activeIndentGuide ?? false,
 					hideOnBlankLines: false,
 				});
 			},

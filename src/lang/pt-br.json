@@ -1407,5 +1407,7 @@
         "ai err network fetch": "Falha de rede — o pedido não chegou ao provedor. Verifique a internet, VPN ou a URL base do provedor.",
         "no tab history next": "Sem mais abas adiante no histórico",
         "no tab history prev": "Sem mais abas atrás no histórico",
-        "terminal failsafe notice": "[XCoder] Modo FailSafe: shell do sistema Android (sem Alpine). Desative o 'FailSafe mode' nas configurações do terminal para usar o Alpine."
+        "terminal failsafe notice": "[XCoder] Modo FailSafe: shell do sistema Android (sem Alpine). Desative o 'FailSafe mode' nas configurações do terminal para usar o Alpine.",
+        "active indent guide": "Guia de indentação ativa",
+        "settings-info-active-indent-guide": "Destaca as guias de indentação do bloco que contém a linha atual (estilo VSCode). Exige as guias de indentação ligadas; pode custar um pouco de desempenho em arquivos grandes."
 }

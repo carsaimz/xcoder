@@ -210,6 +210,13 @@ export default function editorSettings() {
 			category: categories.guidesIndicators,
 		},
 		{
+			key: "activeIndentGuide",
+			text: strings["active indent guide"] || "Active indent guide",
+			checkbox: values.activeIndentGuide ?? false,
+			info: strings["settings-info-active-indent-guide"],
+			category: categories.guidesIndicators,
+		},
+		{
 			key: "rainbowBrackets",
 			text: strings["rainbow brackets"] || "Rainbow brackets",
 			checkbox: values.rainbowBrackets ?? true,

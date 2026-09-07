@@ -13,7 +13,7 @@ import {
  * Configuration options for indent guides
  */
 export interface IndentGuidesConfig {
-	/** Deprecated: active guide highlighting is disabled for performance. */
+	/** Highlight the guides of the block enclosing the cursor (opt-in). */
 	highlightActiveGuide?: boolean;
 	/** Whether to hide guides on blank lines */
 	hideOnBlankLines?: boolean;
@@ -98,13 +98,19 @@ function getLeadingWhitespaceLength(line: string): number {
 	return count;
 }
 
-function buildGuideStyle(levels: number, guideStepPx: number): string {
+function buildGuideStyle(
+	levels: number,
+	guideStepPx: number,
+	activeLayers?: Set<number>,
+): string {
 	const images = [];
 	const positions = [];
 	const sizes = [];
 
 	for (let i = 0; i < levels; i++) {
-		const color = "var(--indent-guide-color)";
+		const color = activeLayers?.has(i)
+			? "var(--indent-guide-active-color)"
+			: "var(--indent-guide-color)";
 		images.push(`linear-gradient(${color}, ${color})`);
 		positions.push(`${i * guideStepPx}px 0`);
 		sizes.push("1px 100%");
@@ -122,14 +128,81 @@ function getGuideStyle(
 	levels: number,
 	guideStepPx: number,
 	styleCache: GuideStyleCache,
+	activeKey = "",
+	activeLayers?: Set<number>,
 ): string {
-	const key = `${levels}:${guideStepPx}`;
+	const key = `${levels}:${guideStepPx}:${activeKey}`;
 	let style = styleCache.get(key);
 	if (!style) {
-		style = buildGuideStyle(levels, guideStepPx);
+		if (styleCache.size > 256) styleCache.clear();
+		style = buildGuideStyle(levels, guideStepPx, activeLayers);
 		styleCache.set(key, style);
 	}
 	return style;
+}
+
+/**
+ * Columns of the indent guides that enclose the given line — i.e. the
+ * block boundaries of every ancestor block above it (VSCode-style active
+ * indent guide). The cursor line's own block level is included when it
+ * aligns to the indent unit. Pure helper, exported for tests.
+ * @param doc minimal doc interface ({ lines, line(n).text })
+ * @param lineNumber 1-based line to compute ancestors for
+ * @param tabSize tab width in columns
+ * @param unitColumns indent unit in columns
+ * @param scanLimit how far up the ancestor walk may go (perf bound)
+ */
+export function computeEnclosingIndentColumns(
+	doc: { lines: number; line(n: number): { text: string } },
+	lineNumber: number,
+	tabSize: number,
+	unitColumns: number,
+	scanLimit = 2000,
+): Set<number> {
+	const columns = new Set<number>();
+	if (
+		lineNumber < 1 ||
+		lineNumber > doc.lines ||
+		unitColumns <= 0
+	) {
+		return columns;
+	}
+
+	const indentOf = (lineNum: number): { indent: number; blank: boolean } => {
+		const text = doc.line(lineNum).text;
+		const blank = isBlankLine(text);
+		return { indent: getLineIndentation(text, tabSize), blank };
+	};
+
+	// effective indent of the cursor line (nearest non-blank at/above it)
+	let cursorIndent = -1;
+	let cursor = lineNumber;
+	while (cursor >= 1) {
+		const { indent, blank } = indentOf(cursor);
+		if (!blank) {
+			cursorIndent = indent;
+			break;
+		}
+		cursor--;
+	}
+	if (cursorIndent <= 0) return columns;
+
+	// the guide at the cursor's own block level (when aligned)
+	if (cursorIndent % unitColumns === 0) {
+		columns.add(cursorIndent);
+	}
+
+	// walk up: every shallower block boundary is an ancestor guide
+	let lastIndent = cursorIndent;
+	const startLine = Math.max(1, cursor - scanLimit);
+	for (let lineNum = cursor - 1; lineNum >= startLine; lineNum--) {
+		const { indent, blank } = indentOf(lineNum);
+		if (blank || indent >= lastIndent) continue;
+		if (indent % unitColumns === 0) columns.add(indent);
+		lastIndent = indent;
+		if (lastIndent <= 0) break;
+	}
+	return columns;
 }
 
 function getCachedLineInfo(
@@ -162,6 +235,7 @@ function buildDecorations(
 	config: Required<IndentGuidesConfig>,
 	lineCache: IndentLineCache,
 	styleCache: GuideStyleCache,
+	activeLine = -1,
 ): DecorationSet {
 	const builder = new RangeSetBuilder<Decoration>();
 	const { state } = view;
@@ -169,6 +243,24 @@ function buildDecorations(
 	const indentUnit = getIndentUnitColumns(state);
 	const guideStepPx = Math.max(view.defaultCharacterWidth * indentUnit, 1);
 	let processedLines = 0;
+
+	// enclosing-block guides of the cursor line (active highlighting)
+	let activeLayers: Set<number> | undefined;
+	let activeKey = "";
+	if (config.highlightActiveGuide && activeLine >= 1) {
+		const enclosing = computeEnclosingIndentColumns(
+			state.doc,
+			Math.min(activeLine, state.doc.lines),
+			tabSize,
+			indentUnit,
+		);
+		if (enclosing.size) {
+			activeLayers = new Set(
+				[...enclosing].map((column) => column / indentUnit),
+			);
+			activeKey = [...enclosing].sort((a, b) => a - b).join(",");
+		}
+	}
 
 	for (const { from: blockFrom, to: blockTo } of view.visibleRanges) {
 		const startLine = state.doc.lineAt(blockFrom);
@@ -250,7 +342,13 @@ function buildDecorations(
 					Decoration.line({
 						attributes: {
 							class: GUIDE_LINE_CLASS,
-							style: getGuideStyle(levels, guideStepPx, styleCache),
+							style: getGuideStyle(
+								levels,
+								guideStepPx,
+								styleCache,
+								activeKey,
+								activeLayers,
+							),
 						},
 					}),
 				);
@@ -262,7 +360,13 @@ function buildDecorations(
 					Decoration.mark({
 						attributes: {
 							class: GUIDE_MARK_CLASS,
-							style: getGuideStyle(levels, guideStepPx, styleCache),
+							style: getGuideStyle(
+								levels,
+								guideStepPx,
+								styleCache,
+								activeKey,
+								activeLayers,
+							),
 						},
 					}),
 				);
@@ -290,18 +394,25 @@ function createIndentGuidesPlugin(
 			lastCharWidth = 0;
 			lastTabSize = 4;
 			lastIndentUnit = 4;
+			activeLine = -1;
 
 			constructor(view: EditorView) {
 				const { state } = view;
 				this.lastCharWidth = view.defaultCharacterWidth;
 				this.lastTabSize = getTabSize(state);
 				this.lastIndentUnit = getIndentUnitColumns(state);
+				if (config.highlightActiveGuide) {
+					this.activeLine = state.doc.lineAt(
+						state.selection.main.head,
+					).number;
+				}
 
 				this.decorations = buildDecorations(
 					view,
 					config,
 					this.lineCache,
 					this.styleCache,
+					this.activeLine,
 				);
 			}
 
@@ -317,6 +428,18 @@ function createIndentGuidesPlugin(
 
 				if (update.viewportChanged) {
 					needsRebuild = true;
+				}
+
+				// active guide follows the cursor's line (only
+				// rebuild when the LINE changes, not every keystroke)
+				if (config.highlightActiveGuide) {
+					const headLine = state.doc.lineAt(
+						state.selection.main.head,
+					).number;
+					if (headLine !== this.activeLine) {
+						this.activeLine = headLine;
+						needsRebuild = true;
+					}
 				}
 
 				const currentTabSize = getTabSize(state);
@@ -346,6 +469,7 @@ function createIndentGuidesPlugin(
 						config,
 						this.lineCache,
 						this.styleCache,
+						this.activeLine,
 					);
 				}
 			}
@@ -375,12 +499,15 @@ const indentGuidesTheme = EditorView.baseTheme({
 	},
 	"&": {
 		"--indent-guide-color": "rgba(128, 128, 128, 0.25)",
+		"--indent-guide-active-color": "rgba(128, 128, 128, 0.65)",
 	},
 	"&light": {
 		"--indent-guide-color": "rgba(0, 0, 0, 0.1)",
+		"--indent-guide-active-color": "rgba(0, 0, 0, 0.4)",
 	},
 	"&dark": {
 		"--indent-guide-color": "rgba(255, 255, 255, 0.1)",
+		"--indent-guide-active-color": "rgba(255, 255, 255, 0.4)",
 	},
 });
 
