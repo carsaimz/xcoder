@@ -1,0 +1,72 @@
+name: Announce release on the site (forum post)
+
+# Roadmap v1.5.x item 4 — quando uma release estável é publicada, um
+# anúncio é postado automaticamente no fórum do site
+# (xcoderapp.vercel.app) via /api/announcements/release.
+#
+# Requer o secret RELEASE_WEBHOOK_SECRET (mesmo valor do env
+# RELEASE_WEBHOOK_SECRET na Vercel). Sem o secret, o job avisa e sai
+# verde — anúncio é um extra, nunca um bloqueio.
+#
+# Releases marcadas como pre-release não geram anúncio.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versão a anunciar (ex.: 1.5.2)"
+        required: false
+      body:
+        description: "Corpo do anúncio (markdown)"
+        required: false
+
+permissions: {}
+
+concurrency:
+  group: release-announce-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  announce:
+    name: Post release announcement
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip pre-releases
+        if: github.event_name == 'release' && github.event.release.prerelease == true
+        run: |
+          echo "Pre-release — sem anúncio no fórum."
+          echo "SKIP=true" >> "$GITHUB_ENV"
+
+      - name: Build announcement payload
+        if: env.SKIP != 'true'
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
+          VERSION="${VERSION#v}"
+          BODY="${{ github.event.release.body || github.event.inputs.body }}"
+          URL="${{ github.event.release.html_url }}"
+          jq -n --arg v "$VERSION" --arg b "$BODY" --arg u "$URL" \
+            '{version: $v, body: $b, url: $u}' > payload.json
+          echo "payload:"; cat payload.json
+
+      - name: POST to the site
+        if: env.SKIP != 'true'
+        continue-on-error: true
+        env:
+          SECRET: ${{ secrets.RELEASE_WEBHOOK_SECRET }}
+        run: |
+          if [ -z "$SECRET" ]; then
+            echo "::warning::RELEASE_WEBHOOK_SECRET não configurado — anúncio pulado (configure no repo e na Vercel)."
+            exit 0
+          fi
+          code=$(curl -sS -o response.json -w "%{http_code}" \
+            -X POST "https://xcoderapp.vercel.app/api/announcements/release" \
+            -H "Content-Type: application/json" \
+            -H "x-release-secret: $SECRET" \
+            --data @payload.json) || code=000
+          echo "HTTP $code"; cat response.json || true
+          case "$code" in
+            200) echo "Anúncio publicado ✓" ;;
+            *)   echo "::warning::Anúncio não publicado (HTTP $code) — ver RELEASE_WEBHOOK_SECRET / RELEASE_BOT_USER_ID no site." ;;
+          esac

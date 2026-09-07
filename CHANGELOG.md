@@ -4,6 +4,81 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.5.2] - 2026-09-07
+
+### Changed — chat de IA
+- **Faixa do chat invertida e melhorada**: o NOME DO MODELO vem primeiro
+  (negrito, cor primária) e o logo do provedor vem depois; a faixa rola
+  na horizontal (sem barra visível) quando o nome é longo — as pílulas
+  de suporte (texto/imagem/vídeo/agentes) nunca mais ficam escondidas
+- **Logos reais dos provedores** (16 marcas): OpenAI, Google Gemini,
+  Anthropic, DuckDuckGo, Hugging Face, Cloudflare, NVIDIA, Perplexity,
+  OpenRouter, GitHub Models, Mistral, DeepSeek, Z.ai, Groq, Azure OpenAI
+  (multicoloridos preservados) — na faixa do chat e nos cartões da página
+  de Provedores; marcas monocromáticas seguem a cor do tema
+
+### Fixed — compositor e chat
+- **Pílulas "Pensar" e "Buscar" agora desligam de verdade**: as chaves
+  `aiShowThinking`/`aiWebTools` não existiam nos defaults do settings e
+  `settings.update()` descartava silenciosamente chaves desconhecidas —
+  o estado voltava a "ativo" e o agente ignorava o toggle; o checkbox
+  "Busca na web" da página de IA também não tinha handler e agora persiste
+- **Copiar mensagem volta a funcionar** (falhava sobretudo em mensagens
+  da IA): nova cascata `writeClipboard` — plugin nativo cordova-clipboard →
+  Clipboard API → fallback `execCommand` com textarea oculta (a Clipboard
+  API do WebView rejeita com NotAllowedError em vários aparelhos)
+
+### Fixed — editor
+- Botões ←/→ do histórico de abas: continuam visíveis quando "mortos"
+  (esmaecidos em vez de `disabled` com `pointer-events:none`) e um toque
+  neles mostra toast "Sem mais abas atrás/adiante no histórico" — os
+  atalhos Alt-←/Alt-→ também dão feedback
+
+### Changed — erros de IA/provedores traduzidos
+- `explainError` + `friendlyError` agora passam por `window.strings` com
+  placeholders `{name}`/`{model}`/`{provider}`/`{status}` interpolados
+  (antes o utilizador via "{name}" literal em strings pt e texto cru em
+  inglês nos casos sem tradução)
+- Novas branches localizadas: rede sem conexão, pedido cancelado, erro
+  genérico do provedor, "No API key configured", máximo de passos, erros
+  de ferramentas/subagentes e o diálogo de permissão do agente
+- `PROVIDER_NAMES` completo (16 provedores faltantes; "gemini" → "google")
+- Toast de modelos usa `explainError` (erros HTTP explicados em pt)
+
+### Fixed — terminal (Alpine de volta sem desinstalar)
+- **Auto-cura do modo FailSafe**: o servidor AXS guarda um marcador de
+  modo (`axs-mode`); se estiver a correr em modo diferente do ajuste atual
+  (ex.: shell Android de uma sessão antiga com FailSafe ligado), o terminal
+  reinicia-o — o Alpine proot volta sem "Uninstall"
+- Banner no terminal quando o modo FailSafe está ativo, explicando porquê
+  e como desligar
+- Extração do rootfs verificada (`bin/busybox`): falha do `tar` não mente
+  mais com marcador `.extracted` saudável — o erro manda reinstalar
+
+### Added
+- **Guia de indentação ativa** (roadmap v1.5.x item 2, opt-in em
+  Configurações › Editor › Guias): destaca as guias do bloco que contém a
+  linha atual, estilo VSCode — varredura limitada de ancestrais, linhas
+  em branco resolvidas, indentações desalinhadas ignoradas
+- **Anúncio automático de release** (item 4): workflow `release-announce`
+  publica o anúncio no fórum do site quando uma release estável sai
+  (`/api/announcements/release` no site, segredo partilhado + conta bot,
+  idempotente por versão; pre-releases não anunciam)
+
+### Tests
+- +29 testes (553 → 582): `v152QuickFixes` (21 — faixa, logos, clipboard,
+  toggles, botões do histórico, erros localizados, cura do terminal) e
+  `activeIndentGuide` (8 — algoritmo puro de blocos ancestrais)
+- Validado com o harness de boot em bundle de produção (10/10 apps)
+
+### Site (xcoder-web)
+- **Perfil com sessão corrigido**: `useDashUser` subscreve
+  `onAuthStateChange` — entrar pela própria página /user (ou noutro separa-
+  dor) agora atualiza o gate; logout também limpa
+- **Site 100% bilíngue na última milha** (item 1): /user/*, submissão de
+  plugins, tópico do fórum, corpo dos posts do blog e das docs (variantes
+  EN em content/{docs,blog}/en/, troca no cliente com SSG)
+
 ## [1.5.1] - 2026-09-07
 
 ### Fixed
