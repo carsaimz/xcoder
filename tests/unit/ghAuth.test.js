@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
         GH_SCOPES,
         fetchGhUser,
+        isGitHubAppClientId,
         pollForToken,
         requestDeviceCode,
         signInWithGitHub,
@@ -27,6 +28,27 @@ describe("ghAuth: requestDeviceCode", () => {
 
         it("rejects a missing client id", async () => {
                 await expect(requestDeviceCode("")).rejects.toThrow("client id");
+        });
+
+        it("detects GitHub App client ids (Ov23li/Iv1.) vs classic OAuth Apps", () => {
+                expect(isGitHubAppClientId("Ov23liUF4sGyfo278bN8")).toBe(true);
+                expect(isGitHubAppClientId("Iv1.16e28e9db2a03bd6")).toBe(true);
+                expect(isGitHubAppClientId("cid123")).toBe(false);
+                expect(isGitHubAppClientId("")).toBe(false);
+                expect(isGitHubAppClientId(null)).toBe(false);
+        });
+
+        it("omits the scope parameter for GitHub App client ids (permissions come from app settings)", async () => {
+                const fetchMock = vi.fn(async () =>
+                        jsonRes({ device_code: "dev-app", user_code: "APP-0001" }),
+                );
+                vi.stubGlobal("fetch", fetchMock);
+
+                await requestDeviceCode("Ov23liUF4sGyfo278bN8");
+
+                const [, init] = fetchMock.mock.calls[0];
+                expect(init.body).toContain("client_id=Ov23liUF4sGyfo278bN8");
+                expect(init.body).not.toContain("scope=");
         });
 
         it("requests a device code with client_id and default scopes", async () => {

@@ -4,6 +4,40 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.5.4] - 2026-09-07
+
+### GitHub App oficial
+- **Chaves oficiais integradas**: o Client ID do GitHub App do mantenedor
+  (`Ov23li…`) agora vem embutido no app (`config.GH_OAUTH_CLIENT_ID`) —
+  "Entrar com um código" (Device Flow) sai de fábrica, sem PAT e sem
+  criação de clientes próprios
+- **Device Flow entende GitHub Apps**: client ids `Ov23li…`/`Iv1.` não
+  enviam o parâmetro `scope` (as permissões do token do usuário vêm das
+  configurações do app no GitHub); OAuth Apps clássicos continuam
+  enviando os escopos de sempre
+- Guia `docs/github-oauth-app.md` atualizado com o app real: ativar
+  **Enable Device Flow**, permissões recomendadas (Contents/Pull
+  requests/Workflows: read & write), papel do **client secret** (guardado
+  pelo mantenedor, fora do repo — o Device Flow não usa), **webhook**
+  (pode ficar Inactive) e **bot user id** (automático, `<slug>[bot]`)
+
+### Model picker com logos (roadmap v1.6.x item 5)
+- **Novo seletor de modelos próprio** (o select nativo era texto-only):
+  lista com **logo real de cada marca**, badge **grátis/pago**, o modelo
+  atual marcado com ✓ e **busca instantânea** — digite para filtrar;
+  grupos sem resultados desaparecem
+- A busca ao vivo (⟳) também usa o novo picker: os modelos vindos da API
+  do provedor (até 300) agora são filtráveis por texto
+- Os atalhos "Buscar modelos disponíveis" e "Digitar id manualmente"
+  viraram ações do rodapé; provedores sem chave continuam visíveis mas
+  desabilitados (nunca dá erro de endpoint por escolha inválida)
+- Novo componente `components/modelPicker` no padrão dos dialogs
+  (actionStack/máscara/tema) com helpers puros testáveis
+
+### Tests
+- +18 testes (device flow sem `scope` para GitHub Apps, filtro e logos
+  do picker, wiring do chat, placeholders de tradução) — 611 no total
+
 ## [1.5.3] - 2026-09-07
 
 ### Changed

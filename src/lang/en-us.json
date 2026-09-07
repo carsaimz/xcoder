@@ -1104,6 +1104,7 @@
         "ai provider key cleared": "Key cleared — using global",
         "ai provider url default": "Provider default",
         "ai model manual": "Type model id manually",
+        "ai model search": "Search models",
         "ai mode switch chat": "Switch to Chat (no tools)",
         "ai mode switch agent": "Switch to Agent (tools)",
         "advanced": "Advanced",

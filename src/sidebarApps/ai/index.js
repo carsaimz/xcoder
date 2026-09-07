@@ -1,6 +1,7 @@
 import "./style.scss";
 import fsOperation from "fileSystem";
 import Contextmenu from "components/contextmenu";
+import modelPicker from "components/modelPicker";
 import Sidebar from "components/sidebar";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
@@ -1917,8 +1918,6 @@ async function openModelPicker() {
 	const typeFree = strings["ai model free"] || "free";
 	const typePaid = strings["ai model paid"] || "paid";
 	const keyNeeded = strings["ai provider key needed"] || "API key needed";
-	const mark = (model, providerId) =>
-		model === current && providerId === activeId ? `✓ ${model}` : model;
 
 	/** model ids of one provider: remembered model first, then catalog */
 	const modelsOf = (provider) => {
@@ -1940,35 +1939,47 @@ async function openModelPicker() {
 		...providers.filter((provider) => provider.id !== activeId),
 	];
 
-	/** @type {any[]} flat select items, separated by provider headers */
+	/** @type {any[]} picker items grouped under provider headers */
 	const items = [];
 	const meta = new Map();
 	for (const provider of order) {
 		const ok = usable(provider);
 		items.push({
+			header: true,
+			providerId: provider.id,
 			text: `${provider.name}${ok ? "" : ` — ${keyNeeded}`}`,
-			className: "group-header",
 		});
-		for (const model of modelsOf(provider).slice(0, 12)) {
-			const type = modelType(provider, model) === "free" ? typeFree : typePaid;
+		for (const model of modelsOf(provider).slice(0, 60)) {
 			const value = `${provider.id}::${model}`;
 			items.push({
 				value: ok ? value : undefined,
 				disabled: !ok,
-				text: `${mark(model, provider.id)} (${type})`,
+				providerId: provider.id,
+				text: model,
+				type: modelType(provider, model),
+				selected: model === current && provider.id === activeId,
 			});
 			if (ok) meta.set(value, { providerId: provider.id, model });
 		}
 	}
 
-	const fetchLabel = strings["ai fetch models"] || "Fetch available models";
-	const manualLabel = strings["ai model manual"] || "Type model id manually";
-	items.push(
-		{ value: "__fetch__", text: `⟳ ${fetchLabel}` },
-		{ value: "__manual__", text: manualLabel },
-	);
-
-	const choice = await select(strings["ai model"] || "Model", items);
+	const choice = await modelPicker({
+		title: strings["ai model"] || "Model",
+		placeholder: strings["ai model search"] || "Search models",
+		items,
+		freeLabel: typeFree,
+		paidLabel: typePaid,
+		actions: [
+			{
+				value: "__fetch__",
+				text: strings["ai fetch models"] || "Fetch available models",
+			},
+			{
+				value: "__manual__",
+				text: strings["ai model manual"] || "Type model id manually",
+			},
+		],
+	});
 	if (!choice) return;
 
 	if (choice === "__fetch__") {
@@ -2040,24 +2051,27 @@ async function pickModelLive() {
 		const current = resolveModel(provider.id);
 		const items = [
 			{
+				header: true,
+				providerId: provider.id,
 				text: `${provider.name} · ${Math.min(models.length, 300)} ${
 					strings["ai models count"] || "models available"
 				}`,
-				className: "group-header",
 			},
-			...models.slice(0, 300).map((model) => {
-				const type =
-					modelType(provider, model) === "free" ? typeFree : typePaid;
-				return {
-					value: model,
-					text: `${model === current ? "✓ " : ""}${model} (${type})`,
-				};
-			}),
+			...models.slice(0, 300).map((model) => ({
+				value: model,
+				providerId: provider.id,
+				text: model,
+				type: modelType(provider, model),
+				selected: model === current,
+			})),
 		];
-		const selected = await select(
-			`${strings["ai model"] || "Model"} — ${provider.name}`,
+		const selected = await modelPicker({
+			title: `${strings["ai model"] || "Model"} — ${provider.name}`,
+			placeholder: strings["ai model search"] || "Search models",
 			items,
-		);
+			freeLabel: typeFree,
+			paidLabel: typePaid,
+		});
 		if (selected) {
 			await setProviderModel(provider.id, selected);
 			if (settings.value.aiProvider !== provider.id) {

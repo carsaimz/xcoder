@@ -1,10 +1,12 @@
 /**
  * GitHub OAuth Device Flow sign-in (RFC 8628).
  *
- * Works with any GitHub OAuth App that has "Device Flow" enabled — only the
- * client_id is required (no client secret, no backend). The user opens
- * https://github.com/login/device in a browser, enters the displayed code
- * and the app polls for the access token.
+ * Works with both GitHub OAuth Apps and GitHub Apps that have "Device
+ * Flow" enabled — only the client_id is required (no client secret, no
+ * backend). The user opens https://github.com/login/device in a browser,
+ * enters the displayed code and the app polls for the access token.
+ * GitHub Apps (client ids "Ov23li"/"Iv1.") do NOT take a scope: the
+ * user-token permissions come from the app settings on GitHub.
  *
  * HTTP strategy: github.com endpoints do NOT send CORS headers, so inside
  * the Cordova webview we use the native cordova-plugin-advanced-http
@@ -16,7 +18,7 @@ const DEVICE_CODE_URL = "https://github.com/login/device/code";
 const TOKEN_URL = "https://github.com/login/oauth/access_token";
 const USER_URL = "https://api.github.com/user";
 
-/** Default scopes: full repo access, workflow files, gists and profile. */
+/** Default scopes (classic OAuth Apps only): repo, workflow, gists, profile. */
 export const GH_SCOPES = ["repo", "workflow", "gist", "read:user"];
 
 /**
@@ -96,8 +98,18 @@ function cordovaPost(url, params) {
 }
 
 /**
+ * Detects a GitHub App client id (vs a classic OAuth App one). GitHub
+ * App client ids start with "Iv1." (legacy) or "Ov23li" (current).
+ * @param {string} clientId
+ * @returns {boolean}
+ */
+export function isGitHubAppClientId(clientId) {
+	return /^(Iv1\.|Ov23li)/.test(String(clientId || ""));
+}
+
+/**
  * Step 1 of the device flow: request a device + user code.
- * @param {string} clientId OAuth App client id
+ * @param {string} clientId OAuth App / GitHub App client id
  * @param {{scopes?: string[], fetchImpl?: typeof fetch}} [opts]
  * @returns {Promise<{deviceCode: string, userCode: string, verificationUri: string, expiresIn: number, interval: number}>}
  */
@@ -107,14 +119,15 @@ export async function requestDeviceCode(
 ) {
 	if (!clientId) throw new Error("Missing GitHub OAuth App client id");
 
-	const { data } = await postForm(
-		DEVICE_CODE_URL,
-		{
-			client_id: clientId,
-			scope: scopes.join(" "),
-		},
-		fetchImpl,
-	);
+	// GitHub Apps (client ids "Ov23li"/"Iv1.") do not take a scope — their
+	// user tokens get the permissions configured in the app settings on
+	// GitHub. Only classic OAuth Apps accept scopes here.
+	const params = { client_id: clientId };
+	if (!isGitHubAppClientId(clientId)) {
+		params.scope = scopes.join(" ");
+	}
+
+	const { data } = await postForm(DEVICE_CODE_URL, params, fetchImpl);
 
 	if (!data?.device_code) {
 		throw new Error(

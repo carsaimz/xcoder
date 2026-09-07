@@ -63,9 +63,9 @@ describe("shared sign-in flow", () => {
                 );
         });
 
-        it("config exposes the built-in client id slot (empty until keys ship)", () => {
+        it("config embeds the official GitHub App client id (Ov23li*)", () => {
                 const config = read("src/lib/config.js");
-                expect(config).toMatch(/const GH_OAUTH_CLIENT_ID = "";/);
+                expect(config).toMatch(/const GH_OAUTH_CLIENT_ID = "Ov23li[^"]+";/);
                 expect(config).toMatch(/\tGH_OAUTH_CLIENT_ID,/);
         });
 });

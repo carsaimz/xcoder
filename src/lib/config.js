@@ -15,12 +15,14 @@ const SUPABASE_PUBLISHABLE_KEY =
 	"sb_publishable_9VuPlcfnLD-BkGMuVD3D1w_4BtZPqvi";
 
 /**
- * Client id of the OFFICIAL XCoder GitHub OAuth App (Device Flow). A
- * client id is public by design; the device flow never needs a client
- * secret nor a backend. Empty until the app owner ships the credentials
- * — users can always sign in with a personal access token (PAT).
+ * Client id of the OFFICIAL XCoder GitHub App (Device Flow). A client id
+ * is public by design; the device flow never needs a client secret nor a
+ * backend. GitHub Apps ignore the "scope" parameter — user-token
+ * permissions come from the app settings on GitHub (Contents/Workflows/
+ * Pull requests: read & write). Users can always fall back to a personal
+ * access token (PAT).
  */
-const GH_OAUTH_CLIENT_ID = "";
+const GH_OAUTH_CLIENT_ID = "Ov23liUF4sGyfo278bN8";
 
 let hasPro = true; // all features are unlocked in XCoder
 

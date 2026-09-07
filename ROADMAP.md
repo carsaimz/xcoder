@@ -6,8 +6,14 @@
 > [Acode](https://github.com/Acode-Foundation/Acode) (CHANGELOG lido por
 > completo até a v1.13.3).
 
-## ✅ Concluído até a v1.5.3
+## ✅ Concluído até a v1.5.4
 
+- **v1.5.4 — GitHub App oficial + model picker com logos:** o Client ID
+  do GitHub App do mantenedor vem embutido (Device Flow de fábrica, sem
+  clientes próprios; GitHub Apps não usam `scope`) e o seletor de
+  modelos ganhou picker próprio: logo real por marca, badge grátis/pago,
+  ✓ no modelo atual e busca instantânea (grupos vazios somem);
+  +18 testes (611)
 - **v1.5.3 — polimento de UI + GitHub sem clientes próprios:** botões
   ←/→ removidos do header (Alt-←/→ e paleta mantidos); suportes de IA
   (texto/imagem/vídeo/agentes) em linha própria **abaixo** do modelo,
@@ -56,23 +62,20 @@
    atribuição separada editor/app (Acode v1.11.6/v1.12.0).
 4. **Onboarding do terminal** — primeira execução mostra o que é o Alpine,
    o que é FailSafe e um botão "reinstalar ambiente" (hoje só o banner).
-5. **Seletor de modelos com logos** — o select nativo do picker é
-   texto-only; migrar para um picker próprio (lista com logo, badge
-   free/pago e busca) reutilizando os SVGs de `providerLogos.js`.
 
 ## 🚀 Depois (v1.7+)
 
-6. **Mais plugins portados do Acode** 💡 — linter, formatter (Prettier/
+5. **Mais plugins portados do Acode** 💡 — linter, formatter (Prettier/
    Ruff), compilador Sass ao vivo, runner avançado, visualizador de
    documentos.
-7. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar,
+6. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar,
    segredos seguros, ratings, exposição de pacotes CM6.
-8. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
+7. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
    anúncios; horário silencioso (Acode v1.12.0 #1918 / v1.11.8 #1779).
-9. **Novos idiomas** — a infra bilíngue pt/en do site e do app abre caminho
+8. **Novos idiomas** — a infra bilíngue pt/en do site e do app abre caminho
    para es/fr (dicionários por área já estão modularizados).
-10. **Painel do bot de release** — administrar os posts automáticos
-    (editar/apagar o anúncio do release) na área /admin do site.
+9. **Painel do bot de release** — administrar os posts automáticos
+   (editar/apagar o anúncio do release) na área /admin do site.
 
 ## 🧭 Direção contínua
 

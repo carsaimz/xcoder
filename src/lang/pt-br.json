@@ -1221,6 +1221,7 @@
         "ai provider key cleared": "Chave limpa — usando a global",
         "ai provider url default": "Padrão do provedor",
         "ai model manual": "Digitar id do modelo manualmente",
+        "ai model search": "Buscar modelos",
         "ai mode switch chat": "Mudar para Chat (sem ferramentas)",
         "ai mode switch agent": "Mudar para Agente (com ferramentas)",
         "advanced": "Avançado",
