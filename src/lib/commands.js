@@ -338,7 +338,11 @@ export default {
 		files[fileIndex].makeActive();
 	},
 	"next-file-history"() {
-		editorManager.openNextEditorFromHistory?.();
+		if (!editorManager.openNextEditorFromHistory?.()) {
+			toast(
+				strings["no tab history next"] || "Sem mais abas adiante no histórico",
+			);
+		}
 	},
 	async open(page) {
 		switch (page) {
@@ -419,7 +423,11 @@ export default {
 		files[fileIndex].makeActive();
 	},
 	"prev-file-history"() {
-		editorManager.openPreviousEditorFromHistory?.();
+		if (!editorManager.openPreviousEditorFromHistory?.()) {
+			toast(
+				strings["no tab history prev"] || "Sem mais abas atrás no histórico",
+			);
+		}
 	},
 	"read-only"() {
 		const file = editorManager.activeFile;

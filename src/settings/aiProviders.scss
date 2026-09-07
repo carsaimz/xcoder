@@ -184,6 +184,23 @@
                 &.g-premium {
                         background: linear-gradient(135deg, #ffb74d, #f57c00);
                 }
+
+                // real brand SVG replaces the letter — no group background,
+                // logo fills the tile (multicolor marks keep their colors,
+                // monochrome marks take the tile color from the inline style)
+                &.svg {
+                        background: color-mix(
+                                in srgb,
+                                var(--primary-text-color) 6%,
+                                transparent
+                        );
+
+                        svg {
+                                width: 22px;
+                                height: 22px;
+                                display: block;
+                        }
+                }
         }
 
         .ai-pcard-text {

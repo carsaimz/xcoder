@@ -1,7 +1,7 @@
 import "./style.scss";
-import Sidebar from "components/sidebar";
 import fsOperation from "fileSystem";
 import Contextmenu from "components/contextmenu";
+import Sidebar from "components/sidebar";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
@@ -1224,11 +1224,50 @@ function messageText($wrap) {
  * @param {string} text
  */
 async function copyMessageText(text) {
+	if (await writeClipboard(text)) {
+		toast(strings.copied || "Copiado ✓", 1500);
+	} else {
+		toast(strings["copy failed"] || "Não foi possível copiar", 2500);
+	}
+}
+
+/**
+ * Writes text to the clipboard using the best available backend:
+ * native cordova plugin → async Clipboard API → hidden-textarea fallback
+ * (the async Clipboard API is unreliable inside the Cordova WebView and
+ * fails with NotAllowedError on several devices, which made copying AI
+ * messages fail randomly).
+ * @param {string} text
+ * @returns {Promise<boolean>} whether the write succeeded
+ */
+async function writeClipboard(text) {
+	try {
+		if (cordova?.plugins?.clipboard) {
+			cordova.plugins.clipboard.copy(text);
+			return true;
+		}
+	} catch {
+		/* fall through to the web APIs */
+	}
 	try {
 		await navigator.clipboard.writeText(text);
-		toast(strings.copied || "Copiado ✓", 1500);
+		return true;
 	} catch {
-		toast(strings["copy failed"] || "Não foi possível copiar", 2500);
+		/* fall through to execCommand */
+	}
+	try {
+		const $ta = document.createElement("textarea");
+		$ta.value = text;
+		$ta.setAttribute("readonly", "");
+		$ta.style.cssText = "position:fixed;top:-999px;left:-999px;opacity:0";
+		document.body.appendChild($ta);
+		$ta.select();
+		$ta.setSelectionRange(0, text.length);
+		const ok = document.execCommand("copy");
+		$ta.remove();
+		return ok;
+	} catch {
+		return false;
 	}
 }
 
@@ -1817,6 +1856,7 @@ function updateModelButton() {
 		</span>
 	);
 	$providerStrip.content = [
+		<span className="ai-strip-model">{model}</span>,
 		<span
 			className={`ai-strip-logo${isLetter ? " letter" : ""}`}
 			style={isLetter ? { background: logo.color } : {}}
@@ -1824,7 +1864,6 @@ function updateModelButton() {
 		>
 			{logo.glyph}
 		</span>,
-		<span className="ai-strip-model">{model}</span>,
 		chip("ai cap text", caps.text, "text"),
 		chip("ai cap image", caps.image, "image"),
 		chip("ai cap video", caps.video, "videocam"),
@@ -1833,6 +1872,16 @@ function updateModelButton() {
 			<span className="ai-strip-multi">+{enabledCount - 1}</span>
 		) : null,
 	];
+	// Real brand SVG (when available) replaces the emoji/letter glyph
+	const $logoEl = $providerStrip.querySelector(".ai-strip-logo");
+	if ($logoEl && logo.svg) {
+		$logoEl.classList.add("svg");
+		$logoEl.textContent = "";
+		if (logo.svg.includes("currentColor")) {
+			$logoEl.style.color = logo.color || "";
+		}
+		$logoEl.innerHTML = logo.svg;
+	}
 	$providerStrip.title =
 		strings["ai strip hint"] || "Active provider and model — tap to change";
 }
@@ -2012,7 +2061,7 @@ async function pickModelLive() {
 			toast(selected, 2000);
 		}
 	} catch (error) {
-		toast(`models: ${error.message || error}`);
+		toast(explainError(error, settings.value.aiProvider));
 	}
 }
 
@@ -2330,14 +2379,8 @@ export async function codeBlockActions(code) {
  * @param {string} text
  */
 async function copyToClipboard(text) {
-	try {
-		if (cordova?.plugins?.clipboard) {
-			cordova.plugins.clipboard.copy(text);
-			return;
-		}
-		await navigator.clipboard.writeText(text);
-	} catch (error) {
-		toast(`clipboard: ${error.message || error}`);
+	if (!(await writeClipboard(text))) {
+		toast(strings["copy failed"] || "Não foi possível copiar");
 	}
 }
 

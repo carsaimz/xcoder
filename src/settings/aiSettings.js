@@ -180,6 +180,10 @@ export default function aiSettings() {
 					await settings.update({ aiShowThinking: Boolean(value) });
 					return;
 				}
+				if (key === "aiWebTools") {
+					await settings.update({ aiWebTools: Boolean(value) });
+					return;
+				}
 				if (key === "aiSkills") {
 					const { default: showSkillsSettings } = await import(
 						"./aiSkillsSettings"

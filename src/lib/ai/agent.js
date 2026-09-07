@@ -189,6 +189,7 @@ export class Agent {
 			!/localhost|127\.0\.0\.1/.test(config.baseURL)
 		) {
 			const message =
+				window.strings?.["ai err no key"] ||
 				'No API key configured. Open Settings > AI assistant to add one — or pick the keyless "Pollinations" provider.';
 			this.onEvent({ type: "error", payload: message });
 			return message;
@@ -214,7 +215,9 @@ export class Agent {
 					messages: this.messages,
 				});
 			} catch (error) {
-				const message = `AI request failed: ${friendlyError(error, config)}`;
+				const message = `${
+					window.strings?.["ai request failed"] || "AI request failed"
+				}: ${friendlyError(error, config)}`;
 				this.onEvent({ type: "error", payload: message });
 				return message;
 			}
@@ -268,6 +271,7 @@ export class Agent {
 
 		if (!this.aborted) {
 			const message =
+				window.strings?.["ai max steps"] ||
 				"Reached the maximum number of steps for this task. Ask me to continue if needed.";
 			this.onEvent({ type: "error", payload: message });
 			return message;
@@ -445,11 +449,13 @@ export class Agent {
 		try {
 			args = JSON.parse(call.function?.arguments || "{}");
 		} catch (error) {
-			return `ERROR: invalid tool arguments (${error.message})`;
+			return `${
+				window.strings?.["ai err tool args"] || "ERROR: invalid tool arguments"
+			} (${error.message})`;
 		}
 
 		if (!(await this.requestPermission(name, args))) {
-			return "DENIED by user.";
+			return window.strings?.["ai tool denied"] || "DENIED by user.";
 		}
 
 		this.onEvent({
@@ -488,7 +494,11 @@ export class Agent {
 		const summary = JSON.stringify(args);
 		return confirm(
 			`AI: ${name}`,
-			`The AI agent wants to run <b>${name}</b><br /><br /><code style="font-size: 10px">${escapeHtml(truncate(summary, 600))}</code>`,
+			(
+				window.strings?.["ai tool dialog body"] ||
+				"The AI agent wants to run <b>{name}</b>"
+			).replace(/{name}/g, name) +
+				`<br /><br /><code style="font-size: 10px">${escapeHtml(truncate(summary, 600))}</code>`,
 			true,
 		);
 	}
@@ -539,7 +549,12 @@ export class Agent {
  */
 export async function runSubagent(args, parent) {
 	const task = String(args?.task || "").trim();
-	if (!task) return "ERROR: subagent requires a task";
+	if (!task) {
+		return (
+			window.strings?.["ai err subagent task"] ||
+			"ERROR: subagent requires a task"
+		);
+	}
 
 	const subagent = new Agent({
 		isSubagent: true,
@@ -593,7 +608,10 @@ export async function runSubagentsParallel(args, parent) {
 	if (subtasks.length < 2) {
 		// single subtask — degrade gracefully to the simple path
 		if (subtasks.length === 1) return runSubagent(subtasks[0], parent);
-		return "ERROR: spawn_subagents requires a 'subtasks' array (2-5 entries)";
+		return (
+			window.strings?.["ai err subagents args"] ||
+			"ERROR: spawn_subagents requires a 'subtasks' array (2-5 entries)"
+		);
 	}
 
 	parent?.onEvent({
@@ -787,6 +805,16 @@ function httpStatus(message) {
  * @param {object} config aiConfig() result
  * @returns {string}
  */
+/**
+ * Fills {placeholders} in a localized template ("{name} rejeitou..." etc).
+ * When a localized string exists for the base key it wins over the passed
+ * fallback (which is the raw/pt-br default); guarded for window-less runtimes.
+ */
+const fillTemplate = (template, values) =>
+	String(template || "").replace(/\{(\w+)\}/g, (match, key) =>
+		values[key] != null ? values[key] : match,
+	);
+
 function friendlyError(error, config) {
 	const raw = String(error?.message || error);
 	const status = httpStatus(raw);
@@ -800,8 +828,11 @@ function friendlyError(error, config) {
 
 	if (status === 401 || status === 403) {
 		return (
-			(window.strings?.["ai err auth"] ||
-				`Authentication failed on ${name}. Check its API key on Settings > AI > Providers.`) +
+			fillTemplate(
+				window.strings?.["ai err auth"] ||
+					`Authentication failed on {name}. Check its API key on Settings > AI > Providers.`,
+				{ name },
+			) +
 			(shape
 				? ` ${shape}.`
 				: ` ${window.strings?.["ai err key in use"] || "Key in use:"} ${keyHint}.`) +
@@ -813,47 +844,77 @@ function friendlyError(error, config) {
 		/invalid api key|invalid_api_key|incorrect api key/i.test(raw)
 	) {
 		return (
-			(window.strings?.["ai err key invalid"] ||
-				`${name} rejected the API key as invalid. Re-copy the key (no spaces/quotes) on Settings > AI > Providers.`) +
-			` (${raw.slice(0, 160)})`
+			fillTemplate(
+				window.strings?.["ai err key invalid"] ||
+					`${name} rejected the API key as invalid. Re-copy the key (no spaces/quotes) on Settings > AI > Providers.`,
+				{ name },
+			) + ` (${raw.slice(0, 160)})`
 		);
 	}
 	if (status === 404) {
 		if (/model not found|model_not_found|no such model/i.test(raw)) {
 			return (
-				(window.strings?.["ai err model missing"] ||
-					`Model "${config.model}" does not exist on ${name}. Open the model picker (⟳ Fetch available models) and pick a current one.`) +
-				` (${raw.slice(0, 160)})`
+				fillTemplate(
+					window.strings?.["ai err model missing"] ||
+						`Model "${config.model}" does not exist on ${name}. Open the model picker (⟳ Fetch available models) and pick a current one.`,
+					{ name, model: config.model },
+				) + ` (${raw.slice(0, 160)})`
 			);
 		}
 		return (
-			(window.strings?.["ai err endpoint"] ||
-				`Endpoint not found on ${name} — verify the Base URL.`) +
-			` (${raw.slice(0, 160)})`
+			fillTemplate(
+				window.strings?.["ai err endpoint"] ||
+					`Endpoint not found on {name} — verify the Base URL.`,
+				{ name },
+			) + ` (${raw.slice(0, 160)})`
 		);
 	}
 	if (status === 429) {
 		return (
-			(window.strings?.["ai err rate"] ||
-				`Rate limit / quota reached on ${name}. Wait a bit or check your plan.`) +
-			` (${raw.slice(0, 160)})`
+			fillTemplate(
+				window.strings?.["ai err rate"] ||
+					`Rate limit / quota reached on {name}. Wait a bit or check your plan.`,
+				{ name },
+			) + ` (${raw.slice(0, 160)})`
 		);
 	}
 	if (status === 400 && /model|endpoint|decommission/i.test(raw)) {
 		return (
-			(window.strings?.["ai err model"] ||
-				`Model "${config.model}" was rejected by ${name}. Pick another model — the provider default will be tried automatically.`) +
-			` (${raw.slice(0, 160)})`
+			fillTemplate(
+				window.strings?.["ai err model"] ||
+					`Model "${config.model}" was rejected by {name}. Pick another model — the provider default will be tried automatically.`,
+				{ name, model: config.model },
+			) + ` (${raw.slice(0, 160)})`
 		);
 	}
 	if (status === 400 && /tool|function/i.test(raw)) {
 		return (
-			(window.strings?.["ai err tools"] ||
-				`${name} rejected tool use for "${config.model}" — continuing without tools.`) +
-			` (${raw.slice(0, 160)})`
+			fillTemplate(
+				window.strings?.["ai err tools"] ||
+					`${name} rejected tool use for "${config.model}" — continuing without tools.`,
+				{ name, model: config.model },
+			) + ` (${raw.slice(0, 160)})`
 		);
 	}
-	return raw;
+	if (/aborted|canceled|cancelled/i.test(raw)) {
+		return window.strings?.["ai err aborted"] || "Pedido cancelado.";
+	}
+	if (
+		/failed to fetch|network request failed|networkerror|load failed|err_connection|err_name|timeout|timed out/i.test(
+			raw,
+		)
+	) {
+		return (
+			fillTemplate(
+				window.strings?.["ai err network"] ||
+					"Sem conexão com o provedor — verifique a internet e tente de novo.",
+				{ name },
+			) + ` (${raw.slice(0, 160)})`
+		);
+	}
+	return fillTemplate(window.strings?.["ai err generic"] || "{raw}", {
+		raw: raw.slice(0, 240),
+	});
 }
 
 export default Agent;

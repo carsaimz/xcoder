@@ -85,7 +85,8 @@
                 }
         }
 
-        // provider · model strip with capability chips
+        // provider · model strip with capability chips — scrolls sideways
+        // when long model names would otherwise hide the capability pills
         .ai-provider-strip {
                 display: flex;
                 align-items: center;
@@ -96,12 +97,18 @@
                 cursor: pointer;
                 min-height: 28px;
                 user-select: none;
+                overflow-x: auto;
+                scrollbar-width: none;
+
+                &::-webkit-scrollbar {
+                        display: none;
+                }
 
                 &:active {
                         background: color-mix(in srgb, var(--active-color) 10%, transparent);
                 }
 
-                // brand logo of the provider (emoji glyph or colored letter)
+                // brand logo of the provider (real SVG, emoji glyph or letter)
                 .ai-strip-logo {
                         display: inline-flex;
                         align-items: center;
@@ -120,6 +127,17 @@
                                 font-size: 10px;
                                 font-weight: 800;
                         }
+
+                        // real brand SVG — drop the pill background, fill the box
+                        &.svg {
+                                background: transparent;
+
+                                svg {
+                                        width: 100%;
+                                        height: 100%;
+                                        display: block;
+                                }
+                        }
                 }
 
                 .ai-strip-provider {
@@ -130,14 +148,14 @@
                         flex-shrink: 0;
                 }
 
+                // model name comes first (before the provider logo) and is
+                // never truncated — the strip scrolls horizontally instead
                 .ai-strip-model {
-                        font-size: 10.5px;
-                        color: var(--secondary-text-color, #999);
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: var(--primary-text-color);
                         white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        min-width: 0;
-                        flex-shrink: 1;
+                        flex-shrink: 0;
                 }
 
                 .ai-strip-multi {

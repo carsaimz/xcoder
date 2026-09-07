@@ -505,48 +505,84 @@ export function explainError(error, providerId) {
 	const message = String(error?.message || error || "");
 	const provider = providerId ? PROVIDER_NAMES[providerId] || providerId : "";
 	const status = /^(\d{3}):/.exec(message)?.[1];
+	const prefix = provider ? `${provider}: ` : "";
+	// localized template with {placeholders}, falling back to the pt-br text
+	// (typeof-guard: some runtimes — tests, workers — have no window)
+	const fill = (key, fallback, values = {}) =>
+		String(
+			(typeof window !== "undefined" && window.strings?.[key]) || fallback,
+		).replace(/\{(\w+)\}/g, (match, name) =>
+			values[name] != null ? values[name] : match,
+		);
 	if (status === "401" || status === "403") {
 		if (providerId === "pollinations") {
-			return (
-				'Built-in: a chave Pollinations guardada é inválida ou expirou ("invalid API key requested"). ' +
-				"O app ignorou a chave e usou o modo anônimo gratuito — para limpar, REMOVA a chave do " +
-				"provedor Built-in em Configurações › IA › Provedores (ou gere um token novo em enter.pollinations.ai/keys)."
+			return fill(
+				"ai err 401 pollinations",
+				'Built-in: a chave Pollinations guardada é inválida ou expirou ("invalid API key requested"). O app ignorou a chave e usou o modo anônimo gratuito — para limpar, REMOVA a chave do provedor Built-in em Configurações › IA › Provedores (ou gere um token novo em enter.pollinations.ai/keys).',
 			);
 		}
-		return (
-			`${provider ? `${provider}: ` : ""}Chave de API inválida, expirada ou sem permissão (${status}). ` +
-			`Abra Configurações › IA › Provedores e verifique/renove a chave deste provedor.`
+		return fill(
+			"ai err 401",
+			"{provider}Chave de API inválida, expirada ou sem permissão ({status}). Abra Configurações › IA › Provedores e verifique/renove a chave deste provedor.",
+			{ provider: prefix, status },
 		);
 	}
 	if (status === "402" || isPollinationsDeprecation(message)) {
 		if (providerId === "pollinations" || !providerId) {
-			return (
-				"Built-in (Pollinations): a API legada foi descontinuada para pedidos autenticados. " +
-				"O app já usa a nova API automaticamente — se o erro persistir, REMOVA a chave do " +
-				"provedor Built-in (não é necessária) ou gere uma nova em enter.pollinations.ai/keys."
+			return fill(
+				"ai err 402 pollinations",
+				"Built-in (Pollinations): a API legada foi descontinuada para pedidos autenticados. O app já usa a nova API automaticamente — se o erro persistir, REMOVA a chave do provedor Built-in (não é necessária) ou gere uma nova em enter.pollinations.ai/keys.",
 			);
 		}
-		return `${provider ? `${provider}: ` : ""}Saldo/credito insuficiente na conta do provedor (402).`;
+		return fill(
+			"ai err 402",
+			"{provider}Saldo/crédito insuficiente na conta do provedor (402).",
+			{ provider: prefix },
+		);
 	}
 	if (status === "404") {
-		return `${provider ? `${provider}: ` : ""}Modelo ou endpoint não encontrado (404). Confirme o nome do modelo nas configurações do provedor.`;
+		return fill(
+			"ai err 404",
+			"{provider}Modelo ou endpoint não encontrado (404). Confirme o nome do modelo nas configurações do provedor.",
+			{ provider: prefix },
+		);
 	}
 	if (status === "429") {
 		if (providerId === "pollinations") {
-			return (
-				"Built-in atingiu o limite público do serviço (~1 req/s por IP). " +
-				"Aguarde alguns segundos e reenvie — ou adicione uma chave GRATUITA " +
-				"para qualidade melhor: Groq (llama-3.3-70b) ou Cerebras em " +
-				"Configurações › IA › Provedores."
+			return fill(
+				"ai err 429 pollinations",
+				"Built-in atingiu o limite público do serviço (~1 req/s por IP). Aguarde alguns segundos e reenvie — ou adicione uma chave GRATUITA para qualidade melhor: Groq (llama-3.3-70b) ou Cerebras em Configurações › IA › Provedores.",
 			);
 		}
-		return `${provider ? `${provider}: ` : ""}Limite de requisições atingido (429) — aguarde alguns segundos e tente de novo. Provedores gratuitos são compartilhados e limitados (~1 req/s).`;
+		return fill(
+			"ai err 429",
+			"{provider}Limite de requisições atingido (429) — aguarde alguns segundos e tente de novo. Provedores gratuitos são compartilhados e limitados (~1 req/s).",
+			{ provider: prefix },
+		);
 	}
 	if (/^5\d\d:/.test(message)) {
-		return `${provider ? `${provider}: ` : ""}O servidor do provedor falhou (${message.slice(0, 3)}). Tente novamente ou troque de modelo.`;
+		return fill(
+			"ai err 5xx",
+			"{provider}O servidor do provedor falhou ({status}). Tente novamente ou troque de modelo.",
+			{ provider: prefix, status: message.slice(0, 3) },
+		);
 	}
 	if (/timeout|timed out/i.test(message)) {
-		return `${provider ? `${provider}: ` : ""}Tempo esgotado (timeout). Verifique a conexão e tente novamente.`;
+		return fill(
+			"ai err timeout",
+			"{provider}Tempo esgotado (timeout). Verifique a conexão e tente novamente.",
+			{ provider: prefix },
+		);
+	}
+	if (
+		/failed to fetch|network request failed|networkerror|load failed|err_connection|err_name/i.test(
+			message,
+		)
+	) {
+		return fill(
+			"ai err network fetch",
+			"Falha de rede — o pedido não chegou ao provedor. Verifique a internet, VPN ou a URL base do provedor.",
+		);
 	}
 	return message;
 }
@@ -556,11 +592,25 @@ const PROVIDER_NAMES = {
 	groq: "Groq",
 	"openrouter-free": "OpenRouter (free)",
 	"openrouter-paid": "OpenRouter",
-	gemini: "Google Gemini",
+	google: "Google Gemini",
+	openai: "OpenAI",
+	anthropic: "Anthropic",
+	deepseek: "DeepSeek",
 	mistral: "Mistral",
 	together: "Together AI",
+	cohere: "Cohere",
 	cerebras: "Cerebras",
 	chutes: "Chutes",
+	fireworks: "Fireworks",
+	huggingface: "Hugging Face",
+	cloudflare: "Cloudflare",
+	"github-models": "GitHub Models",
+	"azure-openai": "Azure OpenAI",
+	nvidia: "NVIDIA",
+	xai: "xAI",
+	perplexity: "Perplexity",
+	zai: "Z.ai",
+	custom: "Personalizado",
 	pollinations: "Built-in",
 	duckduckgo: "DuckDuckGo AI",
 };

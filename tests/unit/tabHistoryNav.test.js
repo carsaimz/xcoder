@@ -63,10 +63,10 @@ describe("tab history navigation", () => {
                 expect(mainSource).toMatch(/editorManager\.editorHistoryIndex/);
                 expect(mainSource).toMatch(/editorManager\.editorHistory/);
                 expect(mainSource).toMatch(
-                        /\$tabBackBtn\.classList\.toggle\(\s*"disabled"/,
+                        /\$tabBackBtn\.classList\.toggle\(\s*"dull"/,
                 );
                 expect(mainSource).toMatch(
-                        /\$tabFwdBtn\.classList\.toggle\(\s*"disabled"/,
+                        /\$tabFwdBtn\.classList\.toggle\(\s*"dull"/,
                 );
         });
 

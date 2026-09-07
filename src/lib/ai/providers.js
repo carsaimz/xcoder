@@ -16,6 +16,7 @@
 
 import { isPremium, maxTokensLimit } from "lib/premium";
 import settings from "lib/settings";
+import { PROVIDER_LOGO_SVGS } from "./providerLogos";
 
 /** Provider used when the user never picked one (zero-config chat). */
 export const DEFAULT_PROVIDER_ID = "pollinations";
@@ -308,6 +309,9 @@ export const PROVIDER_MAP = Object.fromEntries(
  * color. Used by the chat strip (logo + model), the model picker headers
  * and the provider cards. Custom endpoints fall back to the 🤖 robot, as
  * promised — they have no brand.
+ *
+ * Real brand SVG logos live in ./providerLogos (generated) and are
+ * attached to the icon at request time — see providerIcon().
  * @type {Record<string, {glyph: string, color: string}>}
  */
 const PROVIDER_ICONS = {
@@ -341,12 +345,23 @@ const DEFAULT_ICON_COLOR = "#8b5cf6";
 
 /**
  * @param {string} providerId
- * @returns {{glyph: string, color: string}} glyph is an emoji or a single
- *          letter (letters render on a colored round badge)
+ * @returns {{glyph: string, color: string, svg?: string}} glyph is an
+ *          emoji or a single letter (letters render on a colored round
+ *          badge); svg is the real brand logo inline SVG when available
  */
 export function providerIcon(providerId) {
 	const known = PROVIDER_ICONS[providerId];
-	if (known) return known;
+	if (known) {
+		const logo = PROVIDER_LOGO_SVGS[providerId];
+		if (logo) {
+			return {
+				glyph: known.glyph,
+				color: logo.color || known.color,
+				svg: logo.svg,
+			};
+		}
+		return known;
+	}
 	const letter =
 		String(providerId || "?")
 			.trim()

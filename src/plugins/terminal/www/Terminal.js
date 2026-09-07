@@ -33,6 +33,9 @@ const Terminal = {
 
         await writeText(`${filesDir}/init-alpine.sh`, initAlpine);
         await writeText(`${filesDir}/init-sandbox.sh`, initSandbox);
+        // remember which mode AXS was launched in, so a later session can
+        // restart it when the FailSafe setting changed (stale-server trap)
+        await writeText(`${filesDir}/axs-mode`, failsafe ? "failsafe" : "alpine");
 
         await deleteFile(`${filesDir}/alpine/bin/rm`).catch(() => {});
         await writeText(`${filesDir}/alpine/bin/rm`, rmWrapper);
@@ -111,6 +114,24 @@ const Terminal = {
 
         const result = await Executor.BackgroundExecutor.execute(`kill -0 $(cat $PREFIX/pid) 2>/dev/null && echo "true" || echo "false"`);
         return String(result).toLowerCase() === "true";
+    },
+
+    /**
+     * Returns the mode the running AXS server was started with
+     * ("failsafe" | "alpine"), or "" when unknown (older installs).
+     * @returns {Promise<string>}
+     */
+    async getAxsMode() {
+        const filesDir = await new Promise((resolve, reject) => {
+            system.getFilesDir(resolve, reject);
+        });
+        try {
+            const mode = await Executor.execute(`cat ${filesDir}/axs-mode 2>/dev/null`);
+            const value = String(mode).trim().toLowerCase();
+            return value === "failsafe" || value === "alpine" ? value : "";
+        } catch {
+            return "";
+        }
     },
 
     /**
@@ -356,6 +377,16 @@ const Terminal = {
 
             logger("📦  Extracting sandbox filesystem...");
             await Executor.execute(`tar --no-same-owner -xf ${filesDir}/alpine.tar.gz -C ${alpineDir}`);
+            // verify the rootfs actually extracted — tar failures used to be
+            // swallowed and the .extracted marker lied about a healthy install
+            const tarOk = await new Promise((resolve, reject) => {
+                system.fileExists(`${alpineDir}/bin/busybox`, false, (r) => resolve(r == 1), reject);
+            }).catch(() => false);
+            if (!tarOk) {
+                throw new Error(
+                    "Alpine rootfs extraction failed — reinstall the terminal (Settings > Terminal > Uninstall, then reopen it).",
+                );
+            }
 
             logger("⚙️  Applying basic configuration...");
             await writeText(`${alpineDir}/etc/resolv.conf`, `nameserver 8.8.4.4 \nnameserver 8.8.8.8`);

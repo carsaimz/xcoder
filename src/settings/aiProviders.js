@@ -31,6 +31,7 @@ import {
 	keyShapeWarning,
 	PROVIDER_MAP,
 	PROVIDERS,
+	providerIcon,
 	resolveApiKey,
 	resolveBaseUrl,
 	resolveMaxTokens,
@@ -364,6 +365,18 @@ export default function aiProviders() {
 					{$adv}
 				</>
 			);
+
+			// real brand logo replaces the first-letter badge when available
+			const $picon = $card.querySelector(".ai-picon");
+			const iconData = providerIcon(id);
+			if ($picon && iconData.svg) {
+				$picon.classList.add("svg");
+				$picon.textContent = "";
+				if (iconData.svg.includes("currentColor")) {
+					$picon.style.color = iconData.color || "";
+				}
+				$picon.innerHTML = iconData.svg;
+			}
 
 			function selectProvider() {
 				if ((settings.value.aiProvider || DEFAULT_PROVIDER_ID) === id) return;

@@ -855,8 +855,10 @@ async function loadApp() {
 		// forward at the newest.
 		const history = editorManager.editorHistory || [];
 		const historyIndex = editorManager.editorHistoryIndex ?? -1;
-		$tabBackBtn.classList.toggle("disabled", historyIndex <= 0);
-		$tabFwdBtn.classList.toggle("disabled", historyIndex >= history.length - 1);
+		// "dull" only dims visually — unlike "disabled" it keeps pointer
+		// events alive, so tapping a dead-end button still gives feedback
+		$tabBackBtn.classList.toggle("dull", historyIndex <= 0);
+		$tabFwdBtn.classList.toggle("dull", historyIndex >= history.length - 1);
 
 		if (mode === "switch-file") {
 			if (settings.value.rememberFiles && activeFile) {

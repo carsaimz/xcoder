@@ -704,21 +704,34 @@ export default class TerminalComponent {
 				);
 			}
 
+			const values = appSettings.value;
+			// Initialize terminal settings with defaults if not present
+			if (!values.terminalSettings) {
+				values.terminalSettings = {
+					...DEFAULT_TERMINAL_SETTINGS,
+					fontFamily:
+						DEFAULT_TERMINAL_SETTINGS.fontFamily ||
+						appSettings.value.fontFamily,
+				};
+			}
+
+			const terminalValues = values.terminalSettings;
+
+			// Auto-heal: a live AXS server keeps serving the mode it was
+			// started with (e.g. Android failsafe sh from an old session),
+			// even after the FailSafe setting changed. Restart it so the
+			// current setting (Alpine proot by default) takes effect.
+			const wantedMode = terminalValues.failsafeMode ? "failsafe" : "alpine";
+			if (await Terminal.isAxsRunning()) {
+				const runningMode = await Terminal.getAxsMode();
+				if (runningMode && runningMode !== wantedMode) {
+					await Terminal.stopAxs();
+					await new Promise((resolve) => setTimeout(resolve, 500));
+				}
+			}
+
 			// Start AXS if not running
 			if (!(await Terminal.isAxsRunning())) {
-				const values = appSettings.value;
-				// Initialize terminal settings with defaults if not present
-				if (!values.terminalSettings) {
-					values.terminalSettings = {
-						...DEFAULT_TERMINAL_SETTINGS,
-						fontFamily:
-							DEFAULT_TERMINAL_SETTINGS.fontFamily ||
-							appSettings.value.fontFamily,
-					};
-				}
-
-				const terminalValues = values.terminalSettings;
-
 				Executor.setProotDebug(terminalValues.prootDebug);
 				Executor.BackgroundExecutor.setProotDebug(terminalValues.prootDebug);
 
@@ -758,6 +771,14 @@ export default class TerminalComponent {
 			}
 
 			this.pid = response.data.trim();
+			// make it obvious why the shell looks like Android sh when the
+			// user (or an old session) is in FailSafe mode
+			if (terminalValues.failsafeMode) {
+				this.terminal.writeln(
+					strings["terminal failsafe notice"] ||
+						"[XCoder] Modo FailSafe: shell do sistema Android (sem Alpine). Desative o 'FailSafe mode' nas configurações do terminal para usar o Alpine.",
+				);
+			}
 			return this.pid;
 		} catch (error) {
 			console.error("Failed to create terminal session:", error);
