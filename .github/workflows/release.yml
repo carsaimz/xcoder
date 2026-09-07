@@ -70,8 +70,11 @@ jobs:
           # latest existing tag (version-sorted); empty for the first release
           PREV=$(git tag --sort=-v:refname | grep -vx "$REF" | head -n 1 || true)
           if [ "$EVENT" = "workflow_dispatch" ]; then
-            # refuse to release a version that does not move forward
-            if [ -n "$PREV" ]; then
+            # refuse to release a version that does not move forward —
+            # EXCEPT an identical re-run of the current version (the
+            # dispatch path already tolerates existing tags/commits)
+            CUR=$(node -p "require('./package.json').version")
+            if [ -n "$PREV" ] && [ "$INPUT_VERSION" != "$CUR" ]; then
               node utils/scripts/bump-version.mjs "$INPUT_VERSION" --check-only --greater-than "$PREV"
             fi
             OUT=$(node utils/scripts/bump-version.mjs "$INPUT_VERSION")
