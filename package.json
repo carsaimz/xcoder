@@ -117,7 +117,7 @@
 		"ts-loader": "^9.6.2",
 		"typescript": "^5.9.3",
 		"vitest": "^4.1.11",
-		"vscode-languageserver-types": "^3.17.5",
+		"vscode-languageserver-types": "3.17.5",
 		"ws": "^8.21.3"
 	},
 	"dependencies": {
