@@ -16,6 +16,7 @@
 
 import { isPremium, maxTokensLimit } from "lib/premium";
 import settings from "lib/settings";
+import { normalizeModelId } from "./modelId";
 import { PROVIDER_LOGO_SVGS } from "./providerLogos";
 
 /** Provider used when the user never picked one (zero-config chat). */
@@ -541,10 +542,10 @@ export function enabledProviders() {
 export function resolveModel(providerId) {
 	const provider = PROVIDER_MAP[providerId];
 	const own = getProviderPrefs(providerId).model;
-	if (own) return own;
+	if (own) return normalizeModelId(own);
 	if ((settings.value?.aiProvider || DEFAULT_PROVIDER_ID) === providerId) {
 		const legacy = String(settings.value?.aiModel || "");
-		if (legacy) return legacy;
+		if (legacy) return normalizeModelId(legacy);
 	}
 	return provider?.models?.[0] || "";
 }

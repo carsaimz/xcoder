@@ -4,7 +4,7 @@ import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import vshell from "lib/ai/vshell";
-import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
+import { signInGitHubFlow } from "lib/ghSignIn";
 import {
 	commit,
 	getStatus,
@@ -287,75 +287,13 @@ function renderAccount() {
 }
 
 /**
- * GitHub OAuth Device Flow sign-in (see lib/ghAuth.js).
+ * GitHub sign-in: delegates to the shared flow — personal access token
+ * (PAT) or the official device flow. No user-owned OAuth clients.
  */
 async function signInGitHub() {
-	try {
-		let clientId = String(settings.value.ghOAuthClientId || "").trim();
-
-		if (!clientId) {
-			const ok = await confirmDialog(
-				strings["sign in with github"] || "Sign in with GitHub",
-				strings["github sign in steps"] ||
-					"Create an OAuth App at github.com/settings/developers, enable 'Device Flow', then paste its client id here. No client secret or backend is needed.",
-			);
-			if (!ok) return;
-
-			const input = await prompt(
-				strings["github client id"] || "OAuth App client id",
-				"",
-				"text",
-			);
-			if (!input || !input.trim()) return;
-
-			clientId = input.trim();
-			settings.value.ghOAuthClientId = clientId;
-			await settings.update();
-		}
-
-		const code = await requestDeviceCode(clientId);
-		const proceed = await confirm(
-			strings["sign in with github"] || "Sign in with GitHub",
-			`${strings["device code"] || "Code"}: ${code.userCode}\n\n${
-				strings["github device steps"] ||
-				"Open the verification page in your browser and enter the code above."
-			}`,
-		);
-		if (!proceed) return;
-
-		system.openInBrowser(code.verificationUri);
-
-		const hide = await loader.show();
-		try {
-			const { token, user } = await pollForToken(
-				clientId,
-				code.deviceCode,
-				code.interval,
-				{ maxMs: code.expiresIn * 1000 },
-			);
-
-			settings.value.ghToken = token;
-			settings.value.ghUserLogin = user?.login || "";
-			settings.value.ghUserName = user?.name || "";
-			settings.value.ghUserAvatar = user?.avatarUrl || "";
-			await settings.update();
-
-			toast(
-				`${strings["signed in as"] || "Signed in as"} ${user?.login || "?"}`,
-			);
-		} finally {
-			hide();
-		}
-
-		renderAccount();
-		renderGh();
-	} catch (error) {
-		toast(
-			`${strings["sign in failed"] || "Sign in failed"}: ${
-				error.message || error
-			}`,
-		);
-	}
+	await signInGitHubFlow();
+	renderAccount();
+	renderGh();
 }
 
 /**

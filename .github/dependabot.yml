@@ -1,6 +1,10 @@
 # Dependabot — daily dependency checks (restored by request).
-# Scans run on every new push via the CodeQL workflow (codeql.yml, daily
-# cron) and dependency-review.yml (on pull requests).
+# npm minor/patch updates are ALSO collected weekly by deps-update.yml
+# (one tested PR); Dependabot covers npm + github-actions and groups
+# action bumps into a single PR. Major npm bumps stay manual by design.
+# NOTE: closing a Dependabot PR suppresses that exact update until the
+# target version changes — merge it (or leave it open) instead of
+# closing it.
 version: 2
 updates:
   # npm dependencies (package.json)
@@ -34,3 +38,7 @@ updates:
     labels:
       - "dependencies"
       - "ci"
+    groups:
+      ci-actions:
+        patterns:
+          - "*"

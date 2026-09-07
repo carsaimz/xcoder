@@ -51,6 +51,7 @@ extend-exclude = [
     "CHANGELOG.md",
     "readme.pt-br.md",
     "docs/ADS.md",
+    "docs/github-oauth-app.md",
     "docs/screenshots",
     "scripts/add_cmd_translations.mjs",
 ]
@@ -94,6 +95,8 @@ autor = "autor"
 avatares = "avatares"
 caracteres = "caracteres"
 cliente = "cliente"
+clientes = "clientes"
+ative = "ative"
 comando = "comando"
 comandos = "comandos"
 componentes = "componentes"

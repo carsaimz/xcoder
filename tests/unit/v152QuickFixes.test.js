@@ -5,10 +5,12 @@ import { describe, expect, it } from "vitest";
 /**
  * v1.5.2 quick fixes regression:
  *  - "Pensar"/"Buscar" pills persist (settings defaults exist → update() no longer drops them)
- *  - chat strip shows the MODEL first, then the provider logo, and scrolls sideways
+ *  - chat strip shows the MODEL first, then the provider logo, with the
+ *    capability chips on their own row BELOW the model (v1.5.3)
  *  - real brand SVG logos are attached via providerIcon()
  *  - message copy falls back to the cordova clipboard plugin + execCommand
- *  - tab-history buttons stay tappable when dead ("dull", not "disabled") and give toast feedback
+ *  - tab-history buttons were REMOVED from the header in v1.5.3 (keyboard
+ *    shortcuts keep the dead-end toast feedback)
  *  - AI/provider errors are localized through window.strings with {placeholder} interpolation
  *  - terminal: AXS mode marker + auto-restart on mode mismatch + verified rootfs extraction
  */
@@ -35,13 +37,23 @@ describe("thinking / web-search quick toggles", () => {
 });
 
 describe("chat provider strip", () => {
-        it("model name comes before the provider logo", () => {
+        it("model name comes before the provider logo, caps row below", () => {
                 const src = read("src/sidebarApps/ai/index.js");
-                const modelPos = src.indexOf('<span className="ai-strip-model">{model}</span>,');
+                const mainPos = src.indexOf('<div className="ai-strip-main">');
+                const modelPos = src.indexOf('<span className="ai-strip-model">{model}</span>');
                 const logoPos = src.indexOf('className={`ai-strip-logo${isLetter ? " letter" : ""}`}');
-                expect(modelPos).toBeGreaterThan(-1);
-                expect(logoPos).toBeGreaterThan(-1);
-                expect(modelPos).toBeLessThan(logoPos);
+                const capsPos = src.indexOf('<div className="ai-strip-caps">');
+                expect(mainPos).toBeGreaterThan(-1);
+                expect(modelPos).toBeGreaterThan(mainPos);
+                expect(logoPos).toBeGreaterThan(modelPos);
+                expect(logoPos).toBeLessThan(capsPos);
+                expect(capsPos).toBeGreaterThan(-1);
+                // every capability chip lives inside the caps row
+                const capsBlock = src.slice(capsPos, src.indexOf("</div>,", capsPos));
+                expect(capsBlock).toMatch(/chip\("ai cap text"/);
+                expect(capsBlock).toMatch(/chip\("ai cap image"/);
+                expect(capsBlock).toMatch(/chip\("ai cap video"/);
+                expect(capsBlock).toMatch(/chip\("ai cap agents"/);
         });
 
         it("strip injects the real brand SVG when available", () => {
@@ -50,9 +62,10 @@ describe("chat provider strip", () => {
                 expect(src).toMatch(/logo\.svg\.includes\("currentColor"\)/);
         });
 
-        it("strip scrolls horizontally instead of clipping", () => {
+        it("model row and caps row scroll sideways instead of clipping", () => {
                 const css = read("src/sidebarApps/ai/style.scss");
-                expect(css).toMatch(/\.ai-provider-strip\s*\{[^}]*overflow-x:\s*auto/s);
+                expect(css).toMatch(/\.ai-strip-main\s*\{[^}]*overflow-x:\s*auto/s);
+                expect(css).toMatch(/\.ai-strip-caps\s*\{[^}]*overflow-x:\s*auto/s);
                 expect(css).toMatch(/\.ai-strip-model\s*\{[^}]*flex-shrink:\s*0/s);
         });
 });
@@ -102,10 +115,10 @@ describe("message copy reliability", () => {
 });
 
 describe("tab history header buttons", () => {
-        it("dead-end buttons stay tappable (dull) and toast instead of pointer-events:none", () => {
+        it("buttons left the header; the dead-end toast feedback stays for the keyboard shortcuts", () => {
                 const main = read("src/main.js");
-                expect(main).toMatch(/\$tabBackBtn\.classList\.toggle\("dull"/);
-                expect(main).toMatch(/\$tabFwdBtn\.classList\.toggle\("dull"/);
+                expect(main).not.toMatch(/\$tabBackBtn/);
+                expect(main).not.toMatch(/\$tabFwdBtn/);
                 const commands = read("src/lib/commands.js");
                 expect(commands).toMatch(
                         /"no tab history prev"\] \|\| "Sem mais abas atrás no histórico"/,

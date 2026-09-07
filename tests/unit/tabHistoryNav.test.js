@@ -52,26 +52,12 @@ describe("tab history navigation", () => {
                 expect(registrySource).toMatch(/keyBindings\[key\]\?\.key != null/);
         });
 
-        it("header exposes back/forward buttons wired to the history commands", () => {
-                expect(mainSource).toMatch(/header-tab-back-btn/);
-                expect(mainSource).toMatch(/header-tab-fwd-btn/);
-                expect(mainSource).toMatch(/xcoder\.exec\("prev-file-history"\)/);
-                expect(mainSource).toMatch(/xcoder\.exec\("next-file-history"\)/);
+
+        it("header no longer ships back/forward buttons (removed by request)", () => {
+                expect(mainSource).not.toMatch(/header-tab-back-btn/);
+                expect(mainSource).not.toMatch(/header-tab-fwd-btn/);
+                expect(mainSource).not.toMatch(/\$tabBackBtn/);
+                expect(mainSource).not.toMatch(/\$tabFwdBtn/);
         });
 
-        it("header buttons reflect the history cursor state", () => {
-                expect(mainSource).toMatch(/editorManager\.editorHistoryIndex/);
-                expect(mainSource).toMatch(/editorManager\.editorHistory/);
-                expect(mainSource).toMatch(
-                        /\$tabBackBtn\.classList\.toggle\(\s*"dull"/,
-                );
-                expect(mainSource).toMatch(
-                        /\$tabFwdBtn\.classList\.toggle\(\s*"dull"/,
-                );
-        });
-
-        it("button titles are translated", () => {
-                expect(mainSource).toMatch(/strings\["previous tab"\]/);
-                expect(mainSource).toMatch(/strings\["next tab"\]/);
-        });
 });

@@ -4,6 +4,59 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.5.3] - 2026-09-07
+
+### Changed
+- **Botões ← e → removidos do header do editor** — a navegação por
+  histórico de abas continua pelos atalhos Alt-←/Alt-→ e pelos comandos
+  na paleta; o histórico persistente entre sessões não foi afetado
+
+### Fixed
+- **Suportes de IA (texto, imagem, vídeo, agentes) agora ficam em linha
+  PRÓPRIA, por baixo do modelo** — complementa o rework da faixa da
+  v1.5.2: o nome do modelo (e o logo) ficam na linha de cima; as pílulas
+  de suporte descem para a linha de baixo, que rola lateralmente quando
+  falta espaço — nada é mais escondido nem ao lado nem embaixo
+
+### GitHub — sem "clientes próprios" (sign-in refeito)
+- **Ninguém precisa mais criar OAuth App próprio**: a tela do GitHub
+  (configurações + app lateral de git) passa a oferecer **PAT primeiro**
+  (token de acesso pessoal, validado contra o perfil) e o **Device Flow
+  oficial** com o client id embutido no app (`config.GH_OAUTH_CLIENT_ID`
+  em `src/lib/config.js` — vazio até as chaves oficiais serem entregues;
+  instalações legadas com client id salvo continuam funcionando)
+- Fluxo compartilhado extraído para `src/lib/ghSignIn.js` (escolha do
+  método → PAT ou device flow → sessão salva); a linha "OAuth App client
+  id" saiu da página de configurações
+- **Novo guia `docs/github-oauth-app.md`** (pt-br): passo a passo do
+  OAuth App oficial, onde entra o client id e explicação de por que
+  **webhook** e **bot user id** não se aplicam ao fluxo atual (e quando
+  aplicariam)
+
+### Fixed — modelos
+- **Busca de modelos sem o prefixo "models/"**: catálogos do Google
+  reportam ids como `models/gemini-2.5-flash`; o app normaliza para
+  `gemini-2.5-flash` na listagem (`listModels`) e na leitura de modelos
+  salvos (`resolveModel`). Ids que apenas CONTÊM `models/` no meio
+  (ex.: Fireworks `accounts/fireworks/models/...`) e namespacing de
+  vendor (ex.: OpenRouter `google/gemini-2.5-pro`) permanecem intactos
+
+### CI
+- **Dependabot**: bumps de `github-actions` agrupados num único PR
+  (menos inundação) + nota de que FECHAR um PR do Dependabot suprime
+  aquela atualização até a versão-alvo mudar (motivo do silêncio desde
+  31/08 — merge em vez de fechar, ou deixe o auto-merge agir)
+
+### Tests
+- +12 testes (581 → 593): `aiModelId` (normalização de ids — unidade,
+  listModels com fetch stub e guards) e `ghSignInPolicy` (sem clientes
+  próprios no código, PAT antes do device flow, client id oficial
+  embutido, ambos os pontos de entrada no fluxo compartilhado);
+  `tabHistoryNav` atualizado para garantir que os botões NÃO voltam ao
+  header e que os comandos continuam registrados
+- i18n: chaves novas pt-br/en-us para o seletor de método, prompt de PAT
+  e aviso de client id ausente; chaves mortas removidas; pt-br 100%
+
 ## [1.5.2] - 2026-09-07
 
 ### Changed — chat de IA

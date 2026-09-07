@@ -285,7 +285,8 @@ function buildUi() {
 	// Slim session title strip (kept out of the header on purpose)
 	const $sessionBar = <div className="ai-session-bar">{$sessionTitle}</div>;
 
-	// Provider · model strip with capability chips (tap to change)
+	// Provider · model strip: model row on top, capability row below
+	// (tap to change)
 	$providerStrip = (
 		<div
 			className="ai-provider-strip"
@@ -1830,10 +1831,12 @@ function hapticTick() {
 }
 
 /**
- * Renders the provider · model strip (with capability chips) under the
- * session bar and keeps the model button tooltip in sync. If more than
- * one provider is enabled the strip says so — the picker lists each
- * provider's models separately.
+ * Renders the provider · model strip under the session bar — the model
+ * row (name first, then brand logo) on top and the capability chips
+ * (text, image, video, agents) on their own horizontally scrollable
+ * row BELOW the model — and keeps the model button tooltip in sync.
+ * If more than one provider is enabled the strip says so — the picker
+ * lists each provider's models separately.
  */
 function updateModelButton() {
 	if (!$modelBtn) return;
@@ -1856,21 +1859,25 @@ function updateModelButton() {
 		</span>
 	);
 	$providerStrip.content = [
-		<span className="ai-strip-model">{model}</span>,
-		<span
-			className={`ai-strip-logo${isLetter ? " letter" : ""}`}
-			style={isLetter ? { background: logo.color } : {}}
-			title={provider?.name || providerId}
-		>
-			{logo.glyph}
-		</span>,
-		chip("ai cap text", caps.text, "text"),
-		chip("ai cap image", caps.image, "image"),
-		chip("ai cap video", caps.video, "videocam"),
-		chip("ai cap agents", caps.agents, "wand"),
-		enabledCount > 1 ? (
-			<span className="ai-strip-multi">+{enabledCount - 1}</span>
-		) : null,
+		<div className="ai-strip-main">
+			<span className="ai-strip-model">{model}</span>
+			<span
+				className={`ai-strip-logo${isLetter ? " letter" : ""}`}
+				style={isLetter ? { background: logo.color } : {}}
+				title={provider?.name || providerId}
+			>
+				{logo.glyph}
+			</span>
+			{enabledCount > 1 ? (
+				<span className="ai-strip-multi">+{enabledCount - 1}</span>
+			) : null}
+		</div>,
+		<div className="ai-strip-caps">
+			{chip("ai cap text", caps.text, "text")}
+			{chip("ai cap image", caps.image, "image")}
+			{chip("ai cap video", caps.video, "videocam")}
+			{chip("ai cap agents", caps.agents, "wand")}
+		</div>,
 	];
 	// Real brand SVG (when available) replaces the emoji/letter glyph
 	const $logoEl = $providerStrip.querySelector(".ai-strip-logo");

@@ -560,24 +560,6 @@ async function loadApp() {
 			onclick={() => xcoder.exec("command-palette")}
 		/>
 	);
-	const $tabBackBtn = (
-		<span
-			id="header-tab-back-btn"
-			className="icon arrow_back"
-			title={strings["previous tab"] || "Previous tab"}
-			style={{ fontSize: "1.2em" }}
-			onclick={() => xcoder.exec("prev-file-history")}
-		/>
-	);
-	const $tabFwdBtn = (
-		<span
-			id="header-tab-fwd-btn"
-			className="icon arrow_forward"
-			title={strings["next tab"] || "Next tab"}
-			style={{ fontSize: "1.2em" }}
-			onclick={() => xcoder.exec("next-file-history")}
-		/>
-	);
 	const $navToggler = (
 		<span className="icon menu" attr-action="toggle-sidebar" />
 	);
@@ -832,16 +814,6 @@ async function loadApp() {
 			$editMenuToggler.remove();
 		}
 
-		// Tab history back/forward buttons — browser-style navigation
-		// through recently used tabs (roadmap v1.5.x item 2). Header order:
-		// [tab-back][tab-fwd][terminal][palette][pencil].
-		if (!$tabBackBtn.isConnected) {
-			$header.insertBefore($tabBackBtn, $header.lastChild);
-		}
-		if (!$tabFwdBtn.isConnected) {
-			$header.insertBefore($tabFwdBtn, $header.lastChild);
-		}
-
 		// Terminal + command palette buttons live in the header next to
 		// the pencil, always available. Order: [terminal][palette][pencil].
 		if (!$terminalToggler.isConnected) {
@@ -850,15 +822,6 @@ async function loadApp() {
 		if (!$paletteToggler.isConnected) {
 			$header.insertBefore($paletteToggler, $header.lastChild);
 		}
-
-		// Reflect the history cursor: back dies at the oldest entry,
-		// forward at the newest.
-		const history = editorManager.editorHistory || [];
-		const historyIndex = editorManager.editorHistoryIndex ?? -1;
-		// "dull" only dims visually — unlike "disabled" it keeps pointer
-		// events alive, so tapping a dead-end button still gives feedback
-		$tabBackBtn.classList.toggle("dull", historyIndex <= 0);
-		$tabFwdBtn.classList.toggle("dull", historyIndex >= history.length - 1);
 
 		if (mode === "switch-file") {
 			if (settings.value.rememberFiles && activeFile) {

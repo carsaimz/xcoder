@@ -1,5 +1,6 @@
 import Url from "utils/Url";
 import { duckChatCompletion } from "./duck";
+import { normalizeModelId } from "./modelId";
 
 /**
  * OpenAI-compatible chat client.
@@ -269,7 +270,9 @@ export async function listModels({ baseURL, apiKey, providerId, strict }) {
 			method: "GET",
 		});
 		const data = json?.data || json?.models || [];
-		return data.map((model) => model?.id || model?.name).filter(Boolean);
+		return data
+			.map((model) => normalizeModelId(model?.id || model?.name))
+			.filter(Boolean);
 	} catch (error) {
 		if (strict) throw error;
 		window.log("error", "AI listModels failed:", error);

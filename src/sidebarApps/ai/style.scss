@@ -85,27 +85,36 @@
                 }
         }
 
-        // provider · model strip with capability chips — scrolls sideways
-        // when long model names would otherwise hide the capability pills
+        // provider · model strip — model row on top, capability chips on
+        // their own row BELOW the model (per user request: the supports
+        // must sit under the model name, not beside it)
         .ai-provider-strip {
                 display: flex;
-                align-items: center;
-                gap: 6px;
-                padding: 4px 12px;
+                flex-direction: column;
+                gap: 3px;
+                padding: 5px 12px 6px;
                 background: color-mix(in srgb, var(--secondary-color) 30%, transparent);
                 border-bottom: 1px solid var(--border-color);
                 cursor: pointer;
-                min-height: 28px;
                 user-select: none;
-                overflow-x: auto;
-                scrollbar-width: none;
-
-                &::-webkit-scrollbar {
-                        display: none;
-                }
 
                 &:active {
                         background: color-mix(in srgb, var(--active-color) 10%, transparent);
+                }
+
+                // top row: model name first, then brand logo (+ badge) —
+                // scrolls sideways when the name alone is too long
+                .ai-strip-main {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        min-width: 0;
+                        overflow-x: auto;
+                        scrollbar-width: none;
+
+                        &::-webkit-scrollbar {
+                                display: none;
+                        }
                 }
 
                 // brand logo of the provider (real SVG, emoji glyph or letter)
@@ -167,6 +176,25 @@
                         padding: 1px 7px;
                         flex-shrink: 0;
                         margin-left: auto;
+                }
+
+                // bottom row: capability chips — scrolls sideways when
+                // the model name leaves no room, so no chip is ever hidden
+                .ai-strip-caps {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        overflow-x: auto;
+                        -webkit-overflow-scrolling: touch;
+                        scrollbar-width: none;
+
+                        &::-webkit-scrollbar {
+                                display: none;
+                        }
+
+                        .ai-cap {
+                                flex-shrink: 0;
+                        }
                 }
 
                 .ai-cap {

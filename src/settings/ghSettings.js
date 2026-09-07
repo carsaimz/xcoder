@@ -1,16 +1,15 @@
 import settingsPage from "components/settingsPage";
 import toast from "components/toast";
-import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
-import prompt from "dialogs/prompt";
 import select from "dialogs/select";
-import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
+import { fetchGhUser } from "lib/ghAuth";
+import { signInGitHubFlow } from "lib/ghSignIn";
 import settings from "lib/settings";
 import "./gh-settings.scss";
 
 /**
- * XCoder GitHub settings — account (device-flow sign in), token (PAT),
- * repositories (list from the API and pick one) and the OAuth client id.
+ * XCoder GitHub settings — account (PAT or the official device-flow
+ * sign in) and repositories. No user-owned OAuth clients.
  */
 
 const REPOS_URL =
@@ -194,7 +193,7 @@ export default function ghSettings() {
 						: strings["not signed in"] || "Not signed in",
 				info:
 					strings["settings-info-gh-account"] ||
-					"Sign in with the GitHub device flow: you get a code, open github.com/login/device in a browser and enter it.",
+					"Sign in with your GitHub account or a personal access token (PAT).",
 				chevron: true,
 			},
 			{
@@ -203,7 +202,7 @@ export default function ghSettings() {
 				button: "primary",
 				info:
 					strings["settings-info-gh-signin"] ||
-					"Opens the device-flow sign in. A GitHub OAuth App client id is required (set below or on first use).",
+					"Sign in with your GitHub account (device flow with the official app client) or paste a personal access token (PAT). No client setup required.",
 			},
 			{
 				key: "gh-signout",
@@ -255,17 +254,6 @@ export default function ghSettings() {
 					strings["settings-info-gh-branch"] ||
 					"Default branch used by push and clone commands.",
 			},
-			{
-				key: "ghOAuthClientId",
-				text: strings["github client id"] || "OAuth App client id",
-				value: values.ghOAuthClientId || "",
-				prompt: strings["github client id"] || "OAuth App client id",
-				promptType: "text",
-				promptOptions: { required: false },
-				info:
-					strings["settings-info-gh-client-id"] ||
-					"Client id of your GitHub OAuth App with Device Flow enabled (github.com/settings/developers).",
-			},
 		];
 	}
 
@@ -278,14 +266,14 @@ export default function ghSettings() {
 				if (settings.value.ghUserLogin || settings.value.ghToken) {
 					await promptAccountActions();
 				} else {
-					await signInDeviceFlow();
+					await signInGitHubFlow();
 				}
 				refresh();
 				break;
 			}
 
 			case "gh-signin":
-				await signInDeviceFlow();
+				await signInGitHubFlow();
 				refresh();
 				break;
 
@@ -309,7 +297,6 @@ export default function ghSettings() {
 
 			case "gitRemoteUrl":
 			case "ghBranch":
-			case "ghOAuthClientId":
 				// persisted by the settings kit; nothing else to do
 				break;
 
@@ -342,7 +329,6 @@ export default function ghSettings() {
 		setRow($list, "gh-repos", values.ghRepo || "");
 		setRow($list, "gitRemoteUrl", values.gitRemoteUrl || "");
 		setRow($list, "ghBranch", values.ghBranch || "main");
-		setRow($list, "ghOAuthClientId", values.ghOAuthClientId || "");
 
 		const $signin = $list.get('[data-key="gh-signin"]');
 		const $signout = $list.get('[data-key="gh-signout"]');
@@ -380,80 +366,6 @@ export default function ghSettings() {
 		} else {
 			await signOut();
 		}
-	}
-
-	/**
-	 * Full device-flow sign in: client id → device code → browser → poll.
-	 */
-	async function signInDeviceFlow() {
-		try {
-			let clientId = String(settings.value.ghOAuthClientId || "").trim();
-
-			if (!clientId) {
-				const ok = await confirm(
-					strings["sign in with github"] || "Sign in with GitHub",
-					strings["github sign in steps"] ||
-						"Create an OAuth App at github.com/settings/developers, enable 'Device Flow', then paste its client id here. No client secret or backend is needed.",
-				);
-				if (!ok) return;
-
-				const input = await prompt(
-					strings["github client id"] || "OAuth App client id",
-					"",
-					"text",
-				);
-				if (!input || !input.trim()) return;
-
-				clientId = input.trim();
-				settings.value.ghOAuthClientId = clientId;
-				await settings.update();
-			}
-
-			const code = await requestDeviceCode(clientId);
-			const proceed = await confirm(
-				strings["sign in with github"] || "Sign in with GitHub",
-				`${strings["device code"] || "Code"}: ${code.userCode}\n\n${
-					strings["github device steps"] ||
-					"Open the verification page in your browser and enter the code above."
-				}`,
-			);
-			if (!proceed) return;
-
-			system.openInBrowser(code.verificationUri);
-
-			const hide = await loader.show();
-			try {
-				const { token, user } = await pollForToken(
-					clientId,
-					code.deviceCode,
-					code.interval,
-					{ maxMs: code.expiresIn * 1000 },
-				);
-				saveSession(token, user);
-				toast(
-					`${strings["signed in as"] || "Signed in as"} ${user?.login || "?"}`,
-				);
-			} finally {
-				hide();
-			}
-		} catch (error) {
-			toast(
-				`${strings["sign in failed"] || "Sign in failed"}: ${error.message || error}`,
-			);
-		}
-	}
-
-	/**
-	 * Stores token + profile.
-	 * @param {string} token
-	 * @param {object} user
-	 */
-	async function saveSession(token, user) {
-		settings.value.ghToken = token;
-		settings.value.ghUserLogin = user?.login || "";
-		settings.value.ghUserName = user?.name || "";
-		settings.value.ghUserAvatar = user?.avatarUrl || "";
-		await settings.update();
 	}
 
 	/**

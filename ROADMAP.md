@@ -6,8 +6,17 @@
 > [Acode](https://github.com/Acode-Foundation/Acode) (CHANGELOG lido por
 > completo até a v1.13.3).
 
-## ✅ Concluído até a v1.5.2
+## ✅ Concluído até a v1.5.3
 
+- **v1.5.3 — polimento de UI + GitHub sem clientes próprios:** botões
+  ←/→ removidos do header (Alt-←/→ e paleta mantidos); suportes de IA
+  (texto/imagem/vídeo/agentes) em linha própria **abaixo** do modelo,
+  com scroll lateral; ids de modelo normalizados sem o prefixo
+  `models/` (Fireworks/OpenRouter intactos); sign-in do GitHub refeito
+  (PAT primeiro + device flow oficial com client id embutido em
+  `config.GH_OAUTH_CLIENT_ID` — ninguém cria OAuth App próprio) + guia
+  `docs/github-oauth-app.md` (webhook/bot user id explicados);
+  Dependabot agrupado por github-actions; +12 testes (581 → 593)
 - Agente de IA com ferramentas, subagentes e streaming (pensamento
   expansível) + pílulas "Pensar"/"Buscar" que desligam de verdade
 - Provedores **Integrados sem chave**: Pollinations (texto + imagem
@@ -17,7 +26,8 @@
   execCommand; erros de IA/provedor 100% em pt (com placeholders
   interpolados, sem "{name}" literal)
 - Editor multi-painel (split view) com abas por painel e foco por clique 💡
-- Navegação por histórico de abas (header ←/→ + Alt-←/→) com feedback de
+- Navegação por histórico de abas (Alt-←/→ + paleta; os botões ←/→ do
+  header saíram na v1.5.3 por não terem utilidade prática) com feedback de
   beco sem saída e histórico persistente entre sessões 💡 (Acode v1.12.7)
 - **Guia de indentação ativa** (opt-in, estilo VSCode) 💡 (Acode v1.11.5)
 - Terminal Alpine (proot) com **auto-cura do modo FailSafe** (o Alpine
