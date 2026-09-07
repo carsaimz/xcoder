@@ -135,6 +135,15 @@ const sectionRegex = new RegExp(
 
 let next;
 if (sectionRegex.test(current)) {
+        // a hand-written section (substantial content) wins over generated
+        // text — the auto path only replaces empty/stub sections (reruns)
+        const existing = sectionRegex.exec(current)[1].trim();
+        if (existing.split("\n").length > 8) {
+                console.log(
+                        `changelog: ${version} section is hand-written (${existing.split("\n").length} lines) — kept untouched`,
+                );
+                process.exit(0);
+        }
         next = current.replace(sectionRegex, `${header}\n${body ? `\n${body}` : "\n"}`);
 } else {
         const lines = current.split("\n");
