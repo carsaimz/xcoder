@@ -19,6 +19,22 @@ import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
 import settings from "lib/settings";
 
 /**
+ * Fetches the profile for a token, tolerating failures (the token
+ * itself is already valid — the profile is cosmetic and can be
+ * refreshed later from the settings page).
+ * @param {string} token
+ * @returns {Promise<object|null>}
+ */
+async function tryFetchGhUser(token) {
+	try {
+		return await fetchGhUser(token);
+	} catch {
+		// profile is cosmetic — the session stays valid without it
+		return null;
+	}
+}
+
+/**
  * Resolves the OAuth App client id used for the Device Flow: the
  * official built-in id first, then the legacy per-user setting. May be
  * empty — the Device Flow option is hidden when it is.
@@ -63,6 +79,7 @@ export async function chooseGhSignInMethod() {
  * @param {object} user
  */
 export async function saveGhSession(token, user) {
+	if (!token) throw new Error("Cannot save a GitHub session without a token");
 	settings.value.ghToken = token;
 	settings.value.ghUserLogin = user?.login || "";
 	settings.value.ghUserName = user?.name || "";
@@ -131,12 +148,17 @@ export async function signInWithDeviceFlow() {
 
 		const hide = await loader.show();
 		try {
-			const { token, user } = await pollForToken(
+			// pollForToken resolves with the access token STRING (not an
+			// object) — destructuring it left token/user undefined and
+			// silently saved an EMPTY session (v1.5.3 bug: "connected"
+			// toast, but no account data and no repositories).
+			const token = await pollForToken(
 				clientId,
 				code.deviceCode,
 				code.interval,
 				{ maxMs: code.expiresIn * 1000 },
 			);
+			const user = await tryFetchGhUser(token);
 			await saveGhSession(token, user);
 			toast(
 				`${strings["signed in as"] || "Signed in as"} ${user?.login || "?"}`,

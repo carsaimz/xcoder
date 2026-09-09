@@ -211,6 +211,47 @@ export async function pollForToken(
 }
 
 /**
+ * Native (CORS-free) GET via cordova-plugin-advanced-http — same
+ * strategy as the token endpoints, because api.github.com requests
+ * from the webview can fail CORS preflight on some Android versions.
+ * @param {string} url
+ * @param {Record<string, string>} headers
+ * @returns {Promise<any>} parsed JSON body
+ */
+function cordovaGetJson(url, headers) {
+	return new Promise((resolve, reject) => {
+		cordova.plugin.http.sendRequest(
+			url,
+			{
+				method: "GET",
+				headers,
+				serializer: "json",
+				responseType: "json",
+				timeout: 20000,
+			},
+			(response) => {
+				let data = response.data;
+				if (typeof data === "string") {
+					try {
+						data = JSON.parse(data);
+					} catch {
+						data = null;
+					}
+				}
+				resolve(data);
+			},
+			(error) => {
+				reject(
+					new Error(
+						`GitHub ${error?.status || ""}: ${error?.error || error?.statusText || "request failed"}`,
+					),
+				);
+			},
+		);
+	});
+}
+
+/**
  * Fetches the authenticated user profile for a token.
  * @param {string} token
  * @param {{fetchImpl?: typeof fetch}} [opts]
@@ -219,15 +260,26 @@ export async function pollForToken(
 export async function fetchGhUser(token, { fetchImpl } = {}) {
 	if (!token) throw new Error("No token provided");
 
+	const headers = {
+		Accept: "application/vnd.github+json",
+		Authorization: `Bearer ${token}`,
+		"X-GitHub-Api-Version": "2022-11-28",
+	};
+
+	if (typeof cordova !== "undefined" && cordova?.plugin?.http?.sendRequest) {
+		const user = await cordovaGetJson(USER_URL, headers);
+		if (!user?.login) throw new Error("GitHub user request failed");
+		return {
+			login: user?.login || "",
+			name: user?.name || "",
+			avatarUrl: user?.avatar_url || "",
+		};
+	}
+
 	const doFetch = fetchImpl || (typeof fetch !== "undefined" ? fetch : null);
 	if (!doFetch) throw new Error("No HTTP client available");
 
-	const res = await doFetch(USER_URL, {
-		headers: {
-			Accept: "application/vnd.github+json",
-			Authorization: `Bearer ${token}`,
-		},
-	});
+	const res = await doFetch(USER_URL, { headers });
 	if (!res.ok) {
 		throw new Error(`GitHub user request failed (${res.status})`);
 	}

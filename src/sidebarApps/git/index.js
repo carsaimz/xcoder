@@ -87,10 +87,24 @@ function initApp(el) {
 		if (el.isConnected) refresh();
 	}, 4000);
 
+	// refresh the account card as soon as the session changes —
+	// sign-in can happen from the settings page while this app is open
+	settings.on("update:ghUserLogin", onAccountChanged);
+	settings.on("update:ghToken", onAccountChanged);
+
 	return () => {
 		container = null;
 		clearInterval(refreshTimer);
+		settings.off("update:ghUserLogin", onAccountChanged);
+		settings.off("update:ghToken", onAccountChanged);
 	};
+}
+
+/** Re-renders the account + GitHub cards when the session changes. */
+function onAccountChanged() {
+	if (!container?._$accountBody?.isConnected) return;
+	renderAccount();
+	renderGh();
 }
 
 function buildUi() {
