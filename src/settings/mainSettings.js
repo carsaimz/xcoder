@@ -14,12 +14,14 @@ import aiSettings from "./aiSettings";
 import otherSettings from "./appSettings";
 import editorSettings from "./editorSettings";
 import filesSettings from "./filesSettings";
+import fontSettings from "./fontSettings";
 import formatterSettings from "./formatterSettings";
 import ghSettings from "./ghSettings";
 import lspSettings from "./lspSettings";
 import previewSettings from "./previewSettings";
 import scrollSettings from "./scrollSettings";
 import searchSettings from "./searchSettings";
+import sshSettings from "./sshSettings";
 import terminalSettings from "./terminalSettings";
 
 export default function mainSettings() {
@@ -127,12 +129,32 @@ export default function mainSettings() {
 			chevron: true,
 		},
 		{
+			key: "ssh-settings",
+			text: strings["ssh sessions"] || "Sessões SSH",
+			icon: "svg:server",
+			info:
+				strings["settings-info-main-ssh"] ||
+				"Sessões SSH salvas: abra um terminal remoto com um toque.",
+			category: categories.customizationTools,
+			chevron: true,
+		},
+		{
 			key: "gh-settings",
 			text: strings["github settings"] || "GitHub",
 			icon: "svg:github",
 			info:
 				strings["settings-info-main-gh"] ||
 				"GitHub account, personal access token, repositories and branch.",
+			category: categories.customizationTools,
+			chevron: true,
+		},
+		{
+			key: "font-settings",
+			text: strings["font manager"] || "Fontes",
+			icon: "svg:type",
+			info:
+				strings["settings-info-main-fonts"] ||
+				"Instale fontes por URL e escolha a fonte do editor e do app.",
 			category: categories.customizationTools,
 			chevron: true,
 		},
@@ -200,6 +222,14 @@ export default function mainSettings() {
 
 			case "gh-settings":
 				ghSettings();
+				break;
+
+			case "ssh-settings":
+				sshSettings();
+				break;
+
+			case "font-settings":
+				fontSettings();
 				break;
 
 			case "marketplaceUrl":

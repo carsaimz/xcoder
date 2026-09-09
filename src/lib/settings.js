@@ -252,6 +252,8 @@ class Settings {
 					workspaces: {},
 				},
 			},
+			// terminal onboarding shown once (v1.6.0)
+			terminalOnboardingDone: false,
 			developerMode: false,
 			shiftClickSelection: true,
 			showShareButton: true,

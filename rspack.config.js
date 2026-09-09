@@ -151,6 +151,7 @@ module.exports = (env, options) => {
       cssLspWorker: './src/cm/lsp/workers/css.worker.ts',
       jsonLspWorker: './src/cm/lsp/workers/json.worker.ts',
       typescriptLspWorker: './src/cm/lsp/workers/typescript.worker.ts',
+      replWorker: './src/lib/replWorker.js',
     },
     output: {
       path: path.resolve(__dirname, 'www/build/'),

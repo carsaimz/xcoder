@@ -71,6 +71,7 @@ const SIDEBAR_APPS = [
         ["extensions", () => import("sidebarApps/extensions")],
         ["ai", () => import("sidebarApps/ai")],
         ["git", () => import("sidebarApps/git")],
+        ["repl", () => import("sidebarApps/repl")],
         ["website", () => import("sidebarApps/website")],
         ["notification", () => import("sidebarApps/notification")],
         ["profile", () => import("sidebarApps/profile")],

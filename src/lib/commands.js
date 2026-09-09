@@ -774,6 +774,11 @@ Additional Info:
 	},
 	async "new-terminal"() {
 		try {
+			// first-run onboarding (Alpine vs FailSafe + reinstall)
+			const { maybeTerminalOnboarding } = await import(
+				"lib/terminalOnboarding"
+			);
+			await maybeTerminalOnboarding();
 			const { TerminalManager } = await import(
 				/* webpackChunkName: "terminal" */ "components/terminal"
 			);

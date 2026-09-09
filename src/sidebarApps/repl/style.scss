@@ -1,0 +1,119 @@
+.repl-app {
+	.repl-panel {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 10px;
+	}
+
+	.repl-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		.repl-title {
+			font-weight: 600;
+			font-size: 0.95em;
+		}
+
+		.icon {
+			padding: 4px;
+			border-radius: 6px;
+			cursor: pointer;
+
+			&:active {
+				opacity: 0.6;
+			}
+		}
+	}
+
+	.repl-output {
+		min-height: 120px;
+		max-height: 40vh;
+		overflow-y: auto;
+		border-radius: 10px;
+		padding: 8px;
+		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+		font-family: var(--editor-font-family, monospace);
+		font-size: 0.85em;
+		line-height: 1.45;
+
+		&:empty::before {
+			content: attr(data-empty);
+			display: block;
+			opacity: 0.55;
+			text-align: center;
+			padding: 42px 8px;
+		}
+	}
+
+	.repl-line {
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+		padding: 1px 0;
+
+		&.repl-input {
+			font-weight: 700;
+			border-top: 1px dashed
+				color-mix(in srgb, var(--primary-color) 25%, transparent);
+			margin-top: 4px;
+			padding-top: 6px;
+		}
+
+		&.repl-warn {
+			color: #d9a441;
+		}
+
+		&.repl-error {
+			color: #e07070;
+		}
+
+		&.repl-result {
+			color: var(--text-color, inherit);
+			font-weight: 600;
+		}
+	}
+
+	.repl-input {
+		width: 100%;
+		resize: vertical;
+		border-radius: 10px;
+		padding: 8px 10px;
+		font-family: var(--editor-font-family, monospace);
+		font-size: 0.9em;
+		background: color-mix(in srgb, var(--primary-color) 6%, transparent);
+		border: 1px solid
+			color-mix(in srgb, var(--primary-color) 18%, transparent);
+		color: var(--text-color, inherit);
+		outline: none;
+
+		&:focus {
+			border-color: color-mix(in srgb, var(--primary-color) 40%, transparent);
+		}
+	}
+
+	.repl-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+
+		.repl-run-btn {
+			min-height: 34px;
+			padding: 0 18px;
+			border-radius: 10px;
+			border: none;
+			background: var(--primary-color);
+			color: #fff;
+			font-weight: 600;
+
+			&:active {
+				opacity: 0.8;
+			}
+		}
+
+		.repl-hint {
+			font-size: 0.72em;
+			opacity: 0.6;
+		}
+	}
+}

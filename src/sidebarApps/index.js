@@ -99,6 +99,8 @@ async function loadApps() {
 		["extensions", () => import("./extensions")],
 		["ai", () => import("./ai")],
 		["git", () => import("./git")],
+		// sandboxed JS console (Web Worker)
+		["repl", () => import("./repl")],
 		// embedded webview of the official site (docs/marketplace/sponsor)
 		["websiteApp", () => import("./website")],
 		["notification", () => import("./notification")],
@@ -117,7 +119,10 @@ async function loadApps() {
 				"error",
 				`Failed to register sidebar app "${id}": ${error?.message || error}\n${error?.stack || ""}`,
 			);
-			toast(`${strings["sidebar app error"] || "App indisponível"}: ${id}`, 3500);
+			toast(
+				`${strings["sidebar app error"] || "App indisponível"}: ${id}`,
+				3500,
+			);
 		}
 	}
 }

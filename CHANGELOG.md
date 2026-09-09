@@ -4,6 +4,51 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.6.0] - 2026-09-10
+
+### Roadmap v1.6.x — concluído
+
+- **Sessões SSH** (item 1): nova página de configurações lista os
+  servidores SFTP salvos e abre o terminal SSH com um toque; credenciais
+  permanecem no perfil nativo SFTP (nada sensível nas configurações) e o
+  botão "Nova conexão SFTP" abre o navegador de arquivos no menu certo
+- **Console JS** (item 2): novo app da sidebar — REPL real num Web Worker
+  em sandbox (sem DOM, sem Cordova): valor da última expressão, console
+  capturado (log/warn/error), histórico ↑/↓, Ctrl+Enter executa, saída
+  limitada a 200 linhas; worker novo `build/replWorker.js` (rspack +
+  webpack)
+- **Gerenciador de fontes** (item 3): instale fontes por URL
+  (.ttf/.otf/.woff2 — baixadas para `DATA/fonts` e cacheadas), aplique ao
+  **editor** e à **interface** separadamente, veja e remova as instaladas;
+  usa a infra `lib/fonts.js` que já existia (a UI era a peça faltante)
+- **Onboarding do terminal** (item 4): na primeira abertura de terminal,
+  um diálogo explica Alpine × FailSafe e oferece "Reinstalar ambiente";
+  mostrado uma vez (flag `terminalOnboardingDone` nas configurações)
+
+### Fixed
+- **Device Flow salvava sessão VAZIA** (o relato "conectou o GitHub mas o
+  app não mostra a conta nem lista repositórios"): o resultado de
+  `pollForToken()` era destruturado como `{token, user}` quando na verdade
+  é a string do token — o app gravava `ghToken` vazio e o card da conta
+  voltava para "Entrar"; agora o token é consumido como string, o perfil
+  é buscado em separado (falha tolerada) e `saveGhSession()` rejeita
+  sessões sem token
+- **Perfil via plugin nativo** (CORS-free) com `fetch` como fallback —
+  mesma estratégia do `ghGet` das configurações
+- **Card da conta na sidebar Git atualiza na hora** quando a sessão muda
+  (entrar/sair pelas configurações reflete imediatamente)
+- Site: **página da conta persistia deslogada** — o gate e o header
+  re-leem a sessão ao voltar de aba congelada (visibilitychange/pageshow);
+  o formulário inline do gate força re-leitura ao entrar; `/auth/callback`
+  não troca o código PKCE duas vezes (o segundo exchange falhava com
+  "Falha na autenticação" mesmo com sessão válida)
+
+### Tests
+- +19 testes (611 → 630): regressão do Device Flow (fluxo completo com
+  fetch simulado, sessão salva com token+perfil), runtime do REPL
+  (valor da última expressão, console, erros, serialização) e guards de
+  wiring das 4 features
+
 ## [1.5.4] - 2026-09-07
 
 ### GitHub App oficial
