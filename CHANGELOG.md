@@ -13,6 +13,41 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.6.4] - 2026-09-11
+
+### Corrigido — conta (página de perfil)
+
+- **"Entrar" e "Criar conta" voltaram a funcionar de verdade** — faltava
+  o conserto central: o setter `body` do WCPage SUBSTITUI o contêiner
+  interno `.main` da página pelo elemento atribuído, e o getter `body`
+  só encontra elementos `.main`/`main` — o div da página de perfil não
+  era nenhum dos dois, então `$page.body` voltava `null` depois da
+  atribuição e cada toque em "Entrar"/"Criar conta" morria num
+  `TypeError` silencioso (promise rejeitada sem tratamento). A sessão
+  até chegava a ser criada no papel, mas a página nunca conseguia ler os
+  campos — e ficava presa em "Convidado" para sempre. O corpo agora
+  guarda a referência local `$body` (usada pelas 7 leituras do ficheiro)
+  e carrega as classes padrão `main scroll`, mesmo padrão da página
+  Sobre, restaurando também o dimensionamento/rolagem canônicos
+- As versões 1.6.1/1.6.2 consertaram a validade da sessão
+  (`ensureFreshSession`), a persistência do PAT e a ponte site → app —
+  mas o clique morto permanecia; é por isso que o perfil continuava sem
+  conta mesmo após o login
+
+### EN summary
+
+- **Sign-in buttons on the account page work again.** The WCPage `body`
+  setter replaces the page's internal `.main` container with the
+  assigned element, and the `body` getter only resolves elements
+  matching `.main`/`main` — the profile div was neither, so `$page.body`
+  returned null afterwards and every tap on "Entrar"/"Criar conta"
+  died in a silent TypeError (async click handler, unhandled rejection).
+  The page body now keeps a local `$body` reference (all 7 reads) and
+  carries the standard `main scroll` classes (About-page pattern), which
+  also restores the canonical sizing/scrolling. v1.6.1/v1.6.2 had fixed
+  session freshness, PAT persistence and the site→app handoff — the dead
+  click remained, which is why the profile still showed "Convidado".
+
 ## [1.6.3] - 2026-09-10
 
 ### Adicionado — Console REPL v2 + wiki bilíngue

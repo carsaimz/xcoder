@@ -16,8 +16,17 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.3).
 
-## ✅ Concluído até a v1.6.3
+## ✅ Concluído até a v1.6.4
 
+- **v1.6.4 — conserto definitivo da conta:** "Entrar"/"Criar conta" da
+  página de perfil estavam mortos desde sempre — o getter `body` do
+  WCPage devolve `null` após o setter substituir o `.main` interno
+  (o div do perfil não tinha a classe `main`), e as leituras dos campos
+  explodiam num TypeError silencioso; corpo agora mantém referência
+  local `$body` + classes padrão `main scroll` (padrão Sobre). Fecha o
+  ciclo iniciado em 1.6.1/1.6.2 (sessão válida, PAT persistido, ponte
+  site → app); +7 testes de regressão com renderização real (694 no
+  total)
 - **v1.6.3 — Console REPL v2 + wiki bilíngue:**
   - **Console REPL v2 (v1.7.x item 3):** histórico persistente entre
     sessões (localStorage, dedupe, cap 50), snippets salvos com nome

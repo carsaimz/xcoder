@@ -76,8 +76,16 @@ async function renderProfilePage() {
 	const status = getPremiumStatus();
 
 	const $page = Page(t("profile", "Perfil").capitalize());
-	$page.body = (
-		<div className="profile-page">
+
+	// Capture the body element in a local reference. WCPage's body setter
+	// replaces the internal .main container with this element, and the
+	// body getter only resolves elements matching ".main"/"main" — which
+	// this div is not (that is why it also needs the main/scroll classes
+	// below, same pattern as the About page). Reading the page body
+	// property afterwards returned null and every interaction touching it
+	// (Entrar/Criar conta) died on a silent TypeError.
+	const $body = (
+		<div className="profile-page main scroll">
 			<section className="profile-card">
 				{user?.user_metadata?.avatar_url || user?.photoUrl ? (
 					<img
@@ -191,6 +199,7 @@ async function renderProfilePage() {
 			)}
 		</div>
 	);
+	$page.body = $body;
 
 	const onAuthChange = () => {
 		// the session arrived via the xcoder://auth/oauth intent (site → app
@@ -234,14 +243,14 @@ async function renderProfilePage() {
 	 * @param {string} message
 	 */
 	function showFormError(message) {
-		const $error = $page.body?.querySelector("[data-form-error]");
+		const $error = $body?.querySelector("[data-form-error]");
 		if (!$error) return;
 		$error.textContent = message || "";
 		$error.hidden = !message;
 	}
 
 	async function updateOAuthAvailability() {
-		const slot = $page.body?.querySelector("[data-oauth-slot]");
+		const slot = $body?.querySelector("[data-oauth-slot]");
 		if (!slot) return;
 		let enabled = [];
 		try {
@@ -258,7 +267,7 @@ async function renderProfilePage() {
 			enabled = []; // unreachable settings → hide federated buttons
 		}
 
-		const divider = $page.body.querySelector(".profile-divider");
+		const divider = $body.querySelector(".profile-divider");
 		if (!enabled.length) {
 			slot.content = (
 				<p className="profile-hint">
@@ -297,11 +306,8 @@ async function renderProfilePage() {
 	}
 
 	async function onSignIn() {
-		const email = $page.body
-			.querySelector('input[type="email"]')
-			?.value?.trim();
-		const password =
-			$page.body.querySelector('input[type="password"]')?.value || "";
+		const email = $body.querySelector('input[type="email"]')?.value?.trim();
+		const password = $body.querySelector('input[type="password"]')?.value || "";
 		if (!email || !password) {
 			toast(t("fill email password", "Preencha e-mail e palavra-passe"), 3000);
 			return;
@@ -322,11 +328,8 @@ async function renderProfilePage() {
 	}
 
 	async function onSignUp() {
-		const email = $page.body
-			.querySelector('input[type="email"]')
-			?.value?.trim();
-		const password =
-			$page.body.querySelector('input[type="password"]')?.value || "";
+		const email = $body.querySelector('input[type="email"]')?.value?.trim();
+		const password = $body.querySelector('input[type="password"]')?.value || "";
 		if (!email || !password) {
 			toast(t("fill email password", "Preencha e-mail e palavra-passe"), 3000);
 			return;
