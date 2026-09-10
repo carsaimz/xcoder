@@ -16,14 +16,20 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.3).
 
-## ✅ Concluído até a v1.6.2
+## ✅ Concluído até a v1.6.3
 
-- **Pós-v1.6.2 — wiki bilíngue:** as 16 páginas da wiki (14 de conteúdo +
-  `_Sidebar` + `_Footer`) agora trazem secções 🇧🇷 + 🇺🇸 num único ficheiro,
-  no mesmo formato de README/ROADMAP/docs; `publish-wiki.mjs` extrai a
-  secção ativa na publicação (`WIKI_LANG=pt|en`) e novo checker
-  `wiki/checkWikiBilingual.mjs` valida a política; site continua com
-  variantes EN próprias (`content/docs/en/`)
+- **v1.6.3 — Console REPL v2 + wiki bilíngue:**
+  - **Console REPL v2 (v1.7.x item 3):** histórico persistente entre
+    sessões (localStorage, dedupe, cap 50), snippets salvos com nome
+    (salvar/listar/excluir na toolbar) e **imports do workspace** —
+    `import {x} from "./lib/mod.js"` resolve arquivos relativos à pasta
+    do arquivo aberto, empacota como Blob URLs e roda no sandbox
+    (transitivo, com guardas de ciclo e cap de 64 módulos)
+  - **Wiki bilíngue:** as 16 páginas (14 conteúdo + `_Sidebar` +
+    `_Footer`) trazem secções 🇧🇷 + 🇺🇸 num único ficheiro;
+    `publish-wiki.mjs` extrai a secção ativa (`WIKI_LANG=pt|en`) e o
+    checker `wiki/checkWikiBilingual.mjs` entrou no CI
+  - +35 testes (652 → 687)
 - **v1.6.2 — PAT de verdade, ícones e conta unificada:**
   - **PAT persistido de verdade (fix crítico):** o kit de settings não
     grava valores de prompt — o PAT colado era descartado em silêncio
@@ -95,24 +101,22 @@
    documentos.
 2. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar,
    segredos seguros, ratings, exposição de pacotes CM6.
-3. **Console REPL v2** — snippets salvos, import de módulos do workspace
-   no sandbox (via Blob/URL), histórico persistente entre sessões.
-4. **Sessões SSH v2** — nome do servidor com favicon/cores, histórico de
+3. **Sessões SSH v2** — nome do servidor com favicon/cores, histórico de
    comandos por host, diretório inicial configurável no perfil.
-5. **Fontes v2** — preview visual antes de aplicar, import por arquivo
+4. **Fontes v2** — preview visual antes de aplicar, import por arquivo
    local (além de URL), variação de peso (bold/black) no editor.
 
 ## 🚀 Depois (v1.8+)
 
-6. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
+5. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
    anúncios; horário silencioso (Acode v1.12.0 #1918 / v1.11.8 #1779).
-7. **Novos idiomas** — a infra bilíngue pt/en do site e do app abre caminho
+6. **Novos idiomas** — a infra bilíngue pt/en do site e do app abre caminho
    para es/fr (dicionários por área já estão modularizados).
-8. **Painel do bot de release** — administrar os posts automáticos
+7. **Painel do bot de release** — administrar os posts automáticos
    (editar/apagar o anúncio do release) na área /admin do site.
-9. **Colaboração/backup** — sincronizar settings + sessões de IA via
+8. **Colaboração/backup** — sincronizar settings + sessões de IA via
    ghBackend já existente (backup/restore agendado, diff visual).
-10. **Editor de temas avançado** — editor visual de tokens (fundo,
+9. **Editor de temas avançado** — editor visual de tokens (fundo,
     primária, syntax colors) com export/import JSON compartilhável.
 
 ## 🧭 Direção contínua
@@ -133,14 +137,20 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.3).
 
-## ✅ Done through v1.6.2
+## ✅ Done through v1.6.3
 
-- **Post-v1.6.2 — bilingual wiki:** all 16 wiki pages (14 content +
-  `_Sidebar` + `_Footer`) now carry 🇧🇷 + 🇺🇸 sections in a single file,
-  matching the README/ROADMAP/docs format; `publish-wiki.mjs` extracts
-  the active section when publishing (`WIKI_LANG=pt|en`) and a new
-  `wiki/checkWikiBilingual.mjs` checker enforces the policy; the website
-  keeps its own EN variants (`content/docs/en/`)
+- **v1.6.3 — Console REPL v2 + bilingual wiki:**
+  - **Console REPL v2 (v1.7.x item 3):** persistent history across
+    sessions (localStorage, dedupe, cap 50), named saved snippets
+    (save/list/delete on the toolbar) and **workspace imports** —
+    `import {x} from "./lib/mod.js"` resolves files relative to the
+    open file's folder, inlines them as Blob URLs and runs them in the
+    sandbox (transitive, with cycle guards and a 64-module cap)
+  - **Bilingual wiki:** all 16 pages (14 content + `_Sidebar` +
+    `_Footer`) carry 🇧🇷 + 🇺🇸 sections in a single file;
+    `publish-wiki.mjs` extracts the active section (`WIKI_LANG=pt|en`)
+    and the `wiki/checkWikiBilingual.mjs` checker joined CI
+  - +35 tests (652 → 687)
 - **v1.6.2 — real PAT persistence, icons and unified account:**
   - **PAT actually persisted (critical fix):** the settings kit does not
     save prompt values — pasted PATs were silently dropped ("connected via
@@ -201,24 +211,22 @@
    Ruff), live Sass compiler, advanced runner, document viewer.
 2. **Expanded plugin API** 💡 — toggle without restart, secure secrets,
    ratings, CM6 package exposure.
-3. **Console REPL v2** — saved snippets, workspace module imports in the
-   sandbox (Blob/URL), persistent history across sessions.
-4. **SSH sessions v2** — server names with colors/icons, per-host command
+3. **SSH sessions v2** — server names with colors/icons, per-host command
    history, configurable home directory.
-5. **Fonts v2** — visual preview before applying, local file import
+4. **Fonts v2** — visual preview before applying, local file import
    (beyond URL), weight variants (bold/black) in the editor.
 
 ## 🚀 Later (v1.8+)
 
-6. **Rewarded ads** 💡 — watching an ad grants extra ad-free time;
+5. **Rewarded ads** 💡 — watching an ad grants extra ad-free time;
    quiet hours (Acode v1.12.0 #1918 / v1.11.8 #1779).
-7. **New languages** — the pt/en bilingual infra paves the way for es/fr
+6. **New languages** — the pt/en bilingual infra paves the way for es/fr
    (per-area dictionaries are already modular).
-8. **Release bot dashboard** — manage automatic announcements
+7. **Release bot dashboard** — manage automatic announcements
    (edit/delete the release post) in the site's /admin area.
-9. **Collaboration/backup** — sync settings + AI sessions via the
+8. **Collaboration/backup** — sync settings + AI sessions via the
    existing ghBackend (scheduled backup/restore, visual diff).
-10. **Advanced theme editor** — visual token editor (background,
+9. **Advanced theme editor** — visual token editor (background,
     primary, syntax colors) with shareable JSON export/import.
 
 ## 🧭 Ongoing direction

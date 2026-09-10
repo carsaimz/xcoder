@@ -13,9 +13,43 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
-<a id="português"></a>
+## [1.6.3] - 2026-09-10
 
-## 🇧🇷 Português
+### Adicionado — Console REPL v2 + wiki bilíngue
+
+- **Console REPL v2 (roadmap v1.7.x item 3)**: o console JS da barra
+  lateral ganhou três superpoderes. **Histórico persistente** — os
+  comandos executados sobrevivem ao reinício do app (localStorage com
+  dedupe de repetições e cap de 50). **Snippets salvos** — dois botões
+  novos na toolbar (salvar/listar): nomeie, carregue e exclua snippets
+  direto do console. **Imports do workspace** — snippets podem importar
+  módulos do projeto com `import {x} from "./lib/mod.js"` (bem como
+  `import()` dinâmico e reexports): os arquivos relativos são resolvidos
+  a partir da pasta do arquivo aberto, convertidos em Blob URLs e
+  executados no sandbox — resolução transitiva com guardas de ciclo e
+  cap de 64 módulos; módulos ausentes aparecem como erro no console
+  ANTES de executar
+- **Wiki 100% bilíngue**: as 16 páginas da wiki (14 de conteúdo +
+  `_Sidebar` + `_Footer`) agora trazem secção 🇧🇷 + 🇺🇸 no mesmo
+  ficheiro, no mesmo formato de README/ROADMAP/docs; `publish-wiki.mjs`
+  extrai apenas a secção ativa na publicação (`WIKI_LANG=pt|en`, padrão
+  pt) e o novo `wiki/checkWikiBilingual.mjs` valida a política no CI
+
+### EN summary
+
+- **JS Console v2**: persistent history, saved snippets and workspace
+  imports (`./relative` specifiers are inlined as Blob URLs into the
+  sandboxed worker, transitively, with cycle/cap guards).
+- **Bilingual wiki**: all 16 wiki pages now carry 🇧🇷 + 🇺🇸 sections in a
+  single file; `publish-wiki.mjs` extracts the active section when
+  publishing (`WIKI_LANG=pt|en`) and CI enforces the policy.
+
+### Testes
+
+- +35 testes (652 → 687): histórico (dedupe/cap/corrupção), snippets
+  (upsert/remove/cap), imports (cláusulas, rewriting de snippet e de
+  módulo, resolução transitiva, ciclos, cap, especificadores externos) e
+  guardas de wiring do app
 
 ## [1.6.2] - 2026-09-10
 
