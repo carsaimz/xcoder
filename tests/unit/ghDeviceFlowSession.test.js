@@ -11,6 +11,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const fetchCalls = [];
 
 vi.mock("components/toast", () => ({ default: vi.fn() }));
+// ghSignIn now pulls in lib/ghWebFlow (web flow), which registers intent
+// handlers — handlers/intent drags in the JSX side of the app, so it must
+// be mocked in this node-environment test.
+vi.mock("handlers/intent", () => ({
+        addIntentHandler: vi.fn(),
+        removeIntentHandler: vi.fn(),
+}));
 vi.mock("dialogs/confirm", () => ({ default: vi.fn(async () => true) }));
 vi.mock("dialogs/loader", () => ({
         default: { show: vi.fn(async () => vi.fn()) },
