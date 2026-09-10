@@ -1,4 +1,146 @@
-# Contributor Covenant Code of Conduct
+# Código de Conduta do Contribuidor / Contributor Covenant Code of Conduct
+
+[🇧🇷 Português](#português) | [🇺🇸 English](#english)
+
+---
+
+<a id="português"></a>
+
+## 🇧🇷 Português
+
+## Nosso Compromisso
+
+Nós, como membros, contribuidores e líderes, nos comprometemos a fazer da
+participação em nossa comunidade uma experiência livre de assédio para todos,
+independentemente da idade, tamanho do corpo, deficiência visível ou
+invisível, etnia, características sexuais, identidade e expressão de gênero,
+nível de experiência, educação, status socioeconômico, nacionalidade,
+aparência pessoal, raça, religião ou identidade e orientação sexuais.
+
+Comprometemo-nos a agir e interagir de formas que contribuam para uma
+comunidade aberta, acolhedora, diversa, inclusiva e saudável.
+
+## Nossos Padrões
+
+Exemplos de comportamento que contribuem para um ambiente positivo:
+
+* Demonstrar empatia e gentileza com as outras pessoas
+* Respeitar opiniões, pontos de vista e experiências diferentes
+* Dar e aceitar gentilmente feedback construtivo
+* Assumir responsabilidade e pedir desculpas a quem for afetado por nossos
+  erros, aprendendo com a experiência
+* Focar no que é melhor não só para nós individualmente, mas para a
+  comunidade como um todo
+
+Exemplos de comportamento inaceitável:
+
+* Uso de linguagem ou imagens sexualizadas e atenção ou investidas sexuais
+  de qualquer tipo
+* Comentários provocadores (trolling), insultuosos ou depreciativos, e
+  ataques pessoais ou políticos
+* Assédio público ou privado
+* Publicar informações privadas de outras pessoas — como endereço físico ou
+  e-mail — sem permissão explícita
+* Outras condutas que razoavelmente possam ser consideradas inadequadas num
+  ambiente profissional
+
+## Responsabilidades de Aplicação
+
+Os líderes da comunidade são responsáveis por esclarecer e aplicar nossos
+padrões de comportamento aceitável e tomarão ações corretivas apropriadas e
+justas em resposta a qualquer comportamento que considerem inadequado,
+ameaçador, ofensivo ou nocivo.
+
+Os líderes da comunidade têm o direito e a responsabilidade de remover,
+editar ou rejeitar comentários, commits, código, edições na wiki, issues e
+outras contribuições que não estejam alinhadas a este Código de Conduta, e
+comunicarão os motivos das moderações quando apropriado.
+
+## Escopo
+
+Este Código de Conduta aplica-se a todos os espaços da comunidade e também
+quando uma pessoa representa oficialmente a comunidade em espaços públicos.
+Exemplos: usar um endereço de e-mail oficial, publicar por uma conta oficial
+de rede social ou atuar como representante nomeado num evento online ou
+presencial.
+
+## Aplicação
+
+Casos de comportamento abusivo, assediante ou de qualquer forma inaceitável
+podem ser reportados aos líderes da comunidade responsáveis pela aplicação,
+no repositório XCoder: https://github.com/carsaimz/xcoder
+Todas as reclamações serão analisadas e investigadas pronta e imparcialmente.
+
+Todos os líderes da comunidade são obrigados a respeitar a privacidade e a
+segurança de quem reporta qualquer incidente.
+
+## Diretrizes de Aplicação
+
+Os líderes da comunidade seguirão estas Diretrizes de Impacto na comunidade
+para determinar as consequências de qualquer ação que considerem violação
+deste Código de Conduta:
+
+### 1. Correção
+
+**Impacto na comunidade**: Uso de linguagem inadequada ou outro comportamento
+considerado pouco profissional ou indesejado na comunidade.
+
+**Consequência**: Aviso privado e por escrito dos líderes da comunidade,
+esclarecendo a natureza da violação e explicando por que o comportamento foi
+inadequado. Uma desculpa pública pode ser solicitada.
+
+### 2. Advertência
+
+**Impacto na comunidade**: Violação por meio de um único incidente ou série
+de ações.
+
+**Consequência**: Advertência com consequências para comportamento
+continuado. Nenhuma interação com as pessoas envolvidas — incluindo
+interação não solicitada com quem aplica este Código — por um período
+especificado. Isso inclui evitar interações nos espaços da comunidade e em
+canais externos como redes sociais. Violar estes termos pode levar a um
+banimento temporário ou permanente.
+
+### 3. Banimento Temporário
+
+**Impacto na comunidade**: Violação grave dos padrões da comunidade,
+incluindo comportamento inadequado sustentado.
+
+**Consequência**: Banimento temporário de qualquer tipo de interação ou
+comunicação pública com a comunidade por um período especificado. Nenhuma
+interação pública ou privada com as pessoas envolvidas — incluindo interação
+não solicitada com quem aplica este Código — é permitida durante este
+período. Violar estes termos pode levar a um banimento permanente.
+
+### 4. Banimento Permanente
+
+**Impacto na comunidade**: Demonstrar um padrão de violação dos padrões da
+comunidade, incluindo comportamento inadequado sustentado, assédio a um
+indivíduo, ou agressão ou desprezo a classes de indivíduos.
+
+**Consequência**: Banimento permanente de qualquer tipo de interação pública
+com a comunidade.
+
+## Atribuição
+
+Este Código de Conduta é adaptado do [Contributor Covenant][homepage],
+versão 2.0, disponível em
+https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
+
+As Diretrizes de Impacto na Comunidade foram inspiradas na
+[moderação de conduta da Mozilla](https://github.com/mozilla/diversity).
+
+[homepage]: https://www.contributor-covenant.org
+
+Para respostas a perguntas comuns sobre este código de conduta, veja o FAQ
+em https://www.contributor-covenant.org/faq. Traduções disponíveis em
+https://www.contributor-covenant.org/translations.
+
+---
+
+<a id="english"></a>
+
+## 🇺🇸 English
 
 ## Our Pledge
 
@@ -59,7 +201,8 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at the XCoder repository: https://github.com/carsaimz/xcoder
+reported to the community leaders responsible for enforcement at the XCoder
+repository: https://github.com/carsaimz/xcoder
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
@@ -70,10 +213,10 @@ reporter of any incident.
 Community leaders will follow these Community Impact Guidelines in determining
 the consequences for any action they deem in violation of this Code of Conduct:
 
-### 1. Corrections Issues
+### 1. Correction
 
-**Community Impact**: Must Not Use of inappropriate coding language or other hacker behavior deemed
-Any professional or manipulative findings like ease dropping hackers, malware bots, or faulty A.I. that breaks code for attacks against citizens cut-off for those programs and users are rendered fictitious businesses spammers using meta-trans-users causing confusion and corruption problems recirculating systems. Without help fixing these misconducts are responsible with talk back in any encryptions XCoder intelligence blocking them from entry to another account. Issues and comments are welcome in the community.
+**Community Impact**: Use of inappropriate language or other behavior deemed
+unprofessional or unwelcome in the community.
 
 **Consequence**: A private, written warning from community leaders, providing
 clarity around the nature of the violation and an explanation of why the
@@ -91,7 +234,8 @@ includes avoiding interactions in community spaces as well as external channels
 like social media. Violating these terms may lead to a temporary or
 permanent ban.
 
-### 3. Temporary Guidance
+### 3. Temporary Ban
+
 **Community Impact**: A serious violation of community standards, including
 sustained inappropriate behavior.
 
@@ -101,14 +245,14 @@ private interaction with the people involved, including unsolicited interaction
 with those enforcing the Code of Conduct, is allowed during this period.
 Violating these terms may lead to a permanent ban.
 
-### 4. Permanent view
+### 4. Permanent Ban
 
 **Community Impact**: Demonstrating a pattern of violation of community
-standards, including sustained inappropriate behavior,  harassment of an
+standards, including sustained inappropriate behavior, harassment of an
 individual, or aggression toward or disparagement of classes of individuals.
 
-**Consequence**: A permanent free service for bandwidth/LTE technology, for opening arguments within discussions hearing any testing that class forms, and any sort of arbitration claims processed are settled. Giving back to private sectors,to public interaction within
-the community, state, country, and never excludes global conglomerates due to consumer reports, feedbacks, sharing viable information that interests any disadvantages against
+**Consequence**: A permanent ban from any sort of public interaction within
+the community.
 
 ## Attribution
 
@@ -116,8 +260,8 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage],
 version 2.0, available at
 https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
 
-Community Impact Guidelines were inspired by [Mozilla's code of conduct
-enforcement reversal legislation relativity](https://github.com/mozilla/diversity).
+Community Impact Guidelines were inspired by
+[Mozilla's code of conduct enforcement ladder](https://github.com/mozilla/diversity).
 
 [homepage]: https://www.contributor-covenant.org
 

@@ -1,4 +1,13 @@
 # Integração GitHub do XCoder — guia de configuração
+# XCoder GitHub integration — setup guide
+
+[🇧🇷 Português](#português) | [🇺🇸 English](#english)
+
+---
+
+<a id="português"></a>
+
+## 🇧🇷 Português
 
 Este guia documenta a integração oficial do app com o GitHub: o que já
 foi criado, onde cada chave entra no código e por que **webhook** e
@@ -133,3 +142,140 @@ nenhuma build do app precisa mudar. **Nunca** coloque o secret em
 | Webhook secret | env do site | Vercel → `GITHUB_APP_WEBHOOK_SECRET` |
 | Bot user id | Não (automático, `<slug>[bot]`) | — |
 | PAT do usuário | Alternativa sempre disponível | cola na tela do app |
+
+---
+
+<a id="english"></a>
+
+## 🇺🇸 English
+
+This guide documents the app's official GitHub integration: what already
+exists, where each key lands in the code, and why **webhook** and **bot
+user id** need no manual setup.
+
+## Overview: how the app signs in to GitHub
+
+XCoder offers three access paths, and **none of them asks users to create
+their own OAuth clients** (chooser order in `src/lib/ghSignIn.js`):
+
+1. **Connect with GitHub (browser) — GitHub App web flow** — the app opens
+   the browser at
+   `github.com/login/oauth/authorize?client_id=…&redirect_uri=<site>/api/github/callback`;
+   the official site exchanges the `code` for a token **server-side** (the
+   client secret lives only in the Vercel env) and hands the session back
+   via `xcoder://github/session#…`, completing the sign-in automatically
+   (`src/lib/ghWebFlow.js`). Easiest path: one tap.
+2. **Official Device Flow** — the user picks "Sign in with a code", opens
+   `github.com/login/device` and types the displayed code. The *client id*
+   ships with the app (see below). A client id is public by design; the
+   Device Flow uses **no client secret** and needs **no backend**. It is
+   the plan B when the browser return leg cannot reach the app.
+3. **Personal access token (PAT)** — the user pastes a token generated at
+   <https://github.com/settings/tokens> (classic or fine-grained, with
+   `repo`, `workflow` and `gist` scopes) on the app's GitHub settings page.
+   The manual path that always works.
+
+In code, the decision order lives in `src/lib/ghSignIn.js`
+(`resolveGhClientId()`): the built-in official client id first
+(`config.GH_OAUTH_CLIENT_ID` in `src/lib/config.js`), then a legacy value
+saved by old installs. With no client id, the UI only offers the PAT flow.
+
+## Already done (maintainer)
+
+| Item | Value | Status |
+|------|-------|--------|
+| App type | **GitHub App** (not a classic OAuth App) | created |
+| Client ID | `Ov23liUF4sGyfo278bN8` | **built into the app** (`src/lib/config.js`) |
+| Callback URL | `https://xcoderapp.vercel.app/api/github/callback` | registered + **route published on the site** (web flow) |
+| Client Secret | kept by the maintainer — **never enters the repo** | n/a (Device Flow does not use it) |
+
+The Device Flow works with **GitHub Apps and OAuth Apps**. The only
+practical difference: GitHub Apps **ignore the `scope` parameter** — the
+user token's permissions come from the app's own settings
+(`src/lib/ghAuth.js` detects `Ov23li*`/`Iv1.` client ids and only sends
+`scope` to classic OAuth Apps).
+
+## Still missing on GitHub (2 minutes)
+
+1. Open <https://github.com/settings/apps> → **XCoder** (your app) →
+   **General**.
+2. Under **Identifying and authorizing users**, check ✅ **Enable Device
+   Flow**. Without it the app gets an error when requesting the code —
+   this is the **only mandatory toggle**.
+3. Under **Permissions**, configure (the app's push/clone depends on them):
+   - *Repository permissions* → **Contents: Read and write** (clone,
+     push, repo gists);
+   - *Repository permissions* → **Pull requests: Read and write**;
+   - *Repository permissions* → **Workflows: Read and write** (editing
+     files under `.github/`);
+   - *Metadata: Read-only* (mandatory, pre-checked);
+   - *Account permissions* → **Email addresses: Read-only** and
+     **Profile: Read-only** (identity on the account screen).
+4. **Save changes**. Users who already authorized must re-authorize when
+   permissions grow — GitHub notifies them on their side.
+
+After that, "Sign in with a code" works end to end.
+
+## Client Secret: keep it, never publish it
+
+The Device Flow does **not** use a client secret, but the **web flow
+does**: the site exchanges `?code=` for a token server-side. The secret
+goes into the Vercel env of the site project:
+
+```text
+GITHUB_APP_CLIENT_ID=Ov23liUF4sGyfo278bN8
+GITHUB_APP_CLIENT_SECRET=<GitHub App secret>
+GITHUB_APP_WEBHOOK_SECRET=<random webhook string>
+```
+
+Without those envs, `/api/github/callback` answers with a page explaining
+the missing setup (the Device Flow keeps working regardless). If the
+secret ever leaked through chat/e-mail, generate a new one under
+**General → Client secrets → Generate** and update the Vercel env — no app
+build needs to change. **Never** put the secret in `src/`, commits or
+issues (the `xcoder` repo is public).
+
+## Webhook: route already published on the site
+
+- The site already ships the receiver: `POST /api/github/webhook`
+  (`xcoder-web/src/app/api/github/webhook`). It validates the
+  `X-Hub-Signature-256` signature (HMAC-SHA256 with
+  `GITHUB_APP_WEBHOOK_SECRET`), answers GitHub's `ping` with `pong` and
+  logs the remaining events.
+- To enable: GitHub → App settings → **Webhook → Active** →
+  **Webhook URL**: `https://xcoderapp.vercel.app/api/github/webhook` →
+  **Webhook secret**: the SAME string as the Vercel env
+  `GITHUB_APP_WEBHOOK_SECRET`. On save, GitHub sends a `ping` and the URL
+  turns green.
+- With no webhook active nothing breaks: the app only calls the API when
+  you use it; events received today are just logged (bot actions with
+  installation tokens land in v1.7+).
+
+## Bot user id: what it is and whether we need it
+
+- Creating a **GitHub App** makes GitHub generate the virtual user
+  `<app-slug>[bot]` — visible at `https://github.com/settings/apps` and
+  via `https://api.github.com/users/<app-slug>%5Bbot%5D` (`[bot]`
+  URL-encoded as `%5Bbot%5D`). The numeric "id" appears in that JSON
+  (`"id": 123456789`).
+- **The current flow does not use it**: with the Device Flow everything
+  the app does (push, clone, gist) happens under the user's own account —
+  the desired behavior for a personal code editor. The bot user would only
+  show up for actions performed with the app's identity (installations,
+  automated comments).
+- There is nothing to configure: the bot is born with the app; choose the
+  slug carefully, since renaming it later breaks mentions.
+
+## Maintainer summary
+
+| Item | Needed? | Where it lands |
+|------|---------|----------------|
+| GitHub App Client ID | ✅ done | `src/lib/config.js` → `GH_OAUTH_CLIENT_ID` |
+| Enable Device Flow | ✅ to do | App settings on GitHub |
+| Permissions (Contents/PR/Workflows) | ✅ to do | App settings on GitHub |
+| Client Secret | site env (web flow) | Vercel → `GITHUB_APP_CLIENT_SECRET` (rotate if exposed) |
+| Callback URL | ✅ route published | `<site>/api/github/callback` |
+| Webhook | ✅ route published — enabling is optional | `<site>/api/github/webhook` |
+| Webhook secret | site env | Vercel → `GITHUB_APP_WEBHOOK_SECRET` |
+| Bot user id | No (automatic, `<slug>[bot]`) | — |
+| User PAT | always-available alternative | pasted on the app's screen |

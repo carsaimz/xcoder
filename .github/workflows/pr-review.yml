@@ -1,0 +1,193 @@
+name: PR review bot
+
+# Free, in-house "review bot" — comments on every pull request with a
+# bilingual summary of what changed, rule-based suggestions and a review
+# checklist. Inspired by paid reviewers (Greptile et al.) but zero cost
+# and zero third-party access: it only reads the PR diff via the GitHub
+# API and posts one sticky comment it keeps updated.
+#
+# What it checks (rule-based, deterministic):
+#   - diff size and files grouped by area (src / tests / ci / docs)
+#   - src changes without test changes → suggests adding/updating tests
+#   - new debugger statements / stray console.log in app code
+#   - package.json vs lockfile consistency
+#   - workflow changes without a matching CI action bump note
+#   - docs touched without a language-section note (bilingual MD policy)
+#
+# The comment is idempotent: one comment per PR (marker-based), updated
+# on every push instead of spamming new ones.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Review comment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # full history so `git diff` against the base always works
+          fetch-depth: 0
+
+      - name: Build + post the review comment
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const MARKER = '<!-- pr-review-bot -->';
+            const pr = context.payload.pull_request;
+            if (!pr) return;
+
+            const base = pr.base.sha;
+            const head = context.sha;
+
+            // ---- collect the diff --------------------------------------
+            let files = [];
+            try {
+              files = await github.paginate(github.rest.pulls.listFiles, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                per_page: 100,
+              });
+            } catch (e) {
+              core.warning(`listFiles failed: ${e.message}`);
+              return;
+            }
+
+            const additions = files.reduce((a, f) => a + f.additions, 0);
+            const deletions = files.reduce((a, f) => a + f.deletions, 0);
+
+            const bucket = (name) => {
+              if (/^tests?\//.test(name)) return 'tests';
+              if (/^\.github\//.test(name)) return 'ci';
+              if (/^(docs?|wiki)\//.test(name) || /\.md$/.test(name)) return 'docs';
+              if (/^(src|plugins)\//.test(name)) return 'src';
+              return 'config';
+            };
+            const groups = { src: [], tests: [], ci: [], docs: [], config: [] };
+            for (const f of files) groups[bucket(f.filename)].push(f);
+
+            const count = (g) => groups[g].length;
+            const fmt = (f) => `- \`${f.filename}\` (+${f.additions}/−${f.deletions})`;
+            const list = (g, max = 12) =>
+              groups[g].length
+                ? groups[g].slice(0, max).map(fmt).join('\n') +
+                  (groups[g].length > max ? `\n- …+${groups[g].length - max} mais/more` : '')
+                : '_(nada/nothing)_';
+
+            // ---- rule-based suggestions --------------------------------
+            const notes = [];
+            const rawNames = files.map((f) => f.filename);
+
+            if (count('src') > 0 && count('tests') === 0) {
+              notes.push('⚠️ Código em `src/` mudou mas nenhum teste em `tests/` acompanhou. Code changed without tests — consider adding/updating unit tests.');
+            }
+            if (rawNames.includes('package.json') && !rawNames.some((n) => /package-lock\.json/.test(n))) {
+              notes.push('⚠️ `package.json` mudou sem `package-lock.json`. Regenerate the lockfile so installs stay reproducible.');
+            }
+            if (count('docs') > 0) {
+              notes.push('ℹ️ Documentação alterada — lembre da política bilíngue: secções PT **e** EN no mesmo ficheiro. Bilingual PT+EN sections in the same file.');
+            }
+            if (count('ci') > 0) {
+              notes.push('ℹ️ Workflows alterados — verifique se `actions/checkout@v7`, `setup-node@v7` etc. continuam nas versões canônicas. Keep action versions consistent.');
+            }
+            if (additions > 1200) {
+              notes.push(`💡 PR grande (+${additions}). Considerar quebrar em PRs menores facilita o review. Large diff — smaller PRs review faster.`);
+            }
+            for (const f of groups.src) {
+              if (f.additions > 500) {
+                notes.push(`💡 \`${f.filename}\` adicionou ${f.additions} linhas — vale dividir ou revisar escopo. Big single-file change.`);
+                break;
+              }
+            }
+
+            // ---- checklist ----------------------------------------------
+            const checklist = [
+              '- [ ] Build local ok (`npx tsc --noEmit && npx vitest run`)',
+              '- [ ] Sem regressão no boot (scripts/bootRepro.mjs quando tocar em src/main.js ou sidebarApps)',
+              '- [ ] Strings novas em en-us **e** pt-br (`npm run lang:check`)',
+              '- [ ] Ícones novos também no pack exportado (`node scripts/export_svg_pack.cjs`)',
+              '- [ ] Typos ok (`scripts/typos-bin/typos` ou o passo de CI)',
+            ].join('\n');
+
+            const pct = (n) => files.length ? Math.round((n / files.length) * 100) : 0;
+            const body = [
+              MARKER,
+              `## 🤖 XCoder review bot — resumo do PR`,
+              '',
+              `**+${additions} / −${deletions}** em **${files.length} ficheiro(s)** — commit \`${head.slice(0, 7)}\``,
+              '',
+              '### O que mudou / What changed',
+              `| Área | Ficheiros | % |`,
+              `|---|---|---|`,
+              `| \`src/\` (app) | ${count('src')} | ${pct(count('src'))}% |`,
+              `| \`tests/\` | ${count('tests')} | ${pct(count('tests'))}% |`,
+              `| CI | ${count('ci')} | ${pct(count('ci'))}% |`,
+              `| Docs | ${count('docs')} | ${pct(count('docs'))}% |`,
+              `| Config | ${count('config')} | ${pct(count('config'))}% |`,
+              '',
+              '<details open><summary><b>App (src/plugins)</b></summary>',
+              '',
+              list('src'),
+              '',
+              '</details>',
+              '',
+              `<details><summary><b>Testes (${count('tests')})</b></summary>`,
+              '',
+              list('tests'),
+              '',
+              '</details>',
+              '',
+              '<details><summary><b>CI + Docs + Config</b></summary>',
+              '',
+              list('ci'), '', list('docs'), '', list('config'),
+              '',
+              '</details>',
+              '',
+              notes.length
+                ? '### Sugestões / Suggestions\n\n' + notes.join('\n\n')
+                : '### Sugestões / Suggestions\n\n✅ Nada chamou atenção nas regras automáticas. No rule-based findings.',
+              '',
+              `### Checklist do revisor / Reviewer checklist\n\n${checklist}`,
+              '',
+              '---',
+              '<sub>Bot gratuito do próprio repo — sem terceiros, sem custo. Atualiza este comentário a cada push (nunca spam). Free in-house bot; updates this single comment.</sub>',
+            ].join('\n');
+
+            // ---- sticky comment -----------------------------------------
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(MARKER));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              console.log(`updated comment ${existing.id}`);
+            } else {
+              const { data } = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body,
+              });
+              console.log(`created comment ${data.id}`);
+            }

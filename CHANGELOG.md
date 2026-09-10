@@ -1,7 +1,25 @@
-# Changelog
+# Changelog / Registro de mudanças
+
+[🇧🇷 Português](#português) | [🇺🇸 English](#english)
 
 All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
+
+<a id="português"></a>
+
+## 🇧🇷 Português
+
+Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
+históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
+resumo em inglês.
+
+<a id="english"></a>
+
+## 🇺🇸 English
+
+Every notable change to **XCoder** is documented here. Historical entries
+are written in Brazilian Portuguese; from v1.6.2 onward each release also
+carries a short English summary right below the Portuguese one.
 
 
 ## [1.6.1] - 2026-09-10

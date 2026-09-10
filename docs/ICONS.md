@@ -1,4 +1,84 @@
+# Sistema de Ícones — Convenção Híbrida
 # Icon System — Hybrid Convention
+
+[🇧🇷 Português](#português) | [🇺🇸 English](#english)
+
+---
+
+<a id="português"></a>
+
+## 🇧🇷 Português
+
+A UI do Xcoder mistura conjuntos de ícones curados, cada um com um papel
+claro. Isso mantém a interface expressiva sem virar ruído, e afasta a
+identidade visual do azul padrão do Acode rumo à paleta da marca:
+**índigo profundo + acento laranja**.
+
+## Os quatro níveis
+
+| Nível                | Conjunto         | Uso                                                              | Exemplos                             |
+| -------------------- | ---------------- | ---------------------------------------------------------------- | ------------------------------------ |
+| Sidebar / atividades | **Lucide**       | Ícones de traço fino e outline moderno para navegação e painéis  | files, search, git-branch, brain, puzzle |
+| Ações primárias      | **Material (Filled)** | Glifos preenchidos para as ações que importam (salvar, rodar, enviar) | send, play_arrow, add, check |
+| Status / indicadores | **FontAwesome 6 (solid)** | Chips de estado, badges e indicadores de conexão        | circle, plug, wifi, triangle-exclamation |
+| Navegação / abas     | **Bootstrap Icons** | Barras de abas, steppers e orientação                          | house, journal-code, grid            |
+
+## Como isso mapeia no código
+
+O app é um projeto WebView (Cordova), então a fonte de ícones em runtime é
+a fonte empacotada em `src/res/icons/` (`icons.ttf` + `style.css`, classes
+como `icon edit`). A convenção define **qual glifo escolher** para UI nova:
+
+1. Ícones novos de sidebar/painéis → adicione o glifo outline estilo Lucide
+   à fonte (o pipeline em `scripts/xcoder_icon.py` renderiza contornos SVG
+   em `icons.ttf`).
+2. Botões de ação (enviar, salvar, testar, novo chat) → glifos preenchidos
+   estilo Material que já existem na fonte (`send`, `play_arrow`, `add`,
+   `check`, `tune`).
+3. Chips de status (Conectado / Offline / badges) → glifos sólidos ou os
+   componentes de pílula coloridos (`.ai-pchip`, badges de provedor) — a
+   cor carrega o estado: verde `#4CAF50`, âmbar `#FFC107`, vermelho
+   `#F44336`, laranja `#FF8A3D` para acentos da marca.
+4. Abas/navegação reutilizam os glifos de navegação existentes; abas
+   outline estilo Bootstrap são questão de estilo (espessura de traço), não
+   de fonte nova.
+
+No **lado web** (`xcoder-web`), o Lucide entra como `lucide-react` e é a
+fonte única da navegação do site — o nível 1 desta convenção.
+
+## O pack de ícones SVG (níveis 1 + 2, entregues)
+
+A navegação é sustentada por um pack real e versionado — não é mais
+convenção no papel:
+
+- **Módulo de runtime**: `src/utils/svgIcons.js` — 61 ícones estilo Lucide
+  (24×24, traço `currentColor`, largura 1.75) como SVG inline, com
+  `svgIcon(name)` / `hasIcon(name)`.
+- **Ficheiros do pack**: `src/res/icons/svg/*.svg` — vetores autônomos
+  regenerados do módulo com `node scripts/export_svg_pack.cjs` (a fonte de
+  verdade é o módulo).
+- **Integração**: ícones de `SidebarApp` registrados como `svg:<nome>`
+  renderizam o vetor inline (`.icon.xc-svgicon`); o kit de settings aceita
+  o mesmo prefixo `svg:<nome>` em qualquer `item.icon`
+  (`components/settingsPage.js`), e o dialog `select` também desenha esses
+  vetores (`dialogs/select.js`). Quando o nome não está no pack, cai
+  silenciosamente para a fonte de ícones, então plugins que usam nomes da
+  fonte continuam funcionando.
+
+## Regras de paleta
+
+- Superfícies/texto primários: guiados pelo tema (tema padrão **Xcoder**:
+  ameixa profunda `rgb(35,33,51)` + violeta `rgb(133,108,250)`).
+- Botões/CTAs: acento laranja `rgb(255,138,61)` → `rgb(224,104,34)` ao
+  pressionar.
+- Status: chips verde/âmbar/vermelho como acima; nunca use o azul antigo do
+  Acode como acento em UI nova.
+
+---
+
+<a id="english"></a>
+
+## 🇺🇸 English
 
 The Xcoder UI mixes curated icon sets, each with a clear role. This keeps the
 interface expressive without becoming noisy, and moves the visual identity
@@ -41,7 +121,7 @@ single source for site navigation — matching tier 1 of this convention.
 The navigation tiers are backed by a real, versioned pack — no longer a
 convention on paper:
 
-- **Runtime module**: `src/utils/svgIcons.js` — 32 Lucide-flavored icons
+- **Runtime module**: `src/utils/svgIcons.js` — 61 Lucide-flavored icons
   (24×24, stroke `currentColor`, width 1.75) as inline SVG, with
   `svgIcon(name)` / `hasIcon(name)`.
 - **Pack files**: `src/res/icons/svg/*.svg` — standalone vectors regenerated
@@ -58,12 +138,14 @@ Current registrations:
 - Sidebar rail: files→`svg:files`, search→`svg:search`, plugins→`svg:puzzle`,
   AI→`svg:brain`, Git→`svg:git-branch`, notifications→`svg:bell`,
   settings→`svg:settings`.
-- Main settings (tier 2 — navigation): app→`svg:sliders-horizontal`,
+- Main settings (tier 2 — navigation, grouped Core → Appearance → Code &
+  tools → Connections → Data → About): app→`svg:sliders-horizontal`,
   editor→`svg:file-code`, terminal→`svg:square-terminal`,
-  preview→`svg:globe`, formatter→`svg:braces`, theme→`svg:palette`,
-  plugins→`svg:puzzle`, language servers→`svg:zap`, AI→`svg:brain`,
-  cloud→`svg:cloud`, settings.json→`svg:file-cog`,
-  reset→`svg:rotate-ccw`, about→`svg:info`, changelog→`svg:history`.
+  preview→`svg:globe`, theme→`svg:palette`, fonts→`svg:type`,
+  formatter→`svg:braces`, language servers→`svg:zap`, AI→`svg:bot`,
+  plugins→`svg:puzzle`, GitHub→`svg:github`, SSH→`svg:server`,
+  settings.json→`svg:file-cog`, reset→`svg:rotate-ccw`,
+  support→`svg:heart`, about→`svg:info`, changelog→`svg:history`.
 
 Tier 3 — menus and static pages (shipped): the icon enhancer
 (`utils/iconEnhancer.js`) upgrades rendered font glyphs to the SVG pack at

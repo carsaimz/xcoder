@@ -34,3 +34,21 @@ O GitHub só cria o repositório da wiki depois que a **primeira página é salv
    > Use um **PAT clássico** com escopo `repo` — PATs fine-grained ainda não têm acesso de escrita a wikis.
 
 Enquanto a wiki hospedada não estiver ativa, este diretório já serve como documentação versionada no repositório (e os mesmos textos estão no site, com busca).
+
+## Política de idiomas / Language policy
+
+Este repositório adota conteúdo **bilíngue num único ficheiro** (secção
+🇧🇷 primeiro, depois 🇺🇸) para README, ROADMAP, CONTRIBUTING, CoC e docs/.
+As páginas da wiki são a exceção por ora: elas são renderizadas pelo site
+(que mantém as variantes EN na sua camada de i18n, `docsLangBody`) e
+publicadas na wiki do GitHub em português. Converter as 15 páginas para o
+formato bilíngue está no roadmap v1.7.x — o passo de publicação
+(`publish-wiki.mjs`) precisará extrair apenas a secção ativa.
+
+This repository uses **bilingual single-file content** (🇧🇷 section first,
+then 🇺🇸) for README, ROADMAP, CONTRIBUTING, CoC and docs/. Wiki pages are
+the exception for now: the site renders them (keeping EN variants in its
+i18n layer, `docsLangBody`) and publishes the GitHub wiki in Portuguese.
+Converting the 15 pages to the bilingual format is on the v1.7.x roadmap —
+the publish step (`publish-wiki.mjs`) will need to extract the active
+section only.

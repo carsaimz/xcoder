@@ -46,11 +46,19 @@ extend-exclude = [
     "src/res/iconNames.json",
     "src/res/plugin-registry.json",
     # --- conteúdo primário em pt-br (o typos não sabe português; v1.4.19+) ---
+    # v1.6.2: os MDs principais viraram BILÍNGUES (secção pt + secção en no
+    # mesmo ficheiro) — o dicionário do typos (só en) sinalizaria palavras
+    # portuguesas legítimas nas secções pt, então ficam excluídos como os
+    # outros conteúdos pt-br
     "wiki",
+    "README.md",
     "ROADMAP.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
     "CHANGELOG.md",
-    "readme.pt-br.md",
     "docs/ADS.md",
+    "docs/ICONS.md",
+    "docs/README.md",
     "docs/github-oauth-app.md",
     "docs/screenshots",
     "scripts/add_cmd_translations.mjs",
