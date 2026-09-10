@@ -45,13 +45,46 @@ describe("shared sign-in flow", () => {
                 expect(legacyPos).toBeGreaterThan(builtinPos);
         });
 
-        it("offers PAT first and hides the device flow without a client id", () => {
+        it("offers the web flow first, device flow with a client id, PAT last", () => {
                 const chooseFn = ghSignIn.slice(
                         ghSignIn.indexOf("export async function chooseGhSignInMethod"),
                         ghSignIn.indexOf("export async function saveGhSession"),
                 );
-                expect(chooseFn.indexOf('"pat"')).toBeGreaterThan(-1);
-                expect(chooseFn.indexOf("resolveGhClientId()")).toBeGreaterThan(-1);
+                const webPos = chooseFn.indexOf("ghWebFlowEnabled()");
+                const devicePos = chooseFn.indexOf("resolveGhClientId()");
+                expect(chooseFn.indexOf('"web"')).toBeGreaterThan(-1);
+                expect(webPos).toBeGreaterThan(-1);
+                expect(devicePos).toBeGreaterThan(webPos);
+        });
+
+        it("the client SECRET never reaches the app source", () => {
+                const offenders = [
+                        "src/lib/config.js",
+                        "src/lib/ghSignIn.js",
+                        "src/lib/ghAuth.js",
+                        "src/lib/ghWebFlow.js",
+                        "src/settings/ghSettings.js",
+                        "src/sidebarApps/git/index.js",
+                ].filter((p) =>
+                        read(p).match(/client_secret|GITHUB_APP_CLIENT_SECRET|3668a226/),
+                );
+                expect(offenders).toEqual([]);
+        });
+
+        it("main.js registers the xcoder://github/session intent handler", () => {
+                expect(read("src/main.js")).toMatch(/registerGhIntentHandler\(\)/);
+        });
+
+        it("the git sidebar renders the account even when local status fails", () => {
+                const sidebar = read("src/sidebarApps/git/index.js");
+                const refreshFn = sidebar.slice(
+                        sidebar.indexOf("async function refresh()"),
+                        sidebar.indexOf("function renderError"),
+                );
+                const accountPos = refreshFn.indexOf("renderAccount()");
+                const tryPos = refreshFn.indexOf("try {");
+                expect(accountPos).toBeGreaterThan(-1);
+                expect(tryPos).toBeGreaterThan(accountPos);
         });
 
         it("both entry points delegate to signInGitHubFlow", () => {

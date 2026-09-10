@@ -16,6 +16,7 @@ import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import config from "lib/config";
 import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
+import { ghWebFlowEnabled, signInWithGitHubApp } from "lib/ghWebFlow";
 import settings from "lib/settings";
 
 /**
@@ -48,17 +49,20 @@ export function resolveGhClientId() {
 }
 
 /**
- * Chooses the sign-in method. The Device Flow is offered only when a
- * client id is available. @returns {Promise<"pat"|"device"|null>}
+ * Chooses the sign-in method, easiest first: the GitHub App web flow
+ * (one tap in the browser) when available, then the Device Flow (needs
+ * only a client id), then the manual PAT.
+ * @returns {Promise<"web"|"device"|"pat"|null>}
  */
 export async function chooseGhSignInMethod() {
-	const options = [
-		[
-			"pat",
-			strings["github pat sign in"] || "Use a personal access token (PAT)",
-			"svg:key",
-		],
-	];
+	const options = [];
+	if (ghWebFlowEnabled()) {
+		options.push([
+			"web",
+			strings["github web sign in"] || "Connect with GitHub (browser)",
+			"svg:open_in_new",
+		]);
+	}
 	if (resolveGhClientId()) {
 		options.push([
 			"device",
@@ -181,6 +185,7 @@ export async function signInWithDeviceFlow() {
  */
 export async function signInGitHubFlow() {
 	const method = await chooseGhSignInMethod();
+	if (method === "web") return signInWithGitHubApp();
 	if (method === "pat") return signInWithPat();
 	if (method === "device") return signInWithDeviceFlow();
 	return false;

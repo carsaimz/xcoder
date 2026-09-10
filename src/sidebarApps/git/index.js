@@ -240,6 +240,12 @@ function setAccountBody(el) {
 async function refresh() {
 	if (!container || !$statusBody?.isConnected) return;
 
+	// Account card and GitHub commands must render regardless of the
+	// local repo state — a broken/absent git workspace used to
+	// early-return and leave the connected account invisible.
+	renderAccount();
+	renderGh();
+
 	let status;
 	try {
 		status = await getStatus();
@@ -250,8 +256,6 @@ async function refresh() {
 
 	renderStatus(status);
 	renderCommits();
-	renderGh();
-	renderAccount();
 }
 
 /**

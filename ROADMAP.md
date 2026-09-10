@@ -6,8 +6,16 @@
 > [Acode](https://github.com/Acode-Foundation/Acode) (CHANGELOG lido por
 > completo até a v1.13.3).
 
-## ✅ Concluído até a v1.6.0
+## ✅ Concluído até a v1.6.1
 
+- **v1.6.1 — GitHub App web flow de um toque + conta à prova de
+  webview:** "Conectar com GitHub (navegador)" como 1ª opção (site troca
+  o código pelo token no servidor, retorno `xcoder://github/session`
+  com validação anti-CSRF); card da conta do sidebar git renderiza
+  mesmo quando o status do git local falha; cliente Supabase do app com
+  camada HTTP nativa (login e-mail/senha à prova de CORS); site publicou
+  `/api/github/callback` + `/api/github/webhook` (HMAC) e o formulário
+  de conta não falha mais em silêncio; +10 testes (630 → 640)
 - **v1.6.0 — roadmap v1.6.x completo + fix do sign-in GitHub:**
   - **Sessões SSH** (item 1): página própria lista os servidores SFTP
     salvos e abre o terminal remoto com um toque (credenciais ficam no

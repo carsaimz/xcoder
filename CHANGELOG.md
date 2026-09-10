@@ -4,6 +4,54 @@ All notable changes to **XCoder** are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
 
+## [1.6.1] - 2026-09-10
+
+### Added — GitHub App web flow (um toque no navegador)
+
+- **"Conectar com GitHub (navegador)"** como primeira opção do chooser
+  (`src/lib/ghWebFlow.js`): o app abre o navegador em
+  `github.com/login/oauth/authorize`, o site oficial troca o código pelo
+  token NO SERVIDOR (o client secret vive só na env da Vercel — nunca no
+  app/repo público) e devolve a sessão por `xcoder://github/session#…`;
+  o app valida o `state` anti-CSRF, salva a sessão e atualiza o card da
+  conta na hora (via `settings.on`, já reativo). Device Flow e PAT
+  seguem disponíveis como alternativas
+- Handler de retorno `xcoder://github/session` registrado no boot
+  (`registerGhIntentHandler`), com tolerância a falha do perfil
+  (fallback nos parâmetros `login`/`avatar` anexados pelo callback)
+
+### Fixed — conta conectada ainda invisível em alguns casos
+
+- O `refresh()` do app lateral de git fazia **early-return quando o
+  status do repositório local falhava** e o cartão de conta nunca
+  renderizava — agora a conta e os comandos GitHub renderizam
+  independentes do estado do git local
+- **Login da conta do app à prova de webview**: o cliente Supabase do
+  app (`src/lib/supabase.js`) ganhou camada HTTP nativa
+  (cordova-plugin-advanced-http, sem CORS) para TODAS as requisições
+  (entrar, criar conta, perfil, refresh, settings) — o login e-mail +
+  senha na página de conta funciona mesmo quando o `fetch` do webview
+  falha, com as mensagens de erro reais do servidor
+
+### Site (xcoder-web)
+
+- **`/api/github/callback`**: troca code→token server-side
+  (`GITHUB_APP_CLIENT_ID`/`GITHUB_APP_CLIENT_SECRET`), página de
+  fallback com "copiar link de retorno" e retorno automático por
+  `xcoder://github/session`
+- **`/api/github/webhook`**: receiver com validação HMAC
+  (`X-Hub-Signature-256`), `ping`→`pong` e registro dos eventos
+- O formulário de conta nunca mais falha em silêncio — backend não
+  configurado e erros comuns do Supabase agora mostram mensagens pt-br
+- Guia `docs/github-oauth-app.md` atualizado: web flow, envs da Vercel,
+  webhook URL + secret, bot user `<slug>[bot]`, rotação do secret
+
+### Tests
+- +10 testes (630 → 640): web flow (disponibilidade, authorize URL sem
+  `scope`, anti-CSRF, salvamento de sessão) e política do sign-in
+  (ordem web → device, secret ausente do código-fonte, handler no boot,
+  conta renderiza mesmo sem git local)
+
 ## [1.6.0] - 2026-09-10
 
 ### Roadmap v1.6.x — concluído

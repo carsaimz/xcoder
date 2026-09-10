@@ -182,7 +182,24 @@ export async function fetchAuthSettings({ force = false } = {}) {
 		return authSettingsCache.settings;
 	}
 	try {
-		const response = await withTimeout(
+		let response;
+		if (
+			typeof cordova !== "undefined" &&
+			cordova?.plugin?.http?.sendRequest
+		) {
+			response = await nativeHttp(`${supabaseUrl()}/auth/v1/settings`, {
+				headers: { apikey: supabaseAnonKey() },
+			});
+			if (response.status >= 400 || !response.data) {
+				throw new Error(`HTTP ${response.status}`);
+			}
+			authSettingsCache = {
+				settings: response.data?.external || {},
+				at: Date.now(),
+			};
+			return authSettingsCache.settings;
+		}
+		response = await withTimeout(
 			fetch(`${supabaseUrl()}/auth/v1/settings`, {
 				headers: { apikey: supabaseAnonKey() },
 			}),
@@ -468,6 +485,20 @@ async function request(path, opts = {}) {
 	if (opts.body !== undefined) headers["Content-Type"] = "application/json";
 	if (opts.prefer) headers.Prefer = opts.prefer;
 
+	if (typeof cordova !== "undefined" && cordova?.plugin?.http?.sendRequest) {
+		// native fast path — CORS-free inside the webview, covers GET
+		// (profile/DB) and POST/PATCH (sign-in, logout, writes)
+		const { status, data } = await nativeHttp(`${base}${path}`, {
+			method: opts.method || "GET",
+			headers,
+			body: opts.body,
+		});
+		if (status >= 400) {
+			throw httpError(status, data);
+		}
+		return status === 204 ? null : data;
+	}
+
 	const response = await withTimeout(
 		fetch(`${base}${path}`, {
 			method: opts.method || "GET",
@@ -485,13 +516,78 @@ async function request(path, opts = {}) {
 		json = { msg: text?.slice(0, 200) };
 	}
 	if (!response.ok) {
-		const error = new Error(
-			json?.msg || json?.error_description || `HTTP ${response.status}`,
-		);
-		error.payload = json;
-		throw error;
+		throw httpError(response.status, json);
 	}
 	return json;
+}
+
+/**
+ * Builds the Error thrown by request() — keeps the server message
+ * ("Invalid login credentials", …) as the primary text.
+ * @param {number} status
+ * @param {any} json
+ * @returns {Error}
+ */
+function httpError(status, json) {
+	const error = new Error(
+		json?.msg || json?.error_description || `HTTP ${status}`,
+	);
+	error.payload = json;
+	return error;
+}
+
+/**
+ * Native (CORS-free) HTTP via cordova-plugin-advanced-http. JSON bodies
+ * are serialized by the plugin (serializer: "json"); the response is
+ * always parsed as JSON when possible.
+ * @param {string} url
+ * @param {{method?: string, headers?: Record<string, string>, body?: object, timeout?: number}} [opts]
+ * @returns {Promise<{status: number, data: any}>}
+ */
+function nativeHttp(url, opts = {}) {
+	const method = opts.method || "GET";
+	const hasBody = opts.body !== undefined;
+	return new Promise((resolve, reject) => {
+		const http = cordova.plugin.http;
+		try {
+			http.setDataSerializer(hasBody ? "json" : "utf8");
+		} catch {
+			/* serializer already default */
+		}
+		http.sendRequest(
+			url,
+			{
+				method,
+				headers: opts.headers || {},
+				data: hasBody ? opts.body : undefined,
+				serializer: hasBody ? "json" : "utf8",
+				responseType: "json",
+				timeout: opts.timeout || FETCH_TIMEOUT,
+			},
+			(response) => {
+				let data = response.data;
+				if (typeof data === "string") {
+					try {
+						data = data ? JSON.parse(data) : null;
+					} catch {
+						data = { msg: data?.slice(0, 200) };
+					}
+				}
+				resolve({ status: response.status, data: data ?? null });
+			},
+			(error) => {
+				let data = error?.error;
+				if (typeof data === "string") {
+					try {
+						data = JSON.parse(data);
+					} catch {
+						data = { msg: data?.slice(0, 200) };
+					}
+				}
+				reject(httpError(error?.status || 0, data));
+			},
+		);
+	});
 }
 
 /**

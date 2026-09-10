@@ -279,6 +279,9 @@ declare type LangStrings = {
   "sign in with github": string;
   "github sign in desc": string;
   "github pat active": string;
+  "github web sign in": string;
+  "github web hint": string;
+  "github web failed": string;
   "github pat sign in": string;
   "github device sign in": string;
   "github pat prompt": string;
