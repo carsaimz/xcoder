@@ -18,6 +18,12 @@
 
 ## ✅ Concluído até a v1.6.2
 
+- **Pós-v1.6.2 — wiki bilíngue:** as 16 páginas da wiki (14 de conteúdo +
+  `_Sidebar` + `_Footer`) agora trazem secções 🇧🇷 + 🇺🇸 num único ficheiro,
+  no mesmo formato de README/ROADMAP/docs; `publish-wiki.mjs` extrai a
+  secção ativa na publicação (`WIKI_LANG=pt|en`) e novo checker
+  `wiki/checkWikiBilingual.mjs` valida a política; site continua com
+  variantes EN próprias (`content/docs/en/`)
 - **v1.6.2 — PAT de verdade, ícones e conta unificada:**
   - **PAT persistido de verdade (fix crítico):** o kit de settings não
     grava valores de prompt — o PAT colado era descartado em silêncio
@@ -129,6 +135,12 @@
 
 ## ✅ Done through v1.6.2
 
+- **Post-v1.6.2 — bilingual wiki:** all 16 wiki pages (14 content +
+  `_Sidebar` + `_Footer`) now carry 🇧🇷 + 🇺🇸 sections in a single file,
+  matching the README/ROADMAP/docs format; `publish-wiki.mjs` extracts
+  the active section when publishing (`WIKI_LANG=pt|en`) and a new
+  `wiki/checkWikiBilingual.mjs` checker enforces the policy; the website
+  keeps its own EN variants (`content/docs/en/`)
 - **v1.6.2 — real PAT persistence, icons and unified account:**
   - **PAT actually persisted (critical fix):** the settings kit does not
     save prompt values — pasted PATs were silently dropped ("connected via

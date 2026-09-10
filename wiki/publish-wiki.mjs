@@ -12,21 +12,37 @@
  *      (o token precisa ser um PAT clássico com escopo "repo" — PATs
  *      fine-grained ainda não escrevem em wikis).
  *
- * O script clona o wiki repo num diretório temporário, copia todos os
- * *.md desta pasta (menos README.md) e faz commit + push.
+ * As páginas-fonte são bilíngues (secção 🇧🇷 + secção 🇺🇸 no mesmo
+ * ficheiro). Na publicação, apenas a secção ativa é extraída:
+ *
+ *   WIKI_LANG=pt  → publica só a secção 🇧🇷 Português (padrão)
+ *   WIKI_LANG=en  → publica só a secção 🇺🇸 English
+ *
+ * A extração procura as âncoras <a id="português"></a> / <a id="english"></a>.
+ * Páginas sem marcadores (ex.: _Footer bilíngue inline) são publicadas
+ * como estão.
+ *
+ * O script clona o wiki repo num diretório temporário, converte e copia
+ * todos os *.md desta pasta (menos README.md) e faz commit + push.
  */
 import { execSync } from "node:child_process";
-import { mkdtempSync, readdirSync, copyFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { extractLangSection } from "./wikiLang.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = "carsaimz/xcoder";
 const TOKEN = process.env.GITHUB_TOKEN;
+const LANG = (process.env.WIKI_LANG || "pt").toLowerCase();
 
 if (!TOKEN) {
         console.error("Defina GITHUB_TOKEN (PAT clássico com escopo repo).");
+        process.exit(1);
+}
+if (LANG !== "pt" && LANG !== "en") {
+        console.error(`WIKI_LANG inválida: "${LANG}" (use pt ou en).`);
         process.exit(1);
 }
 
@@ -37,11 +53,13 @@ try {
         console.log("Clonando wiki repo...");
         execSync(`git clone ${url} ${tmp}`, { stdio: "inherit" });
 
-        console.log("Copiando páginas...");
+        console.log(`Copiando páginas (WIKI_LANG=${LANG})...`);
         for (const file of readdirSync(HERE)) {
                 if (file.endsWith(".md") && file !== "README.md") {
-                        copyFileSync(join(HERE, file), join(tmp, file));
-                        console.log("  +", file);
+                        const raw = readFileSync(join(HERE, file), "utf8");
+                        const { text, extracted } = extractLangSection(raw, LANG);
+                        writeFileSync(join(tmp, file), extracted ? text : raw);
+                        console.log("  +", file, extracted ? `(${LANG})` : "(inteiro)");
                 }
         }
 
@@ -50,7 +68,7 @@ try {
                 execSync(`git -C ${tmp} ${cmd}`, { stdio: "inherit" });
         git("add -A");
         git(
-                '-c user.name=xcoder-bot -c user.email=bot@xcoder.local commit -m "docs(wiki): sync pages with wiki/"',
+                `-c user.name=xcoder-bot -c user.email=bot@xcoder.local commit -m "docs(wiki): sync pages with wiki/ (${LANG})"`,
         );
         git("push origin master");
         console.log("Wiki publicada ✔");

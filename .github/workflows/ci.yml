@@ -38,6 +38,9 @@ jobs:
       - name: Check translations (pt-br 100%, no missing keys)
         run: npm run lang:check
 
+      - name: Check bilingual wiki policy
+        run: node wiki/checkWikiBilingual.mjs
+
       - name: Spell check (typos)
         uses: crate-ci/typos@master
 

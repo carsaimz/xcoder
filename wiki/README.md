@@ -37,18 +37,22 @@ Enquanto a wiki hospedada não estiver ativa, este diretório já serve como doc
 
 ## Política de idiomas / Language policy
 
-Este repositório adota conteúdo **bilíngue num único ficheiro** (secção
-🇧🇷 primeiro, depois 🇺🇸) para README, ROADMAP, CONTRIBUTING, CoC e docs/.
-As páginas da wiki são a exceção por ora: elas são renderizadas pelo site
-(que mantém as variantes EN na sua camada de i18n, `docsLangBody`) e
-publicadas na wiki do GitHub em português. Converter as 15 páginas para o
-formato bilíngue está no roadmap v1.7.x — o passo de publicação
-(`publish-wiki.mjs`) precisará extrair apenas a secção ativa.
+Todo o conteúdo deste repositório é **bilíngue num único ficheiro** (secção
+🇧🇷 primeiro, depois 🇺🇸): README, ROADMAP, CONTRIBUTING, CoC, docs/ **e todas
+as páginas da wiki** (desde a v1.6.3). Ao publicar no GitHub Wiki, o passo
+`publish-wiki.mjs` extrai apenas a secção ativa:
 
-This repository uses **bilingual single-file content** (🇧🇷 section first,
-then 🇺🇸) for README, ROADMAP, CONTRIBUTING, CoC and docs/. Wiki pages are
-the exception for now: the site renders them (keeping EN variants in its
-i18n layer, `docsLangBody`) and publishes the GitHub wiki in Portuguese.
-Converting the 15 pages to the bilingual format is on the v1.7.x roadmap —
-the publish step (`publish-wiki.mjs`) will need to extract the active
-section only.
+```bash
+WIKI_LANG=pt GITHUB_TOKEN=... node wiki/publish-wiki.mjs   # padrão
+WIKI_LANG=en GITHUB_TOKEN=... node wiki/publish-wiki.mjs   # wiki em inglês
+```
+
+O site da comunidade continua com as variantes EN na sua própria camada de
+i18n (`content/docs/en/` + `docsLangBody`), servida por idioma da sessão.
+
+All content in this repository is **bilingual in a single file** (🇧🇷 section
+first, then 🇺🇸): README, ROADMAP, CONTRIBUTING, CoC, docs/ **and every wiki
+page** (since v1.6.3). When publishing to the GitHub Wiki, the
+`publish-wiki.mjs` step extracts only the active section (`WIKI_LANG=pt|en`,
+`pt` by default). The community website keeps its own EN variants in its
+i18n layer (`content/docs/en/` + `docsLangBody`), served per session language.

@@ -1,4 +1,12 @@
-# Bem-vindo à Wiki do XCoder
+# Bem-vindo à Wiki do XCoder / Welcome to the XCoder Wiki
+
+[🇧🇷 Português](#português) | [🇺🇸 English](#english)
+
+---
+
+<a id="português"></a>
+
+## 🇧🇷 Português
 
 O **XCoder** é um editor de código para Android, poderoso e open source — um fork do [Acode](https://github.com/Acode-Foundation/Acode) mantido por [carsaimz](https://github.com/carsaimz), com um conjunto de recursos próprios que levam a experiência de programar no celular para outro nível:
 
@@ -45,3 +53,55 @@ O **XCoder** é um editor de código para Android, poderoso e open source — um
 ## Licença e créditos
 
 O XCoder é distribuído sob a **licença MIT**, com atribuição a [Foxdebug / Ajit Kumar](https://github.com/deadlyjack) pelo Acode original (2020) e a **carsaimz** (2026) pelo XCoder. Veja [[Contribuindo]] para saber como fazer parte do projeto — toda ajuda é bem-vinda, de tradução a código.
+
+---
+
+<a id="english"></a>
+
+## 🇺🇸 English
+
+The **XCoder** is a powerful, open source code editor for Android — a fork of [Acode](https://github.com/Acode-Foundation/Acode) maintained by [carsaimz](https://github.com/carsaimz), with its own feature set that takes the mobile coding experience to another level:
+
+- **Built-in AI assistant** — side chat with support for 20 providers (Groq, OpenRouter, Gemini, OpenAI, Claude, DeepSeek and more, including any OpenAI-compatible endpoint).
+- **Full Git in your pocket** — clone, commit, push, pull and branches, with *device flow* login (no password typed inside the app).
+- **Built-in Linux terminal** — xterm emulator with real file and Git commands, accessible via ``Ctrl-` ``.
+- **Its own plugin marketplace** — install community extensions or publish your own.
+- **30 themes + 31 languages** — including Portuguese (automatic fallback on first run).
+- **100% open source (MIT)** — build it yourself, contribute, adapt.
+
+## Start here
+
+| I want to... | Page |
+|---|---|
+| Install the app on Android | [[Instalacao|Installation]] |
+| Learn the basics in 10 minutes | [[Primeiros-Passos|First steps]] |
+| Get to know every corner of the UI | [[Interface|Interface]] |
+| See all keyboard shortcuts | [[Atalhos|Shortcuts]] |
+
+## Main features
+
+- [[Assistente-IA|AI assistant]] — providers, tokens, models and autonomy
+- [[Git]] — GitHub account, device flow, commit/push/pull
+- [[Temas|Themes]] — the 30 bundled themes and how to create your own
+- [[Plugins]] — marketplace, installation and plugin development
+- [[Integracao-App|Integration API]] — backend, announcements, changelog and marketplace in the app
+
+## Advanced and help
+
+- [[Build|Building from source]]
+- [[Solucao-de-Problemas|Troubleshooting]]
+- [[FAQ|Frequently asked questions]]
+- [[Contribuindo|Contributing]]
+
+## Quick links
+
+- **Download the APK**: [github.com/carsaimz/xcoder/releases](https://github.com/carsaimz/xcoder/releases)
+- **Report a bug or suggest**: [Issues](https://github.com/carsaimz/xcoder/issues) (use the bilingual templates)
+- **Community forum**: [Discussions](https://github.com/carsaimz/xcoder/discussions)
+- **Plugin marketplace**: [carsaimz/xcoder-plugins](https://github.com/carsaimz/xcoder-plugins)
+- **Community website**: [carsaimz/xcoder-web](https://github.com/carsaimz/xcoder-web) (blog, docs, forum and marketplace)
+- **Backend**: [carsaimz/xcoder-backend](https://github.com/carsaimz/xcoder-backend)
+
+## License and credits
+
+XCoder is distributed under the **MIT license**, with attribution to [Foxdebug / Ajit Kumar](https://github.com/deadlyjack) for the original Acode (2020) and to **carsaimz** (2026) for XCoder. See [[Contribuindo|Contributing]] to learn how to take part in the project — every bit of help is welcome, from translation to code.

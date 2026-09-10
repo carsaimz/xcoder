@@ -1,4 +1,12 @@
-# Primeiros passos
+# Primeiros passos / First steps
+
+[🇧🇷 Português](#português) | [🇺🇸 English](#english)
+
+---
+
+<a id="português"></a>
+
+## 🇧🇷 Português
 
 Este guia leva você do app recém-instalado até o primeiro arquivo salvo, em cerca de dez minutos.
 
@@ -38,3 +46,48 @@ Em **Configurações › Tema** você escolhe entre **30 temas** prontos (Xcoder
 ## 6. Salve tudo e siga em frente
 
 `Ctrl-Shift-S` salva com "salvar como"; o autosave pode ser ativado em **Configurações › Editor**. Se algo se comportar de forma estranha, a [[Solucao-de-Problemas]] e o menu oculto de desenvolvedor (7 toques no número da versão em **Sobre**) resolvem a maioria dos casos. Bom código!
+
+---
+
+<a id="english"></a>
+
+## 🇺🇸 English
+
+This guide takes you from a freshly installed app to your first saved file in about ten minutes.
+
+## 1. Pick your language
+
+On first run XCoder detects the system language; if there is no exact match, **Portuguese** is the default. To change it later, go to **Settings (Ctrl-,) › App › Language** — 31 languages are available and the change applies **immediately**, with no app restart.
+
+## 2. Open or create a project folder
+
+Everything in XCoder revolves around a working folder. Tap the **main menu (☰) › Open folder** (or `Ctrl-Shift-O`) and grant the storage access permission when prompted. Choose — or create — your project's folder; it will show up in the sidebar **file explorer**.
+
+To create a new file: `Ctrl-N` (or the + button in the explorer). To rename/duplicate/delete, long-press the file in the explorer — the context menu has every action.
+
+## 3. Edit comfortably
+
+The editor is built on CodeMirror 6, with syntax highlighting for dozens of languages, automatic pair closing, code folding and formatting (`Ctrl-Alt-F`). Shortcuts you will use all the time:
+
+- `Ctrl-S` — save
+- `Ctrl-F` / `Ctrl-R` — find / replace
+- `Ctrl-G` — go to line
+- `Ctrl-/` — toggle line comment
+- `` Ctrl-` `` — open the terminal
+
+The full list lives in [[Atalhos|Shortcuts]].
+
+## 4. Tune the look
+
+Under **Settings › Theme** you pick from **30 ready-made themes** (Xcoder, Aurora, Nord, Matcha, Mocha, Sakura...). Font, size (`Ctrl-+` / `Ctrl--`), word wrap and tab/space live in **Settings › Editor**. Details in [[Temas|Themes]].
+
+## 5. Connect the superpowers
+
+- **AI**: open the side chat and configure a provider under **Settings › AI** — see [[Assistente-IA|AI assistant]]. Free-tier providers (Groq, OpenRouter *free models*, Google Gemini) work great to start.
+- **Git**: tap the **Git** app in the sidebar and sign in with your GitHub account via *device flow* — see [[Git]].
+- **Plugins**: under **Settings › Plugins** (`Ctrl-Shift-X`) you browse the marketplace with the official plugins — see [[Plugins]].
+- **Terminal**: ``Ctrl-` `` opens the terminal with file and Git commands. See [[Interface|Interface]].
+
+## 6. Save everything and move on
+
+`Ctrl-Shift-S` saves with "save as"; autosave can be enabled in **Settings › Editor**. If anything behaves strangely, [[Solucao-de-Problemas|Troubleshooting]] and the hidden developer menu (7 taps on the version number in **About**) solve most cases. Happy coding!
