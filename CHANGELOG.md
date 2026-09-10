@@ -13,6 +13,72 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+<a id="português"></a>
+
+## 🇧🇷 Português
+
+## [1.6.2] - 2026-09-10
+
+### Corrigido — GitHub que não aparecia + ícones + conta
+
+- **PAT persistido de verdade (causa raiz de "conectei via PAT e os repos
+  não aparecem")**: o kit de settings NÃO grava valores de prompt — só
+  atualiza a linha e chama o callback; o comentário "the settings kit
+  already persisted the prompt value" em `ghSettings.js` estava errado e o
+  token colado era descartado em silêncio. Agora a página persiste
+  `ghToken`/`gitRemoteUrl`/`ghBranch` explicitamente (`settings.update`),
+  busca o perfil logo após salvar um token e encerra a sessão GitHub
+  quando o token é limpo. Guardas em `v162Fixes.test.js`
+- **Ícones das opções Fontes e Sessões SSH**: os nomes `svg:server` e
+  `svg:type` não existiam no pack (`src/utils/svgIcons.js`) e o fallback
+  (`icon svg:<nome>`) não corresponde a nenhum glifo da fonte de ícones —
+  nada renderizava. Adicionados `server`, `type`, `copy`, `trash-2`,
+  `check` e `qr-code` (Lucide) + regenerados os vetores de
+  `src/res/icons/svg/` (61). `dialogs/select.js` agora também desenha
+  ícones `svg:` como vetores — picker de repositórios, chooser de login e
+  ações de commit incluídos; ícones do chooser corrigidos
+  (`external-link`, `qr-code`)
+- **Página de conta: fim do "Convidado eterno"**: novo botão "Continuar
+  com a conta do site" (abre `/auth/app-handoff`, que entrega a sessão já
+  existente do site para o app via `xcoder://auth/oauth`); a página
+  re-renderiza no evento `authchange` (sessão chegando pelo intent);
+  sessão expirada é renovada em background (`ensureFreshSession`);
+  **erros de login aparecem dentro do formulário** (`data-form-error`) —
+  falhas nunca mais parecem "o botão não faz nada"
+
+### Adicionado
+
+- **Settings reagrupadas por categoria**: Core → Aparência (Tema, Fontes)
+  → Código e ferramentas (Formatter, LSP, IA, Plugins, marketplace URL) →
+  Conexões (GitHub, Sessões SSH) → Dados e backup → Sobre o XCoder; novas
+  strings `settings-category-*` (en + pt-br)
+- **Site: `/auth/app-handoff`** (xcoder-web) — ponte de sessão
+  site → app: usuário logado no site tem a sessão entregue ao app
+  automaticamente; sem sessão, mostra o formulário compartilhado e entrega
+  após o login
+- **Workflow `pr-review.yml`** (app + site): bot de review GRATUITO do
+  próprio repo — comentário fixo bilíngue no PR com resumo do diff por
+  área, sugestões por regras (src sem testes, package.json sem lockfile,
+  docs sem nota bilíngue) e checklist do revisor (substitui reviewers
+  pagos tipo Greptile; comentário único atualizado a cada push)
+- Actions atualizadas: checkout v7, setup-node v7, setup-java v6,
+  github-script v9, create-pull-request v8, stale v11
+
+### Documentação
+
+- **MDs bilíngues**: README (fundido com README.en.md, apagado),
+  CONTRIBUTING, CODE_OF_CONDUCT (texto canônico do Contributor Covenant
+  restaurado nas seções corrompidas), ROADMAP, docs/{ADS,ICONS,README,
+  github-oauth-app} — secção 🇧🇷 + 🇺🇸 no mesmo ficheiro, com âncoras;
+  wiki/README.md documenta a política (páginas da wiki seguem pt por ora —
+  conversão no roadmap v1.7.x); `_typos.toml` exclui os MDs bilíngues
+
+### Testes
+
+- +8 testes (640 → 652): varredura de completude do pack de ícones, render
+  `svg:` no select, guardas de persistência do PAT, wiring do handoff e
+  ordem das categorias
+
 <a id="english"></a>
 
 ## 🇺🇸 English
