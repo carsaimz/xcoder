@@ -3,6 +3,7 @@ import tile from "components/tile";
 import DOMPurify from "dompurify";
 import actionStack from "lib/actionStack";
 import restoreTheme from "lib/restoreTheme";
+import svgIcon from "utils/svgIcons";
 
 /**
  * @typedef {object} SelectOptions
@@ -105,6 +106,18 @@ function select(title, items, options = {}) {
 				if (itemOptions.icon === "letters" && !!itemOptions.letters) {
 					lead = (
 						<i className="icon letters" data-letters={itemOptions.letters}></i>
+					);
+				} else if (
+					typeof itemOptions.icon === "string" &&
+					itemOptions.icon.startsWith("svg:")
+				) {
+					// vector pack icons (docs/ICONS.md tier 1) — same
+					// convention as the sidebar and the settings rows
+					const $svg = svgIcon(itemOptions.icon.slice(4));
+					lead = $svg ? (
+						<i className="icon xc-svgicon">{$svg}</i>
+					) : (
+						<i className="icon" />
 					);
 				} else {
 					lead = <i className={`icon ${itemOptions.icon}`}></i>;

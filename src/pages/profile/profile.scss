@@ -94,6 +94,18 @@
         opacity: 0.75;
 }
 
+.profile-form-error {
+	margin: 0;
+	padding: 0.55rem 0.75rem;
+	border-radius: 8px;
+	border: 1px solid rgba(255, 107, 107, 0.35);
+	background: rgba(255, 107, 107, 0.08);
+	color: #ff6b6b;
+	font-size: 0.8rem;
+	line-height: 1.45;
+	overflow-wrap: anywhere;
+}
+
 .profile-input {
         height: 44px;
         padding: 0 12px;

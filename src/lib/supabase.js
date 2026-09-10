@@ -146,6 +146,17 @@ export function oauthCallbackUrl() {
 }
 
 /**
+ * The site page that hands an ALREADY AUTHENTICATED site session back to
+ * the app (xcoder://auth/oauth#…) — the "Continue with the site account"
+ * flow. Fixes the split-origin gap: signing in on the website never
+ * reached the app because the two keep separate storages.
+ * @returns {string}
+ */
+export function appHandoffUrl() {
+	return `${String(config.WEBSITE_URL || "").replace(/\/+$/, "")}/auth/app-handoff`;
+}
+
+/**
  * Builds the Supabase authorize URL (implicit flow — tokens come back in
  * the redirect fragment, so no code exchange is needed on a device).
  * @param {"google" | "github" | string} provider
@@ -183,10 +194,7 @@ export async function fetchAuthSettings({ force = false } = {}) {
 	}
 	try {
 		let response;
-		if (
-			typeof cordova !== "undefined" &&
-			cordova?.plugin?.http?.sendRequest
-		) {
+		if (typeof cordova !== "undefined" && cordova?.plugin?.http?.sendRequest) {
 			response = await nativeHttp(`${supabaseUrl()}/auth/v1/settings`, {
 				headers: { apikey: supabaseAnonKey() },
 			});
@@ -319,6 +327,20 @@ export async function completeOAuthFromPaste() {
 	);
 	if (!link) return false;
 	return applyOAuthTokens(String(link).trim());
+}
+
+/**
+ * Lazily refreshes an EXPIRED stored session (refresh token exists but
+ * the access token already expired). The profile page calls this before
+ * reading the user, so a session that is merely stale still shows the
+ * account instead of "Convidado".
+ * @returns {Promise<boolean>} true when the session was refreshed
+ */
+export async function ensureFreshSession() {
+	if (!session?.refresh_token) return false;
+	const expiresAt = Number(session.expires_at || 0);
+	if (expiresAt && expiresAt - Date.now() > 60000) return false;
+	return refreshSession();
 }
 
 /**
@@ -629,6 +651,7 @@ export default {
 	signUpWithPassword,
 	OAUTH_PROVIDERS,
 	oauthCallbackUrl,
+	appHandoffUrl,
 	buildOAuthUrl,
 	fetchAuthSettings,
 	oauthProviderEnabled,
@@ -636,6 +659,7 @@ export default {
 	applyOAuthTokens,
 	fetchProfile,
 	completeOAuthFromPaste,
+	ensureFreshSession,
 	refreshSession,
 	signOut,
 	getUser,

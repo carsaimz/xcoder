@@ -283,7 +283,23 @@ export default function ghSettings() {
 				break;
 
 			case "ghToken":
-				// the settings kit already persisted the prompt value
+				// The settings kit does NOT persist prompt values — it only
+				// updates the row and calls this callback. Persist here
+				// (v1.6.1 and earlier silently dropped the pasted PAT, so
+				// repositories never listed and no account ever appeared).
+				if (typeof value === "string") {
+					const token = value.trim();
+					if (token !== settings.value.ghToken) {
+						if (!token) {
+							// token cleared — drop the whole GitHub session
+							await signOut();
+							refresh();
+							break;
+						}
+						settings.value.ghToken = token;
+						await settings.update();
+					}
+				}
 				if (settings.value.ghToken && !settings.value.ghUserLogin) {
 					await fetchProfile(settings.value.ghToken);
 				}
@@ -297,7 +313,14 @@ export default function ghSettings() {
 
 			case "gitRemoteUrl":
 			case "ghBranch":
-				// persisted by the settings kit; nothing else to do
+				// persisted here too — the kit does not persist prompts
+				if (typeof value === "string") {
+					const trimmed = value.trim();
+					if (trimmed !== settings.value[key]) {
+						settings.value[key] = trimmed;
+						await settings.update();
+					}
+				}
 				break;
 
 			default:

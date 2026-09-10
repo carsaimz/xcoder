@@ -26,9 +26,13 @@ import terminalSettings from "./terminalSettings";
 
 export default function mainSettings() {
 	const title = strings.settings.capitalize();
+	// Grouped so related options sit together and the list scans fast:
+	// Core → Appearance → Code & tools → Connections → Data → About.
 	const categories = {
 		core: strings["settings-category-core"],
-		customizationTools: strings["settings-category-customization-tools"],
+		appearance: strings["settings-category-appearance"],
+		code: strings["settings-category-code"],
+		connections: strings["settings-category-connections"],
 		// "Maintenance" was renamed to "Data & backup" to keep dev-ish wording
 		// out of the user-facing UI (dev actions live in the hidden developer
 		// menu, opened by tapping the version number in About).
@@ -38,6 +42,7 @@ export default function mainSettings() {
 		aboutXCoder: strings["settings-category-about-xcoder"],
 	};
 	const items = [
+		// --- Core ---------------------------------------------------------
 		{
 			key: "app-settings",
 			text: strings["app settings"],
@@ -70,20 +75,53 @@ export default function mainSettings() {
 			category: categories.core,
 			chevron: true,
 		},
-		{
-			key: "formatter",
-			text: strings.formatter,
-			icon: "svg:braces",
-			info: strings["settings-info-main-formatter"],
-			category: categories.customizationTools,
-			chevron: true,
-		},
+		// --- Appearance ----------------------------------------------------
 		{
 			key: "theme",
 			text: strings.theme,
 			icon: "svg:palette",
 			info: strings["settings-info-main-theme"],
-			category: categories.customizationTools,
+			category: categories.appearance,
+			chevron: true,
+		},
+		{
+			key: "font-settings",
+			text: strings["font manager"] || "Fontes",
+			icon: "svg:type",
+			info:
+				strings["settings-info-main-fonts"] ||
+				"Instale fontes por URL e escolha a fonte do editor e do app.",
+			category: categories.appearance,
+			chevron: true,
+		},
+		// --- Code & tools --------------------------------------------------
+		{
+			key: "formatter",
+			text: strings.formatter,
+			icon: "svg:braces",
+			info: strings["settings-info-main-formatter"],
+			category: categories.code,
+			chevron: true,
+		},
+		{
+			key: "lsp-settings",
+			text:
+				strings?.lsp_settings ||
+				strings["language servers"] ||
+				"Language servers",
+			icon: "svg:zap",
+			info: strings["settings-info-main-lsp-settings"],
+			category: categories.code,
+			chevron: true,
+		},
+		{
+			key: "ai-settings",
+			text: strings["ai settings"] || "AI assistant",
+			icon: "svg:bot",
+			info:
+				strings["settings-info-main-ai"] ||
+				"Configure AI providers and agent behavior.",
+			category: categories.code,
 			chevron: true,
 		},
 		{
@@ -91,7 +129,7 @@ export default function mainSettings() {
 			text: strings["plugins"],
 			icon: "svg:puzzle",
 			info: strings["settings-info-main-plugins"],
-			category: categories.customizationTools,
+			category: categories.code,
 			chevron: true,
 		},
 		{
@@ -105,27 +143,17 @@ export default function mainSettings() {
 			info:
 				strings["settings-info-marketplace-url"] ||
 				"Fetch the plugin list from your own marketplace (JSON). Leave empty to use the default Xcoder marketplace.",
-			category: categories.customizationTools,
+			category: categories.code,
 		},
+		// --- Connections ----------------------------------------------------
 		{
-			key: "lsp-settings",
-			text:
-				strings?.lsp_settings ||
-				strings["language servers"] ||
-				"Language servers",
-			icon: "svg:zap",
-			info: strings["settings-info-main-lsp-settings"],
-			category: categories.customizationTools,
-			chevron: true,
-		},
-		{
-			key: "ai-settings",
-			text: strings["ai settings"] || "AI assistant",
-			icon: "svg:bot",
+			key: "gh-settings",
+			text: strings["github settings"] || "GitHub",
+			icon: "svg:github",
 			info:
-				strings["settings-info-main-ai"] ||
-				"Configure AI providers and agent behavior.",
-			category: categories.customizationTools,
+				strings["settings-info-main-gh"] ||
+				"GitHub account, personal access token, repositories and branch.",
+			category: categories.connections,
 			chevron: true,
 		},
 		{
@@ -135,29 +163,10 @@ export default function mainSettings() {
 			info:
 				strings["settings-info-main-ssh"] ||
 				"Sessões SSH salvas: abra um terminal remoto com um toque.",
-			category: categories.customizationTools,
+			category: categories.connections,
 			chevron: true,
 		},
-		{
-			key: "gh-settings",
-			text: strings["github settings"] || "GitHub",
-			icon: "svg:github",
-			info:
-				strings["settings-info-main-gh"] ||
-				"GitHub account, personal access token, repositories and branch.",
-			category: categories.customizationTools,
-			chevron: true,
-		},
-		{
-			key: "font-settings",
-			text: strings["font manager"] || "Fontes",
-			icon: "svg:type",
-			info:
-				strings["settings-info-main-fonts"] ||
-				"Instale fontes por URL e escolha a fonte do editor e do app.",
-			category: categories.customizationTools,
-			chevron: true,
-		},
+		// --- Data & backup ---------------------------------------------------
 		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
@@ -174,6 +183,7 @@ export default function mainSettings() {
 			category: categories.maintenance,
 			chevron: true,
 		},
+		// --- About XCoder -----------------------------------------------------
 		{
 			key: "support",
 			text: getPremiumStatus()?.active

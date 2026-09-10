@@ -428,6 +428,46 @@ const ICONS = {
 		["line", { x1: "12", x2: "12", y1: "8", y2: "12" }],
 		["line", { x1: "12", x2: "12.01", y1: "16", y2: "16" }],
 	],
+	// ---- v1.6.2: glyphs that settings rows / select dialogs reference ----
+	// (missing names used to render NOTHING — the fallback class
+	// "icon svg:<name>" matches no glyph in the icon font)
+	server: [
+		["rect", { width: "20", height: "8", x: "2", y: "2", rx: "2", ry: "2" }],
+		["rect", { width: "20", height: "8", x: "2", y: "14", rx: "2", ry: "2" }],
+		["line", { x1: "6", x2: "6.01", y1: "6", y2: "6" }],
+		["line", { x1: "6", x2: "6.01", y1: "18", y2: "18" }],
+	],
+	type: [
+		["polyline", { points: "4 7 4 4 20 4 20 7" }],
+		["line", { x1: "9", x2: "15", y1: "20", y2: "20" }],
+		["line", { x1: "12", x2: "12", y1: "4", y2: "20" }],
+	],
+	copy: [
+		["rect", { width: "14", height: "14", x: "8", y: "8", rx: "2", ry: "2" }],
+		["path", { d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" }],
+	],
+	"trash-2": [
+		["path", { d: "M3 6h18" }],
+		["path", { d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" }],
+		["path", { d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" }],
+		["line", { x1: "10", x2: "10", y1: "11", y2: "17" }],
+		["line", { x1: "14", x2: "14", y1: "11", y2: "17" }],
+	],
+	check: [["path", { d: "M20 6 9 17l-5-5" }]],
+	"qr-code": [
+		["rect", { width: "5", height: "5", x: "3", y: "3", rx: "1" }],
+		["rect", { width: "5", height: "5", x: "16", y: "3", rx: "1" }],
+		["rect", { width: "5", height: "5", x: "3", y: "16", rx: "1" }],
+		["path", { d: "M21 16h-3a2 2 0 0 0-2 2v3" }],
+		["path", { d: "M21 21v.01" }],
+		["path", { d: "M12 7v3a2 2 0 0 1-2 2H7" }],
+		["path", { d: "M3 12h.01" }],
+		["path", { d: "M12 3h.01" }],
+		["path", { d: "M12 16v.01" }],
+		["path", { d: "M16 12h1" }],
+		["path", { d: "M21 12v.01" }],
+		["path", { d: "M12 21v-1" }],
+	],
 };
 
 /**

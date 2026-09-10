@@ -8,7 +8,9 @@ import logger from "lib/logger";
 import { getPremiumStatus, isPremium, syncCloudPremium } from "lib/premium";
 import { openSupportPage } from "lib/premiumUI";
 import supabase, {
+	appHandoffUrl,
 	completeOAuthFromPaste,
+	ensureFreshSession,
 	OAUTH_PROVIDERS,
 	oauthProviderEnabled,
 	signInWithOAuth,
@@ -28,7 +30,19 @@ export default function renderProfile() {
 	// error inside the page body used to leave a blank screen and make
 	// the sidebar icon feel dead ("Ícone de conta não funciona").
 	try {
-		renderProfilePage();
+		// renderProfilePage is async — both the synchronous path and the
+		// promise rejection must surface the visible error toast
+		Promise.resolve(renderProfilePage()).catch((error) => {
+			logger.log(
+				"error",
+				`Profile page render failed: ${error?.message || error}`,
+			);
+			toast(
+				strings["account page error"] ||
+					"Não foi possível abrir a conta — reinicie o app e tente de novo.",
+				4000,
+			);
+		});
 	} catch (error) {
 		logger.log(
 			"error",
@@ -42,8 +56,20 @@ export default function renderProfile() {
 	}
 }
 
-function renderProfilePage() {
+async function renderProfilePage() {
 	Sidebar.hide();
+
+	// A stored session whose access token merely expired used to render as
+	// "Convidado" until the next successful sign-in. Refresh it lazily —
+	// in the BACKGROUND (the page mounts synchronously with the current
+	// user) and re-render via the authchange listener when it succeeds.
+	ensureFreshSession()
+		.then((refreshed) => {
+			if (refreshed) document.dispatchEvent(new CustomEvent("authchange"));
+		})
+		.catch(() => {
+			/* offline — render with whatever we have */
+		});
 
 	const user = supabase.getUser();
 	const premium = isPremium();
@@ -120,6 +146,7 @@ function renderProfilePage() {
 						placeholder={t("password", "Palavra-passe")}
 						autoComplete="current-password"
 					/>
+					<p className="profile-form-error" data-form-error hidden />
 					<div className="profile-row">
 						<button className="profile-action is-primary" onclick={onSignIn}>
 							<span className="icon login" />
@@ -137,6 +164,16 @@ function renderProfilePage() {
                                             confirm the providers are active (default-deny) —
                                             no more buttons that flash and always fail. */}
 					<div className="profile-oauth" data-oauth-slot />
+					<button className="profile-action" onclick={onSiteHandoff}>
+						<span className="icon public" />
+						{t("continue on site", "Continuar com a conta do site")}
+					</button>
+					<p className="profile-hint">
+						{t(
+							"site handoff hint",
+							"Se você já entrou no site, o login é concluído aqui automaticamente.",
+						)}
+					</p>
 					<button className="profile-action" onclick={onPasteLink}>
 						<span className="icon content_paste" />
 						{t("oauth paste", "Já entrei — colar link de retorno")}
@@ -155,7 +192,16 @@ function renderProfilePage() {
 		</div>
 	);
 
+	const onAuthChange = () => {
+		// the session arrived via the xcoder://auth/oauth intent (site → app
+		// handoff) while this page is open — re-render so the account card
+		// stops showing "Convidado" without the user reopening the page
+		refreshPage();
+	};
+	document.addEventListener("authchange", onAuthChange);
+
 	$page.onhide = () => {
+		document.removeEventListener("authchange", onAuthChange);
 		actionStack.remove("profile");
 	};
 	actionStack.push({
@@ -180,6 +226,18 @@ function renderProfilePage() {
 		const { default: render } = await import("./profile");
 		$page.hide();
 		render();
+	}
+
+	/**
+	 * Shows a persistent error INSIDE the sign-in form — toasts disappear
+	 * and failures used to look like "the form does nothing".
+	 * @param {string} message
+	 */
+	function showFormError(message) {
+		const $error = $page.body?.querySelector("[data-form-error]");
+		if (!$error) return;
+		$error.textContent = message || "";
+		$error.hidden = !message;
 	}
 
 	async function updateOAuthAvailability() {
@@ -248,6 +306,7 @@ function renderProfilePage() {
 			toast(t("fill email password", "Preencha e-mail e palavra-passe"), 3000);
 			return;
 		}
+		showFormError("");
 		const hide = await loader.show(t("signing in", "A entrar…"));
 		try {
 			await supabase.signInWithPassword(email, password);
@@ -258,7 +317,7 @@ function renderProfilePage() {
 			refreshPage();
 		} catch (error) {
 			hide();
-			toast(String(error.message || error), 4000);
+			showFormError(String(error.message || error));
 		}
 	}
 
@@ -272,6 +331,7 @@ function renderProfilePage() {
 			toast(t("fill email password", "Preencha e-mail e palavra-passe"), 3000);
 			return;
 		}
+		showFormError("");
 		const hide = await loader.show(t("creating account", "A criar conta…"));
 		try {
 			const result = await supabase.signUpWithPassword(email, password);
@@ -291,7 +351,7 @@ function renderProfilePage() {
 			}
 		} catch (error) {
 			hide();
-			toast(String(error.message || error), 4000);
+			showFormError(String(error.message || error));
 		}
 	}
 
@@ -326,6 +386,22 @@ function renderProfilePage() {
 		} catch (error) {
 			toast(String(error.message || error), 4000);
 		}
+	}
+
+	async function onSiteHandoff() {
+		const url = appHandoffUrl();
+		try {
+			system.openInBrowser(url);
+		} catch {
+			window.open(url, "_blank", "noopener");
+		}
+		toast(
+			t(
+				"site handoff browser hint",
+				"Conclua no navegador — você volta ao app automaticamente",
+			),
+			6000,
+		);
 	}
 
 	async function onPasteLink() {

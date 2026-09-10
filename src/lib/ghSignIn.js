@@ -60,14 +60,14 @@ export async function chooseGhSignInMethod() {
 		options.push([
 			"web",
 			strings["github web sign in"] || "Connect with GitHub (browser)",
-			"svg:open_in_new",
+			"svg:external-link",
 		]);
 	}
 	if (resolveGhClientId()) {
 		options.push([
 			"device",
 			strings["github device sign in"] || "Sign in with a code (device flow)",
-			"svg:qr_code",
+			"svg:qr-code",
 		]);
 	}
 	const choice = await select(
