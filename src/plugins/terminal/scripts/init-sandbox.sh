@@ -69,29 +69,54 @@ ARGS="$ARGS -b $PREFIX/public:/root"
 ARGS="$ARGS -b $PREFIX/alpine/tmp:/dev/shm"
 
 
-if [ -e "/proc/self/fd" ]; then
+if [ -d "/proc/self/fd" ]; then
   ARGS="$ARGS -b /proc/self/fd:/dev/fd"
 fi
 
 # Bind stdin/stdout/stderr ONLY when they resolve to a real file/device.
-# When the app launches the sandbox with pipes (installations, command
-# output capture), /proc/self/fd/N points to a virtual "pipe:[…]" target
-# that proot cannot sanitize — it printed three scary
+#
+# PRoot canonicalizes every -b host path with realpath(3). The magic links
+# under /proc/<pid>/fd only resolve when the descriptor points at a real
+# file: for pipes, sockets and anon inodes the link target is not a path
+# ("pipe:[123]"), so realpath(3) fails with ENOENT, proot drops the binding
+# and prints
 #   proot warning: can't sanitize binding "/proc/self/fd/N"
-# lines during installation while everything still worked. Skipping the
-# binding in that case silences the warnings; the guest still reaches the
-# fds through the bound /proc and /dev (fd 0/1/2 pass through natively).
-for sandbox_fd in 0 1 2; do
-  fd_target=$(readlink -f "/proc/self/fd/$sandbox_fd" 2>/dev/null || true)
-  if [ -n "$fd_target" ] && [ -e "$fd_target" ]; then
-    case "$sandbox_fd" in
-      0) ARGS="$ARGS -b /proc/self/fd/0:/dev/stdin" ;;
-      1) ARGS="$ARGS -b /proc/self/fd/1:/dev/stdout" ;;
-      2) ARGS="$ARGS -b /proc/self/fd/2:/dev/stderr" ;;
-    esac
+#
+# Two pitfalls shape the probe below (same approach as upstream Acode
+# #2878): probe through this shell's own pid ($$) instead of /proc/self —
+# readlink(1) runs as a child whose own fds differ (in command substitution
+# fd 1 is the capture pipe) — and use readlink without -f so the raw link
+# target is compared, matching what realpath(3) will do inside proot.
+#
+# Skipping a non-canonicalizable binding silences the warnings; the guest
+# still reaches the fds through the bound /proc and /dev (fd 0/1/2 pass
+# through natively).
+SELF_PID=$$
+
+can_bind() {
+  # Directories canonicalize as-is.
+  if [ -d "$1" ]; then
+    return 0
   fi
-done
-unset sandbox_fd fd_target
+  # A /proc/<pid>/fd/N magic link is only canonicalizable when it resolves
+  # to an existing absolute path; "pipe:[N]" and friends are not.
+  fd_target=$(readlink "$1" 2>/dev/null) || return 1
+  case "$fd_target" in
+    /*) [ -e "$fd_target" ] ;;
+    *) return 1 ;;
+  esac
+}
+
+if can_bind "/proc/$SELF_PID/fd/0"; then
+  ARGS="$ARGS -b /proc/self/fd/0:/dev/stdin"
+fi
+if can_bind "/proc/$SELF_PID/fd/1"; then
+  ARGS="$ARGS -b /proc/self/fd/1:/dev/stdout"
+fi
+if can_bind "/proc/$SELF_PID/fd/2"; then
+  ARGS="$ARGS -b /proc/self/fd/2:/dev/stderr"
+fi
+unset SELF_PID fd_target
 
 
 ARGS="$ARGS -r $PREFIX/alpine"

@@ -13,6 +13,100 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.0] - 2026-09-11
+
+### Adicionado — Sessões SSH v2 (roadmap v1.7.x item 3)
+
+- **Identidade visual por host:** cada servidor salvo ganha uma cor
+  estável derivada do próprio nome (determinística — o mesmo host
+  aparece sempre com a mesma cor na lista de sessões SSH), com rótulo
+  `user@host:porta` e o diretório inicial configurado visível na linha
+  do servidor
+- **Histórico de comandos por host:** os comandos digitados nos
+  terminais SSH são gravados por servidor (cap 100, dedupe consecutivo,
+  apenas no aparelho — nada vai para a rede); o diálogo lista do mais
+  recente ao mais antigo, um toque copia o comando, e o botão limpa o
+  histórico do host. Prompts de senha/frase-chave/código são detectados
+  no buffer do terminal e NUNCA são gravados; Ctrl+C/D/U e ESC abandonam
+  a linha em edição
+- **Diretório inicial configurável:** ação nova em cada servidor grava
+  o diretório onde o shell começa (vazio = padrão do servidor); o
+  terminal respeita a precedência opção explícita > home configurado >
+  caminho da URL > `/`; hosts apagados pelo navegador de arquivos são
+  limpos automaticamente da lista
+- Novo módulo puro `lib/sshSessions.js` (visual, histórico, home dir,
+  resolução de diretório) + 16 testes
+
+### Adicionado — Fontes v2 (roadmap v1.7.x item 4)
+
+- **Preview ao vivo em cada linha** do gerenciador de fontes — cada
+  fonte é renderizada nela mesma ("AaBbCc 123 — …" com pangrama
+  traduzido) ANTES de aplicar; fontes remotas são pré-carregadas em
+  background e cacheadas
+- **Variação de peso no editor:** nova opção "Peso da fonte do editor"
+  nas configurações (400 Normal → 900 Black) aplicada ao tema do
+  CodeMirror com reconfiguração ao vivo; validação de peso no
+  `fonts.setEditorFont` e default `editorFontWeight: 400`
+- **Página de fontes internacionalizada** — 28 chaves novas (en +
+  pt-br 100%), incluindo subtítulos, diálogos de aplicar/excluir e
+  mensagens de erro
+
+### Corrigido
+
+- **Página de suporte normalizada:** o corpo da página não tinha as
+  classes `main scroll` (o mesmo defeito latente que matava a página de
+  perfil antes da v1.6.4 — `$page.body` voltava `null`) e o caminho de
+  erro de abertura da conta usava `logger` SEM import (ReferenceError
+  silenciosa no catch); código morto `maskAccount` removido
+- **Aviso do proot "can't sanitize binding" eliminado na origem** (porte
+  do upstream Acode #2878): o `init-sandbox.sh` testava os descritores
+  via `/proc/self` DENTRO de command substitution — o readlink via o
+  /dev/null do próprio filho em vez do stderr real do sandbox — e
+  acabava sempre ligando o binding do fd de pipe; agora o probe usa o
+  pid do shell (`$$`), compara o alvo cru do magic link (mesma semântica
+  do realpath(3) do proot) e só liga stdin/stdout/stderr quando
+  resolvem para caminho real
+
+### Adicionado — repositório
+
+- **Workflow `congrats-pr.yml`:** quando um PR da comunidade é mesclado
+  (autor ≠ dono, sem bots), o bot deixa um obrigado bilíngue no PR —
+  alternativa gratuita e sem dependências ao bot de Discord do upstream
+  (#2855)
+- **Atalho de teclado novo:** `Ctrl-Shift-W` abre a aba Welcome (porte
+  do Acode #2773)
+
+### Site (xcoder-web)
+
+- **i18n final:** editor do blog admin traduzido (17 strings), tiers e
+  textos do /sponsor cobertos em inglês, placeholders dinâmicos de chat
+  e download convertidos para tokens (`{room}`, `{v}`), +47 traduções
+  novas no dicionário EN
+
+### Testes
+
+- +22 testes (716 no total, 83 ficheiros): sshSessions (16) e fontsV2
+  (6); baseline 716/716 verde, tsc limpo, biome limpo, build production
+  OK, boot harness OK ("STARTED APP AND ITS SERVICES", todos os chunks
+  carregados)
+
+### EN summary
+
+- **SSH sessions v2:** stable per-host colors, per-host command history
+  (local-only, password-prompt safe, cap 100) and a configurable home
+  directory per server (explicit option > stored home > URL path > /)
+- **Fonts v2:** live preview of every font in the manager list, editor
+  font weight (400–900) with live CodeMirror reconfigure, and a fully
+  localized fonts page (28 new keys)
+- **Fixed:** support page normalized (missing `main scroll` classes +
+  missing `logger` import in error path); proot "can't sanitize
+  binding" fd warnings fixed at the source (ported Acode #2878)
+- **Repo:** congrats workflow for merged community PRs; Ctrl-Shift-W
+  opens Welcome (Acode #2773)
+- **Site:** last i18n gaps closed (admin blog editor, sponsor tiers,
+  dynamic placeholders) — +47 EN translations
+- Tests: 716/716 green (83 files)
+
 ## [1.6.4] - 2026-09-11
 
 ### Corrigido — conta (página de perfil)

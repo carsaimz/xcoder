@@ -19,6 +19,7 @@ import {
 import confirm from "dialogs/confirm";
 import fonts from "lib/fonts";
 import appSettings from "lib/settings";
+import { looksLikeHiddenInput, recordCommand } from "lib/sshSessions";
 import { quotePosixShellArg } from "utils/shell";
 import LigaturesAddon from "./ligatures";
 import {
@@ -69,6 +70,8 @@ export default class TerminalComponent {
 		this.isConnected = false;
 		this.serverMode = options.serverMode !== false; // Default true
 		this.remoteSsh = options.remoteSsh || null;
+		/** Line buffer of typed-but-not-yet-sent SSH input (for history). */
+		this.remoteInputLine = "";
 		this.remoteShellId = null;
 		this.remoteInputDisposable = null;
 		this.touchSelection = null;
@@ -971,6 +974,7 @@ export default class TerminalComponent {
 						() => {},
 						(error) => this.onError?.(error),
 					);
+					this.trackRemoteInput(data);
 				});
 				this.terminal.unicode.activeVersion = "11";
 				this.terminal.focus();
@@ -1438,12 +1442,65 @@ export default class TerminalComponent {
 	}
 
 	/**
+	 * Accumulates raw xterm onData chunks of the remote shell and records
+	 * finished command lines per host (SSH sessions v2). Password prompts
+	 * are detected on the live buffer and never recorded. Never throws —
+	 * history must not break typing.
+	 * @param {string} data
+	 */
+	trackRemoteInput(data) {
+		try {
+			const profile = this.remoteSsh;
+			if (!profile?.profileId) return;
+			for (const char of String(data ?? "")) {
+				const code = char.codePointAt(0);
+				if (char === "\r" || char === "\n") {
+					const line = this.remoteInputLine;
+					this.remoteInputLine = "";
+					if (!line) continue;
+					if (looksLikeHiddenInput(this.getRemoteCursorLineText())) continue;
+					recordCommand(profile.profileId, line);
+				} else if (code === 0x7f || code === 0x08) {
+					this.remoteInputLine = this.remoteInputLine.slice(0, -1);
+				} else if (
+					code === 0x03 ||
+					code === 0x04 ||
+					code === 0x15 ||
+					code === 0x1b
+				) {
+					// Ctrl+C / Ctrl+D / Ctrl+U / ESC — abandon the line
+					this.remoteInputLine = "";
+				} else if (code >= 0x20 && code !== 0x7f) {
+					this.remoteInputLine += char;
+				}
+			}
+		} catch {
+			// history is best-effort
+		}
+	}
+
+	/**
+	 * Visible text of the line the cursor is on (where a password prompt
+	 * would sit while hidden input is being typed).
+	 * @returns {string}
+	 */
+	getRemoteCursorLineText() {
+		try {
+			const buffer = this.terminal?.buffer?.active;
+			return buffer?.getLine(buffer.cursorY)?.translateToString(true) || "";
+		} catch {
+			return "";
+		}
+	}
+
+	/**
 	 * Terminate terminal session
 	 */
 	async terminate() {
 		this.intentionalClose = true;
 		this.remoteInputDisposable?.dispose?.();
 		this.remoteInputDisposable = null;
+		this.remoteInputLine = "";
 
 		if (this.remoteShellId) {
 			const shellID = this.remoteShellId;

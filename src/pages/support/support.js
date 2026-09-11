@@ -5,6 +5,7 @@ import toast from "components/toast";
 import prompt from "dialogs/prompt";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
+import logger from "lib/logger";
 import {
 	getPremiumStatus,
 	isPremium,
@@ -30,8 +31,10 @@ export default function renderSupport() {
 	const info = supportInfo();
 
 	const $page = Page(t("support the project", "Apoie o XCoder").capitalize());
+	// `main scroll` keeps the WCPage body getter working — pages whose
+	// body div lacks these classes get a null $page.body (see profile.js).
 	$page.body = (
-		<div className="support-page">
+		<div className="support-page main scroll">
 			<section className={`support-status ${premium ? "is-premium" : ""}`}>
 				<span className="icon favorite" />
 				<div className="support-status-text">
@@ -225,15 +228,4 @@ function renderMethod(method) {
 			)}
 		</div>
 	);
-}
-
-/**
- * Shortens an account value for display (keeps first/last 4 chars).
- * @param {string} value
- * @returns {string}
- */
-function maskAccount(value) {
-	const clean = String(value || "").trim();
-	if (clean.length <= 12) return clean;
-	return `${clean.slice(0, 8)}…${clean.slice(-4)}`;
 }

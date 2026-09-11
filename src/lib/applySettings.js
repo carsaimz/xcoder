@@ -54,7 +54,7 @@ export default {
 			actions("set-height", settings.quickTools);
 		}
 		fonts.setAppFont(settings.appFont);
-		fonts.setEditorFont(settings.editorFont);
+		fonts.setEditorFont(settings.editorFont, settings.editorFontWeight);
 		if (!themes.applied) {
 			themes.apply("dark");
 		}

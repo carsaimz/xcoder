@@ -1,0 +1,45 @@
+name: Congrats
+
+# Free alternative to Acode's Discord congrats bot (upstream #2855):
+# when a community PR is merged, the bot drops a bilingual thank-you
+# comment right on the PR — no external service, no secrets needed.
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  pull-requests: write
+
+jobs:
+  congrats:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.user.type != 'Bot' &&
+      github.event.pull_request.user.login != github.repository_owner
+    steps:
+      - name: Congratulate the contributor
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const { owner, repo } = context.repo;
+
+            const body = [
+              `🎉 **Parabéns @${pr.user.login}!** Seu PR foi mesclado em \`${repo.name}\`. Obrigado por melhorar o XCoder!`,
+              ``,
+              `🎉 **Congratulations @${pr.user.login}!** Your PR was merged into \`${repo.name}\`. Thank you for making XCoder better!`,
+              ``,
+              `> ${pr.title} (#${pr.number})`,
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr.number,
+              body,
+            });
+
+            core.info(`Congratulated @${pr.user.login} on PR #${pr.number}`);

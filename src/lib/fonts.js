@@ -136,13 +136,17 @@ function isCustom(name) {
 	return customFontNames.has(name);
 }
 
-async function setEditorFont(name) {
+async function setEditorFont(name, weight) {
 	loader.showTitleLoader();
 	try {
 		await loadFont(name);
+		const safeWeight = sanitizeEditorFontWeight(weight);
+		const weightRule = safeWeight
+			? `\n    font-weight: ${safeWeight} !important;`
+			: "";
 		const $style = ensureStyleElement(EDITOR_STYLE_ID);
 		$style.textContent = `.editor-container.ace_editor{
-    font-family: "${name}", NotoMono, Monaco, MONOSPACE !important;
+    font-family: "${name}", NotoMono, Monaco, MONOSPACE !important;${weightRule}
   }
   .ace_text{
     font-family: inherit !important;
@@ -153,6 +157,17 @@ async function setEditorFont(name) {
 	} finally {
 		loader.removeTitleLoader();
 	}
+}
+
+/**
+ * Valid editor font weights (Fontes v2 — weight variation in the editor).
+ * @param {unknown} weight
+ * @returns {number|""} a valid weight or "" (keep the font's default)
+ */
+function sanitizeEditorFontWeight(weight) {
+	const value = Number(weight);
+	if (!Number.isInteger(value)) return "";
+	return value >= 100 && value <= 900 ? value : "";
 }
 
 async function setAppFont(name) {

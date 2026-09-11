@@ -23,10 +23,10 @@ export default function fontManager() {
 	const defaultTerminalFont = DEFAULT_TERMINAL_SETTINGS.fontFamily;
 	const defaultAppFontLabel = strings.default || "Default";
 	const targetLabels = {
-		app: "App",
-		editor: "Editor",
-		terminal: "Terminal",
-		all: "All",
+		app: strings["font target app"] || "App",
+		editor: strings["font target editor"] || "Editor",
+		terminal: strings["font target terminal"] || "Terminal",
+		all: strings["font target all"] || "All",
 	};
 	const $page = Page(strings.fonts?.capitalize());
 	const $search = <span attr-action="search" className="icon search"></span>;
@@ -66,7 +66,7 @@ export default function fontManager() {
 			<FontItem
 				name={defaultAppFontLabel}
 				appliedTargets={defaultAppliedTargets}
-				subtitle="System default app font"
+				subtitle={strings["font system default"] || "System default app font"}
 				deletable={false}
 				onSelect={() => chooseApplyTarget("")}
 			/>
@@ -113,26 +113,31 @@ export default function fontManager() {
 		try {
 			const { url, name } = await FileBrowser(
 				"file",
-				"Select font file (.ttf, .otf, .woff)",
+				strings["font select file"] || "Select font file (.ttf, .otf, .woff)",
 				false,
 			);
 
 			// Check if file is a font file
 			const ext = name.toLowerCase().split(".").pop();
 			if (!["ttf", "otf", "woff", "woff2"].includes(ext)) {
-				toast("Please select a valid font file (.ttf, .otf, .woff)");
+				toast(
+					strings["font invalid file"] ||
+						"Please select a valid font file (.ttf, .otf, .woff)",
+				);
 				return;
 			}
 
 			const fontName = await prompt(
-				"Font Name",
+				strings["font name"] || "Font Name",
 				name.replace(/\.(ttf|otf|woff|woff2)$/i, ""),
 			);
 			if (!fontName) return;
 
 			// Check if font already exists
 			if (fonts.get(fontName)) {
-				toast("Font with this name already exists");
+				toast(
+					strings["font name exists"] || "Font with this name already exists",
+				);
 				return;
 			}
 
@@ -200,7 +205,7 @@ export default function fontManager() {
 		return new Promise((resolve) => {
 			const htmlContent = `
 				<div style="margin-bottom: 10px; font-size: 0.9em; opacity: 0.8;">
-					Edit the CSS @font-face rule below:
+					${strings["font css hint"] || "Edit the CSS @font-face rule below:"}
 				</div>
 				<textarea 
 					class="input font-css-editor" 
@@ -211,10 +216,10 @@ export default function fontManager() {
 			`;
 
 			const editDialog = dialog(
-				`Edit CSS - ${fontName}`,
+				`${strings["font css title"] || "Edit CSS"} - ${fontName}`,
 				htmlContent,
-				"Save",
-				"Cancel",
+				strings["save"] || "Save",
+				strings["cancel"] || "Cancel",
 			)
 				.then((children) => {
 					const textarea = children[0].querySelector(".font-css-editor");
@@ -338,23 +343,27 @@ export default function fontManager() {
 			toast(getApplyToast(fontName, target));
 			renderFonts();
 		} catch (error) {
-			toast("Failed to apply font: " + error.message);
+			toast(
+				`${strings["font apply failed"] || "Failed to apply font"}: ${error.message}`,
+			);
 		}
 	}
 
 	function getApplyToast(fontName, target) {
-		const label = fontName ? `"${fontName}"` : "default font";
+		const label = fontName
+			? `"${fontName}"`
+			: strings["font default label"] || "default font";
 		switch (target) {
 			case "app":
-				return `${label} applied to app`;
+				return `${label} ${strings["font applied to app"] || "applied to app"}`;
 			case "editor":
-				return `${label} applied to editor`;
+				return `${label} ${strings["font applied to editor"] || "applied to editor"}`;
 			case "terminal":
-				return `${label} applied to terminal`;
+				return `${label} ${strings["font applied to terminal"] || "applied to terminal"}`;
 			case "all":
-				return `${label} applied to app, editor, and terminal`;
+				return `${label} ${strings["font applied to all"] || "applied to app, editor, and terminal"}`;
 			default:
-				return "Font applied";
+				return strings["font applied generic"] || "Font applied";
 		}
 	}
 
@@ -366,8 +375,10 @@ export default function fontManager() {
 		}
 
 		const shouldDelete = await confirm(
-			"Delete Font",
-			`Are you sure you want to delete "${fontName}"?`,
+			strings["font delete title"] || "Delete Font",
+			`${
+				strings["font delete confirm"] || "Are you sure you want to delete"
+			} "${fontName}"?`,
 		);
 
 		if (shouldDelete) {
@@ -507,10 +518,18 @@ export default function fontManager() {
 		const resolvedSubtitle =
 			subtitle ||
 			(isApplied
-				? "Applied font"
+				? strings["font applied"] || "Applied font"
 				: isBuiltIn
-					? "Built-in font"
-					: "Custom font");
+					? strings["font builtin"] || "Built-in font"
+					: strings["font custom"] || "Custom font");
+
+		// Fontes v2: live preview of the actual font in every row, so the
+		// user sees what they get before applying. Bundled fonts inject
+		// instantly; remote ones download once and are cached.
+
+		if (name && fonts.get(name)) {
+			fonts.loadFont(name).catch(() => {});
+		}
 
 		const $item = (
 			<div
@@ -523,6 +542,13 @@ export default function fontManager() {
 				<div className="container">
 					<div className="text">{name}</div>
 					<small className="value">{resolvedSubtitle}</small>
+					<div
+						className="font-manager-preview"
+						style={name ? { fontFamily: `'${name}', monospace` } : null}
+					>
+						{strings["font preview sample"] ||
+							"AaBbCc 123 — The quick brown fox jumps over the lazy dog"}
+					</div>
 				</div>
 				{appliedTargets.length || deletable ? (
 					<div className="setting-tail">

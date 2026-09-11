@@ -1,0 +1,48 @@
+/* SSH sessions v2 — command history dialog + tips */
+
+.ssh-history {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 4px 0 8px;
+
+	.ssh-history-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		width: 100%;
+		padding: 8px 10px;
+		border: none;
+		border-radius: 6px;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
+
+		&:active {
+			background: rgba(128, 128, 128, 0.15);
+		}
+
+		code {
+			flex: 1;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			font-size: 0.85em;
+		}
+
+		.icon {
+			flex-shrink: 0;
+			opacity: 0.6;
+			font-size: 0.9em;
+		}
+	}
+}
+
+.ssh-history-tip {
+	margin: 4px 0;
+	font-size: 0.8em;
+	opacity: 0.65;
+}

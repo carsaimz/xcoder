@@ -34,6 +34,23 @@ export default function editorSettings() {
 			category: categories.textLayout,
 		},
 		{
+			key: "editorFontWeight",
+			text: strings["editor font weight"],
+			value: values.editorFontWeight,
+			get select() {
+				return [
+					[400, `400 — ${strings["font weight normal"] || "Normal"}`],
+					[500, `500 — ${strings["font weight medium"] || "Medium"}`],
+					[600, `600 — ${strings["font weight semibold"] || "SemiBold"}`],
+					[700, `700 — ${strings["font weight bold"] || "Bold"}`],
+					[800, `800 — ${strings["font weight extrabold"] || "ExtraBold"}`],
+					[900, `900 — ${strings["font weight black"] || "Black"}`],
+				];
+			},
+			info: strings["settings-info-editor-font-weight"],
+			category: categories.textLayout,
+		},
+		{
 			key: "fontSize",
 			text: strings["font size"],
 			value: values.fontSize,

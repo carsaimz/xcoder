@@ -188,3 +188,15 @@ wc-page.font-manager-page {
 		}
 	}
 }
+
+
+/* Fontes v2 — live preview of the font in each list row */
+.font-manager-preview {
+	margin-top: 4px;
+	font-size: 0.95em;
+	line-height: 1.35;
+	opacity: 0.85;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

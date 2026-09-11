@@ -16,8 +16,30 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.3).
 
-## ✅ Concluído até a v1.6.4
+## ✅ Concluído até a v1.7.0
 
+- **v1.7.0 — Sessões SSH v2 + Fontes v2 (v1.7.x itens 3 e 4):**
+  - **SSH v2:** cor estável por host (derivada do nome, determinística),
+    histórico de comandos por servidor (local, cap 100, prompots de
+    senha/fase-chave nunca gravados, Ctrl+C/D/U abandonam a linha) e
+    diretório inicial configurável por servidor (precedência: opção
+    explícita > home salvo > caminho da URL > `/`); hosts apagados são
+    limpos automaticamente
+  - **Fontes v2:** preview ao vivo de cada fonte na própria lista
+    (pangrama traduzido, pré-carregamento em background), peso da fonte
+    do editor 400–900 com reconfiguração ao vivo do CodeMirror e página
+    de fontes 100% internacionalizada (+28 chaves)
+  - **Suporte normalizado:** classes `main scroll` no corpo (mesmo
+    defeito latente do perfil v1.6.4) + import `logger` faltante no
+    caminho de erro
+  - **proot fd fix (Acode #2878):** o probe do `init-sandbox.sh` passou a
+    usar o pid do shell e a semântica do realpath(3) — sem mais avisos
+    "can't sanitize binding /proc/self/fd/N"
+  - **Repo:** `congrats-pr.yml` agradece PRs da comunidade mesclados
+    (grátis, sem Discord); `Ctrl-Shift-W` abre o Welcome (Acode #2773)
+  - **Site:** últimas lacunas de i18n fechadas (editor do blog admin,
+    tiers do /sponsor, placeholders dinâmicos) — +47 traduções EN
+  - +22 testes (716 no total)
 - **v1.6.4 — conserto definitivo da conta:** "Entrar"/"Criar conta" da
   página de perfil estavam mortos desde sempre — o getter `body` do
   WCPage devolve `null` após o setter substituir o `.main` interno
@@ -110,22 +132,18 @@
    documentos.
 2. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar,
    segredos seguros, ratings, exposição de pacotes CM6.
-3. **Sessões SSH v2** — nome do servidor com favicon/cores, histórico de
-   comandos por host, diretório inicial configurável no perfil.
-4. **Fontes v2** — preview visual antes de aplicar, import por arquivo
-   local (além de URL), variação de peso (bold/black) no editor.
 
 ## 🚀 Depois (v1.8+)
 
-5. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
+3. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
    anúncios; horário silencioso (Acode v1.12.0 #1918 / v1.11.8 #1779).
-6. **Novos idiomas** — a infra bilíngue pt/en do site e do app abre caminho
+4. **Novos idiomas** — a infra bilíngue pt/en do site e do app abre caminho
    para es/fr (dicionários por área já estão modularizados).
-7. **Painel do bot de release** — administrar os posts automáticos
+5. **Painel do bot de release** — administrar os posts automáticos
    (editar/apagar o anúncio do release) na área /admin do site.
-8. **Colaboração/backup** — sincronizar settings + sessões de IA via
+6. **Colaboração/backup** — sincronizar settings + sessões de IA via
    ghBackend já existente (backup/restore agendado, diff visual).
-9. **Editor de temas avançado** — editor visual de tokens (fundo,
+7. **Editor de temas avançado** — editor visual de tokens (fundo,
     primária, syntax colors) com export/import JSON compartilhável.
 
 ## 🧭 Direção contínua
@@ -146,7 +164,7 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.3).
 
-## ✅ Done through v1.6.3
+## ✅ Done through v1.7.0
 
 - **v1.6.3 — Console REPL v2 + bilingual wiki:**
   - **Console REPL v2 (v1.7.x item 3):** persistent history across
@@ -220,22 +238,18 @@
    Ruff), live Sass compiler, advanced runner, document viewer.
 2. **Expanded plugin API** 💡 — toggle without restart, secure secrets,
    ratings, CM6 package exposure.
-3. **SSH sessions v2** — server names with colors/icons, per-host command
-   history, configurable home directory.
-4. **Fonts v2** — visual preview before applying, local file import
-   (beyond URL), weight variants (bold/black) in the editor.
 
 ## 🚀 Later (v1.8+)
 
-5. **Rewarded ads** 💡 — watching an ad grants extra ad-free time;
+3. **Rewarded ads** 💡 — watching an ad grants extra ad-free time;
    quiet hours (Acode v1.12.0 #1918 / v1.11.8 #1779).
-6. **New languages** — the pt/en bilingual infra paves the way for es/fr
+4. **New languages** — the pt/en bilingual infra paves the way for es/fr
    (per-area dictionaries are already modular).
-7. **Release bot dashboard** — manage automatic announcements
+5. **Release bot dashboard** — manage automatic announcements
    (edit/delete the release post) in the site's /admin area.
-8. **Collaboration/backup** — sync settings + AI sessions via the
+6. **Collaboration/backup** — sync settings + AI sessions via the
    existing ghBackend (scheduled backup/restore, visual diff).
-9. **Advanced theme editor** — visual token editor (background,
+7. **Advanced theme editor** — visual token editor (background,
     primary, syntax colors) with shareable JSON export/import.
 
 ## 🧭 Ongoing direction

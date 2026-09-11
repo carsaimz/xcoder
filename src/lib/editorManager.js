@@ -973,6 +973,12 @@ async function EditorManager($header, $body) {
 		return `${font}, Noto Mono, Monaco, monospace`;
 	}
 
+	function getEditorFontWeight() {
+		const value = Number(appSettings?.value?.editorFontWeight);
+		if (!Number.isInteger(value) || value < 100 || value > 900) return null;
+		return String(value);
+	}
+
 	function getLspCompletionSource(context) {
 		if (!context.state.facet(lspCompletionEnabled)) return null;
 		return serverCompletionSource(context);
@@ -1019,8 +1025,9 @@ async function EditorManager($header, $body) {
 		const fontSize = appSettings?.value?.fontSize || "12px";
 		const lineHeight = appSettings?.value?.lineHeight || 1.6;
 		const fontFamily = getEditorFontFamily();
+		const fontWeight = getEditorFontWeight();
 		return EditorView.theme({
-			"&": { fontSize, lineHeight: String(lineHeight) },
+			"&": { fontSize, lineHeight: String(lineHeight), fontWeight },
 			".cm-content": { fontFamily },
 			".cm-gutter": { fontFamily },
 			".cm-tooltip, .cm-tooltip *": { fontFamily },
@@ -1212,14 +1219,13 @@ async function EditorManager($header, $body) {
 				const enabled = appSettings?.value?.indentGuides ?? false;
 				if (!enabled) return [];
 				return indentGuides({
-					highlightActiveGuide:
-						appSettings?.value?.activeIndentGuide ?? false,
+					highlightActiveGuide: appSettings?.value?.activeIndentGuide ?? false,
 					hideOnBlankLines: false,
 				});
 			},
 		},
 		{
-			keys: ["fontSize", "editorFont", "lineHeight"],
+			keys: ["fontSize", "editorFont", "editorFontWeight", "lineHeight"],
 			compartments: [fontStyleCompartment],
 			build() {
 				return makeFontTheme();
@@ -3556,6 +3562,11 @@ async function EditorManager($header, $body) {
 
 	// Font family update for CodeMirror
 	appSettings.on("update:editorFont", function () {
+		updateEditorStyleFromSettings();
+	});
+
+	// Font weight update for CodeMirror (Fontes v2)
+	appSettings.on("update:editorFontWeight", function () {
 		updateEditorStyleFromSettings();
 	});
 
