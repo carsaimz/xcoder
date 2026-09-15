@@ -965,6 +965,11 @@ declare type LangStrings = {
   "terminal_required_message_for_lsp": string;
   "text file busy": string;
   "text wrap": string;
+  "wrapped line indent": string;
+  "wrap-indent-same": string;
+  "wrap-indent-indent": string;
+  "wrap-indent-deep": string;
+  "settings-info-editor-wrapping-indent": string;
   "thank you :)": string;
   "theme": string;
   "theme type": string;

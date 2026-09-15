@@ -14,10 +14,19 @@
 > Tudo aqui é **gratuito** — o Premium continua limitado a remover anúncios
 > e ampliar os limites de IA. Itens marcados com 💡 vêm da comparação
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
-> (CHANGELOG lido por completo até a v1.13.3).
+> (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.1
+## ✅ Concluído até a v1.7.2
 
+- **v1.7.2 — quebra de linha suave com indentação (Acode #2886 +
+  #2880):** linhas quebradas continuam na indentação da linha original
+  (ou +1/+2 níveis, configurável) em vez de voltar à margem;
+  oportunidades de quebra em pontuação estilo VS Code (fecha
+  `)`/`]` juntos, quebra antes de aberturas, inclusive CJK); nova
+  opção "Indentação da quebra de linha" em Configurações do editor →
+  Texto e layout (Nenhuma / Mesma indentação / Indentar (+1 nível) /
+  Indentação profunda (+2 níveis)), reconfigura ao vivo; +6 testes
+  (739 no total)
 - **v1.7.1 — conta à prova de falha + repositórios onde são usados:**
   - **Perfil corrigido de vez:** a renovação de token em voo podia
     ressuscitar a sessão recém-apagada pelo "Terminar sessão" (guarda
@@ -38,10 +47,8 @@
   - +18 testes (733 em 87 ficheiros)
 
 - **v1.7.0 — Sessões SSH v2 + Fontes v2 (v1.7.x itens 3 e 4):**
-
-- **v1.7.0 — Sessões SSH v2 + Fontes v2 (v1.7.x itens 3 e 4):**
   - **SSH v2:** cor estável por host (derivada do nome, determinística),
-    histórico de comandos por servidor (local, cap 100, prompots de
+    histórico de comandos por servidor (local, cap 100, prompts de
     senha/fase-chave nunca gravados, Ctrl+C/D/U abandonam a linha) e
     diretório inicial configurável por servidor (precedência: opção
     explícita > home salvo > caminho da URL > `/`); hosts apagados são
@@ -170,10 +177,10 @@
 ## 🧭 Direção contínua
 
 - Manter o CI verde e a pt-br 100% traduzida (`npm run lang:check`).
-- **Acode triado até 15/09 (v1.13.5):** pendente de estudo com CM6 —
-  indentação de word wrap (#2886 + #2880) e API oficial de fileIcons
-  com pack de ícones (#2887); minimificação r8 (#2891) exige testes de
-  build. Já cobertos aqui: menu de contexto de abas (#2863), recuperação
+- **Acode triado até 16/09 (v1.13.5):** indentação de word wrap portada
+  (#2886 + #2880). Pendente de estudo: API oficial de fileIcons com
+  pack de ícones (#2887) e minimificação r8 (#2891, exige testes de
+  build). Já cobertos aqui: menu de contexto de abas (#2863), recuperação
   de migração SFTP (#2840), corrida do cordova.exec (#2851).
 - Verificar o CHANGELOG do Acode a cada release upstream e portar o que
   for útil (workflows, plugins, IA, editor).
@@ -188,10 +195,18 @@
 > Everything here is **free** — Premium stays limited to removing ads and
 > raising AI limits. Items marked with 💡 come from continuous comparison
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
-> (their CHANGELOG fully read up to v1.13.3).
+> (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.1
+## ✅ Done through v1.7.2
 
+- **v1.7.2 — indented soft wrap (Acode #2886 + #2880):** wrapped lines
+  now continue at the original line's indentation (or +1/+2 levels,
+  configurable) instead of returning to the margin; VS Code-style
+  punctuation break opportunities (closing brackets stay together,
+  breaks happen before openings, CJK included); new "Word wrap
+  indentation" option in Editor settings → Text & layout (None / Same
+  indent / Indent (+1 level) / Deep indent (+2 levels)), live
+  reconfiguration; +6 tests (739 total)
 - **v1.7.1 — bullet-proof account + repos where they are used:**
   - **Profile fixed for good:** an in-flight token refresh could
     resurrect the session just cleared by "Sign out" (epoch guard in
@@ -210,8 +225,36 @@
     fallback)
   - +18 tests (733 in 87 files)
 
-- **v1.6.3 — Console REPL v2 + bilingual wiki:**
-
+- **v1.7.0 — SSH sessions v2 + Fonts v2 (v1.7.x items 3 and 4):**
+  - **SSH v2:** stable per-host color (derived from the name,
+    deterministic), per-server command history (local, cap 100,
+    password/key-phase prompts never recorded, Ctrl+C/D/U abandon the
+    line) and a configurable home directory per server (precedence:
+    explicit option > saved home > URL path > `/`); deleted hosts are
+    cleaned automatically
+  - **Fonts v2:** live preview of each font in the list itself
+    (translated pangram, background preloading), editor font weight
+    400–900 with live CodeMirror reconfiguration and a fully
+    internationalized fonts page (+28 keys)
+  - **Support normalized:** `main scroll` classes on the body (same
+    latent defect as profile v1.6.4) + missing `logger` import on the
+    error path
+  - **proot fd fix (Acode #2878):** the `init-sandbox.sh` probe now
+    uses the shell's pid and realpath(3) semantics — no more "can't
+    sanitize binding /proc/self/fd/N" warnings
+  - **Repo:** `congrats-pr.yml` thanks community PRs merged (free, no
+    Discord); `Ctrl-Shift-W` opens the Welcome (Acode #2773)
+  - **Site:** last i18n gaps closed (admin blog editor, /sponsor
+    tiers, dynamic placeholders) — +47 EN translations
+  - +22 tests (716 total)
+- **v1.6.4 — definitive account fix:** the profile page's "Sign in"/
+  "Sign up" buttons were dead from day one — the WCPage `body` getter
+  returned `null` after the setter replaced the inner `.main` (the
+  profile div lacked the `main` class), and field reads exploded in a
+  silent TypeError; the body now keeps a local `$body` reference +
+  default `main scroll` classes (About-page pattern). Closes the cycle
+  started in 1.6.1/1.6.2 (valid session, persisted PAT, site → app
+  bridge); +7 regression tests with real rendering (694 total)
 - **v1.6.3 — Console REPL v2 + bilingual wiki:**
   - **Console REPL v2 (v1.7.x item 3):** persistent history across
     sessions (localStorage, dedupe, cap 50), named saved snippets
@@ -301,7 +344,11 @@
 ## 🧭 Ongoing direction
 
 - Keep CI green and pt-br 100% translated (`npm run lang:check`).
+- **Acode triaged through 16/09 (v1.13.5):** word wrap indentation
+  ported (#2886 + #2880). Pending study: the official fileIcons API
+  with icon packs (#2887) and r8 minification (#2891, needs build
+  tests). Already covered here: tab context menu (#2863), SFTP
+  migration recovery (#2840), cordova.exec race (#2851).
 - Check the Acode CHANGELOG on every upstream release and port what is
   useful (workflows, plugins, AI, editor).
 - Never gate features behind Premium — donating is optional.
-"""

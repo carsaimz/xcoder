@@ -45,6 +45,7 @@ import {
 	reconfigureEditorReadOnly,
 } from "cm/editorReadOnly";
 import iconCompletions, { iconCompletionSource } from "cm/iconCompletions";
+import { indentedLineWrapping } from "cm/indentedLineWrapping";
 import { handleLineNumberClick } from "cm/lineNumberSelection";
 import localWordCompletions, {
 	localWordCompletionSource,
@@ -1051,7 +1052,9 @@ async function EditorManager($header, $body) {
 	}
 
 	function makeWrapExtension() {
-		if (appSettings?.value?.textWrap) return EditorView.lineWrapping;
+		if (appSettings?.value?.textWrap) {
+			return indentedLineWrapping(appSettings?.value?.wrappingIndent);
+		}
 		return horizontalScrollPastEnd(
 			Number(appSettings?.value?.leftMargin ?? 50),
 		);
@@ -1239,7 +1242,7 @@ async function EditorManager($header, $body) {
 			},
 		},
 		{
-			keys: ["textWrap"],
+			keys: ["textWrap", "wrappingIndent"],
 			compartments: [wrapCompartment],
 			build() {
 				return makeWrapExtension();

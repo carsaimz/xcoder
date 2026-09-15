@@ -13,6 +13,50 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.2] - 2026-09-16
+
+### Adicionado — quebra de linha suave com indentação (Acode #2886 + #2880)
+
+- **Linhas quebradas com indentação:** com a quebra de linha ativa, a
+  continuação de cada linha agora começa na indentação da linha
+  original em vez de voltar à margem esquerda — um abaixo do outro,
+  do jeito que o código é lido. Nova extensão CodeMirror 6
+  (`indentedLineWrapping`): mede a largura visível, cacheia por linha,
+  preserva paradas de tabulação (linhas com tab arredondam a indentação
+  para cima) e limita a indentação a metade das colunas visíveis para
+  painéis estreitos nunca ficarem sem conteúdo
+- **Modos extras:** além de "Mesma indentação", dois níveis opcionais —
+  "Indentar (+1 nível)" e "Indentação profunda (+2 níveis)" — somam
+  tabulações inteiras sobre a indentação da linha
+- **Quebras em pontuação (Acode #2880/#2886):** oportunidades de quebra
+  estilo VS Code (`punctuationWrapping`) — fecha `)`/`]`/`}` junto do
+  caractere anterior e quebra ANTES de `(`/`[`/`"`, não depois; inclui
+  pontuação CJK (`、` `。` `」` etc.) com widgets `wbr` nativos, sem
+  tocar no layout
+- **Nova opção de settings:** "Indentação da quebra de linha" em
+  Configurações do editor → Texto e layout (Nenhuma / Mesma / +1 / +2);
+  trocar reconfigura o editor ao vivo (mesmo compartimento do "Quebra
+  de texto"); strings novas em pt/en (fallback: inglês nos demais
+  idiomas)
+
+### Testes
+
+- +6 testes (`indentedLineWrapping.test.ts`): indentação de espaços
+  preservada e truncada no conteúdo, contagem de tabulações por coluna,
+  arredondamento misto, tetos sem paradas fracionárias e os modos
+  extra/none — incluindo a regra "níveis extras somam sobre a
+  indentação da própria linha" (739 no total, 88 ficheiros)
+
+### EN summary
+
+- **Indented soft wrap (Acode #2886 + #2880):** wrapped lines continue
+  at the original line's indentation instead of returning to the left
+  margin; optional +1/+2 extra indent levels; VS Code-style punctuation
+  break opportunities (closing brackets kept together, breaks before
+  openings, CJK included); new "Word wrap indentation" editor setting
+  (None / Same / +1 / +2) with live reconfiguration; +6 tests (739
+  total, 88 files)
+
 ## [1.7.1] - 2026-09-15
 
 ### Corrigido — perfil: "Terminar sessão" e botão voltar

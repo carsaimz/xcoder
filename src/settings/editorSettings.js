@@ -15,6 +15,12 @@ export default function editorSettings() {
 		guidesIndicators: strings["settings-category-guides-indicators"],
 		cursorSelection: strings["settings-category-cursor-selection"],
 	};
+	const wrappingIndentOptions = [
+		["none", strings.none],
+		["same", strings["wrap-indent-same"]],
+		["indent", strings["wrap-indent-indent"]],
+		["deepIndent", strings["wrap-indent-deep"]],
+	];
 	const items = [
 		{
 			key: "scroll-settings",
@@ -82,6 +88,17 @@ export default function editorSettings() {
 			text: strings["text wrap"],
 			checkbox: values.textWrap,
 			info: strings["settings-info-editor-text-wrap"],
+			category: categories.textLayout,
+		},
+		{
+			key: "wrappingIndent",
+			text: strings["wrapped line indent"],
+			value: values.wrappingIndent ?? "same",
+			valueText: (value) =>
+				wrappingIndentOptions.find(([key]) => key === value)?.[1] ??
+				wrappingIndentOptions[1][1],
+			select: wrappingIndentOptions,
+			info: strings["settings-info-editor-wrapping-indent"],
 			category: categories.textLayout,
 		},
 		{

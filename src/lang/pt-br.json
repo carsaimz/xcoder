@@ -1509,5 +1509,10 @@
 	"font weight black": "Black",
 	"git repo card": "Repositório GitHub",
 	"git repo change": "Trocar",
-	"git repo hint": "Nenhum repositório selecionado — toque para listar."
+	"git repo hint": "Nenhum repositório selecionado — toque para listar.",
+	"wrapped line indent": "Indentação da quebra de linha",
+	"wrap-indent-same": "Mesma indentação",
+	"wrap-indent-indent": "Indentar (+1 nível)",
+	"wrap-indent-deep": "Indentação profunda (+2 níveis)",
+	"settings-info-editor-wrapping-indent": "Escolha se o texto quebrado começa na margem esquerda, segue a indentação da linha original ou é indentado ainda mais. Cada nível extra usa o tamanho da tabulação."
 }
