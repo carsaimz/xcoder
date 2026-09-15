@@ -12,6 +12,7 @@ import settings from "lib/settings";
 import Url from "utils/Url";
 import { buildUserContent } from "./artifacts";
 import { chatCompletion, resolveBaseURL, streamChatCompletion } from "./client";
+import { ghToolsContext } from "./githubTools";
 import {
 	DEFAULT_PROVIDER_ID,
 	keyShapeWarning,
@@ -116,6 +117,10 @@ export class Agent {
 			skillsSection,
 			"- If a task is ambiguous, ask the user.",
 		];
+		const ghContext = ghToolsContext();
+		if (ghContext) {
+			parts.push("", ghContext);
+		}
 		if (settings.value.aiSystemPrompt) {
 			parts.push(
 				"",

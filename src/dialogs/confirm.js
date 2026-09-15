@@ -40,18 +40,25 @@ function confirm(titleText, message, isHTML, options = {}) {
 				checked: Boolean(checkbox?.checked),
 			};
 		};
+		/** set by OK/cancel so the back-dismiss path never overrides them */
+		let settled = false;
+		const settle = (confirmed) => {
+			if (settled) return;
+			settled = true;
+			resolve(getResponse(confirmed));
+		};
 		const okBtn = tag("button", {
 			textContent: strings.ok,
 			onclick: function () {
+				settle(true);
 				hide();
-				resolve(getResponse(true));
 			},
 		});
 		const cancelBtn = tag("button", {
 			textContent: strings.cancel,
 			onclick: function () {
+				settle(false);
 				hide();
-				resolve(getResponse(false));
 			},
 		});
 		const confirmDiv = tag("div", {
@@ -80,6 +87,10 @@ function confirm(titleText, message, isHTML, options = {}) {
 		restoreTheme(true);
 
 		function hideAlert() {
+			// resolve as CANCELLED when the dialog leaves the screen without
+			// an explicit OK/cancel (hardware back via actionStack) — the
+			// awaiting code used to hang forever on back-dismiss
+			settle(false);
 			confirmDiv.classList.add("hide");
 			restoreTheme();
 			setTimeout(() => {

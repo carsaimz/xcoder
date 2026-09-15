@@ -387,6 +387,63 @@ export const TOOLS = [
 		},
 	},
 	{
+		name: "github_read",
+		description:
+			"Read from the GitHub repository selected in the Git sidebar (uses the user's token). One of: tree=true (list all tracked files), file='src/main.js' (file content with its sha), endpoint='repos/owner/repo/...' (any GET endpoint: issues, PRs, branches). Optional ref (branch).",
+		danger: "read",
+		parameters: {
+			type: "object",
+			properties: {
+				tree: { type: "boolean", description: "list all tracked files" },
+				file: {
+					type: "string",
+					description: "repo-relative file path to read",
+				},
+				endpoint: {
+					type: "string",
+					description: "raw API path after api.github.com/ (GET)",
+				},
+				ref: {
+					type: "string",
+					description: "branch/tag — defaults to the active branch",
+				},
+			},
+		},
+		async run(args) {
+			const { githubRead } = await import("./githubTools");
+			return githubRead(args || {});
+		},
+	},
+	{
+		name: "github_write",
+		description:
+			"Write to the GitHub repository selected in the Git sidebar (contents API commits, issues, PR comments, branches). Needs endpoint (after api.github.com/), method POST/PATCH/PUT/DELETE and body. ALWAYS confirm with the user before calling. For committing a file: PUT repos/OWNER/REPO/contents/PATH with {message, content(base64), branch, sha} — get the sha from github_read file=...",
+		danger: "write",
+		parameters: {
+			type: "object",
+			properties: {
+				endpoint: {
+					type: "string",
+					description: "raw API path after api.github.com/",
+				},
+				method: {
+					type: "string",
+					enum: ["POST", "PATCH", "PUT", "DELETE"],
+					description: "default POST",
+				},
+				body: {
+					type: "object",
+					description: "JSON request body",
+				},
+			},
+			required: ["endpoint"],
+		},
+		async run(args) {
+			const { githubWrite } = await import("./githubTools");
+			return githubWrite(args || {});
+		},
+	},
+	{
 		name: "load_skill",
 		description:
 			"Load a skill: a short markdown playbook with step-by-step guidance (debug-build, code-review, write-tests, git-hygiene, refactor-safe, plus workspace .xcoder/skills). Load it when its description matches the task, follow it, then continue the task.",

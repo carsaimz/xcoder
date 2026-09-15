@@ -1,6 +1,5 @@
 import settingsPage from "components/settingsPage";
 import toast from "components/toast";
-import loader from "dialogs/loader";
 import select from "dialogs/select";
 import { fetchGhUser } from "lib/ghAuth";
 import { signInGitHubFlow } from "lib/ghSignIn";
@@ -9,83 +8,9 @@ import "./gh-settings.scss";
 
 /**
  * XCoder GitHub settings — account (PAT or the official device-flow
- * sign in) and repositories. No user-owned OAuth clients.
+ * sign in) plus the remote URL/branch rows. Repository LISTING moved to
+ * the Git sidebar app (and the AI chat) — that is where repos are used.
  */
-
-const REPOS_URL =
-	"https://api.github.com/user/repos?per_page=100&sort=updated&affiliation=owner,collaborator";
-
-/**
- * CORS-free GET for api.github.com (native plugin inside the webview,
- * fetch fallback elsewhere). api.github.com also sends CORS headers, so
- * the fetch fallback works in browser builds too.
- * @param {string} url
- * @param {string} token
- * @returns {Promise<any>} parsed JSON body
- */
-async function ghGet(url, token) {
-	const headers = {
-		Accept: "application/vnd.github+json",
-		Authorization: `Bearer ${token}`,
-		"X-GitHub-Api-Version": "2022-11-28",
-	};
-
-	if (typeof cordova !== "undefined" && cordova.plugin?.http?.sendRequest) {
-		return new Promise((resolve, reject) => {
-			cordova.plugin.http.sendRequest(
-				url,
-				{
-					method: "GET",
-					headers,
-					serializer: "json",
-					responseType: "json",
-					timeout: 20000,
-				},
-				(response) => {
-					let data = response.data;
-					if (typeof data === "string") {
-						try {
-							data = JSON.parse(data);
-						} catch {
-							data = null;
-						}
-					}
-					resolve(data);
-				},
-				(error) => {
-					let detail = error?.error || "";
-					if (detail && typeof detail !== "string") {
-						try {
-							detail = detail?.message || JSON.stringify(detail);
-						} catch {
-							detail = String(detail);
-						}
-					}
-					reject(
-						new Error(
-							`GitHub ${error?.status || ""}: ${detail || error?.statusText || "request failed"}`,
-						),
-					);
-				},
-			);
-		});
-	}
-
-	const response = await fetch(url, { headers });
-	const text = await response.text();
-	let data = null;
-	try {
-		data = text ? JSON.parse(text) : null;
-	} catch {
-		/* non-JSON error body */
-	}
-	if (!response.ok) {
-		throw new Error(
-			`GitHub ${response.status}: ${data?.message || text?.slice(0, 140) || "request failed"}`,
-		);
-	}
-	return data;
-}
 
 /**
  * Opens the GitHub configuration page.
@@ -224,15 +149,6 @@ export default function ghSettings() {
 					"Alternative to signing in: paste a PAT (classic or fine-grained) with repo, workflow and gist scopes.",
 			},
 			{
-				key: "gh-repos",
-				text: strings["github repos"] || "My repositories",
-				value: values.ghRepo || "",
-				info:
-					strings["settings-info-gh-repos"] ||
-					"Lists your repositories and sets the one used by push/clone. Requires an account or token.",
-				chevron: true,
-			},
-			{
 				key: "gitRemoteUrl",
 				text: strings["git remote url"] || "Remote URL",
 				value: values.gitRemoteUrl || "",
@@ -306,11 +222,6 @@ export default function ghSettings() {
 				refresh();
 				break;
 
-			case "gh-repos":
-				await pickRepo();
-				refresh();
-				break;
-
 			case "gitRemoteUrl":
 			case "ghBranch":
 				// persisted here too — the kit does not persist prompts
@@ -349,7 +260,6 @@ export default function ghSettings() {
 					: strings["not signed in"] || "Not signed in",
 		);
 		setRow($list, "ghToken", values.ghToken ? "••••••••" : "");
-		setRow($list, "gh-repos", values.ghRepo || "");
 		setRow($list, "gitRemoteUrl", values.gitRemoteUrl || "");
 		setRow($list, "ghBranch", values.ghBranch || "main");
 
@@ -423,60 +333,5 @@ export default function ghSettings() {
 		settings.value.ghUserAvatar = "";
 		await settings.update();
 		toast(strings.logout || "Logout");
-	}
-
-	/**
-	 * Lists the user's repositories and saves the chosen one as remote.
-	 */
-	async function pickRepo() {
-		const token = String(settings.value.ghToken || "").trim();
-		if (!token) {
-			toast(
-				strings["github token needed"] ||
-					"Sign in or set a token to list repositories",
-				3000,
-			);
-			return;
-		}
-
-		const hide = await loader.show();
-		let repos = [];
-		try {
-			repos = (await ghGet(REPOS_URL, token)) || [];
-		} catch (error) {
-			toast(String(error.message || error), 4000);
-			return;
-		} finally {
-			hide();
-		}
-
-		if (!Array.isArray(repos) || !repos.length) {
-			toast(strings["github no repos"] || "No repositories found", 3000);
-			return;
-		}
-
-		const options = repos.slice(0, 60).map((repo) => [
-			repo.full_name,
-			`${repo.full_name}${repo.private ? " 🔒" : ""}`, // label
-			"svg:folder", // icon
-		]);
-		const fullName = await select(
-			strings["github repos"] || "My repositories",
-			options,
-		);
-		if (!fullName) return;
-
-		const chosen = repos.find((repo) => repo.full_name === fullName);
-		if (!chosen) return;
-
-		settings.value.ghRepo = chosen.full_name || "";
-		settings.value.gitRemoteUrl =
-			chosen.clone_url || `https://github.com/${chosen.full_name}.git`;
-		settings.value.ghBranch = chosen.default_branch || "main";
-		await settings.update();
-		toast(
-			`${strings["github repo saved"] || "Repository"}: ${settings.value.ghRepo}`,
-			2500,
-		);
 	}
 }

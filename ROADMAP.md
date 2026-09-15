@@ -16,7 +16,28 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.3).
 
-## ✅ Concluído até a v1.7.0
+## ✅ Concluído até a v1.7.1
+
+- **v1.7.1 — conta à prova de falha + repositórios onde são usados:**
+  - **Perfil corrigido de vez:** a renovação de token em voo podia
+    ressuscitar a sessão recém-apagada pelo "Terminar sessão" (guarda
+    de época em `lib/supabase.js`); o botão voltar do hardware lançava
+    erro nas páginas de perfil e suporte (chave `action` do
+    actionStack); confirmação descartada pelo voltar agora resolve
+    como cancelado; logout à prova de falha de rede
+  - **"Meus repositórios" movido da página GitHub** para onde os
+    repositórios são usados: cartão "Repositório GitHub" no Git
+    (sidebar) com o repositório ativo + seletor, e o chat de IA ganhou
+    o contexto do repositório ativo com as ferramentas
+    `github_read`/`github_write` (árvore, conteúdo com sha, Contents
+    API, issues — escrita sempre com aprovação; token nunca sai do
+    aparelho)
+  - **Acode #2851 portado:** chamadas de plugin muito cedo durante o
+    boot do Cordova não falham mais (fallback
+    `cordova.require("cordova/exec")`)
+  - +18 testes (733 em 87 ficheiros)
+
+- **v1.7.0 — Sessões SSH v2 + Fontes v2 (v1.7.x itens 3 e 4):**
 
 - **v1.7.0 — Sessões SSH v2 + Fontes v2 (v1.7.x itens 3 e 4):**
   - **SSH v2:** cor estável por host (derivada do nome, determinística),
@@ -149,6 +170,11 @@
 ## 🧭 Direção contínua
 
 - Manter o CI verde e a pt-br 100% traduzida (`npm run lang:check`).
+- **Acode triado até 15/09 (v1.13.5):** pendente de estudo com CM6 —
+  indentação de word wrap (#2886 + #2880) e API oficial de fileIcons
+  com pack de ícones (#2887); minimificação r8 (#2891) exige testes de
+  build. Já cobertos aqui: menu de contexto de abas (#2863), recuperação
+  de migração SFTP (#2840), corrida do cordova.exec (#2851).
 - Verificar o CHANGELOG do Acode a cada release upstream e portar o que
   for útil (workflows, plugins, IA, editor).
 - Nunca travar recursos atrás do Premium — doar é opcional.
@@ -164,7 +190,27 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.3).
 
-## ✅ Done through v1.7.0
+## ✅ Done through v1.7.1
+
+- **v1.7.1 — bullet-proof account + repos where they are used:**
+  - **Profile fixed for good:** an in-flight token refresh could
+    resurrect the session just cleared by "Sign out" (epoch guard in
+    `lib/supabase.js`); the hardware back button threw on the
+    profile/support pages (actionStack `action` key); back-dismissed
+    confirms now resolve as cancelled; sign-out survives network
+    failures
+  - **"Meus repositórios" moved out of the GitHub settings page** to
+    where repos are used: a "Repositório GitHub" card in the Git
+    sidebar (active repo + picker) and the AI chat now receives the
+    active repo context with `github_read`/`github_write` tools (tree,
+    file contents with sha, Contents API commits, issues — writes
+    always user-approved; the token never leaves the device)
+  - **Acode #2851 ported:** very-early plugin calls no longer fail
+    during the Cordova boot race (`cordova.require("cordova/exec")`
+    fallback)
+  - +18 tests (733 in 87 files)
+
+- **v1.6.3 — Console REPL v2 + bilingual wiki:**
 
 - **v1.6.3 — Console REPL v2 + bilingual wiki:**
   - **Console REPL v2 (v1.7.x item 3):** persistent history across

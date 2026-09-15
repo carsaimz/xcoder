@@ -4,6 +4,7 @@ import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import vshell from "lib/ai/vshell";
+import { pickAndApplyGhRepo } from "lib/ghRepos";
 import { signInGitHubFlow } from "lib/ghSignIn";
 import {
 	commit,
@@ -91,12 +92,15 @@ function initApp(el) {
 	// sign-in can happen from the settings page while this app is open
 	settings.on("update:ghUserLogin", onAccountChanged);
 	settings.on("update:ghToken", onAccountChanged);
+	// the repository card mirrors the active repo (set here or in chat)
+	settings.on("update:ghRepo", onAccountChanged);
 
 	return () => {
 		container = null;
 		clearInterval(refreshTimer);
 		settings.off("update:ghUserLogin", onAccountChanged);
 		settings.off("update:ghToken", onAccountChanged);
+		settings.off("update:ghRepo", onAccountChanged);
 	};
 }
 
@@ -125,6 +129,22 @@ function buildUi() {
 				<span className="icon github"></span>
 			</div>
 			<div className="git-account-body" ref={setAccountBody}></div>
+		</div>
+	);
+
+	const $repo = (
+		<div className="git-card git-repo">
+			<div className="git-card-header">
+				<span className="git-card-title">
+					{strings["git repo card"] || "Repositório GitHub"}
+				</span>
+				<span
+					className="icon refresh"
+					title={strings["github repos"] || "My repositories"}
+					onclick={chooseRepo}
+				></span>
+			</div>
+			<div className="git-repo-body" ref={setRepoBody}></div>
 		</div>
 	);
 
@@ -211,6 +231,7 @@ function buildUi() {
 	return (
 		<div className="git-panel">
 			{$account}
+			{$repo}
 			{$status}
 			{$composer}
 			{$commits}
@@ -237,6 +258,69 @@ function setAccountBody(el) {
 	renderAccount();
 }
 
+function setRepoBody(el) {
+	container._$repoBody = el;
+	renderRepo();
+}
+
+/** Re-renders the repository card (active repo or empty hint). */
+function renderRepo() {
+	const $body = container?._$repoBody;
+	if (!$body?.isConnected) return;
+	const values = settings.value;
+
+	if (values.ghRepo) {
+		$body.content = (
+			<div className="git-repo-row">
+				<span className="icon folder git-repo-icon"></span>
+				<div className="git-repo-info">
+					<span className="git-repo-name">{values.ghRepo}</span>
+					<span className="git-repo-meta">
+						{values.ghBranch || "main"}
+						{values.gitRemoteUrl ? ` · ${values.gitRemoteUrl}` : ""}
+					</span>
+				</div>
+				<button
+					className="git-ghost-btn"
+					onclick={chooseRepo}
+					title={strings["github repos"] || "My repositories"}
+				>
+					{strings["git repo change"] || "Trocar"}
+				</button>
+			</div>
+		);
+		return;
+	}
+
+	$body.content = (
+		<div className="git-repo-row">
+			<span className="git-account-hint">
+				{values.ghToken
+					? strings["git repo hint"] ||
+						"Nenhum repositório selecionado — toque para listar."
+					: strings["github token needed"] ||
+						"Entre com a conta ou defina um token para listar repositórios"}
+			</span>
+			<button
+				className="git-commit-btn"
+				onclick={chooseRepo}
+				disabled={!values.ghToken}
+			>
+				{strings["github repos"] || "Meus repositórios"}
+			</button>
+		</div>
+	);
+}
+
+/** Opens the shared repository picker and persists the choice. */
+async function chooseRepo() {
+	const changed = await pickAndApplyGhRepo();
+	if (changed) {
+		renderRepo();
+		renderGh();
+	}
+}
+
 async function refresh() {
 	if (!container || !$statusBody?.isConnected) return;
 
@@ -244,6 +328,7 @@ async function refresh() {
 	// local repo state — a broken/absent git workspace used to
 	// early-return and leave the connected account invisible.
 	renderAccount();
+	renderRepo();
 	renderGh();
 
 	let status;

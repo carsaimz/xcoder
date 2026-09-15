@@ -37,6 +37,15 @@ const FETCH_TIMEOUT = 15000;
 let session = readSession();
 
 /**
+ * Bumped by signOut() so in-flight token refreshes/profile fetches can
+ * detect that the session ended while their request was on the wire and
+ * DISCARD the response instead of resurrecting the signed-out session
+ * (reported: "Terminar sessão não pegava — a conta voltava sozinha").
+ * @type {number}
+ */
+let sessionEpoch = 0;
+
+/**
  * Whether the user has configured Supabase on this device.
  * @returns {boolean}
  */
@@ -299,8 +308,11 @@ export function applyOAuthTokens(rawUrl) {
  */
 export async function fetchProfile() {
 	if (!session?.access_token) return null;
+	const epoch = sessionEpoch;
 	try {
 		const user = await request("/auth/v1/user");
+		// a concurrent signOut() must win over this response
+		if (epoch !== sessionEpoch || !session) return null;
 		if (user?.id) {
 			session.user = user;
 			writeSession(session);
@@ -349,11 +361,15 @@ export async function ensureFreshSession() {
  */
 export async function refreshSession() {
 	if (!session?.refresh_token) return false;
+	const epoch = sessionEpoch;
+	const refreshToken = session.refresh_token;
 	try {
 		const response = await request(`/auth/v1/token?grant_type=refresh_token`, {
 			method: "POST",
-			body: { refresh_token: session.refresh_token },
+			body: { refresh_token: refreshToken },
 		});
+		// a concurrent signOut() must win over this response
+		if (epoch !== sessionEpoch || !session) return false;
 		if (!response?.access_token) return false;
 		session = {
 			access_token: response.access_token,
@@ -372,6 +388,8 @@ export async function refreshSession() {
  * Signs out and clears the stored session.
  */
 export async function signOut() {
+	// invalidate every in-flight refresh/profile response FIRST
+	sessionEpoch += 1;
 	try {
 		if (session?.access_token) {
 			await request(`/auth/v1/logout`, { method: "POST" });

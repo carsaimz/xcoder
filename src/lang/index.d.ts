@@ -1393,6 +1393,9 @@ declare type LangStrings = {
   "font weight bold": string;
   "font weight extrabold": string;
   "font weight black": string;
+  "git repo card": string;
+  "git repo change": string;
+  "git repo hint": string;
 };
 
 declare var strings: LangStrings;

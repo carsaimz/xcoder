@@ -106,7 +106,9 @@ export default function renderSupport() {
 	};
 	actionStack.push({
 		id: "support",
-		callback: () => {
+		// `action` — same fix as the profile page: pop() invokes
+		// fun.action(), `callback` was ignored and back stayed dead
+		action: () => {
 			$page.hide();
 			actionStack.remove("support");
 		},

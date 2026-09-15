@@ -13,6 +13,88 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.1] - 2026-09-15
+
+### Corrigido — perfil: "Terminar sessão" e botão voltar
+
+- **Sessão que ressuscitava:** uma renovação de token em voo quando o
+  usuário tocava em "Terminar sessão" gravava de volta a sessão
+  acabada de apagar — a conta voltava sozinha ao reabrir a página.
+  `signOut()` agora invalida toda resposta de refresh/perfil pendente
+  (contador de época em `lib/supabase.js`); testes provam que a
+  ressurreição acontecia antes do conserto e não acontece mais
+- **Botão voltar morto na página de perfil (e suporte):** as páginas
+  empilhavam a entrada no actionStack com a chave `callback`, mas o
+  `pop()` invoca `action` — o hardware back lançava
+  "fun.action is not a function" e a página ficava presa. Chave
+  corrigida nas duas páginas
+- **Confirmação descartada pelo voltar:** o diálogo de confirmação
+  nunca resolvia quando dispensado pelo botão voltar do hardware (a
+  promessa ficava pendente para sempre); agora resolve como cancelado,
+  com flag `settled` para OK/cancelar nunca serem sobrescritos
+- **"Terminar sessão" blindado:** falha de rede no logout não trava
+  mais o botão — a sessão local é limpa de qualquer forma e a página
+  re-renderiza para Convidado
+
+### Adicionado — "Meus repositórios" no Git (sidebar) e no chat de IA
+
+- **Movido da página GitHub:** listar repositórios agora mora onde os
+  repositórios são USADOS. A página GitHub (settings) fica com conta,
+  token, URL remota e branch; a linha "Meus repositórios" saiu de lá
+- **Git sidebar:** cartão "Repositório GitHub" novo (logo abaixo da
+  conta) mostrando o repositório ativo, branch e URL remota — um toque
+  lista os repositórios da conta e define o usado por push/clone;
+  espelha em tempo real mudanças feitas no chat
+- **IA com contexto de repositório:** quando um repositório está ativo
+  e há sessão GitHub, o agente recebe o contexto no system prompt e
+  ganha duas ferramentas: `github_read` (árvore de ficheiros, conteúdo
+  de ficheiro com sha, qualquer endpoint GET — issues, PRs, branches) e
+  `github_write` (commits via Contents API, criação de issues/PR —
+  sempre com permissão do usuário). O token nunca sai do aparelho —
+  as chamadas vão direto para api.github.com
+
+### Adicionado — Acode upstream (últimos 15 dias triados)
+
+- **#2851 portado:** `cordova.exec` é mapeado de forma assíncrona
+  durante o boot — chamadas de plugin muito cedo podiam falhar com
+  "bridge is not available" mesmo com cordova.js já avaliado; o
+  pluginContext agora cai para `cordova.require("cordova/exec")`
+  (disponível desde a avaliação) e o hardenBridge tolera ausência do
+  bridge
+- Triagem dos outros 34 commits: #2863 (menu de contexto de abas) já
+  existe (close others/left/right); #2840 (recuperação de migração
+  SFTP) e #2836 (webview destroy) já cobertos pelo nosso
+  reescrita; #2888 (Content-Type em POST) não aplicável; #2886/#2880
+  (indentação de word wrap) e #2887 (fileIcons API) anotados no
+  roadmap para estudo com CM6
+
+### Testes
+
+- +18 testes novos, −1 superseded (716 → 733 em 87 ficheiros):
+  profileSignOut (3 — confirm real + actionStack real + corrida de
+  ressurreição), ghRepos (5), aiGithubTools (8), pluginContextExecRace
+  (2); tsc limpo, biome limpo, typos 0, build production OK, boot
+  harness idêntico ao baseline (11 apps, STARTED APP AND ITS SERVICES)
+
+### EN summary
+
+- **Profile fixed for good:** a token refresh racing "Sign out" could
+  resurrect the just-cleared session (epoch guard added); the hardware
+  back button threw on profile/support pages (actionStack `callback`
+  vs `action` key); back-dismissed confirms hang forever (now resolve
+  as cancelled); sign-out is failure-proof (local session always
+  cleared)
+- **Repositories moved where they are used:** the GitHub settings page
+  keeps account/token/remote/branch; the Git sidebar gains a
+  "Repositório GitHub" card (active repo + picker) and the AI agent
+  gains the active repo as context plus `github_read`/`github_write`
+  tools (tree, file contents with sha, Contents API commits, issues —
+  write always user-approved; token never leaves the device)
+- **Acode #2851 ported:** early plugin calls no longer fail during the
+  Cordova boot race (internal `cordova/exec` loader fallback)
+- +18 new tests, −1 superseded (733 green in 87 files), tsc/biome/typos clean, production
+  build OK, boot harness identical to baseline
+
 ## [1.7.0] - 2026-09-11
 
 ### Adicionado — Sessões SSH v2 (roadmap v1.7.x item 3)

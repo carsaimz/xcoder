@@ -215,7 +215,10 @@ async function renderProfilePage() {
 	};
 	actionStack.push({
 		id: "profile",
-		callback: () => {
+		// `action` is the key actionStack.pop() invokes — `callback`
+		// is silently ignored, so the hardware back button used to
+		// throw ("fun.action is not a function") and strand the page
+		action: () => {
 			$page.hide();
 			actionStack.remove("profile");
 		},
@@ -426,7 +429,13 @@ async function renderProfilePage() {
 			t("sign out confirm", "Terminar a sessão nesta conta?"),
 		);
 		if (!ok) return;
-		await supabase.signOut();
+		try {
+			await supabase.signOut();
+		} catch (error) {
+			// signOut is best-effort — a network failure must never
+			// leave the button feeling dead ("não aceita sair")
+			logger.log("error", `signOut failed: ${error?.message || error}`);
+		}
 		toast(t("signed out", "Sessão terminada"), 2500);
 		document.dispatchEvent(new CustomEvent("premiumchange"));
 		refreshPage();

@@ -13,6 +13,16 @@ function getCordovaExec() {
 		if (bridge && typeof bridge.exec === "function") {
 			return bridge.exec.bind(bridge);
 		}
+		// Acode #2851: `cordova.exec` is mapped asynchronously while Cordova
+		// starts, but Cordova's internal module loader is available as soon
+		// as cordova.js has been evaluated — so a very early plugin call
+		// ("Cordova bridge is not available") can still go through.
+		if (bridge && typeof bridge.require === "function") {
+			const internal = bridge.require("cordova/exec");
+			if (typeof internal === "function") {
+				return internal.bind(bridge);
+			}
+		}
 	} catch {
 		// ignore — bridge not ready yet
 	}
@@ -32,6 +42,8 @@ let bridgeHardened = false;
 
 function hardenBridge() {
 	if (bridgeHardened) return;
+	// some environments never attach cordova — nothing to harden
+	if (typeof cordova === "undefined" || !cordova) return;
 	bridgeHardened = true;
 
 	for (const prop of [

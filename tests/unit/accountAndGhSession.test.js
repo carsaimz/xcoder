@@ -422,6 +422,89 @@ describe("account page (profile) — sign-in must actually work", () => {
                         cleanupPages();
                 },
         );
+        test(
+                "Terminar sessão clears the session and re-renders to guest",
+                { timeout: 20000 },
+                async () => {
+                        // 1. sign in (same path as the previous test)
+                        renderProfile();
+                        let $body = document.querySelector(".profile-page");
+                        $body.querySelector('input[type="email"]').value =
+                                "teste@exemplo.com";
+                        $body.querySelector('input[type="password"]').value =
+                                "senha-123";
+                        const $in = [...$body.querySelectorAll("button")].find(($b) =>
+                                ($b.textContent || "").includes("Entrar"),
+                        );
+                        $in.click();
+                        await vi.waitFor(
+                                () => {
+                                        const stored = JSON.parse(
+                                                localStorage.getItem(
+                                                        "xcoder.supabase.session",
+                                                ) || "null",
+                                        );
+                                        assert.equal(stored?.access_token, "at-123");
+                                },
+                                { timeout: 5000 },
+                        );
+                        await vi.waitFor(
+                                () => {
+                                        assert.match(
+                                                document.body.textContent || "",
+                                                /teste@exemplo\.com/,
+                                        );
+                                },
+                                { timeout: 5000 },
+                        );
+
+                        // 2. sign out — the confirm dialog (mocked) resolves true
+                        $body = document.querySelector(".profile-page");
+                        const $out = [...$body.querySelectorAll("button")].find(($b) =>
+                                ($b.textContent || "").includes("Terminar sessão"),
+                        );
+                        assert.ok($out, "Terminar sessão button exists when signed in");
+                        $out.click();
+
+                        await vi.waitFor(
+                                () => {
+                                        assert.ok(
+                                                state.fetchCalls.some((c) =>
+                                                        c.url.includes("/auth/v1/logout"),
+                                                ),
+                                                "logout request sent",
+                                        );
+                                },
+                                { timeout: 5000 },
+                        );
+                        await vi.waitFor(
+                                () => {
+                                        const stored = JSON.parse(
+                                                localStorage.getItem(
+                                                        "xcoder.supabase.session",
+                                                ) || "null",
+                                        );
+                                        assert.equal(
+                                                stored,
+                                                null,
+                                                "session removed from localStorage",
+                                        );
+                                },
+                                { timeout: 5000 },
+                        );
+                        await vi.waitFor(
+                                () => {
+                                        assert.match(
+                                                document.body.textContent || "",
+                                                /Convidado/,
+                                                "page re-rendered to the guest state",
+                                        );
+                                },
+                                { timeout: 5000 },
+                        );
+                        cleanupPages();
+                },
+        );
 });
 
 describe("GitHub settings — prompt rows must persist", () => {
@@ -467,44 +550,6 @@ describe("GitHub settings — prompt rows must persist", () => {
         );
 
         test(
-                "Meus repositórios lists repos and saves the chosen one",
-                { timeout: 20000 },
-                async () => {
-                        state.settingsValue = { ghToken: "ghp_token_abc" };
-                        state.selectResult = "octocat/hello-world";
-                        const page = ghSettings();
-                        const $list = page.getListElement();
-                        $list.get('[data-key="gh-repos"]').click();
-
-                        await vi.waitFor(
-                                () => {
-                                        assert.equal(
-                                                state.settingsValue.ghRepo,
-                                                "octocat/hello-world",
-                                        );
-                                },
-                                { timeout: 5000 },
-                        );
-                        const reposCall = state.fetchCalls.find((c) =>
-                                c.url.includes("api.github.com/user/repos"),
-                        );
-                        assert.ok(reposCall, "repos request sent");
-                        assert.match(reposCall.url, /affiliation=owner/);
-                        assert.equal(
-                                reposCall.opts.headers?.Authorization,
-                                "Bearer ghp_token_abc",
-                        );
-                        assert.equal(state.selects[0]?.title, "Meus repositórios");
-                        assert.equal(
-                                state.settingsValue.gitRemoteUrl,
-                                "https://github.com/octocat/hello-world.git",
-                        );
-                        assert.equal(state.settingsValue.ghBranch, "main");
-                        cleanupPages();
-                },
-        );
-
-        test(
                 "Remote URL row persists its value",
                 { timeout: 20000 },
                 async () => {
@@ -524,30 +569,5 @@ describe("GitHub settings — prompt rows must persist", () => {
                         cleanupPages();
                 },
         );
-
-        test(
-                "Meus repositórios without a token shows guidance instead of failing",
-                { timeout: 20000 },
-                async () => {
-                        const page = ghSettings();
-                        page.getListElement().get('[data-key="gh-repos"]').click();
-                        await vi.waitFor(
-                                () => {
-                                        assert.ok(
-                                                state.toasts.some((t) => /token/i.test(t)),
-                                                "guidance toast shown",
-                                        );
-                                },
-                                { timeout: 5000 },
-                        );
-                        assert.equal(
-                                state.fetchCalls.filter((c) =>
-                                        c.url.includes("user/repos"),
-                                ).length,
-                                0,
-                                "no repos request without a token",
-                        );
-                        cleanupPages();
-                },
-        );
 });
+
