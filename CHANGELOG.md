@@ -13,6 +13,65 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.3] - 2026-09-16
+
+### Adicionado — API oficial de fileIcons + pacotes de ícones (Acode #2887)
+
+- **API pública estável (`acode.require("fileIcons")`):** plugins
+  registram pacotes de ícones com `register`, consultam ícones com
+  `icon` e reagem a trocas com `onChange` — o mesmo sistema de temas
+  estilo VS Code/Zed do upstream, portado quase 1:1 (1103 linhas de
+  núcleo + 232 do pacote embutido). A API é ligada ao script do plugin
+  que a pede (`bindPlugin`): a propriedade do pacote é automática e o
+  des-registro acontece em falha de load, erro de init ou
+  desinstalação
+- **Pacote embutido continua o padrão:** as classes `file_type_*`
+  existentes continuam funcionando sem nenhuma migração visual —
+  temas que usam classes e temas com SVG (por URL de ficheiro ou
+  pasta com `icons/`) são suportados; versão de schema para futuras
+  migrações de pacotes
+- **Nova opção "Pacote de ícones"** em Configurações do app →
+  Interface, com a lista viva dos temas disponíveis (temas com assets
+  indisponíveis aparecem marcados) e texto de valor tolerante; a
+  escolha persiste em `iconTheme` e reconfigura ao vivo
+- **Ícones de pastas vivos:** pastas agora refletem aberto/fechado
+  (inclusive a raiz, com ícone próprio), na árvore de ficheiros, nas
+  listas de pastas abertas e no reciclador da FileTree — que também
+  corrige a reutilização de tiles para limpar a sub-árvore e os
+  handlers de clique/contexto usarem os dados do tile em vez de
+  closures obsoletas
+- **Atualização global ao trocar de tema:** ícones já renderizados
+  (árvore de ficheiros, listas, abas do editor, resultados de pesquisa
+  com widgets CodeMirror, painel de referências, seletores e páginas
+  de configuração) são atualizados via `refreshRenderedIcons`
+  (`data-file-icon-*`), incluindo sidebars destacadas que ficavam
+  fora do documento
+
+### Testes
+
+- +56 testes dos 5 ficheiros de teste do upstream (`fileIconTheme`,
+  `fileIconAssets`, `fileIconOwnership`, `fileIconSidebar`,
+  `fileTreeRecycling`): matching por nome/extensão/languageId,
+  prioridade do tema ativo, fallback embutido, propriedade e
+  des-registro por plugin, persistência da escolha, refresh de
+  ícones renderizados e reciclagem da árvore (795 no total, 93
+  ficheiros)
+
+### EN summary
+
+- **Official fileIcons API + icon packs (Acode #2887):** plugins
+  register icon packs via `acode.require("fileIcons")`
+  (`register`/`icon`/`onChange`) — the same VS Code/Zed-style theme
+  system as upstream, ported nearly 1:1; builtin pack stays the
+  default and keeps the existing `file_type_*` classes, SVG packs by
+  URL/folder supported, ownership bound to the requesting plugin
+  script with automatic unregistration. New "Icon pack" app setting
+  with a live theme list; live folder icons (expanded/collapsed, root
+  included) and global refresh of rendered icons on theme change
+  (file tree, lists, editor tabs, CodeMirror search widgets,
+  references panel, settings); +56 tests from upstream's 5 test files
+  (795 total, 93 files)
+
 ## [1.7.2] - 2026-09-16
 
 ### Adicionado — quebra de linha suave com indentação (Acode #2886 + #2880)

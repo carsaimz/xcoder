@@ -245,6 +245,9 @@ declare type LangStrings = {
   "file already exists force": string;
   "file already exists force named": string;
   "file browser": string;
+  "icon pack": string;
+  "settings-info-icon-pack": string;
+  "unavailable": string;
   "file changed": string;
   "file deleted": string;
   "file exists": string;

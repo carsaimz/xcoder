@@ -42,6 +42,7 @@ import { canSaveFile } from "lib/commands";
 import config from "lib/config";
 import EditorFile from "lib/editorFile";
 import EditorManager from "lib/editorManager";
+import fileIcons from "lib/fileIcons";
 import { initFileList } from "lib/fileList";
 import fonts from "lib/fonts";
 import lang from "lib/lang";
@@ -281,6 +282,8 @@ async function onDeviceReady() {
 
 	xcoder.setLoadingMessage("Loading settings...");
 	await settings.init();
+	fileIcons.bindSettings(settings);
+	fileIcons.syncFromSettings();
 	themes.init();
 	initHighlighting();
 
@@ -325,7 +328,8 @@ async function onDeviceReady() {
 
 			// load plugins
 			try {
-				await loadPlugins();
+					await loadPlugins();
+				fileIcons.refreshRenderedIcons();
 				// Ensure at least one sidebar app is active after all plugins are loaded
 				// This handles cases where the stored section was from an uninstalled plugin
 				sidebarApps.ensureActiveApp();

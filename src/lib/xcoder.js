@@ -51,6 +51,7 @@ import windowResize from "handlers/windowResize";
 import actionStack from "lib/actionStack";
 import commands from "lib/commands";
 import EditorFile from "lib/editorFile";
+import fileIcons from "lib/fileIcons";
 import fileIndex from "lib/fileIndex";
 import files from "lib/fileList";
 import fileTypeHandler from "lib/fileTypeHandler";
@@ -558,6 +559,8 @@ class XCoder {
 	}
 
 	require(module) {
+		if (module.toLowerCase() === "fileicons")
+			return fileIcons.getPluginApi(document.currentScript);
 		return this.#modules[module.toLowerCase()];
 	}
 
@@ -702,6 +705,7 @@ class XCoder {
 		}
 
 		delete appSettings.uiSettings[`plugin-${id}`];
+		fileIcons.unregisterByPlugin(id);
 	}
 
 	registerFormatter(id, extensions, format, displayName) {

@@ -259,6 +259,7 @@ class Settings {
                         developerMode: false,
                         shiftClickSelection: true,
                         showShareButton: true,
+                        iconTheme: "builtin",
                 };
                 this.value = structuredClone(this.#defaultSettings);
         }

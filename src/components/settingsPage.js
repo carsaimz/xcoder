@@ -6,6 +6,7 @@ import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import Ref from "html-tag-js/ref";
 import actionStack from "lib/actionStack";
+import fileIcons from "lib/fileIcons";
 import appSettings from "lib/settings";
 import { animate, hover, press } from "motion";
 import FileBrowser from "pages/fileBrowser";
@@ -428,16 +429,21 @@ function createListItemElement(item, options, useInfoAsDescription, callback) {
 	const $item = (
 		<div
 			tabIndex={1}
-			className={`list-item ${item.sake ? "sake" : ""} ${item.icon || item.image ? "" : "no-leading-icon"}`}
+			className={`list-item ${item.sake ? "sake" : ""} ${item.icon || item.image || item.fileIcon ? "" : "no-leading-icon"}`}
 			data-key={item.key}
 			data-action="list-item"
 		>
 			<span
 				className={
-					$svg
-						? "icon xc-svgicon"
-						: `icon ${item.icon || (item.image ? "" : "no-icon")}`
+					item.fileIcon
+						? `icon ${fileIcons.icon(item.fileIcon)}`
+						: $svg
+							? "icon xc-svgicon"
+							: `icon ${item.icon || (item.image ? "" : "no-icon")}`
 				}
+				data-file-icon-name={item.fileIcon?.name}
+				data-file-icon-kind={item.fileIcon?.kind}
+				data-file-icon-extra={item.fileIcon ? "icon" : undefined}
 				style={{ color: item.iconColor }}
 			>
 				{$svg}

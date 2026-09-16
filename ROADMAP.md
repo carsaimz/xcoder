@@ -16,8 +16,22 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.2
+## ✅ Concluído até a v1.7.3
 
+- **v1.7.3 — API oficial de fileIcons + pacotes de ícones (Acode #2887
+  portado):** os ícones de ficheiros e pastas agora passam por uma API
+  pública estável (`acode.require("fileIcons")` com `register`, `icon`
+  e `onChange`) — o mesmo sistema de temas estilo VS Code/Zed do
+  upstream, quase 1:1. O pacote embutido continua o padrão e mantém as
+  classes `file_type_*` existentes; plugins podem registar os próprios
+  pacotes (SVG por URL/pasta ou classes), com propriedade ligada ao
+  script do plugin e des-registo automático em falha de load ou
+  desinstalação. Nova opção "Pacote de ícones" em Configurações do app
+  → Interface, com lista viva dos temas disponíveis; ícones de pastas
+  agora refletem aberto/fechado e a raiz tem ícone próprio; ícones
+  renderizados são atualizados ao trocar de tema (árvore de ficheiros,
+  listas, abas do editor, pesquisa e painel de referências); +56
+  testes dos 5 ficheiros de teste do upstream (795 no total)
 - **v1.7.2 — quebra de linha suave com indentação (Acode #2886 +
   #2880):** linhas quebradas continuam na indentação da linha original
   (ou +1/+2 níveis, configurável) em vez de voltar à margem;
@@ -178,9 +192,16 @@
 
 - Manter o CI verde e a pt-br 100% traduzida (`npm run lang:check`).
 - **Acode triado até 16/09 (v1.13.5):** indentação de word wrap portada
-  (#2886 + #2880). Pendente de estudo: API oficial de fileIcons com
-  pack de ícones (#2887) e minimificação r8 (#2891, exige testes de
-  build). Já cobertos aqui: menu de contexto de abas (#2863), recuperação
+  (#2886 + #2880) e API oficial de fileIcons com pacotes de ícones
+  portada (#2887). **#2891 (r8) estudado e ADIADO:** as regras do
+  upstream são sólidas (keep para CordovaPlugin via reflexão, bridge
+  JS, BuildConfig, dontwarn do java.lang.management para o SSH), mas
+  exigem validação em dispositivo real — roturas de r8 só aparecem em
+  runtime (precedente v1.4.8 no nosso fork), stack traces ficam
+  ofuscados nos crash reports e o soak time upstream tem só 3 dias.
+  Revisitar quando houver passada de testes em dispositivo; diff é
+  pequeno (build-extras.gradle + proguard-rules.pro + config.xml).
+  Já cobertos aqui: menu de contexto de abas (#2863), recuperação
   de migração SFTP (#2840), corrida do cordova.exec (#2851).
 - Verificar o CHANGELOG do Acode a cada release upstream e portar o que
   for útil (workflows, plugins, IA, editor).
@@ -197,8 +218,22 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.2
+## ✅ Done through v1.7.3
 
+- **v1.7.3 — official fileIcons API + icon packs (Acode #2887
+  ported):** file and folder icons now go through a stable public API
+  (`acode.require("fileIcons")` with `register`, `icon` and
+  `onChange`) — the same VS Code/Zed-style icon theme system as
+  upstream, ported nearly 1:1. The builtin pack stays the default and
+  keeps the existing `file_type_*` classes; plugins can register their
+  own packs (SVG by URL/folder or classes), with ownership bound to
+  the plugin script and automatic unregistration on load failure or
+  uninstall. New "Icon pack" option in App settings → Interface with a
+  live list of available themes; folder icons now reflect
+  expanded/collapsed state and roots get their own icon; rendered
+  icons refresh on theme change (file tree, lists, editor tabs, search
+  and references panel); +56 tests from upstream's 5 test files (795
+  total)
 - **v1.7.2 — indented soft wrap (Acode #2886 + #2880):** wrapped lines
   now continue at the original line's indentation (or +1/+2 levels,
   configurable) instead of returning to the margin; VS Code-style
@@ -345,10 +380,18 @@
 
 - Keep CI green and pt-br 100% translated (`npm run lang:check`).
 - **Acode triaged through 16/09 (v1.13.5):** word wrap indentation
-  ported (#2886 + #2880). Pending study: the official fileIcons API
-  with icon packs (#2887) and r8 minification (#2891, needs build
-  tests). Already covered here: tab context menu (#2863), SFTP
-  migration recovery (#2840), cordova.exec race (#2851).
+  ported (#2886 + #2880) and the official fileIcons API with icon
+  packs ported (#2887). **#2891 (r8) studied and DEFERRED:** upstream's
+  rules are solid (keep for reflectively-instantiated CordovaPlugin
+  classes, JS bridge, BuildConfig, java.lang.management dontwarn for
+  the SSH library), but they need real-device validation — r8
+  breakages only show at runtime (v1.4.8 precedent in this fork),
+  stack traces become obfuscated in crash reports and upstream soak
+  time is only 3 days. Revisit when a device-testing pass is
+  available; the diff is small (build-extras.gradle +
+  proguard-rules.pro + config.xml). Already covered here: tab context
+  menu (#2863), SFTP migration recovery (#2840), cordova.exec race
+  (#2851).
 - Check the Acode CHANGELOG on every upstream release and port what is
   useful (workflows, plugins, AI, editor).
 - Never gate features behind Premium — donating is optional.
