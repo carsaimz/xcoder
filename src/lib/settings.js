@@ -206,6 +206,7 @@ class Settings {
                         showSponsorSidebarApp: true,
                         showAnnotations: false,
                         lintGutter: true,
+                        syntaxLint: true,
                         // VSCode shows indent guides by default (roadmap v1.5.x item 3);
                         // existing installs keep their stored choice via the type
                         // back-fill below — only fresh installs get `true`.

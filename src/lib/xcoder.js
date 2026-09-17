@@ -56,6 +56,7 @@ import fileIndex from "lib/fileIndex";
 import files from "lib/fileList";
 import fileTypeHandler from "lib/fileTypeHandler";
 import fonts from "lib/fonts";
+import linterRegistry from "lib/linterRegistry";
 import {
 	BROKEN_PLUGINS,
 	LOADED_PLUGINS,
@@ -561,6 +562,8 @@ class XCoder {
 	require(module) {
 		if (module.toLowerCase() === "fileicons")
 			return fileIcons.getPluginApi(document.currentScript);
+		if (module.toLowerCase() === "linter")
+			return linterRegistry.getPluginApi(document.currentScript);
 		return this.#modules[module.toLowerCase()];
 	}
 
@@ -706,6 +709,7 @@ class XCoder {
 
 		delete appSettings.uiSettings[`plugin-${id}`];
 		fileIcons.unregisterByPlugin(id);
+		linterRegistry.unregisterByPlugin(id);
 	}
 
 	registerFormatter(id, extensions, format, displayName) {

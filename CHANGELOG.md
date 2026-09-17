@@ -13,6 +13,56 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.5] - 2026-09-17
+
+### Adicionado — linter de sintaxe nativo + API de linters para plugins
+
+- **Erros de sintaxe em qualquer linguagem:** o editor marca os erros
+  usando a própria árvore de parse do CodeMirror 6 (nós `isError` do
+  Lezer) — funciona para php, c/cpp, java, yaml, xml, e qualquer outra
+  linguagem com parser, sem depender de LSP e sem embutir engines de
+  lint (JSHint/CSSLint do plugin upstream somavam ~3 MB; aqui: zero
+  bytes novos). Inclui erros de token ausente (nós de largura zero,
+  ex. `const x = ;`)
+- **Sem duplicar LSP:** em ficheiros cobertos por um servidor LSP
+  (JS/TS, HTML, CSS, JSON, Python, Lua), o verificador embutido dá
+  lugar aos diagnósticos do servidor — o mesmo erro nunca aparece duas
+  vezes
+- **API para plugins (`xcoder.require("linter")`):** plugins registram
+  linters próprios (`register`/`unregister`/`onChange`) com escopo por
+  plugin — descarregados automaticamente no uninstall ou em falha de
+  carga, o mesmo modelo da API de fileIcons; filtro opcional por
+  extensão de ficheiro
+- **Painel de Problemas:** lista os diagnósticos do linter junto com
+  os do LSP e as anotações legadas
+- **Configuração:** interruptor "Verificação de erros de sintaxe" em
+  Configurações do editor → Guias e indicadores (ligado por padrão)
+
+### Removido
+
+- Dependência `esprima` — declarada no package.json mas nunca
+  importada; um pacote a menos no install
+
+### Testes
+
+- +14 testes (`linterRegistry.test.ts`): deteção de nós de erro
+  (incluindo largura zero), registro/unregister/onChange, escopo por
+  plugin (bind/getApi/unregisterByPlugin), filtro por extensão,
+  cortesia ao LSP (skip em ficheiro coberto) e ao `syntaxLint` off,
+  robustez com estados simples (809 no total, 94 ficheiros)
+
+### EN summary
+
+- **Native syntax linter + plugin linter API:** syntax errors flagged
+  via the CodeMirror 6 parse tree (Lezer error nodes) for every
+  language with a parser — zero new dependencies (upstream's Ace
+  workers are ~3 MB); steps aside on LSP-covered files so errors are
+  never duplicated; `xcoder.require("linter")` lets plugins register
+  scoped linters (auto-unloaded on uninstall, fileIcons model);
+  Problems panel integration and a "Syntax error checking" editor
+  toggle. Unused `esprima` dependency removed; +14 tests (809 total,
+  94 files)
+
 ## [1.7.4] - 2026-09-17
 
 ### Corrigido — links mortos do upstream

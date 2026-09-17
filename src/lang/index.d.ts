@@ -404,6 +404,7 @@ declare type LangStrings = {
   "line count": string;
   "line height": string;
   "lint gutter": string;
+  "syntax error checking": string;
   "linting": string;
   "live autocompletion": string;
   "loading": string;
@@ -843,6 +844,7 @@ declare type LangStrings = {
   "settings-info-editor-line-height": string;
   "settings-info-editor-line-numbers": string;
   "settings-info-editor-lint-gutter": string;
+  "settings-info-editor-syntax-lint": string;
   "settings-info-editor-live-autocomplete": string;
   "settings-info-editor-local-word-completion": string;
   "settings-info-editor-icon-completion": string;

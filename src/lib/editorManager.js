@@ -103,6 +103,7 @@ import {
 	deserializeEditorHistory,
 	MAX_EDITOR_HISTORY,
 } from "./editorHistoryState";
+import linterRegistry, { setLspCoveredFile } from "./linterRegistry";
 import openFile from "./openFile";
 import { addedFolder } from "./openFolder";
 import appSettings from "./settings";
@@ -1376,6 +1377,9 @@ async function EditorManager($header, $body) {
 				}
 			}
 		}
+		// syntax linter (built-in Lezer checker + plugin linters) —
+		// reads settings at lint time, so no compartment is needed
+		exts.push(...linterRegistry.uiExtension({ skipLspCovered: true }));
 		return exts;
 	}
 
@@ -1456,6 +1460,15 @@ async function EditorManager($header, $body) {
 		};
 	}
 
+	linterRegistry.bindFilenameProvider(() => {
+		try {
+			const active = manager.activeFile;
+			return active?.filename || active?.name || null;
+		} catch {
+			return null;
+		}
+	});
+
 	async function configureLspForFile(file) {
 		const pane = getFileLspPane(file);
 		if (!pane?.editor || pane.activeFile?.id !== file?.id) return;
@@ -1465,6 +1478,7 @@ async function EditorManager($header, $body) {
 		if (!metadata) {
 			detachActiveLsp(pane, { invalidate: false });
 			targetEditor?.dispatch({ effects: lspCompartment.reconfigure([]) });
+			setLspCoveredFile(false);
 			if (file?.type === "editor" && targetEditor) {
 				file.session = targetEditor.state;
 			}
@@ -1481,6 +1495,7 @@ async function EditorManager($header, $body) {
 			if (!extensions.length) {
 				pane.lastLspUri = null;
 				targetEditor.dispatch({ effects: lspCompartment.reconfigure([]) });
+				setLspCoveredFile(false);
 				file.session = targetEditor.state;
 				return;
 			}
@@ -1488,6 +1503,7 @@ async function EditorManager($header, $body) {
 			targetEditor.dispatch({
 				effects: lspCompartment.reconfigure(extensions),
 			});
+			setLspCoveredFile(true);
 			file.session = targetEditor.state;
 		} catch (error) {
 			if (token !== pane.lspRequestToken) return;
@@ -1495,6 +1511,7 @@ async function EditorManager($header, $body) {
 			console.error("Failed to configure LSP", error);
 			pane.lastLspUri = null;
 			targetEditor.dispatch({ effects: lspCompartment.reconfigure([]) });
+			setLspCoveredFile(false);
 			file.session = targetEditor.state;
 		}
 	}
@@ -1602,6 +1619,7 @@ async function EditorManager($header, $body) {
 			);
 		}
 		pane.lastLspUri = null;
+		setLspCoveredFile(false);
 	}
 
 	function applyLspSettings() {

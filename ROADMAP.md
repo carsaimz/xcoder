@@ -16,8 +16,20 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.4
+## ✅ Concluído até a v1.7.5
 
+- **v1.7.5 — linter de sintaxe + API de linters para plugins:** o editor
+  agora marca erros de sintaxe em qualquer linguagem com parser
+  CodeMirror 6 (nós `isError` do Lezer — php, c/cpp, java, yaml, xml…
+  sem depender de LSP nem embutir engines de lint); em ficheiros
+  cobertos por LSP (JS/TS, HTML, CSS, JSON, Python, Lua) o verificador
+  embutido dá lugar aos diagnósticos do servidor — nunca duplicados.
+  API `xcoder.require("linter")` para plugins registrem os próprios
+  linters (escopo por plugin, descarregados no uninstall — mesmo
+  modelo da fileIcons); painel de Problemas lista os novos
+  diagnósticos; interruptor "Verificação de erros de sintaxe" nas
+  configurações do editor. Dependência `esprima` (não utilizada)
+  removida; +14 testes (809 no total)
 - **v1.7.4 — links do upstream corrigidos:** o crédito do Acode na
   página Sobre e no README apontava para o endereço morto
   `deewarz/acodeapp` (404); agora aponta para
@@ -175,11 +187,16 @@
 
 ## 🎯 Próximo (v1.7.x)
 
-1. **Mais plugins portados do Acode** 💡 — linter, formatter (Prettier/
-   Ruff), compilador Sass ao vivo, runner avançado, visualizador de
-   documentos.
-2. **API de plugins expandida** 💡 — ativar/desativar sem reiniciar,
-   segredos seguros, ratings, exposição de pacotes CM6.
+1. **Mais plugins portados do Acode** 💡 — compilador Sass ao vivo, runner
+   avançado, visualizador de documentos. (Linter ✅ v1.7.5, formatter
+   Prettier ✅ já integrado via `registerFormatter`; Ruff fica de fora —
+   binário nativo, pesado demais para o build WebView.)
+2. ~~**API de plugins expandida**~~ ✅ CONCLUÍDA — ativar/desativar sem
+   reiniciar (`plugins.js` monta/desmonta ao vivo), segredos seguros
+   (`pluginContext.js` + `Tee.java` com EncryptedSharedPreferences por
+   plugin), ratings (`plugin/reviewUtils.js` + API do site) e exposição
+   de CM6 (`xcoder.require("codemirror")` + pacotes
+   `@codemirror/*`/`@lezer/*`).
 
 ## 🚀 Depois (v1.8+)
 
@@ -224,8 +241,18 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.4
+## ✅ Done through v1.7.5
 
+- **v1.7.5 — syntax linter + linter API for plugins:** the editor now
+  flags syntax errors in any language with a CodeMirror 6 parser (Lezer
+  `isError` nodes — php, c/cpp, java, yaml, xml… no LSP required and no
+  lint engines bundled); on LSP-covered files (JS/TS, HTML, CSS, JSON,
+  Python, Lua) the built-in checker steps aside for server diagnostics
+  — never duplicated. `xcoder.require("linter")` API lets plugins
+  register their own linters (per-plugin scope, unregistered on
+  uninstall — same model as fileIcons); the Problems panel lists the
+  new diagnostics; "Syntax error checking" toggle in editor settings.
+  Unused `esprima` dependency removed; +14 tests (809 total)
 - **v1.7.4 — dead upstream links fixed:** the Acode credit in the
   About page and README pointed to the dead `deewarz/acodeapp` URL
   (404); now points to `Acode-Foundation/Acode` (owner renamed,
@@ -369,10 +396,16 @@
 
 ## 🎯 Next (v1.7.x)
 
-1. **More plugins ported from Acode** 💡 — linter, formatter (Prettier/
-   Ruff), live Sass compiler, advanced runner, document viewer.
-2. **Expanded plugin API** 💡 — toggle without restart, secure secrets,
-   ratings, CM6 package exposure.
+1. **More plugins ported from Acode** 💡 — live Sass compiler, advanced
+   runner, document viewer. (Linter ✅ v1.7.5, Prettier formatter ✅
+   already integrated via `registerFormatter`; Ruff stays out — a native
+   binary, too heavy for the WebView build.)
+2. ~~**Expanded plugin API**~~ ✅ DONE — toggle without restart
+   (`plugins.js` mounts/unmounts live), secure secrets
+   (`pluginContext.js` + `Tee.java` with per-plugin
+   EncryptedSharedPreferences), ratings (`plugin/reviewUtils.js` + site
+   API) and CM6 exposure (`xcoder.require("codemirror")` + the
+   `@codemirror/*`/`@lezer/*` packages).
 
 ## 🚀 Later (v1.8+)
 

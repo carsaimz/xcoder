@@ -4,6 +4,7 @@ import { getLspDiagnostics } from "cm/lsp/diagnostics";
 import Page from "components/page";
 import actionStack from "lib/actionStack";
 import EditorFile from "lib/editorFile";
+import { getLinterDiagnostics } from "lib/linterRegistry";
 import helpers from "utils/helpers";
 
 export default function Problems() {
@@ -115,12 +116,46 @@ export default function Problems() {
 		if (state && typeof state.field === "function") {
 			annotations.push(...readLspAnnotations(state));
 		}
+		if (state && typeof state.field === "function") {
+			annotations.push(...readLinterAnnotations(state));
+		}
 
 		return annotations;
 	}
 
 	function readLspAnnotations(state) {
 		const diagnostics = getLspDiagnostics(state);
+		if (!diagnostics.length) return [];
+
+		const doc = state.doc;
+		if (!doc || typeof doc.lineAt !== "function") return [];
+
+		return diagnostics
+			.map((diagnostic) => {
+				const start = clampPosition(diagnostic.from, doc.length);
+				const line = doc.lineAt(start);
+				const row = Math.max(0, line.number - 1);
+				const column = Math.max(0, start - line.from);
+
+				let message = diagnostic.message || "";
+				if (diagnostic.source) {
+					message = message
+						? `${message} (${diagnostic.source})`
+						: diagnostic.source;
+				}
+
+				return {
+					row: normalizeIndex(row),
+					column: normalizeIndex(column),
+					text: message,
+					type: normalizeSeverity(diagnostic.severity),
+				};
+			})
+			.filter((annotation) => annotation.text);
+	}
+
+	function readLinterAnnotations(state) {
+		const diagnostics = getLinterDiagnostics(state);
 		if (!diagnostics.length) return [];
 
 		const doc = state.doc;

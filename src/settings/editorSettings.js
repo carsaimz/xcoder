@@ -230,6 +230,13 @@ export default function editorSettings() {
 			category: categories.guidesIndicators,
 		},
 		{
+			key: "syntaxLint",
+			text: strings["syntax error checking"] || "Syntax error checking",
+			checkbox: values.syntaxLint ?? true,
+			info: strings["settings-info-editor-syntax-lint"],
+			category: categories.guidesIndicators,
+		},
+		{
 			key: "showSpaces",
 			text: strings["show spaces"],
 			checkbox: values.showSpaces,
