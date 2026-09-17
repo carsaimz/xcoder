@@ -13,6 +13,31 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.4] - 2026-09-17
+
+### Corrigido — links mortos do upstream
+
+- **Crédito do Acode atualizado:** o link do projeto original na
+  página Sobre (Reconhecimentos) e no README apontava para
+  `github.com/deewarz/acodeapp` — endereço morto (404). O upstream
+  vive hoje em `github.com/Acode-Foundation/Acode` (o dono antigo,
+  `deadlyjack/acode`, migrou para a organização com redirecionamento
+  permanente); os 3 links agora apontam para o endereço atual
+- **Nada mais mudou:** só URLs (2 no README, 1 no JSX da página
+  Sobre) — sem mudança de comportamento nem de dependências (o
+  pacote npm `@deadlyjack/ajax` é uma dependência real e segue como
+  está; os links de atribuição ao perfil do autor original na wiki
+  continuam válidos — perfil pessoal não mudou)
+
+### EN summary
+
+- **Dead upstream links fixed:** the Acode credit in the About page
+  and README pointed to `github.com/deewarz/acodeapp` (404); all
+  three links now point to the current home
+  `github.com/Acode-Foundation/Acode` (owner rename with permanent
+  redirect). URLs only — no behavior, dependency or wiki attribution
+  changes
+
 ## [1.7.3] - 2026-09-16
 
 ### Adicionado — API oficial de fileIcons + pacotes de ícones (Acode #2887)

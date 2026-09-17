@@ -215,7 +215,7 @@ Issues, pull requests e traduções são bem-vindas! Leia o
 
 O XCoder se apoia em gigantes:
 
-- **[Acode](https://github.com/deewarz/acodeapp)** (© Foxdebug / Ajit Kumar) —
+- **[Acode](https://github.com/Acode-Foundation/Acode)** (© Foxdebug / Ajit Kumar) —
   o incrível editor do qual este projeto é fork.
 - **Bibliotecas open-source** — CodeMirror 6, xterm.js, markdown-it, KaTeX,
   Mermaid, DOMPurify, Emmet, motion, html-tag-js, JSZip e todas as
@@ -404,7 +404,7 @@ Issues, pull requests and translations are welcome! Read
 
 XCoder stands on the shoulders of giants:
 
-- **[Acode](https://github.com/deewarz/acodeapp)** (© Foxdebug / Ajit Kumar) —
+- **[Acode](https://github.com/Acode-Foundation/Acode)** (© Foxdebug / Ajit Kumar) —
   the awesome editor this project forked from.
 - **Open-source libraries** — CodeMirror 6, xterm.js, markdown-it, KaTeX,
   Mermaid, DOMPurify, Emmet, motion, html-tag-js, JSZip and every dependency

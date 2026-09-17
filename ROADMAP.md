@@ -16,8 +16,14 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.3
+## ✅ Concluído até a v1.7.4
 
+- **v1.7.4 — links do upstream corrigidos:** o crédito do Acode na
+  página Sobre e no README apontava para o endereço morto
+  `deewarz/acodeapp` (404); agora aponta para
+  `Acode-Foundation/Acode` (dono renomeado, redirecionamento
+  permanente); URLs apenas — sem mudança de comportamento nem de
+  dependências (`@deadlyjack/ajax` é pacote npm real)
 - **v1.7.3 — API oficial de fileIcons + pacotes de ícones (Acode #2887
   portado):** os ícones de ficheiros e pastas agora passam por uma API
   pública estável (`acode.require("fileIcons")` com `register`, `icon`
@@ -218,8 +224,13 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.3
+## ✅ Done through v1.7.4
 
+- **v1.7.4 — dead upstream links fixed:** the Acode credit in the
+  About page and README pointed to the dead `deewarz/acodeapp` URL
+  (404); now points to `Acode-Foundation/Acode` (owner renamed,
+  permanent redirect); URLs only — no behavior or dependency changes
+  (`@deadlyjack/ajax` is a real npm package)
 - **v1.7.3 — official fileIcons API + icon packs (Acode #2887
   ported):** file and folder icons now go through a stable public API
   (`acode.require("fileIcons")` with `register`, `icon` and

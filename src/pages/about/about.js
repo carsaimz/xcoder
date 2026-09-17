@@ -237,7 +237,10 @@ export default function AboutInclude() {
 					{strings["about acknowledgments"] || "Acknowledgments"}
 				</h2>
 				<div className="info-section">
-					<a href="https://github.com/deewarz/acodeapp" className="info-item">
+					<a
+						href="https://github.com/Acode-Foundation/Acode"
+						className="info-item"
+					>
 						<div className="info-item-icon">
 							<span className="icon xcoder"></span>
 						</div>
