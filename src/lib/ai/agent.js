@@ -11,6 +11,7 @@ import { openSupportPage } from "lib/premiumUI";
 import settings from "lib/settings";
 import Url from "utils/Url";
 import { buildUserContent } from "./artifacts";
+import { activeBot, applyBotToPrompt } from "./bots";
 import { chatCompletion, resolveBaseURL, streamChatCompletion } from "./client";
 import { ghToolsContext } from "./githubTools";
 import {
@@ -127,7 +128,8 @@ export class Agent {
 				`Extra instructions from the user:\n${settings.value.aiSystemPrompt}`,
 			);
 		}
-		return parts.join("\n");
+		// active bot persona (chat pill) colors the whole prompt
+		return applyBotToPrompt(parts.join("\n"), activeBot());
 	}
 
 	abort() {

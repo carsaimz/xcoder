@@ -13,6 +13,70 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.7] - 2026-09-19
+
+### Adicionado — bots de IA e modelos locais (offline)
+
+- **Bots de IA (personas prontas):** o chat ganhou uma terceira pill
+  ("Bot") ao lado de Pensar/Buscar — um toque troca a persona do
+  assistente mantendo as ferramentas e o contexto do workspace. Oito
+  bots embutidos: Revisor de Código (severidade + diff mínimo),
+  Arquiteto (plano antes de editar), Professor (analogias e passos),
+  Tradutor (PT↔EN↔ES preservando código), Regex, Terminal (one-liners
+  seguros), Redator Técnico (READMEs e Conventional Commits) e Analista
+  SQL (query + plano + dialeto). O utilizador pode criar bots próprios
+  (nome, emoji, descrição, instruções) em Definições > IA > Bots; o bot
+  ativo entra no system prompt logo após o bloco de identidade e os
+  bots do utilizador ficam guardados nas definições
+- **Tela de Modelos locais (baixáveis):** nova página em Definições >
+  IA > Modelos locais (e ação "Baixar modelos locais" no seletor de
+  modelos) com três abas — Assistentes (LLM), Voz→Texto (STT) e
+  Texto→Voz (TTS). Catálogo de 10 modelos reais verificados na Hugging
+  Face, dos leves aos completos (todos ≥ 50MB): SmolLM2 135M (~120MB)
+  e 360M (~275MB), Qwen2.5 0.5B (~490MB), Qwen2.5 Coder 0.5B (~562MB),
+  Qwen2.5 1.5B (~1,23GB), Llama 3.2 1B (~1,25GB), Whisper Base (~81MB)
+  e Small (~253MB), MMS TTS Português (~58MB) e SpeechT5 EN (~181MB)
+- **Gestor de downloads com progresso:** cada cartão mostra tamanho e
+  idiomas, baixa com barra de progresso e percentagem (transporte
+  nativo cordova-plugin-advanced-http direto ao disco, sem estourar
+  memória; fallback fetch no navegador), permite cancelar, retoma
+  onde parou (compara bytes com o manifesto), apagar com confirmação e
+  resumo de armazenamento usado. Modelos instalados ficam em
+  `xcoder-models/<id>/` com manifesto `_manifest.json` como prova de
+  instalação
+- **Runtime local (transformers.js):** motor ONNX WASM carregado
+  preguiçosamente de CDN com versão fixa (zero impacto no bundle, sem
+  workers); os ficheiros dos modelos são servidos do disco por um
+  cache personalizado — depois de baixar, chat/STT/TTS funcionam 100%
+  offline. Novo provider "Local (no aparelho)" no catálogo (sem chave,
+  streaming de tokens pelo mesmo pipeline do chat) e botão "Usar no
+  chat" nos cartões de LLM instala o modelo como ativo
+
+### English
+
+- **AI Bots (ready-made personas):** new third "Bot" pill in the chat
+  composer — one tap swaps the assistant persona while keeping tools
+  and workspace context. Eight built-in bots (Reviewer, Architect,
+  Teacher, Translator, Regex, Terminal, Tech Writer, SQL) plus
+  user-created bots stored in settings; the active persona is merged
+  into the system prompt right after the identity block
+- **Local models screen:** new Models page (AI settings > Local
+  models, and "Download local models" action in the model picker) with
+  three tabs — LLM assistants, speech-to-text and text-to-speech.
+  Catalog of 10 verified Hugging Face models from ~56MB to ~1.25GB
+  (all ≥ 50MB): SmolLM2 135M/360M, Qwen2.5 0.5B, Qwen2.5 Coder 0.5B,
+  Qwen2.5 1.5B, Llama 3.2 1B, Whisper Base/Small, MMS TTS Portuguese
+  and SpeechT5
+- **Download manager:** per-model progress bar and percentage (native
+  advanced-http transport straight to disk, fetch fallback), cancel,
+  byte-exact resume, delete with confirmation and storage summary;
+  installs live under `xcoder-models/<id>/` with a `_manifest.json`
+- **On-device runtime (transformers.js):** lazily imported pinned ESM
+  build (no bundle impact, no workers); model files are served from
+  disk through a custom cache — once installed, chat/STT/TTS run fully
+  offline. New keyless "Local (on device)" provider with token
+  streaming and a "Use in chat" action on LLM cards
+
 ## [1.7.6] - 2026-09-19
 
 ### Adicionado — substituição em lote grava em disco

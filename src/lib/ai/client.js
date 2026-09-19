@@ -3,6 +3,37 @@ import { duckChatCompletion } from "./duck";
 import { normalizeModelId } from "./modelId";
 
 /**
+ * Routes a chat turn to the on-device runtime (provider "local") and
+ * shapes the result like an HTTP turn (content/toolCalls/raw).
+ */
+async function localChatTurn({
+	model,
+	messages,
+	temperature,
+	maxTokens,
+	signal,
+	onDelta,
+}) {
+	const { localChat } = await import("./localRuntime");
+	const { content } = await localChat({
+		modelId: model,
+		messages,
+		temperature,
+		maxTokens,
+		signal,
+		onDelta: (text) => onDelta?.({ content: text }),
+	});
+	return {
+		content,
+		toolCalls: [],
+		raw: {
+			model,
+			choices: [{ finish_reason: "stop", message: { content } }],
+		},
+	};
+}
+
+/**
  * OpenAI-compatible chat client.
  *
  * In the Cordova app, requests go through the native http plugin
@@ -314,6 +345,17 @@ export async function streamChatCompletion({
 	signal,
 	onDelta,
 }) {
+	// on-device GGUF/ONNX runtime — no HTTP at all (see localRuntime.js)
+	if (providerId === "local") {
+		return localChatTurn({
+			model,
+			messages,
+			temperature,
+			maxTokens,
+			signal,
+			onDelta: (chunk) => onDelta?.({ content: chunk }),
+		});
+	}
 	// duck.ai has no OpenAI-compatible SSE endpoint — the plain adapter
 	// handles it (this error makes streamOrRequest fall back instantly)
 	if (providerId === "duckduckgo") {
@@ -679,6 +721,16 @@ async function chatCompletionOnce({
 	maxTokens,
 	signal,
 }) {
+	// on-device runtime — no HTTP at all (see localRuntime.js)
+	if (providerId === "local") {
+		return localChatTurn({
+			model,
+			messages,
+			temperature,
+			maxTokens,
+			signal,
+		});
+	}
 	// keyless duck.ai speaks its own protocol — dedicated adapter
 	if (providerId === "duckduckgo") {
 		return duckChatCompletion({ model, messages, signal });

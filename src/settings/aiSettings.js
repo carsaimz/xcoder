@@ -2,6 +2,13 @@ import settingsPage from "components/settingsPage";
 import toast from "components/toast";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
+import {
+	activeBot,
+	deleteUserBot,
+	listBots,
+	saveUserBot,
+	setActiveBot,
+} from "lib/ai/bots";
 import { listModels } from "lib/ai/client";
 import {
 	badgeLabel,
@@ -24,6 +31,89 @@ function skillsSummary(values) {
 		: 0;
 	if (!disabled) return strings["ai skills all on"] || "todas ativas";
 	return `${disabled} ${strings["ai skills off"] || "desativada(s)"}`;
+}
+
+/** Short summary shown as the value of the Bots row. */
+function botsSummary() {
+	const bots = listBots().length;
+	const active = activeBot();
+	return active
+		? `${active.icon} ${active.name}`
+		: `${strings["ai bots count"] || "bots"}: ${bots}`;
+}
+
+/** Bot picker/manager dialog (select + create + delete). */
+async function manageBots() {
+	const bots = listBots();
+	const noneLabel = strings["ai bot none"] || "Nenhum (bot desligado)";
+	const newLabel = strings["ai bot new"] || "+ Criar bot";
+	const items = [
+		{ text: noneLabel, value: "__none__" },
+		...bots.map((bot) => ({
+			text: `${bot.icon} ${bot.name} — ${bot.description || ""}`,
+			value: bot.id,
+		})),
+		{ text: newLabel, value: "__new__" },
+		...bots
+			.filter((bot) => bot.id.startsWith("user-"))
+			.map((bot) => ({
+				text: `${strings["ai bot delete"] || "Apagar"}: ${bot.name}`,
+				value: `__del__${bot.id}`,
+			})),
+	];
+	const choice = await select(strings["ai bots"] || "Bots", items);
+	if (!choice) return;
+	if (choice === "__none__") {
+		await setActiveBot("");
+		toast(strings["ai bot cleared"] || "Bot desligado");
+		return;
+	}
+	if (choice === "__new__") {
+		const name = await prompt(
+			strings["ai bot name"] || "Nome do bot",
+			"",
+			"text",
+			{ required: true },
+		);
+		if (!name) return;
+		const icon = await prompt(
+			strings["ai bot icon"] || "Ícone (emoji)",
+			"🤖",
+			"text",
+		);
+		const description = await prompt(
+			strings["ai bot desc"] || "Descrição curta",
+			"",
+			"text",
+		);
+		const botPrompt = await prompt(
+			strings["ai bot prompt"] || "Instruções da persona",
+			"",
+			"textarea",
+			{ required: true },
+		);
+		if (!botPrompt) return;
+		try {
+			const bot = await saveUserBot({
+				name,
+				icon,
+				description,
+				prompt: botPrompt,
+			});
+			await setActiveBot(bot.id);
+			toast(`${bot.icon} ${bot.name}`);
+		} catch (error) {
+			helpers.error(error);
+		}
+		return;
+	}
+	if (choice.startsWith("__del__")) {
+		await deleteUserBot(choice.slice(7));
+		toast(strings["ai bot deleted"] || "Bot removido");
+		return;
+	}
+	const bot = await setActiveBot(choice);
+	if (bot) toast(`${bot.icon} ${bot.name}`);
 }
 
 /**
@@ -132,6 +222,23 @@ export default function aiSettings() {
 				"Bundled and user skills (markdown playbooks) the agent can load on demand.",
 		},
 		{
+			key: "aiBots",
+			text: strings["ai bots"] || "Bots",
+			value: botsSummary(),
+			chevron: true,
+			info:
+				strings["settings-info-ai-bots"] ||
+				"Assistant personas (reviewer, teacher, translator…) applied to new chats. Create your own too.",
+		},
+		{
+			key: "localModels",
+			text: strings["local models title"] || "Modelos locais",
+			chevron: true,
+			info:
+				strings["settings-info-local-models"] ||
+				"Download LLM, speech-to-text and text-to-speech models to run fully offline on this device (56MB – 1.2GB).",
+		},
+		{
 			key: "aiSystemPrompt",
 			text: strings["ai system prompt"] || "System prompt",
 			value: values.aiSystemPrompt || "",
@@ -189,6 +296,15 @@ export default function aiSettings() {
 						"./aiSkillsSettings"
 					);
 					showSkillsSettings();
+					return;
+				}
+				if (key === "localModels") {
+					const { default: modelsPage } = await import("pages/models");
+					modelsPage();
+					return;
+				}
+				if (key === "aiBots") {
+					await manageBots();
 					return;
 				}
 				if (key === "aiModel") {

@@ -16,6 +16,7 @@
 
 import { isPremium, maxTokensLimit } from "lib/premium";
 import settings from "lib/settings";
+import { localLlmIds } from "./localModels";
 import { normalizeModelId } from "./modelId";
 import { PROVIDER_LOGO_SVGS } from "./providerLogos";
 
@@ -299,6 +300,18 @@ export const PROVIDERS = [
 		docs: "",
 		note: "Point to any OpenAI-compatible /v1 endpoint (Ollama, LM Studio, vLLM, LiteLLM...).",
 	},
+	{
+		id: "local",
+		name: "Local (no aparelho)",
+		group: "free",
+		baseURL: "",
+		// catalog ids of the downloadable LLMs (localModels.js) — the
+		// chat routes these to the on-device WASM runtime, no network
+		models: localLlmIds(),
+		docs: "",
+		noKeyRequired: true,
+		note: "Modelos baixados no aparelho, funcionam offline. Instale na tela de Modelos (AI settings > Modelos locais).",
+	},
 ];
 
 export const PROVIDER_MAP = Object.fromEntries(
@@ -339,6 +352,7 @@ const PROVIDER_ICONS = {
 	"azure-openai": { glyph: "A", color: "#0078d4" },
 	nvidia: { glyph: "N", color: "#76b900" },
 	custom: { glyph: "🤖", color: "#8b5cf6" },
+	local: { glyph: "📱", color: "#059669" },
 };
 
 /** Fallback for providers without a brand entry: first letter badge. */

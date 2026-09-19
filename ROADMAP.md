@@ -16,7 +16,15 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.6
+## ✅ Concluído até a v1.7.7
+
+- **v1.7.7 — bots de IA + modelos locais:** personas prontas (Revisor,
+  Arquiteto, Professor, Tradutor, Regex, Terminal, Redator, SQL) numa
+  pill do chat com criação de bots próprios; tela de Modelos locais
+  com catálogo de 10 modelos (LLM/STT/TTS, ~56MB–1,25GB), downloads
+  com progresso/retoma/cancelar, provider "Local (no aparelho)" e
+  runtime transformers.js a servir modelos do disco — chat, voz→texto
+  e texto→voz 100% offline após instalar
 
 - **v1.7.6 — substituição em lote grava em disco:** o "Substituir tudo"
   do painel Buscar em ficheiros agora persiste as alterações no disco
@@ -254,7 +262,15 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.6
+## ✅ Done through v1.7.7
+
+- **v1.7.7 — AI bots + local models:** ready-made personas (Reviewer,
+  Architect, Teacher, Translator, Regex, Terminal, Tech Writer, SQL)
+  in a chat pill with user-created bots; Local models screen with a 10
+  model catalog (LLM/STT/TTS, ~56MB–1.25GB), downloads with
+  progress/resume/cancel, a "Local (on device)" provider and a
+  transformers.js runtime serving models from disk — chat, speech→text
+  and text→speech run fully offline after install
 
 - **v1.7.6 — batch replace writes to disk:** "Replace all" in the
   Search in files panel now persists changes to disk (the only
