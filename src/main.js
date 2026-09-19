@@ -45,11 +45,11 @@ import EditorManager from "lib/editorManager";
 import fileIcons from "lib/fileIcons";
 import { initFileList } from "lib/fileList";
 import fonts from "lib/fonts";
+import { registerGhIntentHandler } from "lib/ghWebFlow";
 import lang from "lib/lang";
 import loadPlugins from "lib/loadPlugins";
 import Logger from "lib/logger";
 import notificationManager from "lib/notificationManager";
-import { registerGhIntentHandler } from "lib/ghWebFlow";
 import { registerOAuthIntentHandler } from "lib/oauthIntent";
 import openFolder, { addedFolder } from "lib/openFolder";
 import { registerPrettierFormatter } from "lib/registerPrettierFormatter";
@@ -328,7 +328,7 @@ async function onDeviceReady() {
 
 			// load plugins
 			try {
-					await loadPlugins();
+				await loadPlugins();
 				fileIcons.refreshRenderedIcons();
 				// Ensure at least one sidebar app is active after all plugins are loaded
 				// This handles cases where the stored section was from an uninstalled plugin
@@ -399,7 +399,14 @@ async function onDeviceReady() {
 						icon: "update",
 						type: "warning",
 						action: () => {
-							system.openInBrowser(update.url);
+							import(
+								/* webpackChunkName: "appUpdateDownload" */ "lib/appUpdateDownload"
+							)
+								.then(({ runUpdateFlow }) => runUpdateFlow(update))
+								.catch((error) => {
+									window.log("error", "In-app update flow failed");
+									window.log("error", error);
+								});
 						},
 					},
 				);

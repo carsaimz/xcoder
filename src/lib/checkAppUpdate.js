@@ -100,6 +100,7 @@ export async function checkAppUpdate() {
 		hasUpdate: isNewerVersion(release.tag_name, BuildInfo.version),
 		tag: release.tag_name,
 		url: release.html_url || RELEASE_API_URL.replace("/releases/latest", ""),
+		assets: Array.isArray(release.assets) ? release.assets : [],
 	};
 }
 

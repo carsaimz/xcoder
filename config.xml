@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.carsaimz.xcoder" android-versionCode="10707" version="1.7.7"
+<widget id="com.carsaimz.xcoder" android-versionCode="10708" version="1.7.8"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -87,6 +87,9 @@
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
             <uses-permission android:name="android.permission.VIBRATE" />
+            <!-- In-app update install: hand the downloaded APK to the
+                 package installer (Android 8+ requires this declaration) -->
+            <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
         </config-file>
 
         <hook type="before_prepare" src="hooks/restore-cordova-resources.js" />

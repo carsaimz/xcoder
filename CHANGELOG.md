@@ -13,6 +13,73 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.8] - 2026-09-20
+
+### Adicionado — atualização dentro do app + ferramentas de webdev
+
+- **Atualização dentro do APP:** a notificação de nova versão (e a
+  verificação manual em Sobre > Verificar atualizações) agora baixa o
+  APK da release do GitHub **dentro do app** — diálogo com tamanho,
+  download com progresso em percentagem e MB (cancelável), e abertura
+  direta do instalador do Android via FileProvider do plugin System.
+  Sem navegador: baixa e instala num só fluxo. Sem permissão de
+  instalação, APK ausente ou falha de rede/instalador? O app recua
+  para abrir a página da release no navegador. AndroidManifest declara
+  agora REQUEST_INSTALL_PACKAGES
+- **Ferramentas Dev (webdev):** novo app na sidebar (ícone de paleta)
+  com quatro geradores de código prontos a colar: Sombra (box-shadow
+  com offsets/blur/spread/cor/inset), Gradiente (linear/radial/conic
+  com ângulo e paradas de cor), Cartão (fundo, texto, raio, padding,
+  borda e sombra — gera CSS + HTML) e Placeholder (imagens SVG
+  determinísticas com tamanho/cores/rótulo — pré-visualização, tag
+  <img> com data URI e opção "Salvar SVG" junto do ficheiro ativo).
+  Cada ferramenta tem pré-visualização ao vivo, saída formatada e
+  botões Copiar e Inserir (no cursor do editor)
+
+### Testes
+
+- tests/unit/appUpdateDownload.test.js (12): escolha do APK (ignora
+  .aab/.sha256, prefere XCoder-*.apk), formatação de bytes, sonda de
+  ambiente e o fluxo completo (fallback navegador sem Android/sem APK,
+  happy path download+instalação com progresso, cancelamento no
+  diálogo, falha de rede e recusa do instalador)
+- tests/unit/webdevTools.test.js (14): geradores puros — sombra com
+  clamp e inset, gradientes linear/radial/conic com paradas ordenadas,
+  cartão com borda condicional/escapes/preset inválido e placeholder
+  SVG com rótulo e escape de marcação
+- tests/unit/devtoolsWiring.test.js (4): guardas estruturais — registo
+  na lista de loaders, ícone e titleKey, import correto de
+  lib/webdevTools (não confundir com o devTools do Eruda) e paridade
+  das chaves i18n em en-us + pt-br
+- tests/unit/checkAppUpdate.test.js atualizado ao novo contrato (o
+  payload passa a incluir `assets`)
+- Baseline: 875/875 testes (102 ficheiros), tsc limpo, biome limpo,
+  typos 0, build de produção OK, boot harness idêntico ao baseline
+  (12 apps na sidebar — 11 anteriores + devtools)
+
+### English
+
+- **In-app update:** the new-version notification (and the manual
+  check under About > Check for updates) now downloads the GitHub
+  release APK **inside the app** — size-aware confirm dialog,
+  cancelable download with percentage + MB progress, and the Android
+  package installer opened directly through the System plugin's
+  FileProvider. No browser detour: download and install in one flow.
+  Falls back to opening the release page when install is impossible
+  (no permission/APK/network/installer). AndroidManifest now declares
+  REQUEST_INSTALL_PACKAGES
+- **Dev Tools (webdev):** new sidebar app (palette icon) with four
+  paste-ready generators: Shadow (box-shadow with offsets/blur/spread/
+  color/inset), Gradient (linear/radial/conic with angle and color
+  stops), Card (background, text, radius, padding, border, shadow —
+  emits CSS + HTML) and Placeholder (deterministic SVG images with
+  size/colors/label — live preview, <img> data-URI tag and a
+  "Save SVG" action next to the active file). Each tool has a live
+  preview, formatted output, plus Copy and Insert (at editor cursor)
+  buttons
+- Tests: 875/875 (102 files) — 30 new tests covering the update flow,
+  the pure generators and the sidebar wiring
+
 ## [1.7.7] - 2026-09-19
 
 ### Adicionado — bots de IA e modelos locais (offline)

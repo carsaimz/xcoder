@@ -16,7 +16,15 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.7
+## ✅ Concluído até a v1.7.8
+
+- **v1.7.8 — atualização dentro do app + ferramentas de webdev:** a
+  notificação/verificação de atualização baixa o APK da release
+  dentro do app (progresso em percentagem, cancelável, instalação via
+  FileProvider + REQUEST_INSTALL_PACKAGES, fallback para o navegador)
+  e a sidebar ganhou Ferramentas Dev: geradores de box-shadow,
+  gradientes (linear/radial/conic), cartões (CSS+HTML) e placeholders
+  SVG, com pré-visualização ao vivo e Copiar/Inserir no cursor
 
 - **v1.7.7 — bots de IA + modelos locais:** personas prontas (Revisor,
   Arquiteto, Professor, Tradutor, Regex, Terminal, Redator, SQL) numa
@@ -262,7 +270,15 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.7
+## ✅ Done through v1.7.8
+
+- **v1.7.8 — in-app update + webdev tools:** the update
+  notification/check now downloads the release APK inside the app
+  (percentage progress, cancelable, install via FileProvider +
+  REQUEST_INSTALL_PACKAGES, browser fallback) and the sidebar gained
+  Dev Tools: box-shadow, gradient (linear/radial/conic), card
+  (CSS+HTML) and SVG placeholder generators with live preview and
+  Copy/Insert at cursor
 
 - **v1.7.7 — AI bots + local models:** ready-made personas (Reviewer,
   Architect, Teacher, Translator, Regex, Terminal, Tech Writer, SQL)

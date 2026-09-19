@@ -101,6 +101,8 @@ async function loadApps() {
 		["git", () => import("./git")],
 		// sandboxed JS console (Web Worker)
 		["repl", () => import("./repl")],
+		// webdev utilities (shadow/gradient/card/placeholder generators)
+		["devtools", () => import("./devtools")],
 		// embedded webview of the official site (docs/marketplace/sponsor)
 		["websiteApp", () => import("./website")],
 		["notification", () => import("./notification")],

@@ -25,11 +25,8 @@ async function checkForUpdates() {
 			toast(strings["up to date"]);
 			return;
 		}
-		const open = await confirm(
-			strings["update available"],
-			strings["update available info"].replace(/\{version\}/, update.tag),
-		);
-		if (open) system.openInBrowser(update.url);
+		const { runUpdateFlow } = await import("lib/appUpdateDownload");
+		await runUpdateFlow(update);
 	} catch (error) {
 		window.log("error", "Manual update check failed");
 		window.log("error", error);

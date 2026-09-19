@@ -1,0 +1,197 @@
+.devtools-app {
+	.devtools-root {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.devtools-tabs {
+		display: flex;
+		gap: 4px;
+		padding: 8px 10px 0;
+		overflow-x: auto;
+		scrollbar-width: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+
+	.devtools-tab {
+		flex: 1 0 auto;
+		padding: 6px 10px;
+		font-size: 0.8em;
+		font-weight: 600;
+		border: none;
+		border-radius: 8px 8px 0 0;
+		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+		color: var(--primary-text-color, inherit);
+		cursor: pointer;
+		white-space: nowrap;
+
+		&.active {
+			background: color-mix(in srgb, var(--primary-color) 22%, transparent);
+		}
+
+		&:active {
+			opacity: 0.6;
+		}
+	}
+
+	.devtools-panel {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		flex: 1;
+		min-height: 0;
+		padding: 10px;
+	}
+
+	.devtools-controls {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		max-height: 42vh;
+		overflow-y: auto;
+		padding-right: 2px;
+	}
+
+	.devtools-row {
+		display: grid;
+		grid-template-columns: minmax(72px, 40%) 1fr 44px;
+		align-items: center;
+		gap: 8px;
+
+		input[type="text"],
+		select {
+			width: 100%;
+			padding: 5px 8px;
+			font-size: 0.85em;
+			border-radius: 8px;
+			border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+			background: color-mix(in srgb, var(--primary-color) 6%, transparent);
+			color: inherit;
+		}
+
+		input[type="color"] {
+			width: 100%;
+			height: 30px;
+			padding: 2px;
+			border: none;
+			border-radius: 8px;
+			background: transparent;
+			justify-self: start;
+		}
+
+		input[type="checkbox"] {
+			justify-self: start;
+			width: 18px;
+			height: 18px;
+		}
+
+		input[type="range"] {
+			width: 100%;
+		}
+
+		&:has(select):not(:has(input[type="range"])) {
+			grid-template-columns: minmax(72px, 40%) 1fr;
+		}
+
+		&:has(input[type="color"]),
+		&:has(input[type="checkbox"]) {
+			grid-template-columns: minmax(72px, 40%) 1fr;
+		}
+	}
+
+	.devtools-label {
+		font-size: 0.8em;
+		opacity: 0.85;
+	}
+
+	.devtools-range-value {
+		font-size: 0.75em;
+		font-family: var(--editor-font-family, monospace);
+		text-align: right;
+		opacity: 0.8;
+	}
+
+	.devtools-preview {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 110px;
+		padding: 12px;
+		border-radius: 10px;
+		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+		overflow: auto;
+	}
+
+	.devtools-shadow-box {
+		width: 96px;
+		height: 64px;
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+	}
+
+	.devtools-gradient-box {
+		width: 100%;
+		height: 80px;
+		border-radius: 10px;
+	}
+
+	.devtools-card-preview {
+		width: 100%;
+		max-width: 240px;
+
+		h2 {
+			margin: 0 0 4px;
+			font-size: 1em;
+		}
+
+		p {
+			margin: 0;
+			font-size: 0.82em;
+			opacity: 0.85;
+		}
+	}
+
+	.devtools-output {
+		flex: 1;
+		min-height: 72px;
+		margin: 0;
+		padding: 8px;
+		font-size: 0.75em;
+		font-family: var(--editor-font-family, monospace);
+		line-height: 1.45;
+		white-space: pre-wrap;
+		word-break: break-word;
+		border-radius: 10px;
+		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+	}
+
+	.devtools-actions {
+		display: flex;
+		gap: 8px;
+
+		.devtools-btn {
+			flex: 1;
+			padding: 8px 10px;
+			font-size: 0.82em;
+			font-weight: 600;
+			border: none;
+			border-radius: 8px;
+			background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+			color: inherit;
+			cursor: pointer;
+
+			&.primary {
+				background: color-mix(in srgb, var(--primary-color) 40%, transparent);
+			}
+
+			&:active {
+				opacity: 0.6;
+			}
+		}
+	}
+}
