@@ -42,7 +42,7 @@ jobs:
         run: node wiki/checkWikiBilingual.mjs
 
       - name: Spell check (typos)
-        uses: crate-ci/typos@master
+        uses: crate-ci/typos@v1.45.0
 
       - name: Build web bundle (production)
         run: |
