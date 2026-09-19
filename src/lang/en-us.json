@@ -1402,5 +1402,10 @@
 	"font weight black": "Black",
 	"git repo card": "GitHub repository",
 	"git repo change": "Change",
-	"git repo hint": "No repository selected — tap to list your repositories."
+	"git repo hint": "No repository selected — tap to list your repositories.",
+	"replace files confirm": "Found {matches} occurrence(s) in {files} file(s). Changes will be saved to disk.",
+	"saving replaced files": "Saving replaced files...",
+	"replaced files saved": "Saved {count} file(s)",
+	"replace failed": "Failed to save {count} file(s)",
+	"no changes found": "No changes found"
 }

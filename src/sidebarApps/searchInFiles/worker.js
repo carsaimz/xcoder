@@ -148,6 +148,7 @@ function searchInFile({ file, content, search }) {
  */
 function replaceInFile({ file, content, search, replace }) {
 	const text = content.replace(search, replace);
+	if (text === content) return;
 
 	self.postMessage({
 		action: "replace-result",

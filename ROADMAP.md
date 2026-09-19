@@ -16,8 +16,21 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.5
+## ✅ Concluído até a v1.7.6
 
+- **v1.7.6 — substituição em lote grava em disco:** o "Substituir tudo"
+  do painel Buscar em ficheiros agora persiste as alterações no disco
+  (era o único fluxo de busca/substituição que não gravava — os
+  ficheiros ficavam abertos como abas não salvas). Confirmação com
+  contagem de ocorrências e ficheiros, progresso ficheiro a ficheiro,
+  resumo com falhas por ficheiro (ex. ficheiro só de leitura) e
+  re-busca automática ao terminar; abas abertas são sincronizadas e
+  marcadas como salvas (sem falso "não salvo"); codificação respeitada
+  (aba aberta ou padrão do utilizador); paridade de grupos de captura
+  `$1` no backend nativo (Java) com fallback literal; ficheiros sem
+  alteração deixam de ser reportados. Interruptor "HD" no painel
+  mantém o comportamento antigo (abrir como abas não salvas). +5
+  testes (814 no total)
 - **v1.7.5 — linter de sintaxe + API de linters para plugins:** o editor
   agora marca erros de sintaxe em qualquer linguagem com parser
   CodeMirror 6 (nós `isError` do Lezer — php, c/cpp, java, yaml, xml…
@@ -241,8 +254,19 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.5
+## ✅ Done through v1.7.6
 
+- **v1.7.6 — batch replace writes to disk:** "Replace all" in the
+  Search in files panel now persists changes to disk (the only
+  search/replace flow that never saved — files were left open as
+  unsaved tabs). Confirmation with occurrence/file counts, per-file
+  progress, summary with per-file failures (e.g. read-only files) and
+  an automatic re-search when done; open tabs are synced and marked as
+  saved (no false "unsaved" state); encoding respected (open tab or
+  user default); `$1` capture-group parity in the native (Java)
+  backend with a literal fallback; unchanged files are no longer
+  reported. The "HD" toggle keeps the old behavior (open as unsaved
+  tabs). +5 tests (814 total)
 - **v1.7.5 — syntax linter + linter API for plugins:** the editor now
   flags syntax errors in any language with a CodeMirror 6 parser (Lezer
   `isError` nodes — php, c/cpp, java, yaml, xml… no LSP required and no

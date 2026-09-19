@@ -1012,8 +1012,24 @@ class WorkspaceIndex {
       }
 
       if ("replace".equals(mode)) {
-        String replacement = Matcher.quoteReplacement(replace == null ? "" : replace);
-        String text = pattern.matcher(content).replaceAll(replacement);
+        String rawReplace = replace == null ? "" : replace;
+        // Support replacement templates like $1 only when present, so
+        // plain replacements keep their literal meaning.
+        String replacement =
+            rawReplace.indexOf('$') >= 0
+                ? rawReplace
+                : Matcher.quoteReplacement(rawReplace);
+        String text;
+        try {
+          text = pattern.matcher(content).replaceAll(replacement);
+        } catch (IllegalArgumentException error) {
+          Log.d(TAG, "Invalid replacement template, using literal replacement", error);
+          text = pattern.matcher(content).replaceAll(Matcher.quoteReplacement(rawReplace));
+        }
+        if (text.equals(content)) {
+          processed += 1;
+          continue;
+        }
         JSONObject result = baseEvent(job.id, "replace-result");
         result.put("file", file);
         result.put("text", text);

@@ -1406,6 +1406,11 @@ declare type LangStrings = {
   "git repo card": string;
   "git repo change": string;
   "git repo hint": string;
+  "replace files confirm": string;
+  "saving replaced files": string;
+  "replaced files saved": string;
+  "replace failed": string;
+  "no changes found": string;
 };
 
 declare var strings: LangStrings;

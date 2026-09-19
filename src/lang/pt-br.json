@@ -1519,5 +1519,10 @@
 	"wrap-indent-same": "Mesma indentação",
 	"wrap-indent-indent": "Indentar (+1 nível)",
 	"wrap-indent-deep": "Indentação profunda (+2 níveis)",
-	"settings-info-editor-wrapping-indent": "Escolha se o texto quebrado começa na margem esquerda, segue a indentação da linha original ou é indentado ainda mais. Cada nível extra usa o tamanho da tabulação."
+	"settings-info-editor-wrapping-indent": "Escolha se o texto quebrado começa na margem esquerda, segue a indentação da linha original ou é indentado ainda mais. Cada nível extra usa o tamanho da tabulação.",
+	"replace files confirm": "Found {matches} occurrence(s) in {files} file(s). Changes will be saved to disk.",
+	"saving replaced files": "Saving replaced files...",
+	"replaced files saved": "Saved {count} file(s)",
+	"replace failed": "Failed to save {count} file(s)",
+	"no changes found": "No changes found"
 }

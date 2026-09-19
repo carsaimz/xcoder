@@ -13,6 +13,53 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.6] - 2026-09-19
+
+### Adicionado — substituição em lote grava em disco
+
+- **"Substituir tudo" persiste no disco:** a substituição em lote do
+  painel Buscar em ficheiros gravava os resultados apenas como abas não
+  salvas (perdidas se o utilizador fechasse o app); agora cada ficheiro
+  alterado é gravado diretamente no disco. Antes de gravar, um diálogo
+  de confirmação mostra quantas ocorrências serão substituídas em
+  quantos ficheiros; durante a gravação, um loader mostra o progresso
+  ficheiro a ficheiro; ao terminar, um toast resume quantos ficheiros
+  foram gravados e, se houver falhas (ex. ficheiro só de leitura, falha
+  de permissão SAF), o painel lista a quantidade — a gravação dos
+  restantes ficheiros não é interrompida
+- **Abas abertas sincronizadas e marcadas como salvas:** depois de
+  gravar, o conteúdo das abas já abertas é atualizado e o ficheiro é
+  marcado como salvo (sem o estado falso "não salvo" que surgia ao
+  despachar o texto para o editor); a codificação usada é a da aba
+  aberta quando existente, senão a codificação padrão configurada
+- **Novo interruptor "HD" no painel Buscar em ficheiros:** controla se
+  a substituição grava em disco (padrão, ligado) ou mantém o
+  comportamento antigo de abrir cada ficheiro alterado como aba não
+  salva — a escolha fica guardada como as demais opções do painel
+- **Paridade de grupos de captura no backend nativo:** o backend Java
+  (pesquisa indexada em `file://`/`content://`) agora suporta
+  referências como `$1` na substituição, igual ao backend JS; quando o
+  texto de substituição contém `$`, ele é interpretado como modelo e,
+  se inválido, cai automaticamente para substituição literal (sem
+  quebrar a busca)
+- **Ficheiros sem alteração não são mais reportados:** o worker JS e o
+  backend nativo passam a omitir ficheiros onde a substituição não
+  mudou nada (antes abriam abas desnecessárias com o mesmo conteúdo)
+- **Re-busca automática:** ao terminar a substituição gravada, os
+  resultados antigos são limpos e a busca é re-executada — o painel
+  passa a mostrar "nenhum resultado", confirmando visualmente que a
+  substituição foi aplicada em todos os ficheiros
+
+### EN summary
+
+Batch replace in "Search in files" now writes changes to disk
+(confirmation with counts, per-file progress, failure summary,
+automatic re-search), syncs open tabs as saved with correct encoding,
+adds an "HD" toggle to keep the old open-as-unsaved-tabs behavior,
+gains `$1` capture-group parity in the native Java backend (with
+literal fallback), and skips files with no changes. +5 tests (814
+total).
+
 ## [1.7.5] - 2026-09-17
 
 ### Adicionado — linter de sintaxe nativo + API de linters para plugins

@@ -1050,5 +1050,10 @@
   "terminal onboarding ok": "Got it",
   "terminal onboarding reinstall": "Reinstall environment",
   "terminal onboarding reinstalled": "Environment removed — it will be reinstalled on next open",
-  "terminal onboarding reinstall unavailable": "Open Settings > Terminal to reinstall"
+  "terminal onboarding reinstall unavailable": "Open Settings > Terminal to reinstall",
+  "replace files confirm": "Found {matches} occurrence(s) in {files} file(s). Changes will be saved to disk.",
+  "saving replaced files": "Saving replaced files...",
+  "replaced files saved": "Saved {count} file(s)",
+  "replace failed": "Failed to save {count} file(s)",
+  "no changes found": "No changes found"
 }

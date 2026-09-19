@@ -5,9 +5,13 @@ import autosize from "autosize";
 import { getDocText } from "cm/editorUtils";
 import Checkbox from "components/checkbox";
 import Sidebar, { preventSlide } from "components/sidebar";
+import toast from "components/toast";
+import confirm from "dialogs/confirm";
+import loader from "dialogs/loader";
 import escapeStringRegexp from "escape-string-regexp";
 import Reactive from "html-tag-js/reactive";
 import Ref from "html-tag-js/ref";
+import { persistReplacedFiles } from "lib/batchReplace";
 import fileIndex from "lib/fileIndex";
 import files, { Tree, whenReady as waitForFileList } from "lib/fileList";
 import openFile from "lib/openFile";
@@ -35,6 +39,7 @@ const $include = Ref();
 const $wholeWord = Ref();
 const $caseSensitive = Ref();
 const $useIndex = Ref();
+const $persist = Ref();
 const $btnReplaceAll = Ref();
 const $resultOverview = Ref();
 const $error = Reactive();
@@ -61,6 +66,7 @@ const REG_EXP = "search-in-files-reg-exp";
 const EXCLUDE = "search-in-files-exclude";
 const INCLUDE = "search-in-files-include";
 const USE_INDEX = "search-in-files-use-native-index";
+const PERSIST = "search-in-files-replace-persist";
 
 const store = {
 	get caseSensitive() {
@@ -99,6 +105,13 @@ const store = {
 	set useIndex(value) {
 		localStorage.setItem(USE_INDEX, value);
 	},
+	get persistReplace() {
+		const stored = localStorage.getItem(PERSIST);
+		return stored === null ? true : stored === "true";
+	},
+	set persistReplace(value) {
+		localStorage.setItem(PERSIST, value);
+	},
 };
 
 const debounceSearch = helpers.debounce(searchAll, 500);
@@ -126,6 +139,8 @@ let pendingNativeSearchFinishVersion = null;
 let nativeSearchId = null;
 let activeSearchTasks = 0;
 let activeReplaceTasks = 0;
+let persistActive = false;
+let pendingPersistFiles = [];
 
 addEventListener($regExp, "change", onInput);
 
@@ -150,6 +165,7 @@ document.addEventListener("langchange", () => {
 addEventListener($wholeWord, "change", onInput);
 addEventListener($caseSensitive, "change", onInput);
 addEventListener($useIndex, "change", onInput);
+addEventListener($persist, "change", onPersistChange);
 addEventListener($search, "input", onInput);
 addEventListener($include, "input", onInput);
 addEventListener($exclude, "input", onInput);
@@ -181,6 +197,13 @@ $container.onref = ($el) => {
 preventSlide((target) => {
 	return $container.el?.contains(target);
 });
+
+/**
+ * Persists the "write to disk" option without re-running the search.
+ */
+function onPersistChange() {
+	store.persistReplace = !!$persist.el?.checked;
+}
 
 function toggleReplace() {
 	showReplace = !showReplace;
@@ -262,6 +285,12 @@ export default [
 							size="10px"
 							text="IDX"
 							ref={$useIndex}
+						/>
+						<Checkbox
+							checked={store.persistReplace}
+							size="10px"
+							text="HD"
+							ref={$persist}
 						/>
 					</div>
 
@@ -366,10 +395,14 @@ async function onWorkerMessage(e) {
 		case "replace-result": {
 			const { file, text } = data;
 			filesReplaced.push(file);
-			openFile(file.url, {
-				render: filesSearched.length === filesReplaced.length,
-				text,
-			});
+			if (persistActive) {
+				queuePersistResult(file, text);
+			} else {
+				openFile(file.url, {
+					render: filesSearched.length === filesReplaced.length,
+					text,
+				});
+			}
 			break;
 		}
 
@@ -573,9 +606,79 @@ async function finishReplaceTask(version = searchVersion) {
 	if (activeReplaceTasks > 0) return;
 	await helpers.showInterstitialIfReady();
 	if (version !== searchVersion) return;
-	replacing = false;
 	nativeSearchId = null;
 	$indexStatus.value = "";
+
+	if (persistActive) {
+		await persistReplacedResults(version);
+	}
+
+	if (version === searchVersion) {
+		replacing = false;
+		persistActive = false;
+	}
+}
+
+/**
+ * Adds a replaced file to the pending persist queue.
+ * @param {object} file
+ * @param {string} text
+ */
+function queuePersistResult(file, text) {
+	if (!file?.url || typeof text !== "string") return;
+	pendingPersistFiles.push({ url: file.url, text });
+}
+
+/**
+ * Writes queued replacement results to disk and reports a summary.
+ * @param {number} version
+ */
+async function persistReplacedResults(version) {
+	const items = pendingPersistFiles.splice(0, pendingPersistFiles.length);
+	if (!items.length) {
+		toast(strings["no changes found"]);
+		return;
+	}
+
+	const progress = loader.create(
+		strings["saving replaced files"],
+		`0/${items.length}`,
+	);
+	try {
+		const summary = await persistReplacedFiles(items, (done, total) => {
+			progress.setMessage(`${done}/${total}`);
+		});
+		if (version !== searchVersion) return;
+		toast(
+			strings["replaced files saved"].replace("{count}", summary.saved.length),
+		);
+		if (summary.failed.length) {
+			$error.value = strings["replace failed"].replace(
+				"{count}",
+				summary.failed.length,
+			);
+		}
+		resetAfterReplace();
+	} finally {
+		progress.hide();
+	}
+}
+
+/**
+ * Clears stale search results after replacements are saved and re-runs the search.
+ */
+function resetAfterReplace() {
+	results.length = 0;
+	words.length = 0;
+	fileNames.length = 0;
+	filesSearched.length = 0;
+	filesReplaced.length = 0;
+	resultOverview.reset();
+	searchResult.setValue("");
+	clearPendingResultText();
+	currentSearchRegex = null;
+	$progress.value = 100;
+	debounceSearch();
 }
 
 /**
@@ -807,10 +910,14 @@ function sendNativeSearch(
 					break;
 				case "replace-result":
 					filesReplaced.push(event.file);
-					openFile(event.file.url, {
-						render: filesSearched.length === filesReplaced.length,
-						text: event.text,
-					});
+					if (persistActive) {
+						queuePersistResult(event.file, event.text);
+					} else {
+						openFile(event.file.url, {
+							render: filesSearched.length === filesReplaced.length,
+							text: event.text,
+						});
+					}
 					break;
 				case "done-searching":
 					nativeSearchId = null;
@@ -923,6 +1030,16 @@ async function replaceAll() {
 	const regex = toRegex(search, options);
 	if (!regex) return;
 
+	persistActive = store.persistReplace;
+	pendingPersistFiles.length = 0;
+	if (persistActive) {
+		if (!filesSearched.length) return;
+		const message = strings["replace files confirm"]
+			.replace("{files}", filesSearched.length)
+			.replace("{matches}", resultOverview.matchesCount);
+		const confirmed = await confirm(strings["replace"], message);
+		if (!confirmed) return;
+	}
 	replacing = true;
 	activeReplaceTasks = 0;
 	const nativeFiles = filesSearched.filter((file) =>
