@@ -2,10 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import {
         CARD_SHADOWS,
+        boilerplateSnippet,
         cardSnippet,
+        ctaSnippet,
+        formSnippet,
         gradientCSS,
         placeholderSnippet,
+        sectionSnippet,
         shadowCSS,
+        tableSnippet,
 } from "../../src/lib/webdevTools";
 
 describe("webdevTools generators", () => {
@@ -209,4 +214,120 @@ describe("webdevTools generators", () => {
                         expect(decodeURIComponent(dataUri.replace("data:image/svg+xml,", ""))).not.toContain("<script>");
                 });
         });
+});
+
+describe("ctaSnippet", () => {
+	it("builds an anchor with escaped text and url", () => {
+		const { html, css } = ctaSnippet({
+			text: "Começar <agora>",
+			url: "https://x.pt/?a=1&b=2",
+			background: "#7c3aed",
+			color: "#ffffff",
+			radius: 12,
+			paddingX: 32,
+			paddingY: 14,
+			fontSize: 17,
+			block: false,
+		});
+		expect(html).toContain('class="cta"');
+		expect(html).toContain("Começar &lt;agora&gt;");
+		expect(html).toContain('href="https://x.pt/?a=1&amp;b=2"');
+		expect(css).toContain("display: inline-block;");
+		expect(css).toContain("border-radius: 12px;");
+		expect(css).toContain("padding: 14px 32px;");
+	});
+
+	it("block mode centers the label", () => {
+		const { css } = ctaSnippet({ block: true });
+		expect(css).toContain("display: block;");
+		expect(css).toContain("text-align: center;");
+	});
+});
+
+describe("sectionSnippet", () => {
+	it("builds hero html with title, subtitle and button", () => {
+		const { html, css } = sectionSnippet({
+			title: "Olá",
+			subtitle: "Bem-vindo ao site",
+			buttonText: "Saber mais",
+			buttonUrl: "#saber",
+			background: "#111111",
+			background2: "#333333",
+			gradient: true,
+			color: "#ffffff",
+			align: "center",
+			padding: 64,
+		});
+		expect(html).toContain('<section class="hero">');
+		expect(html).toContain("<h1>Olá</h1>");
+		expect(html).toContain('class="hero-btn" href="#saber"');
+		expect(css).toContain(
+			"background: linear-gradient(135deg, #111111, #333333);",
+		);
+		expect(css).toContain("text-align: center;");
+		expect(css).toContain(".hero-btn {");
+	});
+
+	it("solid background and no button when omitted", () => {
+		const { html, css } = sectionSnippet({ gradient: false, buttonText: "" });
+		expect(html).not.toContain("hero-btn");
+		expect(css).toMatch(/background: #1e293b;/);
+	});
+});
+
+describe("formSnippet", () => {
+	it("always includes name+email and toggles optional fields", () => {
+		const on = formSnippet({
+			title: "Fale connosco",
+			buttonText: "Enviar",
+			includePhone: true,
+			includeSubject: false,
+			includeMessage: true,
+		});
+		expect(on.html).toContain('id="name"');
+		expect(on.html).toContain('type="text"');
+		expect(on.html).toContain('type="email"');
+		expect(on.html).toContain('type="tel"');
+		expect(on.html).not.toContain('id="subject"');
+		expect(on.html).toContain("<textarea");
+
+		const off = formSnippet({ includeMessage: false, includePhone: false });
+		expect(off.html).not.toContain("<textarea");
+		expect(off.html).not.toContain('type="tel"');
+	});
+});
+
+describe("tableSnippet", () => {
+	it("generates the requested grid", () => {
+		const { html } = tableSnippet({ columns: 2, rows: 3 });
+		expect((html.match(/<th>/g) || []).length).toBe(2);
+		expect((html.match(/<tr>/g) || []).length).toBe(4); // head + 3 rows
+		expect(html).toContain("Item 3.2");
+	});
+
+	it("striped and bordered variants change the css", () => {
+		const plain = tableSnippet({ columns: 2, rows: 2, striped: false, bordered: false });
+		expect(plain.css).not.toContain("nth-child");
+		expect(plain.css).not.toContain("border: 1px solid");
+		const fancy = tableSnippet({ columns: 2, rows: 2, striped: true, bordered: true });
+		expect(fancy.css).toContain("nth-child");
+		expect(fancy.css).toContain("border: 1px solid");
+	});
+});
+
+describe("boilerplateSnippet", () => {
+	it("produces a complete html5 document", () => {
+		const { html } = boilerplateSnippet({ title: "Minha página", lang: "pt" });
+		expect(html.startsWith("<!DOCTYPE html>")).toBe(true);
+		expect(html).toContain('<html lang="pt">');
+		expect(html).toContain("<title>Minha página</title>");
+		expect(html).toContain('charset="UTF-8"');
+		expect(html).toContain("viewport");
+		expect(html).toContain("box-sizing: border-box;");
+	});
+
+	it("can omit the reset style", () => {
+		const { html } = boilerplateSnippet({ reset: false });
+		expect(html).not.toContain("<style>");
+	});
 });

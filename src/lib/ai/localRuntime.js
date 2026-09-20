@@ -1,5 +1,9 @@
 import { getLocalModel, LOCAL_MODELS, modelFiles } from "./localModels";
-import { isModelDownloaded } from "./modelDownloads";
+import {
+	ensureModelDirPath,
+	installedFileUrl,
+	isModelDownloaded,
+} from "./modelDownloads";
 
 /**
  * Local (on-device) inference runtime.
@@ -68,9 +72,7 @@ function diskCache() {
 			try {
 				const fsOperation = (await import("fileSystem")).default;
 				const { model, path } = hit;
-				const fileUrl = `${globalThis.DATA_STORAGE || ""}/xcoder-models/${
-					model.id
-				}/${path}`;
+				const fileUrl = installedFileUrl(model.id, path);
 				const fs = fsOperation(fileUrl);
 				if (!(await fs.exists())) return undefined;
 				const data = await fs.readFile();
@@ -100,27 +102,13 @@ function diskCache() {
 				const blob = await response.clone().blob();
 				const fsOperation = (await import("fileSystem")).default;
 				const { model, path } = hit;
-				const dir = `${globalThis.DATA_STORAGE || ""}/xcoder-models/${
-					model.id
-				}`;
-				const fileUrl = `${dir}/${path}`;
+				const fileUrl = installedFileUrl(model.id, path);
 				const fs = fsOperation(fileUrl);
 				if (!(await fs.exists())) {
 					const segments = path.split("/");
 					const name = segments.pop();
-					let parent = dir;
-					for (const segment of segments) {
-						parent = Url_join(parent, segment);
-						if (!(await fsOperation(parent).exists())) {
-							await fsOperation(
-								parent.slice(0, parent.lastIndexOf("/")),
-							).createDirectory(segment);
-						}
-					}
-					await fsOperation(Url_join(dir, segments.join("/"))).createFile(
-						name,
-						blob,
-					);
+					const parent = await ensureModelDirPath(model.id, segments);
+					await fsOperation(parent).createFile(name, blob);
 					return;
 				}
 				await fs.writeFile(blob);
@@ -129,11 +117,6 @@ function diskCache() {
 			}
 		},
 	};
-}
-
-/** Small URL joiner (avoid importing utils/Url inside cache hot path). */
-function Url_join(base, name) {
-	return `${String(base).replace(/\/+$/, "")}/${name}`;
 }
 
 /** Loaded pipelines per task:model. */

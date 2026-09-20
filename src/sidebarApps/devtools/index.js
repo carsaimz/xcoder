@@ -4,10 +4,15 @@ import toast from "components/toast";
 import { applyToEditor } from "lib/ai/editorBridge";
 import editorManager from "lib/editorManager";
 import {
+	boilerplateSnippet,
 	cardSnippet,
+	ctaSnippet,
+	formSnippet,
 	gradientCSS,
 	placeholderSnippet,
+	sectionSnippet,
 	shadowCSS,
+	tableSnippet,
 } from "lib/webdevTools";
 import Url from "utils/Url";
 
@@ -23,6 +28,11 @@ const TOOL_TABS = [
 	["gradient", "dev tools gradient", "Gradient"],
 	["card", "dev tools card", "Card"],
 	["placeholder", "dev tools placeholder", "Placeholder"],
+	["cta", "dev tools cta", "CTA"],
+	["section", "dev tools section", "Section"],
+	["form", "dev tools form", "Form"],
+	["table", "dev tools table", "Table"],
+	["boilerplate", "dev tools boilerplate", "Boilerplate"],
 ];
 
 const state = {
@@ -59,6 +69,48 @@ const state = {
 		background: "#e2e8f0",
 		color: "#64748b",
 		text: "",
+	},
+	cta: {
+		text: "Get started",
+		url: "#",
+		background: "#7c3aed",
+		color: "#ffffff",
+		radius: 12,
+		paddingX: 32,
+		paddingY: 14,
+		fontSize: 17,
+		block: false,
+	},
+	section: {
+		title: "Hero title",
+		subtitle: "A short description of your product or service.",
+		buttonText: "Learn more",
+		buttonUrl: "#",
+		background: "#1e293b",
+		background2: "#4c1d95",
+		gradient: true,
+		color: "#f8fafc",
+		align: "center",
+		padding: 64,
+	},
+	form: {
+		title: "Contact us",
+		buttonText: "Send",
+		includePhone: false,
+		includeSubject: false,
+		includeMessage: true,
+	},
+	table: {
+		columns: 3,
+		rows: 4,
+		striped: true,
+		bordered: false,
+	},
+	boilerplate: {
+		title: "My page",
+		lang: "pt",
+		viewport: true,
+		reset: true,
 	},
 };
 
@@ -171,6 +223,75 @@ function refresh() {
 			cardSnippet(state.card).css.match(/box-shadow: ([^;]+);/)?.[1] || "none";
 		$preview.append(card);
 		$output.textContent = `${css}\n\n${cardSnippet(state.card).html}`;
+	} else if (activeTool === "cta") {
+		const { css, html } = ctaSnippet(state.cta);
+		const link = (
+			<a
+				className="devtools-cta-preview"
+				href="#"
+				onclick={(event) => event.preventDefault()}
+			>
+				{state.cta.text}
+			</a>
+		);
+		link.style.background = state.cta.background;
+		link.style.color = state.cta.color;
+		link.style.borderRadius = `${state.cta.radius}px`;
+		link.style.padding = `${state.cta.paddingY}px ${state.cta.paddingX}px`;
+		link.style.fontSize = `${state.cta.fontSize}px`;
+		if (state.cta.block) {
+			link.style.display = "block";
+			link.style.textAlign = "center";
+		}
+		$preview.append(link);
+		$output.textContent = `${css}\n\n${html}`;
+	} else if (activeTool === "section") {
+		const { css, html } = sectionSnippet(state.section);
+		const hero = (
+			<div className="devtools-section-preview">
+				<div className="devtools-section-inner">
+					<h2>{state.section.title}</h2>
+					<p>{state.section.subtitle}</p>
+					{state.section.buttonText ? (
+						<a href="#" onclick={(event) => event.preventDefault()}>
+							{state.section.buttonText}
+						</a>
+					) : null}
+				</div>
+			</div>
+		);
+		hero.style.background = state.section.gradient
+			? `linear-gradient(135deg, ${state.section.background}, ${state.section.background2})`
+			: state.section.background;
+		hero.style.color = state.section.color;
+		hero.style.padding = `${state.section.padding}px 16px`;
+		hero.style.textAlign = state.section.align;
+		$preview.append(hero);
+		$output.textContent = `${css}\n\n${html}`;
+	} else if (activeTool === "form") {
+		const { html, css } = formSnippet(state.form);
+		const holder = <div className="devtools-form-preview" />;
+		holder.innerHTML = html;
+		const $form = holder.querySelector("form");
+		if ($form) $form.onsubmit = (event) => event.preventDefault();
+		$preview.append(holder);
+		$output.textContent = `${html}\n\n${css}`;
+	} else if (activeTool === "table") {
+		const { html, css } = tableSnippet(state.table);
+		const holder = <div className="devtools-table-preview" />;
+		holder.innerHTML = html;
+		$preview.append(holder);
+		$output.textContent = `${html}\n\n${css}`;
+	} else if (activeTool === "boilerplate") {
+		const { html } = boilerplateSnippet(state.boilerplate);
+		const doc = (
+			<div className="devtools-doc-hint">
+				<span className="devtools-doc-icon">{"</>"}</span>
+				<span>{`index.html — ${state.boilerplate.title}`}</span>
+			</div>
+		);
+		$preview.append(doc);
+		$output.textContent = html;
 	} else if (activeTool === "placeholder") {
 		const { svg, dataUri, imgTag } = placeholderSnippet(state.placeholder);
 		const img = <img src={dataUri} alt="placeholder preview" />;
@@ -431,6 +552,189 @@ function buildControls() {
 					["hard", "Hard"],
 				],
 				(v) => (c.shadow = v),
+			),
+		];
+	}
+	if (activeTool === "cta") {
+		const c = state.cta;
+		return [
+			textRow(t("dev tools text", "Text"), c.text, (v) => (c.text = v)),
+			textRow(t("dev tools url", "URL"), c.url, (v) => (c.url = v)),
+			colorRow(
+				t("dev tools background", "Background"),
+				c.background,
+				(v) => (c.background = v),
+			),
+			colorRow(
+				t("dev tools text color", "Text color"),
+				c.color,
+				(v) => (c.color = v),
+			),
+			rangeRow(
+				t("dev tools radius", "Corner radius"),
+				0,
+				40,
+				c.radius,
+				(v) => (c.radius = v),
+			),
+			rangeRow(
+				t("dev tools padding x", "Padding X"),
+				4,
+				64,
+				c.paddingX,
+				(v) => (c.paddingX = v),
+			),
+			rangeRow(
+				t("dev tools padding y", "Padding Y"),
+				2,
+				40,
+				c.paddingY,
+				(v) => (c.paddingY = v),
+			),
+			rangeRow(
+				t("dev tools font size", "Font size"),
+				10,
+				32,
+				c.fontSize,
+				(v) => (c.fontSize = v),
+			),
+			checkRow(
+				t("dev tools block", "Full width"),
+				c.block,
+				(v) => (c.block = v),
+			),
+		];
+	}
+	if (activeTool === "section") {
+		const s = state.section;
+		return [
+			textRow(t("dev tools title", "Title"), s.title, (v) => (s.title = v)),
+			textRow(
+				t("dev tools subtitle", "Subtitle"),
+				s.subtitle,
+				(v) => (s.subtitle = v),
+			),
+			textRow(
+				t("dev tools button text", "Button text"),
+				s.buttonText,
+				(v) => (s.buttonText = v),
+			),
+			textRow(t("dev tools url", "URL"), s.buttonUrl, (v) => (s.buttonUrl = v)),
+			colorRow(
+				t("dev tools background", "Background"),
+				s.background,
+				(v) => (s.background = v),
+			),
+			checkRow(
+				t("dev tools gradient bg", "Gradient background"),
+				s.gradient,
+				(v) => (s.gradient = v),
+			),
+			colorRow(
+				t("dev tools background 2", "Gradient color"),
+				s.background2,
+				(v) => (s.background2 = v),
+			),
+			colorRow(
+				t("dev tools text color", "Text color"),
+				s.color,
+				(v) => (s.color = v),
+			),
+			selectRow(
+				t("dev tools align", "Align"),
+				s.align,
+				[
+					["center", "Center"],
+					["left", "Left"],
+				],
+				(v) => (s.align = v),
+			),
+			rangeRow(
+				t("dev tools padding", "Padding"),
+				16,
+				160,
+				s.padding,
+				(v) => (s.padding = v),
+			),
+		];
+	}
+	if (activeTool === "form") {
+		const f = state.form;
+		return [
+			textRow(t("dev tools title", "Title"), f.title, (v) => (f.title = v)),
+			textRow(
+				t("dev tools button text", "Button text"),
+				f.buttonText,
+				(v) => (f.buttonText = v),
+			),
+			checkRow(
+				t("dev tools field phone", "Phone field"),
+				f.includePhone,
+				(v) => (f.includePhone = v),
+			),
+			checkRow(
+				t("dev tools field subject", "Subject field"),
+				f.includeSubject,
+				(v) => (f.includeSubject = v),
+			),
+			checkRow(
+				t("dev tools field message", "Message field"),
+				f.includeMessage,
+				(v) => (f.includeMessage = v),
+			),
+		];
+	}
+	if (activeTool === "table") {
+		const table = state.table;
+		return [
+			rangeRow(
+				t("dev tools columns", "Columns"),
+				1,
+				8,
+				table.columns,
+				(v) => (table.columns = v),
+			),
+			rangeRow(
+				t("dev tools rows", "Rows"),
+				1,
+				20,
+				table.rows,
+				(v) => (table.rows = v),
+			),
+			checkRow(
+				t("dev tools striped", "Striped rows"),
+				table.striped,
+				(v) => (table.striped = v),
+			),
+			checkRow(
+				t("dev tools bordered", "Borders"),
+				table.bordered,
+				(v) => (table.bordered = v),
+			),
+		];
+	}
+	if (activeTool === "boilerplate") {
+		const b = state.boilerplate;
+		return [
+			textRow(t("dev tools title", "Title"), b.title, (v) => (b.title = v)),
+			selectRow(
+				t("dev tools lang", "Language"),
+				b.lang,
+				[
+					["pt", "Português"],
+					["en", "English"],
+				],
+				(v) => (b.lang = v),
+			),
+			checkRow(
+				t("dev tools viewport", "Viewport meta"),
+				b.viewport,
+				(v) => (b.viewport = v),
+			),
+			checkRow(
+				t("dev tools reset", "Include reset CSS"),
+				b.reset,
+				(v) => (b.reset = v),
 			),
 		];
 	}

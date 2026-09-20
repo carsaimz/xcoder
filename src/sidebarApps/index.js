@@ -103,6 +103,8 @@ async function loadApps() {
 		["repl", () => import("./repl")],
 		// webdev utilities (shadow/gradient/card/placeholder generators)
 		["devtools", () => import("./devtools")],
+		// offline web libraries (htmx, bootstrap, icon fonts…) shipped in the app
+		["libs", () => import("./libs")],
 		// embedded webview of the official site (docs/marketplace/sponsor)
 		["websiteApp", () => import("./website")],
 		["notification", () => import("./notification")],

@@ -195,3 +195,127 @@
 		}
 	}
 }
+
+/* CTA / section / form / table / boilerplate previews */
+.devtools-cta-preview {
+	display: inline-block;
+	text-decoration: none;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.devtools-section-preview {
+	width: 100%;
+	border-radius: 10px;
+
+	.devtools-section-inner {
+		max-width: 480px;
+		margin: 0 auto;
+
+		h2 {
+			margin: 0 0 6px;
+		}
+
+		p {
+			margin: 0 0 10px;
+			opacity: 0.85;
+			font-size: 0.9em;
+		}
+
+		a {
+			display: inline-block;
+			padding: 6px 14px;
+			border-radius: 8px;
+			background: rgb(255 255 255 / 0.9);
+			color: #1e293b;
+			text-decoration: none;
+			font-weight: 600;
+			font-size: 0.85em;
+		}
+	}
+}
+
+.devtools-form-preview {
+	width: 100%;
+
+	form {
+		display: grid;
+		gap: 6px;
+	}
+
+	label {
+		font-size: 0.78em;
+		font-weight: 600;
+	}
+
+	input,
+	textarea {
+		width: 100%;
+		box-sizing: border-box;
+		padding: 6px 8px;
+		border: 1px solid
+			color-mix(in srgb, var(--primary-color) 30%, transparent);
+		border-radius: 6px;
+		font: inherit;
+		background: transparent;
+		color: inherit;
+	}
+
+	textarea {
+		resize: vertical;
+	}
+
+	button {
+		margin-top: 4px;
+		padding: 8px 12px;
+		border: none;
+		border-radius: 8px;
+		font: inherit;
+		font-weight: 600;
+		background: color-mix(in srgb, var(--primary-color) 40%, transparent);
+		color: inherit;
+		cursor: pointer;
+	}
+}
+
+.devtools-table-preview {
+	width: 100%;
+	overflow-x: auto;
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 0.8em;
+	}
+
+	th,
+	td {
+		padding: 6px 8px;
+		text-align: left;
+		border-bottom: 1px solid
+			color-mix(in srgb, var(--primary-color) 20%, transparent);
+	}
+
+	thead th {
+		font-weight: 600;
+		background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+	}
+}
+
+.devtools-doc-hint {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px;
+	border-radius: 10px;
+	font-size: 0.85em;
+	background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+
+	.devtools-doc-icon {
+		font-family: var(--editor-font-family, monospace);
+		font-weight: 700;
+		padding: 6px 8px;
+		border-radius: 6px;
+		background: color-mix(in srgb, var(--primary-color) 20%, transparent);
+	}
+}

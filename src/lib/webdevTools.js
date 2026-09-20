@@ -155,10 +155,214 @@ export function placeholderSnippet(state) {
 	return { svg, dataUri, imgTag };
 }
 
+/** @typedef {{text: string, url: string, background: string, color: string, radius: number, paddingX: number, paddingY: number, fontSize: number, block: boolean}} CtaState */
+
+/**
+ * Builds a call-to-action button (HTML + CSS).
+ * @param {CtaState} state
+ * @returns {{html: string, css: string}}
+ */
+export function ctaSnippet(state) {
+	const text = String(state?.text ?? "Get started");
+	const url = String(state?.url || "#");
+	const bg = state?.background || "#7c3aed";
+	const fg = state?.color || "#ffffff";
+	const radius = Math.round(clamp(state?.radius, 0, 40));
+	const px = Math.round(clamp(state?.paddingX, 4, 64));
+	const py = Math.round(clamp(state?.paddingY, 2, 40));
+	const size = Math.round(clamp(state?.fontSize, 10, 32));
+	const block = Boolean(state?.block);
+	const css =
+		`.cta {\n` +
+		`\tdisplay: ${block ? "block" : "inline-block"};\n` +
+		(block ? `\ttext-align: center;\n` : "") +
+		`\tbackground: ${bg};\n` +
+		`\tcolor: ${fg};\n` +
+		`\tpadding: ${py}px ${px}px;\n` +
+		`\tborder-radius: ${radius}px;\n` +
+		`\tfont-size: ${size}px;\n` +
+		`\tfont-weight: 600;\n` +
+		`\ttext-decoration: none;\n` +
+		`\ttransition: filter 0.2s;\n` +
+		`}\n\n` +
+		`.cta:hover {\n\tfilter: brightness(1.1);\n}`;
+	const html = `<a class="cta" href="${escapeHTML(url)}">${escapeHTML(text)}</a>`;
+	return { html, css };
+}
+
+/** @typedef {{title: string, subtitle: string, buttonText: string, buttonUrl: string, background: string, background2: string, gradient: boolean, color: string, align: string, padding: number}} SectionState */
+
+/**
+ * Builds a hero/section block with optional gradient background and button.
+ * @param {SectionState} state
+ * @returns {{html: string, css: string}}
+ */
+export function sectionSnippet(state) {
+	const title = String(state?.title ?? "Hero title");
+	const subtitle = String(
+		state?.subtitle ?? "A short description of your product or service.",
+	);
+	const buttonText = String(state?.buttonText || "");
+	const buttonUrl = String(state?.buttonUrl || "#");
+	const bg = state?.background || "#1e293b";
+	const bg2 = state?.background2 || "#4c1d95";
+	const gradient = Boolean(state?.gradient);
+	const fg = state?.color || "#f8fafc";
+	const align = state?.align === "left" ? "left" : "center";
+	const padding = Math.round(clamp(state?.padding, 16, 160));
+	const background = gradient ? `linear-gradient(135deg, ${bg}, ${bg2})` : bg;
+
+	const lines = [
+		`<section class="hero">`,
+		`\t<div class="hero-inner">`,
+		`\t\t<h1>${escapeHTML(title)}</h1>`,
+		`\t\t<p>${escapeHTML(subtitle)}</p>`,
+	];
+	if (buttonText) {
+		lines.push(
+			`\t\t<a class="hero-btn" href="${escapeHTML(buttonUrl)}">${escapeHTML(buttonText)}</a>`,
+		);
+	}
+	lines.push(`\t</div>`, `</section>`);
+	const html = lines.join("\n");
+
+	const css =
+		`.hero {\n` +
+		`\tbackground: ${background};\n` +
+		`\tcolor: ${fg};\n` +
+		`\tpadding: ${padding}px 24px;\n` +
+		`\ttext-align: ${align};\n` +
+		`}\n\n` +
+		`.hero-inner {\n\tmax-width: 960px;\n\tmargin: 0 auto;\n}\n\n` +
+		`.hero h1 {\n\tmargin: 0 0 12px;\n\tfont-size: 40px;\n}\n\n` +
+		`.hero p {\n\tmargin: 0 0 24px;\n\tfont-size: 18px;\n\topacity: 0.85;\n}` +
+		(buttonText
+			? `\n\n.hero-btn {\n\tdisplay: inline-block;\n\tbackground: ${fg};\n\tcolor: ${bg};\n\tpadding: 12px 32px;\n\tborder-radius: 8px;\n\ttext-decoration: none;\n\tfont-weight: 600;\n}`
+			: "");
+	return { html, css };
+}
+
+/** @typedef {{title: string, buttonText: string, includePhone: boolean, includeSubject: boolean, includeMessage: boolean}} FormState */
+
+/**
+ * Builds a contact form (HTML + CSS) from toggled fields.
+ * @param {FormState} state
+ * @returns {{html: string, css: string}}
+ */
+export function formSnippet(state) {
+	const title = String(state?.title ?? "Contact us");
+	const buttonText = String(state?.buttonText ?? "Send");
+	const fields = [
+		{ id: "name", label: "Name", type: "text", required: true },
+		{ id: "email", label: "Email", type: "email", required: true },
+		...(state?.includePhone
+			? [{ id: "phone", label: "Phone", type: "tel", required: false }]
+			: []),
+		...(state?.includeSubject
+			? [{ id: "subject", label: "Subject", type: "text", required: false }]
+			: []),
+		...(state?.includeMessage !== false
+			? [{ id: "message", label: "Message", type: "textarea", required: false }]
+			: []),
+	];
+	const inputs = fields
+		.map((field) => {
+			const label = `<label for="${field.id}">${field.label}</label>`;
+			if (field.type === "textarea") {
+				return `${label}\n\t<textarea id="${field.id}" name="${field.id}" rows="5"></textarea>`;
+			}
+			const required = field.required ? " required" : "";
+			return `${label}\n\t<input id="${field.id}" name="${field.id}" type="${field.type}"${required} />`;
+		})
+		.join("\n\t");
+	const html =
+		`<form class="contact-form" action="#" method="post">\n` +
+		`\t<h2>${escapeHTML(title)}</h2>\n` +
+		`\t${inputs}\n` +
+		`\t<button type="submit">${escapeHTML(buttonText)}</button>\n` +
+		`</form>`;
+	const css =
+		`.contact-form {\n\tdisplay: grid;\n\tgap: 16px;\n\tmax-width: 480px;\n}\n\n` +
+		`.contact-form label {\n\tdisplay: block;\n\tmargin-bottom: 6px;\n\tfont-size: 14px;\n\tfont-weight: 600;\n}\n\n` +
+		`.contact-form input,\n.contact-form textarea {\n\twidth: 100%;\n\tpadding: 10px 12px;\n\tborder: 1px solid #cbd5e1;\n\tborder-radius: 8px;\n\tfont: inherit;\n\tbox-sizing: border-box;\n}\n\n` +
+		`.contact-form button {\n\tbackground: #7c3aed;\n\tcolor: #ffffff;\n\tpadding: 12px 24px;\n\tborder: 0;\n\tborder-radius: 8px;\n\tfont: inherit;\n\tfont-weight: 600;\n\tcursor: pointer;\n}`;
+	return { html, css };
+}
+
+/** @typedef {{columns: number, rows: number, striped: boolean, bordered: boolean}} TableState */
+
+/**
+ * Builds a data table scaffold (HTML + CSS).
+ * @param {TableState} state
+ * @returns {{html: string, css: string}}
+ */
+export function tableSnippet(state) {
+	const columns = Math.round(clamp(state?.columns, 1, 8));
+	const rows = Math.round(clamp(state?.rows, 1, 20));
+	const striped = state?.striped !== false;
+	const bordered = Boolean(state?.bordered);
+	const head = Array.from(
+		{ length: columns },
+		(_, index) => `<th>Column ${index + 1}</th>`,
+	).join("");
+	const body = Array.from(
+		{ length: rows },
+		(_, r) =>
+			`<tr>${Array.from({ length: columns }, (_, c) => `<td>Item ${r + 1}.${c + 1}</td>`).join("")}</tr>`,
+	).join("\n\t\t");
+	const html =
+		`<table class="data-table">\n` +
+		`\t<thead>\n\t\t<tr>${head}</tr>\n\t</thead>\n` +
+		`\t<tbody>\n\t\t${body}\n\t</tbody>\n` +
+		`</table>`;
+	const css =
+		`.data-table {\n\tborder-collapse: collapse;\n\twidth: 100%;\n\tfont-size: 15px;\n}\n\n` +
+		`.data-table th,\n.data-table td {\n\tpadding: 10px 14px;\n\ttext-align: left;${bordered ? "\n\tborder: 1px solid #cbd5e1;" : ""}\n}\n\n` +
+		`.data-table thead th {\n\tbackground: #f1f5f9;\n\tfont-weight: 600;\n}` +
+		(striped
+			? `\n\n.data-table tbody tr:nth-child(even) {\n\tbackground: #f8fafc;\n}`
+			: "");
+	return { html, css };
+}
+
+/** @typedef {{title: string, lang: string, charset: boolean, viewport: boolean, reset: boolean}} BoilerplateState */
+
+/**
+ * Builds a complete HTML5 document scaffold.
+ * @param {BoilerplateState} state
+ * @returns {{html: string}}
+ */
+export function boilerplateSnippet(state) {
+	const title = String(state?.title || "My page");
+	const lang = state?.lang === "pt" ? "pt" : "en";
+	const charset = state?.charset !== false;
+	const viewport = state?.viewport !== false;
+	const reset = state?.reset !== false;
+	const head = [
+		charset ? `\t<meta charset="UTF-8" />` : null,
+		viewport
+			? `\t<meta name="viewport" content="width=device-width, initial-scale=1.0" />`
+			: null,
+		`\t<title>${escapeHTML(title)}</title>`,
+	]
+		.filter(Boolean)
+		.join("\n");
+	const style = reset
+		? `\n\t<style>\n\t\t*, *::before, *::after { box-sizing: border-box; }\n\t\tbody { margin: 0; font-family: system-ui, sans-serif; color: #1f2937; background: #ffffff; }\n\t</style>`
+		: "";
+	const html = `<!DOCTYPE html>\n<html lang="${lang}">\n<head>\n${head}${style}\n</head>\n<body>\n\t<h1>${escapeHTML(title)}</h1>\n</body>\n</html>`;
+	return { html };
+}
+
 export default {
 	shadowCSS,
 	gradientCSS,
 	cardSnippet,
 	placeholderSnippet,
+	ctaSnippet,
+	sectionSnippet,
+	formSnippet,
+	tableSnippet,
+	boilerplateSnippet,
 	CARD_SHADOWS,
 };

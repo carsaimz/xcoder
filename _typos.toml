@@ -45,6 +45,8 @@ extend-exclude = [
     # --- arquivos gerados (nomes de glifos de fontes / registry com prose pt+en) ---
     "src/res/iconNames.json",
     "src/res/plugin-registry.json",
+    # --- bibliotecas web de terceiros (minificadas / unicode-ranges) ---
+    "src/res/libs",
     # --- conteúdo primário em pt-br (o typos não sabe português; v1.4.19+) ---
     # v1.6.2: os MDs principais viraram BILÍNGUES (secção pt + secção en no
     # mesmo ficheiro) — o dicionário do typos (só en) sinalizaria palavras
@@ -149,4 +151,5 @@ variante = "variante"
 leves = "leves"
 falso = "falso"
 transcrito = "transcrito"
+Fale = "Fale"
 vai = "vai"

@@ -13,6 +13,127 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.7.9] - 2026-09-21
+
+### Corrigido — falha de Path ao baixar modelos
+
+- **Modelos locais (IA offline):** a primeira instalação de qualquer
+  modelo (LLM/STT/TTS) falhava sempre com o erro "Path does not
+  exist" do Cordova — o código criava a pasta do modelo DENTRO de
+  `xcoder-models/` sem criar a própria pasta-raiz primeiro. Agora o
+  gestor de downloads cria a cadeia completa de diretórios
+  (`DATA_STORAGE/xcoder-models/<id>/onnx/…`) nível a nível, e o
+  runtime de inferência partilha exatamente a mesma fonte de
+  caminhos (`ensureModelDirPath`/`installedFileUrl`), eliminando a
+  dessincronia entre download e execução. Teste de regressão: o stub
+  de ficheiros ficou tão rígido quanto o Cordova (pai inexistente =
+  erro) e um teste novo garante a criação da cadeia completa na
+  primeira instalação
+
+### Adicionado — mais ferramentas webdev (Dev Tools)
+
+- **Cinco novos geradores** no app Dev Tools (agora 9 ferramentas):
+  **CTA** (botão de call-to-action com cores, raio, paddings, tamanho
+  de fonte e largura total), **Secção** (hero com título, subtítulo,
+  botão e fundo sólido ou gradiente), **Formulário** (contact form
+  com campos nome/e-mail sempre presentes e telefone/assunto/mensagem
+  opcionais), **Tabela** (scaffold de dados com nº de colunas/linhas,
+  listras e bordas) e **Esqueleto HTML** (documento HTML5 completo
+  com charset, viewport, título e reset CSS — lang pt/en). Todos com
+  pré-visualização ao vivo, HTML+CSS formatados, Copiar e Inserir
+
+### Adicionado — bibliotecas locais para projetos (htmx e mais)
+
+- **Novo app Bibliotecas na sidebar** (ícone de livro): 8 bibliotecas
+  web embarcadas no APK (1,6 MB) — **htmx** 2.0.4, **Alpine.js**
+  3.14.9, **jQuery** 3.7.1, **Bootstrap** 5.3.3 (css+js), **Bootstrap
+  Icons** 1.11.3, **Boxicons** 2.1.4, **Font Awesome** 6.7.2 e
+  **Chart.js** 4.4.7 — com suporte OFFLINE: "Copiar tag local"
+  (aponta para `libs/<id>/…`), "Copiar tag CDN", "Inserir tag no
+  cursor" e **"Copiar para o projeto"**, que escreve os ficheiros
+  (fontes woff2 incluídas, com os caminhos relativos do css intactos)
+  na pasta do ficheiro ativo. O build copia `src/res/libs` para
+  `www/res/libs` verbatim (utils/config.js), preservando as urls de
+  fontes das folhas de estilo
+
+### Adicionado — 7 novos plugins no marketplace (23 no total)
+
+- **Tag Wrapper** (Ctrl-Alt-R): envolve a seleção com qualquer tag
+  HTML, atributos incluídos — inspirado no fluxo "wrap" dos editores
+  de desktop e no catálogo do Acode
+- **Quote Converter** (Ctrl-Alt-Q): troca aspas simples/duplas (ou
+  remove as externas) na seleção/palavra, com escape automático —
+  versão própria do plugin clássico do Acode
+- **HTML Skeleton** (Ctrl-Alt-O): esqueleto HTML5 completo no
+  documento atual — sucessor do "HTML Page Generator" do Acode
+- **Sort JSON** (Ctrl-Alt-D): ordena chaves de objetos JSON
+  recursivamente (A→Z / Z→A), mantendo arrays
+- **URL Tools** (Ctrl-Alt-N): encode/decode com as quatro funções
+  nativas de URI
+- **Slugify** (Ctrl-Alt-L): slug URL-friendly (kebab-case, sem
+  acentos) da seleção/palavra
+- **Blank Lines** (Ctrl-Alt-A): limpeza de linhas vazias, espaços
+  residuais e linhas quebradas
+- Todos com ícones gradientes, zips e registry atualizados
+  (source raw + fallback jsDelivr), smoke-tests no pacote (27
+  verificações) e o registry offline do app (`plugin-registry.json`)
+  já embarca os 23 plugins
+
+### Testes
+
+- tests/unit/modelDownloads.test.js: stub de fs rígido (pai tem de
+  existir, como o Cordova) + regressão "cadeia completa na 1.ª
+  instalação" (9 testes no ficheiro)
+- tests/unit/webdevTools.test.js: +13 testes — CTA com escapes e
+  modo bloco, secção gradiente/sólida com/sem botão, formulário com
+  campos opcionais, tabela com listras/bordas e esqueleto HTML5
+  (27 no ficheiro)
+- tests/unit/localLibs.test.js (13): catálogo, integridade no disco
+  (tamanho exato de cada ficheiro), tags locais/CDN, tamanhos
+  formatados, planos de cópia e guardas de wiring (loader + cópia no
+  build)
+- Baseline: 898/898 testes (103 ficheiros), tsc limpo, biome limpo,
+  typos 0, build de produção OK
+
+### English
+
+### Fixed — Path failure when downloading models
+
+- **Local models (offline AI):** the first install of any model
+  (LLM/STT/TTS) always failed with Cordova's "Path does not exist" —
+  the manager created the model folder INSIDE `xcoder-models/` without
+  creating the root folder itself. The download manager now walks the
+  whole directory chain (`DATA_STORAGE/xcoder-models/<id>/onnx/…`)
+  level by level and the inference runtime shares the exact same
+  source of paths (`ensureModelDirPath`/`installedFileUrl`).
+
+### Added — more webdev tools (Dev Tools)
+
+- **Five new generators** in Dev Tools (now 9 tools): **CTA** button,
+  **Section** (hero), **Form** (contact form), **Table** scaffold and
+  **HTML Boilerplate** — all with live preview, copy and insert.
+
+### Added — offline web libraries (htmx and friends)
+
+- **New Libraries sidebar app**: 8 libraries bundled in the APK
+  (1.6 MB) — htmx, Alpine.js, jQuery, Bootstrap, Bootstrap Icons,
+  Boxicons, Font Awesome and Chart.js — with copy-to-project keeping
+  the relative font paths intact, plus local/CDN tag copy and insert.
+
+### Added — 7 new marketplace plugins (23 total)
+
+- Tag Wrapper, Quote Converter, HTML Skeleton, Sort JSON, URL Tools,
+  Slugify and Blank Lines — inspired by Acode's plugin catalog,
+  rebuilt on the Xcoder API, with smoke tests and the bundled
+  registry updated to 23 entries.
+
+### Tests
+
+- Regression for the directory chain (strict cordova-like stub),
+  +13 webdev generator tests, 13 localLibs tests incl. on-disk
+  integrity of every bundled file. Baseline: 898/898 tests (103
+  files), clean tsc/biome/typos, production build OK.
+
 ## [1.7.8] - 2026-09-20
 
 ### Adicionado — atualização dentro do app + ferramentas de webdev

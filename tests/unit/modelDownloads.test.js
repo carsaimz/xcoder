@@ -29,6 +29,11 @@ vi.mock("fileSystem", () => ({
                 stat: async () => ({ size: files.get(url)?.size || 0 }),
                 readFile: async () => files.get(url)?.data ?? "",
                 createDirectory: async (name) => {
+                        // strict like cordova-plugin-file: the PARENT must exist,
+                        // otherwise it rejects with "Path does not exist"
+                        if (!files.has(url) || files.get(url)?.dir === false) {
+                                throw new Error("Path does not exist");
+                        }
                         const child = `${url}/${name}`;
                         files.set(child, { data: "", size: 0, dir: true });
                         return child;
@@ -61,6 +66,8 @@ let LOCAL;
 
 beforeEach(async () => {
         files.clear();
+        // the app storage root exists by the time downloads run (main.js)
+        files.set(globalThis.DATA_STORAGE, { data: "", size: 0, dir: true });
         vi.resetModules();
         downloads = await import("lib/ai/modelDownloads");
         LOCAL = await import("lib/ai/localModels");
@@ -97,6 +104,28 @@ describe("model download manager", () => {
                 const usage = await downloads.localStorageUsage();
                 expect(usage.count).toBe(1);
                 expect(usage.bytes).toBeGreaterThan(0);
+        });
+
+        it("creates the whole directory chain on first install (path bug)", async () => {
+                // regression: the first download ever used to fail with
+                // cordova's "Path does not exist" because the parent
+                // `xcoder-models/` directory was never created first
+                const model = LOCAL.getLocalModel("smollm2-135m");
+                downloads.setModelDownloadPorts({ http: fakeHttp({}) });
+                const result = await downloads.downloadModel(model);
+                expect(result.ok).toBe(true);
+
+                const root = globalThis.DATA_STORAGE;
+                expect(files.has(`${root}/xcoder-models`)).toBe(true);
+                expect(files.has(`${root}/xcoder-models/${model.id}`)).toBe(true);
+                expect(
+                        files.has(`${root}/xcoder-models/${model.id}/onnx`),
+                ).toBe(true);
+                expect(
+                        files.has(
+                                `${root}/xcoder-models/${model.id}/onnx/model_q4f16.onnx`,
+                        ),
+                ).toBe(true);
         });
 
         it("emits progress events during download", async () => {

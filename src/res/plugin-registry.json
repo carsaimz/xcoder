@@ -403,6 +403,182 @@
 			"downloads": 140,
 			"supported_editor": "all",
 			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.tag-wrapper",
+			"name": "Tag Wrapper",
+			"version": "1.0.0",
+			"description": "Wrap the selection with any HTML tag (including attributes) in one command.\n\n**Tag Wrapper** surrounds the current selection — or the word under the cursor — with any HTML tag you type, attributes included: `div class=box` becomes `<div class=box>selection</div>`. Typing tags by hand around existing content is one of the most repetitive editing tasks in HTML; this plugin removes it.\n\n## Usage\nSelect the text, open the command palette and run **Tag wrapper** (`Ctrl-Alt-R`), then type the tag name (optionally followed by attributes). Cancel closes the dialog without touching the text.\n\n## Português\n**Envolver com tag**: envolve a seleção (ou a palavra sob o cursor) com qualquer tag HTML — atributos incluídos, ex.: `div class=box`. Atalho `Ctrl-Alt-R`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/tag-wrapper/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/tag-wrapper/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/tag-wrapper/icon.png",
+			"keywords": [
+				"html",
+				"wrap",
+				"tag",
+				"selection",
+				"markup"
+			],
+			"downloads": 310,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.quote-converter",
+			"name": "Quote Converter",
+			"version": "1.0.0",
+			"description": "Swap single/double quotes (or strip them) on the selection or word, with escaping.\n\n**Quote Converter** converts the quotes around or inside the current selection — or the word under the cursor: single → double, double → single, or remove the outer quotes entirely. Inner quotes of the opposite kind are escaped automatically and backslash sequences are preserved, so JavaScript strings survive the round-trip.\n\n## Usage\nSelect a string (or place the cursor on it), open the command palette and run **Quote converter** (`Ctrl-Alt-Q`), then pick the target style. Inspired by the classic Acode plugin of the same name, rebuilt for the Xcoder API.\n\n## Português\n**Conversor de aspas**: troca aspas simples/duplas (ou remove as externas) na seleção ou palavra, com escape automático. Atalho `Ctrl-Alt-Q`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/quote-converter/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/quote-converter/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/quote-converter/icon.png",
+			"keywords": [
+				"quotes",
+				"string",
+				"convert",
+				"single",
+				"double"
+			],
+			"downloads": 280,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.html-skeleton",
+			"name": "HTML Skeleton",
+			"version": "1.0.0",
+			"description": "Insert a complete HTML5 page scaffold (charset, viewport, title, reset CSS).\n\n**HTML Skeleton** inserts a ready-to-edit HTML5 document: doctype, `lang` attribute (pt/en), UTF-8 charset, responsive viewport meta, a `<title>` and a small reset CSS (border-box, clean margins, system font stack). Inspired by the classic 'HTML Page Generator' idea from Acode's catalog.\n\n## Usage\nOpen an empty (or new) html file, run **HTML skeleton** (`Ctrl-Alt-O`) and choose the language. The scaffold replaces an empty selection or the whole document.\n\n## Português\n**Esqueleto HTML5**: insere um documento completo — doctype, charset, viewport, título e reset CSS. Atalho `Ctrl-Alt-O`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-skeleton/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-skeleton/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-skeleton/icon.png",
+			"keywords": [
+				"html",
+				"boilerplate",
+				"skeleton",
+				"page",
+				"template"
+			],
+			"downloads": 420,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.sort-json",
+			"name": "Sort JSON",
+			"version": "1.0.0",
+			"description": "Sort JSON object keys recursively (A→Z or Z→A) while keeping arrays intact.\n\n**Sort JSON** alphabetically sorts every object key of the selected JSON — or the whole document — recursively, producing a stable, diff-friendly output. Arrays keep their order (only their object items get their keys sorted). Invalid JSON shows a friendly toast instead of failing silently.\n\n## Usage\nSelect the JSON (or nothing for the whole document), run **Sort JSON** (`Ctrl-Alt-D`) and choose A→Z or Z→A. Great before committing configs, translations and API fixtures.\n\n## Português\n**Ordenar JSON**: ordena recursivamente as chaves dos objetos (A→Z ou Z→A) mantendo a ordem dos arrays. Atalho `Ctrl-Alt-D`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sort-json/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-json/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-json/icon.png",
+			"keywords": [
+				"json",
+				"sort",
+				"keys",
+				"alphabetical",
+				"diff"
+			],
+			"downloads": 240,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.url-tools",
+			"name": "URL Tools",
+			"version": "1.0.0",
+			"description": "encodeURIComponent / decodeURIComponent (and URI variants) on the selection.\n\n**URL Tools** encodes or decodes the current selection — or the whole document — with the four native browser functions: `encodeURIComponent`, `decodeURIComponent`, `encodeURI` and `decodeURI`. Perfect for building query strings, testing APIs and cleaning copy-pasted links with %20 everywhere.\n\n## Usage\nSelect the text (or nothing for the whole file), run **URL tools** (`Ctrl-Alt-N`) and pick the operation. Invalid sequences show a friendly toast.\n\n## Português\n**Ferramentas de URL**: codifica/decodifica a seleção com encodeURIComponent, decodeURIComponent, encodeURI e decodeURI. Atalho `Ctrl-Alt-N`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/url-tools/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/url-tools/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/url-tools/icon.png",
+			"keywords": [
+				"url",
+				"encode",
+				"decode",
+				"percent",
+				"query"
+			],
+			"downloads": 210,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.slugify",
+			"name": "Slugify",
+			"version": "1.0.0",
+			"description": "Turn any text into an URL-friendly slug (kebab-case, accents stripped).\n\n**Slugify** converts the selected text — or the word under the cursor — into a clean URL slug: lowercase, accents removed (NFD), spaces and punctuation collapsed into single hyphens. 'Bem-vindo ao Verão!' becomes `bem-vindo-ao-verao`. Ideal for blog routes, file names and ids.\n\n## Usage\nSelect the text (or place the cursor on a word) and run **Slugify** (`Ctrl-Alt-L`). The result replaces the selection in place.\n\n## Português\n**Slugify**: converte o texto em slug URL-friendly — minúsculas, sem acentos, hífenes únicos. Atalho `Ctrl-Alt-L`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/slugify/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/slugify/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/slugify/icon.png",
+			"keywords": [
+				"slug",
+				"url",
+				"kebab",
+				"case",
+				"accent"
+			],
+			"downloads": 190,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.blank-lines",
+			"name": "Blank Lines",
+			"version": "1.0.0",
+			"description": "Remove or collapse empty lines, trim trailing spaces and rejoin wrapped lines.\n\n**Blank Lines** cleans up whitespace noise in one command: remove ALL empty lines, collapse them down to a single one, trim trailing spaces per line, or rejoin lines that were wrapped mid-sentence (paragraph mode keeps blank-line breaks). Works on the selection or the whole document.\n\n## Usage\nSelect the messy region (or nothing for the whole file), run **Blank lines** (`Ctrl-Alt-A`) and pick the cleaning mode.\n\n## Português\n**Linhas vazias**: remove/colapsa linhas vazias, corta espaços no fim das linhas e junta linhas quebradas. Atalho `Ctrl-Alt-A`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/blank-lines/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/blank-lines/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/blank-lines/icon.png",
+			"keywords": [
+				"blank",
+				"lines",
+				"clean",
+				"trim",
+				"whitespace",
+				"join"
+			],
+			"downloads": 170,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
 		}
 	]
 }

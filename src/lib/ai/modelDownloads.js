@@ -124,6 +124,43 @@ function modelsRoot() {
 	return Url.join(globalThis.DATA_STORAGE || "", MODELS_ROOT_DIR);
 }
 
+/**
+ * Creates every missing directory between the storage root and
+ * `<DATA_STORAGE>/<MODELS_ROOT_DIR>/<modelId>/<...parts>`, returning the
+ * url of the deepest directory.
+ *
+ * Why: Cordova's createDirectory() requires the PARENT directory to
+ * already exist. The old code did a single
+ * `fsOperation(modelsRoot()).createDirectory(model.id)` — on a fresh
+ * install `xcoder-models` itself did not exist yet, so every first
+ * download failed with cordova's "Path does not exist" error. Walking
+ * the chain level by level makes the first install work like the rest.
+ *
+ * @param {string} modelId catalog model id
+ * @param {string[]} parts extra path segments below the model root
+ * @returns {Promise<string>} url of the deepest created directory
+ */
+export async function ensureModelDirPath(modelId, parts = []) {
+	const base = globalThis.DATA_STORAGE || "";
+	if (!base) {
+		throw new Error("storage unavailable: DATA_STORAGE is not set");
+	}
+	let current = base;
+	for (const part of [MODELS_ROOT_DIR, modelId, ...parts]) {
+		const next = Url.join(current, part);
+		if (!(await fsOperation(next).exists())) {
+			await fsOperation(current).createDirectory(part);
+		}
+		current = next;
+	}
+	return current;
+}
+
+/** Absolute file url of an installed model file (single source of truth). */
+export function installedFileUrl(modelId, path) {
+	return Url.join(modelRootUrl(modelId), path);
+}
+
 /** Root url of one model's directory. */
 function modelRootUrl(modelId) {
 	return Url.join(modelsRoot(), modelId);
@@ -158,15 +195,6 @@ async function contentLength(url, signal) {
 	} catch {
 		return 0;
 	}
-}
-
-/** Creates a nested directory path (e.g. "onnx") under parent and returns it. */
-async function ensureDir(parentUrl, name) {
-	const dirUrl = Url.join(parentUrl, name);
-	if (!(await fsOperation(dirUrl).exists())) {
-		await fsOperation(parentUrl).createDirectory(name);
-	}
-	return dirUrl;
 }
 
 /** Reads the manifest of a model (or null). */
@@ -271,10 +299,8 @@ export async function downloadModel(model, { onEvent } = {}) {
 	active.set(model.id, { abort });
 	const emit = (event) => onEvent?.({ modelId: model.id, ...event });
 	try {
-		const root = modelRootUrl(model.id);
-		if (!(await fsOperation(root).exists())) {
-			await fsOperation(modelsRoot()).createDirectory(model.id);
-		}
+		// creates the full chain on first install
+		const root = await ensureModelDirPath(model.id);
 
 		const files = modelFiles(model);
 		/** @type {Record<string, number>} */
@@ -287,10 +313,7 @@ export async function downloadModel(model, { onEvent } = {}) {
 			const file = files[index];
 			const parts = file.path.split("/");
 			const name = parts.pop();
-			let dirUrl = root;
-			for (const part of parts) {
-				dirUrl = await ensureDir(dirUrl, part);
-			}
+			const dirUrl = await ensureModelDirPath(model.id, parts);
 			const destUrl = Url.join(dirUrl, name);
 			const expect = Number(previous?.files?.[file.path] || 0);
 			const already = await fileSize(destUrl);

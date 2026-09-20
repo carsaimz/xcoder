@@ -37,8 +37,27 @@ try {
 }
 
 // Write launcher/splash background colors
-const logoPath = path.join(rootDir, "res/android/values/ic_launcher_background.xml");
+const logoPath = path.join(
+	rootDir,
+	"res/android/values/ic_launcher_background.xml",
+);
 fs.writeFileSync(logoPath, LOGO_COLORS, "utf8");
+
+// Copy the bundled web libraries verbatim into www/ (utils/config.js runs
+// before every rspack build — dev and prod — so both flows stay in sync).
+// A verbatim copy (not rspack assets) keeps the relative font paths inside
+// the libraries' css files working offline: url(./fonts/...), url(../webfonts/...).
+try {
+	fs.cpSync(
+		path.join(rootDir, "src", "res", "libs"),
+		path.join(rootDir, "www", "res", "libs"),
+		{
+			recursive: true,
+		},
+	);
+} catch (error) {
+	console.warn(`Unable to copy local libs: ${error.message}`);
+}
 
 // Keep config.xml version in sync with package.json
 const configPath = path.join(rootDir, "config.xml");
@@ -58,4 +77,6 @@ try {
 	console.warn(`Unable to sync version: ${error.message}`);
 }
 
-console.log(`XCoder config ready (mode: ${mode === "p" ? "production" : "development"})`);
+console.log(
+	`XCoder config ready (mode: ${mode === "p" ? "production" : "development"})`,
+);
