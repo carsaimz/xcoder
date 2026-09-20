@@ -24,3 +24,5 @@ tsconfig.tsbuildinfo
 /www/cordova.js
 /www/cordova_plugins.js
 .pnpm-store/
+# generated build artifacts (copied from src/res/libs by utils/config.js)
+/www/res
