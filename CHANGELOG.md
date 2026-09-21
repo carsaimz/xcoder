@@ -16,11 +16,7 @@ resumo em inglês.
 ## [1.8.1] - 2026-09-21
 
 ### Added
-- **Marketplace**: +5 plugins — conversor de unidades CSS (px↔rem↔em, `Ctrl-Alt-P`), entidades HTML (`Ctrl-Alt-M`), formatador de tabelas Markdown (`Ctrl-Alt-F`), conversor RGB ↔ Hex (`Ctrl-Alt-Y`) e limpeza de espaços finais (`Ctrl-Alt-Z`); catálogo com 28 plugins
-- Registry oficial do marketplace atualizado (fonte remota + cópia offline embutida)
-
-### EN summary
-- **Marketplace**: five new plugins — CSS unit converter (px↔rem↔em, `Ctrl-Alt-P`), HTML entities (`Ctrl-Alt-M`), Markdown table formatter (`Ctrl-Alt-F`), RGB ↔ Hex converter (`Ctrl-Alt-Y`) and trim trailing whitespace (`Ctrl-Alt-Z`); catalog now at 28 plugins.
+- V1.8.1 — marketplace +5 plugins (CSS units, HTML entities, MD tables, RGB-hex, trim trailing), registry at 28
 
 ## [1.8.0] - 2026-09-21
 
