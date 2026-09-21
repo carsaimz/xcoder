@@ -170,8 +170,11 @@ describe("GitHub PAT persistence (repos que não apareciam)", () => {
                 assert.match(src, /settings\.value\.ghToken = token/);
                 assert.match(src, /await settings\.update\(\)/);
                 assert.match(src, /settings\.value\[key\] = trimmed/);
-                // profile is fetched right after a manual token save
-                assert.match(src, /fetchProfile\(settings\.value\.ghToken\)/);
+                // profile is fetched right after a manual token save —
+                // since v1.8.0 through the shared refreshGhProfile flow
+                // (normalises the token, friendly 401 hint)
+                assert.match(src, /normalizeGhToken\(value\)/);
+                assert.match(src, /await refreshGhProfile\(\)/);
         });
 });
 

@@ -4,35 +4,144 @@ import toast from "components/toast";
 import { applyToEditor } from "lib/ai/editorBridge";
 import editorManager from "lib/editorManager";
 import {
+	base64Convert,
 	boilerplateSnippet,
 	cardSnippet,
+	colorConvert,
 	ctaSnippet,
-	formSnippet,
-	gradientCSS,
+	formatJson,
+	loremText,
 	placeholderSnippet,
 	sectionSnippet,
 	shadowCSS,
+	slugText,
 	tableSnippet,
+	timestampConvert,
+	uuidIds,
 } from "lib/webdevTools";
 import Url from "utils/Url";
 
 /**
- * Dev Tools sidebar app — quick webdev utilities that generate ready-to-
- * paste code: box-shadow, gradients, cards and SVG placeholder images.
- * Generators live in lib/devTools.js (pure, unit-tested); this file is
- * only the UI layer: controls → live preview → copy/insert/save.
+ * Dev Tools sidebar app — quick webdev/programmer utilities that
+ * generate ready-to-paste code: box-shadow, gradients, cards, SVG
+ * placeholders, JSON, Base64, IDs, timestamps, colors, lorem and slugs.
+ * Generators live in lib/webdevTools.js (pure, unit-tested); this file
+ * is only the UI layer: controls → live preview → copy/insert/save.
  */
 
-const TOOL_TABS = [
-	["shadow", "dev tools shadow", "Shadow"],
-	["gradient", "dev tools gradient", "Gradient"],
-	["card", "dev tools card", "Card"],
-	["placeholder", "dev tools placeholder", "Placeholder"],
-	["cta", "dev tools cta", "CTA"],
-	["section", "dev tools section", "Section"],
-	["form", "dev tools form", "Form"],
-	["table", "dev tools table", "Table"],
-	["boilerplate", "dev tools boilerplate", "Boilerplate"],
+const TOOL_LIST = [
+	[
+		"shadow",
+		"dev tools shadow",
+		"Shadow",
+		"dev tools shadow desc",
+		"Box-shadow generator with live preview",
+	],
+	[
+		"gradient",
+		"dev tools gradient",
+		"Gradient",
+		"dev tools gradient desc",
+		"Linear, radial and conic CSS gradients",
+	],
+	[
+		"card",
+		"dev tools card",
+		"Card",
+		"dev tools card desc",
+		"Card component (HTML + CSS)",
+	],
+	[
+		"placeholder",
+		"dev tools placeholder",
+		"Placeholder",
+		"dev tools placeholder desc",
+		"SVG placeholder images by size",
+	],
+	[
+		"cta",
+		"dev tools cta",
+		"CTA",
+		"dev tools cta desc",
+		"Call-to-action button (HTML + CSS)",
+	],
+	[
+		"section",
+		"dev tools section",
+		"Section",
+		"dev tools section desc",
+		"Hero/section block with optional gradient",
+	],
+	[
+		"form",
+		"dev tools form",
+		"Form",
+		"dev tools form desc",
+		"Contact form scaffold",
+	],
+	[
+		"table",
+		"dev tools table",
+		"Table",
+		"dev tools table desc",
+		"Data table scaffold (striped/bordered)",
+	],
+	[
+		"boilerplate",
+		"dev tools boilerplate",
+		"Boilerplate",
+		"dev tools boilerplate desc",
+		"HTML5 document starter",
+	],
+	[
+		"json",
+		"dev tools json",
+		"JSON",
+		"dev tools json desc",
+		"Format, minify and validate JSON",
+	],
+	[
+		"base64",
+		"dev tools base64",
+		"Base64",
+		"dev tools base64 desc",
+		"Encode and decode UTF-8-safe Base64",
+	],
+	[
+		"ids",
+		"dev tools ids",
+		"IDs / UUID",
+		"dev tools ids desc",
+		"UUID v4 and short ids in bulk",
+	],
+	[
+		"timestamp",
+		"dev tools timestamp",
+		"Timestamp",
+		"dev tools timestamp desc",
+		"Unix ↔ ISO 8601 converter",
+	],
+	[
+		"color",
+		"dev tools color",
+		"Color",
+		"dev tools color desc",
+		"Hex ↔ RGB ↔ HSL converter",
+	],
+	[
+		"lorem",
+		"dev tools lorem",
+		"Lorem ipsum",
+		"dev tools lorem desc",
+		"Filler text generator",
+	],
+	[
+		"slug",
+		"dev tools slug",
+		"Slug / URL",
+		"dev tools slug desc",
+		"Slugify titles and links",
+	],
 ];
 
 const state = {
@@ -112,6 +221,34 @@ const state = {
 		viewport: true,
 		reset: true,
 	},
+	json: {
+		text: '{\n  "app": "XCoder",\n  "version": 1\n}',
+		mode: "format",
+		indent: "2",
+	},
+	base64: {
+		text: "XCoder",
+		mode: "encode",
+	},
+	ids: {
+		count: 5,
+		length: 10,
+		format: "both",
+	},
+	timestamp: {
+		text: "",
+		mode: "auto",
+	},
+	color: {
+		text: "#7c3aed",
+	},
+	lorem: {
+		paragraphs: 3,
+		sentences: 5,
+	},
+	slug: {
+		text: "XCoder — editor de código!",
+	},
 };
 
 let activeTool = "shadow";
@@ -121,8 +258,6 @@ let $panel = null;
 let $preview = null;
 /** @type {HTMLElement} */
 let $output = null;
-/** @type {Array<[HTMLElement, string]>} */
-const $tabs = [];
 
 /** Short texts resolved at render time (language can change mid-session). */
 function t(key, fallback) {
@@ -299,6 +434,58 @@ function refresh() {
 		$output.textContent = imgTag;
 		// keep the raw SVG reachable for the save action
 		$preview.dataset.svg = svg;
+	} else if (activeTool === "json") {
+		const result = formatJson(
+			state.json.text,
+			state.json.mode,
+			state.json.indent,
+		);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "base64") {
+		const result = base64Convert(state.base64.text, state.base64.mode);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "ids") {
+		const { uuids, shortIds } = uuidIds(state.ids.count, state.ids.length);
+		if (state.ids.format === "uuid") {
+			$output.textContent = uuids.join("\n");
+		} else if (state.ids.format === "short") {
+			$output.textContent = shortIds.join("\n");
+		} else {
+			$output.textContent = uuids
+				.map((uuid, index) => `${uuid}  ${shortIds[index]}`)
+				.join("\n");
+		}
+	} else if (activeTool === "timestamp") {
+		if (!String(state.timestamp.text || "").trim()) {
+			$output.textContent = t(
+				"dev tools timestamp hint",
+				"Digite um timestamp (unix ou ISO 8601) para converter.",
+			);
+		} else {
+			const result = timestampConvert(
+				state.timestamp.text,
+				state.timestamp.mode,
+			);
+			$output.textContent = result.ok
+				? result.output
+				: `${t("dev tools error", "Erro")}: ${result.error}`;
+		}
+	} else if (activeTool === "color") {
+		const result = colorConvert(state.color.text);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "lorem") {
+		$output.textContent = loremText(
+			state.lorem.paragraphs,
+			state.lorem.sentences,
+		);
+	} else if (activeTool === "slug") {
+		$output.textContent = slugText(state.slug.text);
 	}
 }
 
@@ -377,6 +564,24 @@ function textRow(label, value, oninput) {
 		<label className="devtools-row">
 			<span className="devtools-label">{label}</span>
 			{$text}
+		</label>
+	);
+}
+
+/** Builds a labeled multi-line text row (JSON, Base64, slugs...). */
+function textareaRow(label, value, oninput, rows = 5) {
+	const $area = (
+		<textarea className="devtools-textarea" rows={rows} aria-label={label} />
+	);
+	$area.value = value ?? "";
+	$area.oninput = () => {
+		oninput($area.value);
+		refresh();
+	};
+	return (
+		<label className="devtools-row devtools-row-stack">
+			<span className="devtools-label">{label}</span>
+			{$area}
 		</label>
 	);
 }
@@ -738,6 +943,139 @@ function buildControls() {
 			),
 		];
 	}
+	if (activeTool === "json") {
+		const j = state.json;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				j.text,
+				(v) => (j.text = v),
+				8,
+			),
+			selectRow(
+				t("dev tools mode", "Mode"),
+				j.mode,
+				[
+					["format", t("dev tools format", "Formatar")],
+					["minify", t("dev tools minify", "Minificar")],
+				],
+				(v) => (j.mode = v),
+			),
+			selectRow(
+				t("dev tools indent", "Indentação"),
+				j.indent,
+				[
+					["2", "2 espaços"],
+					["4", "4 espaços"],
+					["tab", "Tab"],
+				],
+				(v) => (j.indent = v),
+			),
+		];
+	}
+	if (activeTool === "base64") {
+		const b = state.base64;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				b.text,
+				(v) => (b.text = v),
+				6,
+			),
+			selectRow(
+				t("dev tools mode", "Mode"),
+				b.mode,
+				[
+					["encode", t("dev tools encode", "Codificar")],
+					["decode", t("dev tools decode", "Decodificar")],
+				],
+				(v) => (b.mode = v),
+			),
+		];
+	}
+	if (activeTool === "ids") {
+		const i = state.ids;
+		return [
+			rangeRow(
+				t("dev tools count", "Quantidade"),
+				1,
+				50,
+				i.count,
+				(v) => (i.count = v),
+			),
+			rangeRow(
+				t("dev tools id length", "Tamanho do id curto"),
+				6,
+				32,
+				i.length,
+				(v) => (i.length = v),
+			),
+			selectRow(
+				t("dev tools mode", "Mode"),
+				i.format,
+				[
+					["both", "UUID + curto"],
+					["uuid", "UUID"],
+					["short", t("dev tools short only", "Só curto")],
+				],
+				(v) => (i.format = v),
+			),
+		];
+	}
+	if (activeTool === "timestamp") {
+		const ts = state.timestamp;
+		return [
+			textRow(
+				t("dev tools timestamp input", "Timestamp / data"),
+				ts.text,
+				(v) => (ts.text = v),
+			),
+			selectRow(
+				t("dev tools input type", "Tipo de entrada"),
+				ts.mode,
+				[
+					["auto", "Auto"],
+					["unix-s", "Unix (s)"],
+					["unix-ms", "Unix (ms)"],
+					["iso", "ISO 8601"],
+				],
+				(v) => (ts.mode = v),
+			),
+		];
+	}
+	if (activeTool === "color") {
+		const c = state.color;
+		return [
+			textRow(
+				t("dev tools color input", "Cor (hex / rgb / hsl)"),
+				c.text,
+				(v) => (c.text = v),
+			),
+		];
+	}
+	if (activeTool === "lorem") {
+		const l = state.lorem;
+		return [
+			rangeRow(
+				t("dev tools paragraphs", "Parágrafos"),
+				1,
+				10,
+				l.paragraphs,
+				(v) => (l.paragraphs = v),
+			),
+			rangeRow(
+				t("dev tools sentences", "Frases por parágrafo"),
+				2,
+				10,
+				l.sentences,
+				(v) => (l.sentences = v),
+			),
+		];
+	}
+	if (activeTool === "slug") {
+		const s = state.slug;
+		return [textRow(t("dev tools text", "Text"), s.text, (v) => (s.text = v))];
+	}
 	const p = state.placeholder;
 	return [
 		rangeRow(
@@ -787,16 +1125,35 @@ function buildActions() {
 			</button>,
 		);
 	}
+	if (activeTool === "ids") {
+		buttons.push(
+			<button className="devtools-btn" onclick={() => refresh()}>
+				{t("dev tools regenerate", "Gerar novamente")}
+			</button>,
+		);
+	}
 	return <div className="devtools-actions">{buttons}</div>;
 }
 
 /** Switches tool and re-renders the panel. */
 function setTool(id) {
 	activeTool = id;
-	for (const [$tab, tool] of $tabs) {
-		$tab.classList.toggle("active", tool === id);
+	const $list = document.querySelector(".devtools-tool-list");
+	const $header = document.querySelector(".devtools-tool-header");
+	if ($list) {
+		$list.classList.remove("open");
+		$list.get?.(".active")?.classList.remove("active");
+		$list.get?.(`[data-tool="${id}"]`)?.classList.add("active");
 	}
+	if ($header) fillToolHeader($header);
 	renderPanel();
+}
+
+/** Fills the collapsed picker header with the active tool's info. */
+function fillToolHeader($header) {
+	const entry = TOOL_LIST.find(([id]) => id === activeTool) || TOOL_LIST[0];
+	$header.get(".devtools-tool-title").textContent = t(entry[1], entry[2]);
+	$header.get(".devtools-tool-desc").textContent = t(entry[3], entry[4]);
 }
 
 /** Rebuilds controls + preview + output for the active tool. */
@@ -814,27 +1171,77 @@ function renderPanel() {
 	refresh();
 }
 
-/** Builds the tab strip. */
-function buildTabs() {
-	const $strip = <div className="devtools-tabs" role="tablist" />;
-	for (const [id, key, fallback] of TOOL_TABS) {
-		const $tab = (
-			<button className="devtools-tab" role="tab">
-				{t(key, fallback)}
-			</button>
+/**
+ * Builds the tool picker: a collapsed header (active tool title +
+ * description) that expands into a VERTICAL list where every tool
+ * shows its own title and short description — easier to scan than the
+ * old horizontal tab strip on narrow screens.
+ */
+function buildToolPicker() {
+	const $header = (
+		<button className="devtools-tool-header" aria-expanded="false">
+			<span className="devtools-tool-texts">
+				<span className="devtools-tool-title"></span>
+				<span className="devtools-tool-desc"></span>
+			</span>
+			<span className="icon chevron_right devtools-tool-chevron"></span>
+		</button>
+	);
+
+	const $list = <div className="devtools-tool-list" role="listbox" />;
+	for (const [id, key, fallback, descKey, descFallback] of TOOL_LIST) {
+		const $row = (
+			<div
+				className={`devtools-tool-item${id === activeTool ? " active" : ""}`}
+				role="option"
+				data-tool={id}
+				tabindex="0"
+			>
+				<span className="devtools-tool-item-title">{t(key, fallback)}</span>
+				<span className="devtools-tool-item-desc">
+					{t(descKey, descFallback)}
+				</span>
+			</div>
 		);
-		$tab.onclick = () => setTool(id);
-		$tabs.push([$tab, id]);
-		$strip.append($tab);
+		$row.onclick = () => setTool(id);
+		$row.onkeydown = (event) => {
+			if (event.key === "Enter" || event.key === " ") {
+				event.preventDefault();
+				setTool(id);
+			}
+		};
+		$list.append($row);
 	}
-	return $strip;
+
+	$header.onclick = () => {
+		const open = $list.classList.toggle("open");
+		$header.setAttribute("aria-expanded", String(open));
+		$header.get(".devtools-tool-chevron").classList.toggle("open", open);
+		if (open) {
+			$list.get(".active")?.scrollIntoView?.({ block: "nearest" });
+		}
+	};
+	fillToolHeader($header);
+
+	return (
+		<div className="devtools-picker">
+			{$header}
+			{$list}
+		</div>
+	);
 }
 
-/** Retranslates tab labels when the language changes. */
+/** Retranslates picker + panel labels when the language changes. */
 function onLangChange() {
-	for (const [$tab, id] of $tabs) {
-		const tab = TOOL_TABS.find(([toolId]) => toolId === id);
-		if (tab) $tab.textContent = t(tab[1], tab[2]);
+	const $header = document.querySelector(".devtools-tool-header");
+	if ($header) fillToolHeader($header);
+	for (const [id, key, fallback, descKey, descFallback] of TOOL_LIST) {
+		const $row = document.querySelector(
+			`.devtools-tool-item[data-tool="${id}"]`,
+		);
+		if (!$row) continue;
+		$row.get(".devtools-tool-item-title").textContent = t(key, fallback);
+		$row.get(".devtools-tool-item-desc").textContent = t(descKey, descFallback);
 	}
 	renderPanel();
 }
@@ -844,7 +1251,7 @@ function initApp(el) {
 	el.classList.add("devtools-app");
 	el.append(
 		<div className="devtools-root">
-			{buildTabs()}
+			{buildToolPicker()}
 			<div className="devtools-panel" />
 		</div>,
 	);

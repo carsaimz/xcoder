@@ -22,6 +22,65 @@ const USER_URL = "https://api.github.com/user";
 export const GH_SCOPES = ["repo", "workflow", "gist", "read:user"];
 
 /**
+ * Cleans a pasted/stored token: strips every whitespace character
+ * (spaces, tabs, newlines — tokens can wrap when copied from messengers)
+ * and invisible Unicode (zero-width spaces, joiners, BOM). A single
+ * stray character makes GitHub answer 401 "Bad credentials".
+ * @param {string} raw
+ * @returns {string}
+ */
+export function normalizeGhToken(raw) {
+	return String(raw || "").replace(/[\s\u200B-\u200D\u2060\uFEFF]/g, "");
+}
+
+/**
+ * True when the token has the shape of a real GitHub token (classic
+ * ghp_/gho_/ghu_/ghs_/ghr_ prefixes or the fine-grained github_pat_).
+ * Used only for friendlier hints — never blocks a save.
+ * @param {string} token
+ * @returns {boolean}
+ */
+export function looksLikeGhToken(token) {
+	return /^(ghp_|gho_|ghu_|ghs_|ghr_|github_pat_)/.test(
+		normalizeGhToken(token),
+	);
+}
+
+/**
+ * Maps a GitHub API failure to a user-facing message. The raw GitHub
+ * detail ("Bad credentials", "Requires authentication"…) is kept for
+ * transparency, but the actionable hint comes first.
+ * @param {number|string} status HTTP status (0/undefined = network)
+ * @param {string} [detail] raw error detail from the API/plugin
+ * @returns {string}
+ */
+export function describeGhError(status, detail) {
+	const raw = String(detail || "").trim();
+	const code = Number(status) || 0;
+	if (code === 401 || /bad credentials/i.test(raw)) {
+		const hint =
+			(typeof strings !== "undefined" && strings["github bad token"]) ||
+			"Token inválido ou revogado — reconecte a conta ou cole um novo token.";
+		return `GitHub 401: ${hint}${raw ? ` (${raw})` : ""}`;
+	}
+	if (code === 403 && /rate limit/i.test(raw)) {
+		const hint =
+			(typeof strings !== "undefined" && strings["github rate limit"]) ||
+			"Limite de pedidos do GitHub atingido — tente de novo em alguns minutos.";
+		return `GitHub 403: ${hint}${raw ? ` (${raw})` : ""}`;
+	}
+	if (!code && /failed|network|timed?\s?out/i.test(raw)) {
+		const hint =
+			(typeof strings !== "undefined" && strings["github network error"]) ||
+			"Sem resposta do GitHub — verifique a conexão.";
+		return `${hint}${raw ? ` (${raw})` : ""}`;
+	}
+	return raw
+		? `GitHub ${code || ""}: ${raw}`.replace(/\s+:/, ":")
+		: `GitHub ${code}`;
+}
+
+/**
  * POSTs url-encoded params and parses the JSON response.
  * @param {string} url
  * @param {Record<string, string>} params
@@ -241,11 +300,14 @@ function cordovaGetJson(url, headers) {
 				resolve(data);
 			},
 			(error) => {
-				reject(
-					new Error(
-						`GitHub ${error?.status || ""}: ${error?.error || error?.statusText || "request failed"}`,
-					),
-				);
+				// error.error can be a STRING body or the parsed
+				// JSON object ({message: "Bad credentials"}) —
+				// normalise both, or the toast shows [object Object].
+				let detail = error?.error || error?.statusText || "request failed";
+				if (detail && typeof detail === "object") {
+					detail = detail?.message || JSON.stringify(detail);
+				}
+				reject(new Error(describeGhError(error?.status, detail)));
 			},
 		);
 	});
@@ -258,11 +320,14 @@ function cordovaGetJson(url, headers) {
  * @returns {Promise<{login: string, name: string, avatarUrl: string}>}
  */
 export async function fetchGhUser(token, { fetchImpl } = {}) {
-	if (!token) throw new Error("No token provided");
+	// defensive normalisation: the token may come straight from a
+	// paste (whitespace/zero-width) or an old stored session
+	const clean = normalizeGhToken(token);
+	if (!clean) throw new Error("No token provided");
 
 	const headers = {
 		Accept: "application/vnd.github+json",
-		Authorization: `Bearer ${token}`,
+		Authorization: `Bearer ${clean}`,
 		"X-GitHub-Api-Version": "2022-11-28",
 	};
 
@@ -281,7 +346,14 @@ export async function fetchGhUser(token, { fetchImpl } = {}) {
 
 	const res = await doFetch(USER_URL, { headers });
 	if (!res.ok) {
-		throw new Error(`GitHub user request failed (${res.status})`);
+		let detail = "";
+		try {
+			const body = await res.json();
+			detail = body?.message || "";
+		} catch {
+			/* non-JSON body */
+		}
+		throw new Error(describeGhError(res.status, detail));
 	}
 	const user = await res.json();
 	return {

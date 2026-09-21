@@ -13,6 +13,102 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.0] - 2026-09-21
+
+### Corrigido — sessão GitHub (bad credentials)
+
+- **PAT agora disponível em todos os fluxos:** o seletor de entrada
+  ("Entrar com GitHub") na barra lateral nunca mostrava a opção de
+  token pessoal — só navegador/device flow. Quem tentava "conectar
+  com GitHub via PAT" não conseguia, e a conta/repositórios nunca
+  apareciam. A opção **Token de acesso pessoal (PAT)** agora está
+  sempre disponível no seletor, com ícone próprio
+- **Normalização de token em toda a linha GitHub:** espaços, quebras
+  de linha (copiar de mensageiros quebra o token em duas linhas),
+  zero-width e BOM são removidos antes de guardar e antes de CADA
+  pedido — um único caractere invisível bastava para o GitHub
+  responder 401 "Bad credentials"
+- **Mensagens de erro acionáveis:** 401 agora explica o problema
+  ("Token inválido ou revogado — reconecte a conta ou cole um novo
+  token") em vez de um genérico; erros do plugin nativo que vinham
+  como objeto deixam de virar "[object Object]"
+- **Botão "Atualizar perfil"** no cartão de conta da barra lateral
+  (e no ecrã de configurações GitHub) para sessões "token definido —
+  sem perfil": revalida o token, guarda o perfil e dá o feedback
+  correto quando o token é inválido
+
+### Adicionado — lista vertical de ferramentas + 7 utilitários de programador
+
+- **Seletor vertical (dropdown expansível):** a faixa horizontal de
+  abas do painel Dev Tools foi substituída por uma lista vertical
+  expansível — o cabeçalho mostra a ferramenta ativa (título +
+  descrição) e, ao tocar, abre a lista em que **cada ferramenta tem
+  título e uma descrição curta**, como pedido. 16 ferramentas no total
+- **Sete novos utilitários** para programadores e webdevs:
+  **JSON** (formatar/minificar/validar com mensagem de erro),
+  **Base64** (codificar/decodificar com suporte UTF-8 seguro),
+  **IDs/UUID** (UUID v4 + ids curtos em lote, com botão gerar de
+  novo), **Timestamp** (unix s/ms ↔ ISO 8601 ↔ data local, detecção
+  automática), **Cor** (hex ↔ rgb() ↔ hsl()), **Lorem ipsum** (texto
+  de preenchimento determinístico) e **Slug/URL** (slugify que remove
+  acentos) — todos com preview/saída, copiar e inserir no cursor
+- **Novo ícone svg "key"** no pacote de ícones (usado na opção PAT);
+  pacote SVG exportado em sincronia
+
+### Traduções
+
+- 44 novas chaves de tradução (títulos e descrições das 16
+  ferramentas, rótulos dos novos utilitários e mensagens da sessão
+  GitHub) em en-us e pt-br
+
+## [1.8.0] - 2026-09-21
+
+### Fixed — GitHub session (bad credentials)
+
+- **PAT available on every flow:** the sidebar "Sign in with GitHub"
+  chooser never offered the personal access token option — only
+  browser/device flow. Pasting a PAT was impossible from the sidebar,
+  so the account/repositories never appeared. The **Personal access
+  token (PAT)** option is now always available in the chooser, with
+  its own key icon
+- **Token normalisation across the whole GitHub layer:** spaces,
+  line breaks (messengers wrap copied tokens), zero-width chars and
+  BOM are stripped before saving and before EVERY request — a single
+  invisible character was enough for GitHub to answer 401 "Bad
+  credentials"
+- **Actionable error messages:** 401 now explains the problem
+  ("Invalid or revoked token — reconnect or paste a new token")
+  instead of a generic one; native plugin errors arriving as objects
+  no longer render as "[object Object]"
+- **"Refresh profile" button** on the sidebar account card (and the
+  GitHub settings page) for "token set — no profile" sessions:
+  revalidates the token, saves the profile and reports properly when
+  the token is invalid
+
+### Added — vertical tool list + 7 programmer utilities
+
+- **Vertical picker (expandable dropdown):** the horizontal tab strip
+  of the Dev Tools panel was replaced by an expandable vertical list
+  — the header shows the active tool (title + description) and
+  tapping it opens the list where **every tool has a title and a
+  short description**, as requested. 16 tools in total
+- **Seven new utilities** for programmers and webdevs: **JSON**
+  (format/minify/validate with error message), **Base64** (encode/
+  decode, UTF-8 safe), **IDs/UUID** (bulk UUID v4 + short ids, with a
+  regenerate button), **Timestamp** (unix s/ms ↔ ISO 8601 ↔ local
+  date, auto detection), **Color** (hex ↔ rgb() ↔ hsl()),
+  **Lorem ipsum** (deterministic filler text) and **Slug/URL**
+  (accent-stripping slugify) — all with preview/output, copy and
+  insert-at-cursor
+- **New "key" svg icon** in the icon pack (used by the PAT option);
+  SVG pack exported in sync
+
+### Translations
+
+- 44 new translation keys (titles and descriptions of the 16 tools,
+  labels of the new utilities and GitHub session messages) in en-us
+  and pt-br
+
 ## [1.7.9] - 2026-09-21
 
 ### Corrigido — falha de Path ao baixar modelos

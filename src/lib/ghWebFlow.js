@@ -15,7 +15,7 @@
 import toast from "components/toast";
 import { addIntentHandler, removeIntentHandler } from "handlers/intent";
 import config from "lib/config";
-import { fetchGhUser } from "lib/ghAuth";
+import { fetchGhUser, normalizeGhToken } from "lib/ghAuth";
 import settings from "lib/settings";
 
 const STATE_KEY = "xcoder.ghWebFlow.state";
@@ -104,7 +104,8 @@ export async function applyGhWebTokens(rawUrl, opts = {}) {
 		? value.slice(value.indexOf("#") + 1)
 		: "";
 	const params = new URLSearchParams(fragment);
-	const token = params.get("access_token");
+	// normalise: URL-encoded fragments can carry %0A/zero-width leftovers
+	const token = normalizeGhToken(params.get("access_token"));
 	if (!token) return false;
 
 	let expectedState = opts.expectedState;

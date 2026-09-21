@@ -15,7 +15,13 @@ import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import config from "lib/config";
-import { fetchGhUser, pollForToken, requestDeviceCode } from "lib/ghAuth";
+import {
+	fetchGhUser,
+	looksLikeGhToken,
+	normalizeGhToken,
+	pollForToken,
+	requestDeviceCode,
+} from "lib/ghAuth";
 import { ghWebFlowEnabled, signInWithGitHubApp } from "lib/ghWebFlow";
 import settings from "lib/settings";
 
@@ -51,7 +57,11 @@ export function resolveGhClientId() {
 /**
  * Chooses the sign-in method, easiest first: the GitHub App web flow
  * (one tap in the browser) when available, then the Device Flow (needs
- * only a client id), then the manual PAT.
+ * only a client id), then the manual PAT. The PAT option is ALWAYS
+ * offered — it needs no client id and works offline-ish; hiding it
+ * here left users with no way to paste a token from the sidebar
+ * (v1.7.9 bug: "connect with GitHub via PAT" was impossible and the
+ * session problem seemed unsolvable).
  * @returns {Promise<"web"|"device"|"pat"|null>}
  */
 export async function chooseGhSignInMethod() {
@@ -70,6 +80,11 @@ export async function chooseGhSignInMethod() {
 			"svg:qr-code",
 		]);
 	}
+	options.push([
+		"pat",
+		strings["github pat sign in"] || "Personal access token (PAT)",
+		"svg:key",
+	]);
 	const choice = await select(
 		strings["sign in with github"] || "Sign in with GitHub",
 		options,
@@ -104,8 +119,17 @@ export async function signInWithPat() {
 		"text",
 		{ required: false },
 	);
-	const value = String(token || "").trim();
+	// normalise: strip whitespace/zero-width chars from copies that
+	// wrapped in messengers or email (a stray char = 401 later)
+	const value = normalizeGhToken(token);
 	if (!value) return false;
+	if (!looksLikeGhToken(value)) {
+		toast(
+			strings["github pat shape"] ||
+				"O token não parece um PAT do GitHub (ghp_… / github_pat_…) — vamos tentar mesmo assim.",
+			4000,
+		);
+	}
 
 	const hide = await loader.show();
 	try {
@@ -189,4 +213,43 @@ export async function signInGitHubFlow() {
 	if (method === "pat") return signInWithPat();
 	if (method === "device") return signInWithDeviceFlow();
 	return false;
+}
+
+/**
+ * Re-fetches the profile for the STORED token and saves it. Used by
+ * the git sidebar account card and the settings page when a token is
+ * set but the profile never arrived (the "token set — no account"
+ * state after a failed first fetch).
+ * @returns {Promise<boolean>} whether the profile was refreshed
+ */
+export async function refreshGhProfile() {
+	const token = normalizeGhToken(settings.value.ghToken);
+	if (!token) {
+		toast(
+			strings["github token needed"] ||
+				"Sign in or set a token to list repositories",
+			3000,
+		);
+		return false;
+	}
+	const hide = await loader.show();
+	try {
+		const user = await fetchGhUser(token);
+		settings.value.ghToken = token;
+		settings.value.ghUserLogin = user?.login || "";
+		settings.value.ghUserName = user?.name || "";
+		settings.value.ghUserAvatar = user?.avatarUrl || "";
+		await settings.update();
+		toast(`${strings["signed in as"] || "Signed in as"} ${user?.login || "?"}`);
+		return true;
+	} catch (error) {
+		toast(
+			`${strings["github profile failed"] || "Could not load profile"}: ${
+				error.message || error
+			}`,
+		);
+		return false;
+	} finally {
+		hide();
+	}
 }

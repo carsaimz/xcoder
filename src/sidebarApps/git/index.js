@@ -5,7 +5,7 @@ import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import vshell from "lib/ai/vshell";
 import { pickAndApplyGhRepo } from "lib/ghRepos";
-import { signInGitHubFlow } from "lib/ghSignIn";
+import { refreshGhProfile, signInGitHubFlow } from "lib/ghSignIn";
 import {
 	commit,
 	getStatus,
@@ -382,11 +382,29 @@ function renderAccount() {
 					: strings["github sign in desc"] ||
 						"Sign in to access your GitHub repositories."}
 			</span>
-			<button className="git-commit-btn" onclick={signInGitHub}>
-				{strings["sign in with github"] || "Sign in with GitHub"}
-			</button>
+			<div className="git-account-actions">
+				{values.ghToken ? (
+					<button
+						className="git-ghost-btn"
+						onclick={retryProfile}
+						title={strings["github refresh profile"] || "Refresh profile"}
+					>
+						{strings["github refresh profile"] || "Atualizar perfil"}
+					</button>
+				) : null}
+				<button className="git-commit-btn" onclick={signInGitHub}>
+					{strings["sign in with github"] || "Sign in with GitHub"}
+				</button>
+			</div>
 		</div>
 	);
+}
+
+/** Re-fetches the profile for the stored token (token set, no login). */
+async function retryProfile() {
+	await refreshGhProfile();
+	renderAccount();
+	renderGh();
 }
 
 /**

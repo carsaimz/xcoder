@@ -1,8 +1,8 @@
 import settingsPage from "components/settingsPage";
 import toast from "components/toast";
 import select from "dialogs/select";
-import { fetchGhUser } from "lib/ghAuth";
-import { signInGitHubFlow } from "lib/ghSignIn";
+import { looksLikeGhToken, normalizeGhToken } from "lib/ghAuth";
+import { refreshGhProfile, signInGitHubFlow } from "lib/ghSignIn";
 import settings from "lib/settings";
 import "./gh-settings.scss";
 
@@ -198,13 +198,13 @@ export default function ghSettings() {
 				refresh();
 				break;
 
-			case "ghToken":
+			case "ghToken": {
 				// The settings kit does NOT persist prompt values — it only
 				// updates the row and calls this callback. Persist here
 				// (v1.6.1 and earlier silently dropped the pasted PAT, so
 				// repositories never listed and no account ever appeared).
 				if (typeof value === "string") {
-					const token = value.trim();
+					const token = normalizeGhToken(value);
 					if (token !== settings.value.ghToken) {
 						if (!token) {
 							// token cleared — drop the whole GitHub session
@@ -212,15 +212,25 @@ export default function ghSettings() {
 							refresh();
 							break;
 						}
+						if (!looksLikeGhToken(token)) {
+							toast(
+								strings["github pat shape"] ||
+									"O token não parece um PAT do GitHub (ghp_… / github_pat_…) — vamos tentar mesmo assim.",
+								4000,
+							);
+						}
 						settings.value.ghToken = token;
 						await settings.update();
 					}
 				}
 				if (settings.value.ghToken && !settings.value.ghUserLogin) {
-					await fetchProfile(settings.value.ghToken);
+					// shared flow: validates the token, saves the profile and
+					// reports a friendly 401 hint when the token is bad
+					await refreshGhProfile();
 				}
 				refresh();
 				break;
+			}
 
 			case "gitRemoteUrl":
 			case "ghBranch":
@@ -295,31 +305,9 @@ export default function ghSettings() {
 		]);
 		if (!choice) return;
 		if (choice === "refresh") {
-			await fetchProfile(values.ghToken);
+			await refreshGhProfile();
 		} else {
 			await signOut();
-		}
-	}
-
-	/**
-	 * Fetches and stores the profile for a manually set PAT.
-	 * @param {string} token
-	 */
-	async function fetchProfile(token) {
-		if (!token) return;
-		try {
-			const user = await fetchGhUser(token);
-			settings.value.ghUserLogin = user?.login || "";
-			settings.value.ghUserName = user?.name || "";
-			settings.value.ghUserAvatar = user?.avatarUrl || "";
-			await settings.update();
-			toast(
-				`${strings["signed in as"] || "Signed in as"} ${user?.login || "?"}`,
-			);
-		} catch (error) {
-			toast(
-				`${strings["github profile failed"] || "Could not load profile"}: ${error.message || error}`,
-			);
 		}
 	}
 

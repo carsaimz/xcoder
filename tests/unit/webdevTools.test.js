@@ -2,15 +2,22 @@ import { describe, expect, it } from "vitest";
 
 import {
         CARD_SHADOWS,
+        base64Convert,
         boilerplateSnippet,
         cardSnippet,
+        colorConvert,
         ctaSnippet,
+        formatJson,
         formSnippet,
         gradientCSS,
+        loremText,
         placeholderSnippet,
         sectionSnippet,
         shadowCSS,
+        slugText,
         tableSnippet,
+        timestampConvert,
+        uuidIds,
 } from "../../src/lib/webdevTools";
 
 describe("webdevTools generators", () => {
@@ -329,5 +336,130 @@ describe("boilerplateSnippet", () => {
 	it("can omit the reset style", () => {
 		const { html } = boilerplateSnippet({ reset: false });
 		expect(html).not.toContain("<style>");
+	});
+});
+
+describe("formatJson", () => {
+	it("formats and minifies valid json", () => {
+		const pretty = formatJson('{"a":1,"b":[2,3]}', "format", 2);
+		expect(pretty.ok).toBe(true);
+		expect(pretty.output).toBe('{\n  "a": 1,\n  "b": [\n    2,\n    3\n  ]\n}');
+		const mini = formatJson('{"a": 1}', "minify");
+		expect(mini.output).toBe('{"a":1}');
+	});
+
+	it("reports parse errors without throwing", () => {
+		const bad = formatJson("{a:1}", "format");
+		expect(bad.ok).toBe(false);
+		expect(bad.error).toContain("JSON");
+	});
+});
+
+describe("base64Convert", () => {
+	it("round-trips ascii and utf-8 text", () => {
+		const encoded = base64Convert("XCoder", "encode");
+		expect(encoded.ok).toBe(true);
+		expect(encoded.output).toBe("WENvZGVy");
+		const unicode = base64Convert("áéÍ çã", "encode");
+		const decoded = base64Convert(unicode.output, "decode");
+		expect(decoded.ok).toBe(true);
+		expect(decoded.output).toBe("áéÍ çã");
+	});
+
+	it("rejects invalid base64 on decode", () => {
+		const bad = base64Convert("!!!not-base64!!!", "decode");
+		expect(bad.ok).toBe(false);
+	});
+});
+
+describe("uuidIds", () => {
+	it("generates unique rfc4122 v4 uuids", () => {
+		const { uuids } = uuidIds(20);
+		expect(uuids).toHaveLength(20);
+		expect(new Set(uuids).size).toBe(20);
+		for (const uuid of uuids) {
+			expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+		}
+	});
+
+	it("clamps count and generates short ids in the alphabet", () => {
+		const { shortIds } = uuidIds(999, 12);
+		expect(shortIds).toHaveLength(50);
+		for (const id of shortIds) {
+			expect(id).toHaveLength(12);
+			expect(id).toMatch(/^[A-Za-z0-9_-]+$/);
+		}
+	});
+});
+
+describe("timestampConvert", () => {
+	it("auto-detects unix seconds and milliseconds", () => {
+		const seconds = timestampConvert("1700000000");
+		expect(seconds.ok).toBe(true);
+		expect(seconds.unixMs).toBe(1700000000000);
+		const millis = timestampConvert("1700000000000");
+		expect(millis.unixMs).toBe(1700000000000);
+	});
+
+	it("parses iso input and reports all notations", () => {
+		const result = timestampConvert("2024-01-15T12:30:00.000Z", "iso");
+		expect(result.ok).toBe(true);
+		expect(result.iso).toBe("2024-01-15T12:30:00.000Z");
+		expect(result.output).toContain("Unix (s):");
+		expect(result.output).toContain("Local:");
+	});
+
+	it("rejects garbage input", () => {
+		expect(timestampConvert("não é data").ok).toBe(false);
+		expect(timestampConvert("").ok).toBe(false);
+	});
+});
+
+describe("colorConvert", () => {
+	it("converts hex to rgb and hsl", () => {
+		const result = colorConvert("#7c3aed");
+		expect(result.ok).toBe(true);
+		expect(result.hex).toBe("#7c3aed");
+		expect(result.rgb).toBe("rgb(124, 58, 237)");
+		expect(result.output).toContain("HSL:");
+	});
+
+	it("accepts rgb() and hsl() inputs", () => {
+		expect(colorConvert("rgb(124, 58, 237)").hex).toBe("#7c3aed");
+		// integer-rounded hsl can drift by one step per channel on the
+		// round trip — assert closeness, not exact equality
+		const fromHsl = colorConvert("hsl(262, 83%, 58%)").hex;
+		expect(Math.abs(Number.parseInt(fromHsl.slice(1, 3), 16) - 124)).toBeLessThanOrEqual(2);
+		expect(Math.abs(Number.parseInt(fromHsl.slice(3, 5), 16) - 58)).toBeLessThanOrEqual(2);
+		expect(Math.abs(Number.parseInt(fromHsl.slice(5, 7), 16) - 237)).toBeLessThanOrEqual(2);
+	});
+
+	it("reports invalid colors", () => {
+		expect(colorConvert("não-é-cor").ok).toBe(false);
+	});
+});
+
+describe("loremText", () => {
+	it("is deterministic for a seed", () => {
+		const a = loremText(2, 3, 7);
+		const b = loremText(2, 3, 7);
+		expect(a).toBe(b);
+		expect(a.split("\n\n")).toHaveLength(2);
+	});
+
+	it("clamps paragraph and sentence counts", () => {
+		const text = loremText(50, 99);
+		expect(text.split("\n\n")).toHaveLength(10);
+	});
+});
+
+describe("slugText", () => {
+	it("strips accents and url-hostile characters", () => {
+		expect(slugText("XCoder — editor de código!")).toBe("xcoder-editor-de-codigo");
+		expect(slugText("  Olá, Mundo!  ")).toBe("ola-mundo");
+	});
+
+	it("returns an empty slug for empty input", () => {
+		expect(slugText("")).toBe("");
 	});
 });

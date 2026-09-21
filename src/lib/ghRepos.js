@@ -11,6 +11,7 @@
 import toast from "components/toast";
 import loader from "dialogs/loader";
 import select from "dialogs/select";
+import { describeGhError, normalizeGhToken } from "lib/ghAuth";
 import settings from "lib/settings";
 
 const REPOS_URL =
@@ -27,7 +28,7 @@ const REPOS_URL =
 export async function ghApiGet(url, token) {
 	const headers = {
 		Accept: "application/vnd.github+json",
-		Authorization: `Bearer ${token}`,
+		Authorization: `Bearer ${normalizeGhToken(token)}`,
 		"X-GitHub-Api-Version": "2022-11-28",
 	};
 
@@ -64,7 +65,10 @@ export async function ghApiGet(url, token) {
 					}
 					reject(
 						new Error(
-							`GitHub ${error?.status || ""}: ${detail || error?.statusText || "request failed"}`,
+							describeGhError(
+								error?.status,
+								detail || error?.statusText || "request failed",
+							),
 						),
 					);
 				},
@@ -82,7 +86,10 @@ export async function ghApiGet(url, token) {
 	}
 	if (!response.ok) {
 		throw new Error(
-			`GitHub ${response.status}: ${data?.message || text?.slice(0, 140) || "request failed"}`,
+			describeGhError(
+				response.status,
+				data?.message || text?.slice(0, 140) || "request failed",
+			),
 		);
 	}
 	return data;
@@ -93,7 +100,7 @@ export async function ghApiGet(url, token) {
  * @returns {string}
  */
 export function ghToken() {
-	return String(settings.value.ghToken || "").trim();
+	return normalizeGhToken(settings.value.ghToken);
 }
 
 /**

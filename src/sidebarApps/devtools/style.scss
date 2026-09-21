@@ -1,321 +1,420 @@
 .devtools-app {
-	.devtools-root {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		overflow: hidden;
-	}
+        .devtools-root {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                overflow: hidden;
+        }
 
-	.devtools-tabs {
-		display: flex;
-		gap: 4px;
-		padding: 8px 10px 0;
-		overflow-x: auto;
-		scrollbar-width: none;
+        .devtools-tabs {
+                display: none; /* replaced by the vertical tool picker */
+        }
 
-		&::-webkit-scrollbar {
-			display: none;
-		}
-	}
+        /* Collapsible vertical tool picker: a header with the active tool's
+           title + description, expanding into a scrollable list where every
+           tool shows its own title and short description. */
+        .devtools-picker {
+                display: flex;
+                flex-direction: column;
+                padding: 8px 10px 0;
+                min-height: 0;
+        }
 
-	.devtools-tab {
-		flex: 1 0 auto;
-		padding: 6px 10px;
-		font-size: 0.8em;
-		font-weight: 600;
-		border: none;
-		border-radius: 8px 8px 0 0;
-		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
-		color: var(--primary-text-color, inherit);
-		cursor: pointer;
-		white-space: nowrap;
+        .devtools-tool-header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+                border-radius: 10px;
+                background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+                color: inherit;
+                cursor: pointer;
+                text-align: left;
+        }
 
-		&.active {
-			background: color-mix(in srgb, var(--primary-color) 22%, transparent);
-		}
+        .devtools-tool-texts {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                flex: 1;
+                min-width: 0;
+        }
 
-		&:active {
-			opacity: 0.6;
-		}
-	}
+        .devtools-tool-title {
+                font-size: 0.9em;
+                font-weight: 700;
+        }
 
-	.devtools-panel {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		flex: 1;
-		min-height: 0;
-		padding: 10px;
-	}
+        .devtools-tool-desc {
+                font-size: 0.72em;
+                opacity: 0.75;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+        }
 
-	.devtools-controls {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		max-height: 42vh;
-		overflow-y: auto;
-		padding-right: 2px;
-	}
+        .devtools-tool-chevron {
+                font-size: 1.2em;
+                opacity: 0.7;
+                transition: transform 0.15s ease;
 
-	.devtools-row {
-		display: grid;
-		grid-template-columns: minmax(72px, 40%) 1fr 44px;
-		align-items: center;
-		gap: 8px;
+                &.open {
+                        transform: rotate(90deg);
+                }
+        }
 
-		input[type="text"],
-		select {
-			width: 100%;
-			padding: 5px 8px;
-			font-size: 0.85em;
-			border-radius: 8px;
-			border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
-			background: color-mix(in srgb, var(--primary-color) 6%, transparent);
-			color: inherit;
-		}
+        .devtools-tool-list {
+                display: none;
+                flex-direction: column;
+                gap: 2px;
+                max-height: 46vh;
+                overflow-y: auto;
+                margin-top: 6px;
+                padding: 4px;
+                border: 1px solid color-mix(in srgb, var(--primary-color) 18%, transparent);
+                border-radius: 10px;
+                background: color-mix(in srgb, var(--primary-color) 4%, transparent);
 
-		input[type="color"] {
-			width: 100%;
-			height: 30px;
-			padding: 2px;
-			border: none;
-			border-radius: 8px;
-			background: transparent;
-			justify-self: start;
-		}
+                &.open {
+                        display: flex;
+                }
+        }
 
-		input[type="checkbox"] {
-			justify-self: start;
-			width: 18px;
-			height: 18px;
-		}
+        .devtools-tool-item {
+                display: flex;
+                flex-direction: column;
+                gap: 1px;
+                padding: 7px 10px;
+                border-radius: 8px;
+                cursor: pointer;
 
-		input[type="range"] {
-			width: 100%;
-		}
+                &:hover {
+                        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+                }
 
-		&:has(select):not(:has(input[type="range"])) {
-			grid-template-columns: minmax(72px, 40%) 1fr;
-		}
+                &.active {
+                        background: color-mix(in srgb, var(--primary-color) 22%, transparent);
 
-		&:has(input[type="color"]),
-		&:has(input[type="checkbox"]) {
-			grid-template-columns: minmax(72px, 40%) 1fr;
-		}
-	}
+                        .devtools-tool-item-title {
+                                color: color-mix(in srgb, var(--primary-color) 80%, var(--primary-text-color, #fff));
+                        }
+                }
 
-	.devtools-label {
-		font-size: 0.8em;
-		opacity: 0.85;
-	}
+                .devtools-tool-item-title {
+                        font-size: 0.84em;
+                        font-weight: 700;
+                }
 
-	.devtools-range-value {
-		font-size: 0.75em;
-		font-family: var(--editor-font-family, monospace);
-		text-align: right;
-		opacity: 0.8;
-	}
+                .devtools-tool-item-desc {
+                        font-size: 0.72em;
+                        opacity: 0.7;
+                        line-height: 1.35;
+                }
+        }
 
-	.devtools-preview {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 110px;
-		padding: 12px;
-		border-radius: 10px;
-		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
-		overflow: auto;
-	}
+        .devtools-row-stack {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+        }
 
-	.devtools-shadow-box {
-		width: 96px;
-		height: 64px;
-		background: #ffffff;
-		border: 1px solid #e2e8f0;
-	}
+        .devtools-textarea {
+                width: 100%;
+                min-height: 90px;
+                resize: vertical;
+                padding: 7px 9px;
+                font-size: 0.8em;
+                font-family: monospace;
+                border-radius: 8px;
+                border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+                background: color-mix(in srgb, var(--primary-color) 6%, transparent);
+                color: inherit;
+                box-sizing: border-box;
+        }
 
-	.devtools-gradient-box {
-		width: 100%;
-		height: 80px;
-		border-radius: 10px;
-	}
+        .devtools-preview:empty {
+                display: none;
+        }
 
-	.devtools-card-preview {
-		width: 100%;
-		max-width: 240px;
+        .devtools-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                flex: 1;
+                min-height: 0;
+                padding: 10px;
+        }
 
-		h2 {
-			margin: 0 0 4px;
-			font-size: 1em;
-		}
+        .devtools-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                max-height: 42vh;
+                overflow-y: auto;
+                padding-right: 2px;
+        }
 
-		p {
-			margin: 0;
-			font-size: 0.82em;
-			opacity: 0.85;
-		}
-	}
+        .devtools-row {
+                display: grid;
+                grid-template-columns: minmax(72px, 40%) 1fr 44px;
+                align-items: center;
+                gap: 8px;
 
-	.devtools-output {
-		flex: 1;
-		min-height: 72px;
-		margin: 0;
-		padding: 8px;
-		font-size: 0.75em;
-		font-family: var(--editor-font-family, monospace);
-		line-height: 1.45;
-		white-space: pre-wrap;
-		word-break: break-word;
-		border-radius: 10px;
-		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
-	}
+                input[type="text"],
+                select {
+                        width: 100%;
+                        padding: 5px 8px;
+                        font-size: 0.85em;
+                        border-radius: 8px;
+                        border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+                        background: color-mix(in srgb, var(--primary-color) 6%, transparent);
+                        color: inherit;
+                }
 
-	.devtools-actions {
-		display: flex;
-		gap: 8px;
+                input[type="color"] {
+                        width: 100%;
+                        height: 30px;
+                        padding: 2px;
+                        border: none;
+                        border-radius: 8px;
+                        background: transparent;
+                        justify-self: start;
+                }
 
-		.devtools-btn {
-			flex: 1;
-			padding: 8px 10px;
-			font-size: 0.82em;
-			font-weight: 600;
-			border: none;
-			border-radius: 8px;
-			background: color-mix(in srgb, var(--primary-color) 14%, transparent);
-			color: inherit;
-			cursor: pointer;
+                input[type="checkbox"] {
+                        justify-self: start;
+                        width: 18px;
+                        height: 18px;
+                }
 
-			&.primary {
-				background: color-mix(in srgb, var(--primary-color) 40%, transparent);
-			}
+                input[type="range"] {
+                        width: 100%;
+                }
 
-			&:active {
-				opacity: 0.6;
-			}
-		}
-	}
+                &:has(select):not(:has(input[type="range"])) {
+                        grid-template-columns: minmax(72px, 40%) 1fr;
+                }
+
+                &:has(input[type="color"]),
+                &:has(input[type="checkbox"]) {
+                        grid-template-columns: minmax(72px, 40%) 1fr;
+                }
+        }
+
+        .devtools-label {
+                font-size: 0.8em;
+                opacity: 0.85;
+        }
+
+        .devtools-range-value {
+                font-size: 0.75em;
+                font-family: var(--editor-font-family, monospace);
+                text-align: right;
+                opacity: 0.8;
+        }
+
+        .devtools-preview {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 110px;
+                padding: 12px;
+                border-radius: 10px;
+                background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+                overflow: auto;
+        }
+
+        .devtools-shadow-box {
+                width: 96px;
+                height: 64px;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+        }
+
+        .devtools-gradient-box {
+                width: 100%;
+                height: 80px;
+                border-radius: 10px;
+        }
+
+        .devtools-card-preview {
+                width: 100%;
+                max-width: 240px;
+
+                h2 {
+                        margin: 0 0 4px;
+                        font-size: 1em;
+                }
+
+                p {
+                        margin: 0;
+                        font-size: 0.82em;
+                        opacity: 0.85;
+                }
+        }
+
+        .devtools-output {
+                flex: 1;
+                min-height: 72px;
+                margin: 0;
+                padding: 8px;
+                font-size: 0.75em;
+                font-family: var(--editor-font-family, monospace);
+                line-height: 1.45;
+                white-space: pre-wrap;
+                word-break: break-word;
+                border-radius: 10px;
+                background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+        }
+
+        .devtools-actions {
+                display: flex;
+                gap: 8px;
+
+                .devtools-btn {
+                        flex: 1;
+                        padding: 8px 10px;
+                        font-size: 0.82em;
+                        font-weight: 600;
+                        border: none;
+                        border-radius: 8px;
+                        background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+                        color: inherit;
+                        cursor: pointer;
+
+                        &.primary {
+                                background: color-mix(in srgb, var(--primary-color) 40%, transparent);
+                        }
+
+                        &:active {
+                                opacity: 0.6;
+                        }
+                }
+        }
 }
 
 /* CTA / section / form / table / boilerplate previews */
 .devtools-cta-preview {
-	display: inline-block;
-	text-decoration: none;
-	font-weight: 600;
-	cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
 }
 
 .devtools-section-preview {
-	width: 100%;
-	border-radius: 10px;
+        width: 100%;
+        border-radius: 10px;
 
-	.devtools-section-inner {
-		max-width: 480px;
-		margin: 0 auto;
+        .devtools-section-inner {
+                max-width: 480px;
+                margin: 0 auto;
 
-		h2 {
-			margin: 0 0 6px;
-		}
+                h2 {
+                        margin: 0 0 6px;
+                }
 
-		p {
-			margin: 0 0 10px;
-			opacity: 0.85;
-			font-size: 0.9em;
-		}
+                p {
+                        margin: 0 0 10px;
+                        opacity: 0.85;
+                        font-size: 0.9em;
+                }
 
-		a {
-			display: inline-block;
-			padding: 6px 14px;
-			border-radius: 8px;
-			background: rgb(255 255 255 / 0.9);
-			color: #1e293b;
-			text-decoration: none;
-			font-weight: 600;
-			font-size: 0.85em;
-		}
-	}
+                a {
+                        display: inline-block;
+                        padding: 6px 14px;
+                        border-radius: 8px;
+                        background: rgb(255 255 255 / 0.9);
+                        color: #1e293b;
+                        text-decoration: none;
+                        font-weight: 600;
+                        font-size: 0.85em;
+                }
+        }
 }
 
 .devtools-form-preview {
-	width: 100%;
+        width: 100%;
 
-	form {
-		display: grid;
-		gap: 6px;
-	}
+        form {
+                display: grid;
+                gap: 6px;
+        }
 
-	label {
-		font-size: 0.78em;
-		font-weight: 600;
-	}
+        label {
+                font-size: 0.78em;
+                font-weight: 600;
+        }
 
-	input,
-	textarea {
-		width: 100%;
-		box-sizing: border-box;
-		padding: 6px 8px;
-		border: 1px solid
-			color-mix(in srgb, var(--primary-color) 30%, transparent);
-		border-radius: 6px;
-		font: inherit;
-		background: transparent;
-		color: inherit;
-	}
+        input,
+        textarea {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 6px 8px;
+                border: 1px solid
+                        color-mix(in srgb, var(--primary-color) 30%, transparent);
+                border-radius: 6px;
+                font: inherit;
+                background: transparent;
+                color: inherit;
+        }
 
-	textarea {
-		resize: vertical;
-	}
+        textarea {
+                resize: vertical;
+        }
 
-	button {
-		margin-top: 4px;
-		padding: 8px 12px;
-		border: none;
-		border-radius: 8px;
-		font: inherit;
-		font-weight: 600;
-		background: color-mix(in srgb, var(--primary-color) 40%, transparent);
-		color: inherit;
-		cursor: pointer;
-	}
+        button {
+                margin-top: 4px;
+                padding: 8px 12px;
+                border: none;
+                border-radius: 8px;
+                font: inherit;
+                font-weight: 600;
+                background: color-mix(in srgb, var(--primary-color) 40%, transparent);
+                color: inherit;
+                cursor: pointer;
+        }
 }
 
 .devtools-table-preview {
-	width: 100%;
-	overflow-x: auto;
+        width: 100%;
+        overflow-x: auto;
 
-	table {
-		border-collapse: collapse;
-		width: 100%;
-		font-size: 0.8em;
-	}
+        table {
+                border-collapse: collapse;
+                width: 100%;
+                font-size: 0.8em;
+        }
 
-	th,
-	td {
-		padding: 6px 8px;
-		text-align: left;
-		border-bottom: 1px solid
-			color-mix(in srgb, var(--primary-color) 20%, transparent);
-	}
+        th,
+        td {
+                padding: 6px 8px;
+                text-align: left;
+                border-bottom: 1px solid
+                        color-mix(in srgb, var(--primary-color) 20%, transparent);
+        }
 
-	thead th {
-		font-weight: 600;
-		background: color-mix(in srgb, var(--primary-color) 10%, transparent);
-	}
+        thead th {
+                font-weight: 600;
+                background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+        }
 }
 
 .devtools-doc-hint {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 12px 14px;
-	border-radius: 10px;
-	font-size: 0.85em;
-	background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 0.85em;
+        background: color-mix(in srgb, var(--primary-color) 8%, transparent);
 
-	.devtools-doc-icon {
-		font-family: var(--editor-font-family, monospace);
-		font-weight: 700;
-		padding: 6px 8px;
-		border-radius: 6px;
-		background: color-mix(in srgb, var(--primary-color) 20%, transparent);
-	}
+        .devtools-doc-icon {
+                font-family: var(--editor-font-family, monospace);
+                font-weight: 700;
+                padding: 6px 8px;
+                border-radius: 6px;
+                background: color-mix(in srgb, var(--primary-color) 20%, transparent);
+        }
 }

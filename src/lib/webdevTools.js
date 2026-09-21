@@ -354,6 +354,407 @@ export function boilerplateSnippet(state) {
 	return { html };
 }
 
+// ---------------------------------------------------------------------------
+// Programmer utilities (v1.8.0): JSON, Base64, IDs, timestamps, colors,
+// lorem ipsum and slugs. Same contract as the generators above — pure,
+// no DOM, unit-testable.
+// ---------------------------------------------------------------------------
+
+/** @typedef {{ok: boolean, output: string, error: string}} ConvertResult */
+
+/** Wraps a fallible conversion into {ok, output, error}. */
+function convertResult(fn, input) {
+	try {
+		return { ok: true, output: fn(), error: "" };
+	} catch (error) {
+		return { ok: false, output: "", error: String(error?.message || error) };
+	}
+}
+
+/**
+ * Formats or minifies JSON. On parse failure the error message AND the
+ * offending position (when the engine reports one) are returned so the
+ * user can jump to the spot.
+ * @param {string} text raw JSON
+ * @param {"format"|"minify"} [mode]
+ * @param {2|4|"tab"} [indent]
+ * @returns {ConvertResult}
+ */
+export function formatJson(text, mode = "format", indent = 2) {
+	return convertResult(() => {
+		const parsed = JSON.parse(String(text || ""));
+		if (mode === "minify") return JSON.stringify(parsed);
+		const space = indent === "tab" ? "\t" : Number(indent) || 2;
+		return JSON.stringify(parsed, null, space);
+	}, text);
+}
+
+/**
+ * UTF-8-safe Base64 encode/decode.
+ * @param {string} text input text
+ * @param {"encode"|"decode"} [mode]
+ * @returns {ConvertResult}
+ */
+export function base64Convert(text, mode = "encode") {
+	const value = String(text ?? "");
+	if (mode === "decode") {
+		return convertResult(() => {
+			const clean = value.replace(/\s/g, "");
+			const binary = atob(clean);
+			const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+			return new TextDecoder().decode(bytes);
+		}, value);
+	}
+	return convertResult(() => {
+		const bytes = new TextEncoder().encode(value);
+		let binary = "";
+		for (const byte of bytes) binary += String.fromCharCode(byte);
+		return btoa(binary);
+	}, value);
+}
+
+/** URL-safe short-id alphabet (NanoID style, no lookalikes removed). */
+const SHORT_ID_ALPHABET =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+/**
+ * Generates RFC 4122 v4 UUIDs (crypto.randomUUID when available, hand
+ * rolled fallback otherwise) plus a NanoID-style short companion.
+ * @param {number} [count] how many ids (1-50)
+ * @param {number} [shortLength] short-id length (6-32)
+ * @returns {{uuids: string[], shortIds: string[]}}
+ */
+export function uuidIds(count = 5, shortLength = 10) {
+	const total = Math.round(clamp(count, 1, 50));
+	const length = Math.round(clamp(shortLength, 6, 32));
+	const uuids = [];
+	const shortIds = [];
+	for (let index = 0; index < total; index += 1) {
+		uuids.push(makeUuid());
+		let short = "";
+		const bytes = randomBytes(length);
+		for (const byte of bytes) {
+			short += SHORT_ID_ALPHABET[byte % SHORT_ID_ALPHABET.length];
+		}
+		shortIds.push(short);
+	}
+	return { uuids, shortIds };
+}
+
+/** RFC 4122 v4 UUID (crypto first, Math.random fallback). */
+function makeUuid() {
+	if (
+		typeof crypto !== "undefined" &&
+		typeof crypto.randomUUID === "function"
+	) {
+		return crypto.randomUUID();
+	}
+	const bytes = randomBytes(16);
+	bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+	bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 10
+	const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0"));
+	return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex
+		.slice(6, 8)
+		.join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
+}
+
+/** Cryptographic random bytes with a Math.random fallback. */
+function randomBytes(length) {
+	const bytes = new Uint8Array(length);
+	if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+		crypto.getRandomValues(bytes);
+	} else {
+		for (let index = 0; index < length; index += 1) {
+			bytes[index] = Math.floor(Math.random() * 256);
+		}
+	}
+	return bytes;
+}
+
+/**
+ * Converts between unix timestamps and ISO 8601. Accepts unix seconds,
+ * unix milliseconds or any parseable date string; "auto" picks the
+ * unit by magnitude (values below 1e11 are seconds).
+ * @param {string} input raw input
+ * @param {"auto"|"unix-s"|"unix-ms"|"iso"} [mode]
+ * @returns {ConvertResult & {unixSec: number, unixMs: number, iso: string, local: string}}
+ */
+export function timestampConvert(input, mode = "auto") {
+	const raw = String(input ?? "").trim();
+	const value = Number(raw);
+	let date = null;
+
+	if (mode === "iso" || (!/^-?\d+$/.test(raw) && mode === "auto")) {
+		date = new Date(raw);
+	} else if (mode === "unix-ms") {
+		date = new Date(value);
+	} else if (mode === "unix-s") {
+		date = new Date(value * 1000);
+	} else {
+		// auto with a pure integer: magnitude decides the unit
+		date = new Date(Math.abs(value) < 1e11 ? value * 1000 : value);
+	}
+
+	if (!raw) {
+		return {
+			ok: false,
+			output: "",
+			error: "Empty input",
+			unixSec: 0,
+			unixMs: 0,
+			iso: "",
+			local: "",
+		};
+	}
+	if (!date || Number.isNaN(date.getTime())) {
+		return {
+			ok: false,
+			output: "",
+			error: "Data inválida — use unix (s/ms) ou ISO 8601",
+			unixSec: 0,
+			unixMs: 0,
+			iso: "",
+			local: "",
+		};
+	}
+
+	const unixMs = date.getTime();
+	const iso = date.toISOString();
+	let local = "";
+	try {
+		local = new Intl.DateTimeFormat(undefined, {
+			dateStyle: "full",
+			timeStyle: "medium",
+		}).format(date);
+	} catch {
+		local = date.toString();
+	}
+	const output = [
+		`Unix (s):  ${Math.floor(unixMs / 1000)}`,
+		`Unix (ms): ${unixMs}`,
+		`ISO 8601:  ${iso}`,
+		`Local:     ${local}`,
+	].join("\n");
+	return {
+		ok: true,
+		output,
+		error: "",
+		unixSec: Math.floor(unixMs / 1000),
+		unixMs,
+		iso,
+		local,
+	};
+}
+
+/** Parses "#rgb", "#rrggbb", "rgb(r, g, b)" and "hsl(h, s%, l%)". */
+function parseColor(input) {
+	const value = String(input ?? "")
+		.trim()
+		.toLowerCase();
+	let match = value.match(/^#?([0-9a-f]{3})$/);
+	if (match) {
+		const [r, g, b] = match[1]
+			.split("")
+			.map((char) => Number.parseInt(char + char, 16));
+		return { r, g, b };
+	}
+	match = value.match(/^#?([0-9a-f]{6})$/);
+	if (match) {
+		const int = Number.parseInt(match[1], 16);
+		return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+	}
+	match = value.match(
+		/^rgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})/,
+	);
+	if (match) {
+		return {
+			r: clamp(Number(match[1]), 0, 255),
+			g: clamp(Number(match[2]), 0, 255),
+			b: clamp(Number(match[3]), 0, 255),
+		};
+	}
+	match = value.match(
+		/^hsla?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})%?\s*[, ]\s*(\d{1,3})%?/,
+	);
+	if (match) {
+		return hslToRgb(
+			Number(match[1]) / 360,
+			clamp(Number(match[2]), 0, 100) / 100,
+			clamp(Number(match[3]), 0, 100) / 100,
+		);
+	}
+	throw new Error("Cor inválida — use hex, rgb() ou hsl()");
+}
+
+/** Converts HSL (0-1 ranges) into RGB channels. */
+function hslToRgb(h, s, l) {
+	const hue = ((h % 1) + 1) % 1;
+	const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+	const p = 2 * l - q;
+	const channel = (t) => {
+		let x = t;
+		if (x < 0) x += 1;
+		if (x > 1) x -= 1;
+		if (x < 1 / 6) return p + (q - p) * 6 * x;
+		if (x < 1 / 2) return q;
+		if (x < 2 / 3) return p + (q - p) * (2 / 3 - x) * 6;
+		return p;
+	};
+	return {
+		r: Math.round(channel(hue + 1 / 3) * 255),
+		g: Math.round(channel(hue) * 255),
+		b: Math.round(channel(hue - 1 / 3) * 255),
+	};
+}
+
+/** Converts RGB channels into {h, s, l} (0-360 / 0-100 / 0-100). */
+function rgbToHsl(r, g, b) {
+	const rn = r / 255;
+	const gn = g / 255;
+	const bn = b / 255;
+	const max = Math.max(rn, gn, bn);
+	const min = Math.min(rn, gn, bn);
+	const l = (max + min) / 2;
+	if (max === min) return { h: 0, s: 0, l: Math.round(l * 100) };
+	const d = max - min;
+	const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+	let h = 0;
+	if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6;
+	else if (max === gn) h = ((bn - rn) / d + 2) / 6;
+	else h = ((rn - gn) / d + 4) / 6;
+	return {
+		h: Math.round(h * 360),
+		s: Math.round(s * 100),
+		l: Math.round(l * 100),
+	};
+}
+
+/**
+ * Converts a color between hex, rgb() and hsl() notations.
+ * @param {string} input hex / rgb() / hsl() input
+ * @returns {ConvertResult & {hex: string, rgb: string, hsl: string}}
+ */
+export function colorConvert(input) {
+	try {
+		const { r, g, b } = parseColor(input);
+		const hex = `#${[r, g, b]
+			.map((part) => part.toString(16).padStart(2, "0"))
+			.join("")}`;
+		const rgb = `rgb(${r}, ${g}, ${b})`;
+		const { h, s, l } = rgbToHsl(r, g, b);
+		const hsl = `hsl(${h}, ${s}%, ${l}%)`;
+		const output = `Hex: ${hex}\nRGB: ${rgb}\nHSL: ${hsl}`;
+		return { ok: true, output, error: "", hex, rgb, hsl };
+	} catch (error) {
+		return {
+			ok: false,
+			output: "",
+			error: String(error?.message || error),
+			hex: "",
+			rgb: "",
+			hsl: "",
+		};
+	}
+}
+
+/** Latin-ish word bank for the lorem generator. */
+const LOREM_WORDS = [
+	"lorem",
+	"ipsum",
+	"dolor",
+	"sit",
+	"amet",
+	"consectetur",
+	"adipiscing",
+	"elit",
+	"sed",
+	"do",
+	"eiusmod",
+	"tempor",
+	"incididunt",
+	"ut",
+	"labore",
+	"et",
+	"dolore",
+	"magna",
+	"aliqua",
+	"enim",
+	"ad",
+	"minim",
+	"veniam",
+	"quis",
+	"nostrud",
+	"exercitation",
+	"ullamco",
+	"laboris",
+	"nisi",
+	"aliquip",
+	"ex",
+	"ea",
+	"commodo",
+	"consequat",
+	"duis",
+	"aute",
+	"irure",
+];
+
+/** Deterministic mulberry32 PRNG (seeded — outputs are reproducible). */
+function seededRandom(seed) {
+	let state = seed >>> 0;
+	return () => {
+		state = (state + 0x6d2b79f5) >>> 0;
+		let t = state;
+		t = Math.imul(t ^ (t >>> 15), t | 1);
+		t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+}
+
+/**
+ * Generates lorem ipsum filler text.
+ * @param {number} [paragraphs] paragraph count (1-10)
+ * @param {number} [sentences] sentences per paragraph (2-10)
+ * @param {number} [seed] PRNG seed (deterministic output)
+ * @returns {string}
+ */
+export function loremText(paragraphs = 3, sentences = 5, seed = 42) {
+	const count = Math.round(clamp(paragraphs, 1, 10));
+	const perParagraph = Math.round(clamp(sentences, 2, 10));
+	const random = seededRandom(seed || 42);
+	const paragraphsOut = [];
+	for (let p = 0; p < count; p += 1) {
+		const sentenceParts = [];
+		for (let s = 0; s < perParagraph; s += 1) {
+			const length = 6 + Math.floor(random() * 8);
+			const words = [];
+			for (let w = 0; w < length; w += 1) {
+				words.push(LOREM_WORDS[Math.floor(random() * LOREM_WORDS.length)]);
+			}
+			const sentence = words.join(" ");
+			sentenceParts.push(
+				`${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`,
+			);
+		}
+		paragraphsOut.push(sentenceParts.join(" "));
+	}
+	return paragraphsOut.join("\n\n");
+}
+
+/**
+ * Slugifies arbitrary text for URLs: strips accents (NFD), lowercases
+ * and collapses non-alphanumeric runs into single dashes.
+ * @param {string} text
+ * @returns {string}
+ */
+export function slugText(text) {
+	return String(text ?? "")
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+}
+
 export default {
 	shadowCSS,
 	gradientCSS,
@@ -364,5 +765,12 @@ export default {
 	formSnippet,
 	tableSnippet,
 	boilerplateSnippet,
+	formatJson,
+	base64Convert,
+	uuidIds,
+	timestampConvert,
+	colorConvert,
+	loremText,
+	slugText,
 	CARD_SHADOWS,
 };
