@@ -579,6 +579,137 @@
 			"downloads": 170,
 			"supported_editor": "all",
 			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.css-units",
+			"name": "CSS Unit Converter",
+			"version": "1.0.0",
+			"description": "Convert px ↔ rem ↔ em across the selection or document (root 16px).\n\n**CSS Unit Converter** rewrites every length value in the selection — or the whole document — between `px`, `rem` and `em`. Decimal values are handled (`1.5rem`), results are rounded to three decimals and untouched units are left alone. Ideal when migrating a stylesheet to a root-relative scale.\n\n## Usage\nSelect the rules to convert (or nothing for the whole file), run **CSS unit converter** (`Ctrl-Alt-P`) and pick the direction — e.g. `px → rem (root 16px)`.\n\n## Português\n**Conversor de unidades CSS**: converte px ↔ rem ↔ em na seleção ou no documento inteiro (raiz 16px), decimais incluídos. Atalho `Ctrl-Alt-P`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/css-units/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-units/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-units/icon.png",
+			"keywords": [
+				"css",
+				"px",
+				"rem",
+				"em",
+				"units",
+				"converter",
+				"responsive"
+			],
+			"downloads": 140,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.html-entities",
+			"name": "HTML Entities",
+			"version": "1.0.0",
+			"description": "Encode/decode HTML entities (&, <, >, quotes) including numeric references.\n\n**HTML Entities** escapes the five markup-critical characters (`&`, `<`, `>`, `\"`, `'`) to their named entities and decodes them back — including numeric references (`&#39;`, `&#x27;`) and `&nbsp;`. Essential when embedding code samples in HTML or cleaning generated markup.\n\n## Usage\nSelect the text (or place the cursor on a word), run **HTML entities** (`Ctrl-Alt-M`) and choose encode or decode.\n\n## Português\n**Entidades HTML**: codifica/decodifica &, <, >, aspas e referências numéricas na seleção. Atalho `Ctrl-Alt-M`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-entities/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-entities/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-entities/icon.png",
+			"keywords": [
+				"html",
+				"entities",
+				"escape",
+				"unescape",
+				"encode",
+				"decode"
+			],
+			"downloads": 120,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.md-table",
+			"name": "Markdown Table Formatter",
+			"version": "1.0.0",
+			"description": "Format and align markdown tables with padded columns and preserved alignments.\n\n**Markdown Table Formatter** takes messy, hand-typed markdown tables and aligns every column to the widest cell. Alignment markers (`:---`, `:---:`, `---:`) are preserved, escaped pipes (`\\|`) survive, and multiple tables in one pass are all formatted at once. Great for READMEs and documentation.\n\n## Usage\nSelect the table (or nothing for the whole document) and run **Markdown table formatter** (`Ctrl-Alt-F`).\n\n## Português\n**Formatador de tabelas Markdown**: alinha colunas na célula mais larga, preservando alinhamentos e pipes escapados. Atalho `Ctrl-Alt-F`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/md-table/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/md-table/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/md-table/icon.png",
+			"keywords": [
+				"markdown",
+				"table",
+				"format",
+				"align",
+				"gfm",
+				"readme"
+			],
+			"downloads": 110,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.rgb-hex",
+			"name": "RGB ↔ Hex Converter",
+			"version": "1.0.0",
+			"description": "Convert every color in the selection between hex and rgb()/rgba(), alpha included.\n\n**RGB ↔ Hex Converter** finds every color token in the selection — short/long hex, with or without alpha, and `rgb()`/`rgba()` with comma or slash alpha — and converts all of them in one pass. Alpha values are kept as-is, so `#7c3aed80` becomes `rgba(124, 58, 237, 0.5)` and back.\n\n## Usage\nSelect the colors (or place the cursor on one), run **RGB ↔ Hex** (`Ctrl-Alt-Y`) and pick the direction.\n\n## Português\n**Conversor RGB ↔ Hex**: converte todas as cores da seleção entre hex e rgb()/rgba(), mantendo o canal alfa. Atalho `Ctrl-Alt-Y`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/rgb-hex/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/rgb-hex/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/rgb-hex/icon.png",
+			"keywords": [
+				"color",
+				"hex",
+				"rgb",
+				"rgba",
+				"converter",
+				"css"
+			],
+			"downloads": 95,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.trim-trailing",
+			"name": "Trim Trailing",
+			"version": "1.0.0",
+			"description": "Remove trailing whitespace from every line, optionally expanding tabs to spaces.\n\n**Trim Trailing** strips trailing spaces and tabs from every line of the selection or document in one command, reporting how many lines were cleaned. The second mode also expands tabs to four spaces first — handy before saving files that must pass a whitespace linter.\n\n## Usage\nRun **Trim trailing** (`Ctrl-Alt-Z`) with or without a selection and pick the mode.\n\n## Português\n**Cortar espaços finais**: remove espaços/tabs do fim de cada linha (seleção ou documento) e expande tabs para espaços. Atalho `Ctrl-Alt-Z`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/trim-trailing/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/trim-trailing/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/trim-trailing/icon.png",
+			"keywords": [
+				"whitespace",
+				"trim",
+				"clean",
+				"tabs",
+				"spaces",
+				"lint"
+			],
+			"downloads": 80,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
 		}
 	]
 }
