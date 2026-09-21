@@ -755,6 +755,56 @@ export function slugText(text) {
 		.replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Builds a CSS grid container declaration.
+ * @param {{columns: number, rows: number, columnGap: number, rowGap: number, minmax: boolean}} state
+ * @param {string} [selector] selector used in the rule (default ".grid")
+ * @returns {string}
+ */
+export function gridCSS(state, selector = ".grid") {
+	const columns = Math.round(clamp(state?.columns, 1, 12));
+	const rows = Math.round(clamp(state?.rows, 0, 12));
+	const columnGap = Math.round(clamp(state?.columnGap, 0, 96));
+	const rowGap = Math.round(clamp(state?.rowGap, 0, 96));
+	const name = String(selector).replace(/^\./, "");
+	const template = state?.minmax
+		? `repeat(auto-fill, minmax(140px, 1fr))`
+		: `repeat(${columns}, 1fr)`;
+	const lines = [`\tdisplay: grid;`, `\tgrid-template-columns: ${template};`];
+	if (rows > 0) {
+		lines.push(`\tgrid-template-rows: repeat(${rows}, auto);`);
+	}
+	if (columnGap === rowGap) {
+		lines.push(`\tgap: ${columnGap}px;`);
+	} else {
+		lines.push(`\tcolumn-gap: ${columnGap}px;`);
+		lines.push(`\trow-gap: ${rowGap}px;`);
+	}
+	return `.${name} {\n${lines.join("\n")}\n}`;
+}
+
+/** @typedef {{tl: number, tr: number, br: number, bl: number}} RadiusState */
+
+/**
+ * Builds a border-radius declaration from the four corners.
+ * Collapses to a single value when all corners match.
+ * @param {RadiusState} state
+ * @param {string} [selector] selector used in the rule (default ".rounded")
+ * @returns {string}
+ */
+export function radiusCSS(state, selector = ".rounded") {
+	const tl = Math.round(clamp(state?.tl, 0, 100));
+	const tr = Math.round(clamp(state?.tr, 0, 100));
+	const br = Math.round(clamp(state?.br, 0, 100));
+	const bl = Math.round(clamp(state?.bl, 0, 100));
+	const name = String(selector).replace(/^\./, "");
+	const value =
+		tl === tr && tr === br && br === bl
+			? `${tl}px`
+			: `${tl}px ${tr}px ${br}px ${bl}px`;
+	return `.${name} {\n\tborder-radius: ${value};\n}`;
+}
+
 export default {
 	shadowCSS,
 	gradientCSS,
@@ -772,5 +822,7 @@ export default {
 	colorConvert,
 	loremText,
 	slugText,
+	gridCSS,
+	radiusCSS,
 	CARD_SHADOWS,
 };

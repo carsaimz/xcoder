@@ -13,6 +13,44 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.2] - 2026-09-21
+
+### Added
+- **Dev Tools: +2 ferramentas (18 no total)** — *Grid CSS* (colunas, linhas,
+  gaps, modo auto-fill `minmax(140px, 1fr)`, com pré-visualização ao vivo da
+  malha) e *Border radius* (ajuste dos quatro cantos com colapso automático
+  para um valor quando iguais). Os mesmos geradores chegaram à página
+  /tools do site (18 ferramentas, EN+ES).
+- **Marketplace: +5 plugins (33 no total)** — *Regex Tester*
+  (`Ctrl-Alt-V`; testa padrões com grupos e substitui usando `$1`),
+  *HTML to JSX* (`Ctrl-Alt-X`; class→className, void tags, style como
+  objeto, comentários `{/* */}`), *CSS Beautify* (expandir/minificar),
+  *SQL Format* (palavras-chave em maiúsculas, cláusulas por linha,
+  literais preservados) e *Text Wrap* (refluí texto em N colunas,
+  padrão 80, preservando indentação).
+
+### Corrigido
+- Nada nesta versão — correções de regressão contínua nos testes
+  (936 testes, 104 ficheiros).
+
+## [1.8.2] - 2026-09-21
+
+### Added
+- **Dev Tools: +2 tools (18 total)** — *CSS Grid* (columns, rows, gaps,
+  auto-fill `minmax(140px, 1fr)` mode, live grid preview) and *Border
+  radius* (four-corner tuning, collapses to a single value when equal).
+  The same generators landed on the site's /tools page (18 tools, EN+ES).
+- **Marketplace: +5 plugins (33 total)** — *Regex Tester* (`Ctrl-Alt-V`;
+  pattern testing with groups and `$1` replace), *HTML to JSX*
+  (`Ctrl-Alt-X`; class→className, void tags, style objects, `{/* */}`
+  comments), *CSS Beautify* (expand/minify), *SQL Format* (uppercase
+  keywords, one clause per line, string literals preserved) and *Text
+  Wrap* (reflow at N columns, default 80, indentation preserved).
+
+### Fixed
+- Nothing in this release — ongoing regression coverage (936 tests,
+  104 files).
+
 ## [1.8.1] - 2026-09-21
 
 ### Added

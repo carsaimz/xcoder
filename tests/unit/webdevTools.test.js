@@ -10,8 +10,10 @@ import {
         formatJson,
         formSnippet,
         gradientCSS,
+        gridCSS,
         loremText,
         placeholderSnippet,
+        radiusCSS,
         sectionSnippet,
         shadowCSS,
         slugText,
@@ -462,4 +464,62 @@ describe("slugText", () => {
 	it("returns an empty slug for empty input", () => {
 		expect(slugText("")).toBe("");
 	});
+
+    describe("gridCSS", () => {
+        it("builds an explicit grid template", () => {
+            const css = gridCSS({
+                columns: 3,
+                rows: 2,
+                columnGap: 16,
+                rowGap: 16,
+                minmax: false,
+            });
+            expect(css).toContain("display: grid;");
+            expect(css).toContain("grid-template-columns: repeat(3, 1fr);");
+            expect(css).toContain("grid-template-rows: repeat(2, auto);");
+            expect(css).toContain("gap: 16px;");
+        });
+
+        it("omits rows when zero and splits unequal gaps", () => {
+            const css = gridCSS({
+                columns: 4,
+                rows: 0,
+                columnGap: 8,
+                rowGap: 20,
+                minmax: false,
+            });
+            expect(css).not.toContain("grid-template-rows");
+            expect(css).toContain("column-gap: 8px;");
+            expect(css).toContain("row-gap: 20px;");
+        });
+
+        it("uses auto-fill minmax when requested and clamps bounds", () => {
+            const css = gridCSS({
+                columns: 99,
+                rows: -5,
+                columnGap: 500,
+                rowGap: 20,
+                minmax: true,
+            });
+            expect(css).toContain("repeat(auto-fill, minmax(140px, 1fr))");
+            expect(css).toContain("gap: 96px;");
+        });
+    });
+
+    describe("radiusCSS", () => {
+        it("emits four corner values when they differ", () => {
+            const css = radiusCSS({ tl: 24, tr: 8, br: 24, bl: 8 });
+            expect(css).toContain("border-radius: 24px 8px 24px 8px;");
+        });
+
+        it("collapses to one value when all corners match", () => {
+            const css = radiusCSS({ tl: 16, tr: 16, br: 16, bl: 16 });
+            expect(css).toContain("border-radius: 16px;");
+        });
+
+        it("clamps out-of-range corners", () => {
+            const css = radiusCSS({ tl: -10, tr: 500, br: 0, bl: 0 });
+            expect(css).toContain("border-radius: 0px 100px 0px 0px;");
+        });
+    });
 });

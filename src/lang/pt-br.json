@@ -1675,5 +1675,17 @@
 	"github bad token": "Token inválido ou revogado — reconecte a conta ou cole um novo token.",
 	"github rate limit": "Limite de pedidos do GitHub atingido — tente de novo em alguns minutos.",
 	"github network error": "Sem resposta do GitHub — verifique a conexão.",
-	"github pat shape": "Isso não parece um PAT do GitHub (ghp_... / github_pat_...) — vamos tentar mesmo assim."
+	"github pat shape": "Isso não parece um PAT do GitHub (ghp_... / github_pat_...) — vamos tentar mesmo assim.",
+	"dev tools grid": "Grid",
+	"dev tools grid desc": "Gerador de layout CSS grid",
+	"dev tools radius desc": "Laboratório de border-radius (4 cantos)",
+	"dev tools column gap": "Espaço entre colunas",
+	"dev tools row gap": "Espaço entre linhas",
+	"dev tools minmax": "Auto-fill minmax(140px, 1fr)",
+	"dev tools top left": "Superior esquerda",
+	"dev tools top right": "Superior direita",
+	"dev tools bottom right": "Inferior direita",
+	"dev tools bottom left": "Inferior esquerda",
+	"dev tools border radius": "Raio da borda",
+	"dev tools border radius desc": "Laboratório de border-radius (4 cantos)"
 }

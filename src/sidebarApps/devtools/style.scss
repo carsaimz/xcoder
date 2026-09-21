@@ -239,6 +239,33 @@
                 border-radius: 10px;
         }
 
+        .devtools-grid-preview {
+                width: 100%;
+                max-width: 240px;
+
+                .devtools-grid-cell {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 32px;
+                        border-radius: 6px;
+                        background: color-mix(
+                                in srgb,
+                                var(--primary-color) 22%,
+                                transparent
+                        );
+                        font-size: 0.72em;
+                        opacity: 0.9;
+                }
+        }
+
+        .devtools-radius-box {
+                width: 96px;
+                height: 72px;
+                background: var(--primary-color);
+                opacity: 0.9;
+        }
+
         .devtools-card-preview {
                 width: 100%;
                 max-width: 240px;

@@ -10,8 +10,10 @@ import {
 	colorConvert,
 	ctaSnippet,
 	formatJson,
+	gridCSS,
 	loremText,
 	placeholderSnippet,
+	radiusCSS,
 	sectionSnippet,
 	shadowCSS,
 	slugText,
@@ -142,6 +144,20 @@ const TOOL_LIST = [
 		"dev tools slug desc",
 		"Slugify titles and links",
 	],
+	[
+		"grid",
+		"dev tools grid",
+		"Grid",
+		"dev tools grid desc",
+		"CSS grid layout generator",
+	],
+	[
+		"radius",
+		"dev tools border radius",
+		"Border radius",
+		"dev tools border radius desc",
+		"Border-radius playground (4 corners)",
+	],
 ];
 
 const state = {
@@ -248,6 +264,19 @@ const state = {
 	},
 	slug: {
 		text: "XCoder — editor de código!",
+	},
+	grid: {
+		columns: 3,
+		rows: 2,
+		columnGap: 16,
+		rowGap: 16,
+		minmax: false,
+	},
+	radius: {
+		tl: 24,
+		tr: 8,
+		br: 24,
+		bl: 8,
 	},
 };
 
@@ -486,6 +515,33 @@ function refresh() {
 		);
 	} else if (activeTool === "slug") {
 		$output.textContent = slugText(state.slug.text);
+	} else if (activeTool === "grid") {
+		const css = gridCSS(state.grid);
+		const columns = state.grid.minmax
+			? 4
+			: Math.min(12, Math.max(1, Math.round(state.grid.columns)));
+		const rows = state.grid.minmax
+			? 2
+			: Math.max(Math.round(state.grid.rows) || 2, 1);
+		const total = Math.min(columns * rows, 24);
+		const holder = <div className="devtools-grid-preview" />;
+		holder.style.display = "grid";
+		holder.style.gridTemplateColumns = state.grid.minmax
+			? "repeat(auto-fill, minmax(64px, 1fr))"
+			: `repeat(${columns}, 1fr)`;
+		holder.style.columnGap = `${state.grid.columnGap}px`;
+		holder.style.rowGap = `${state.grid.rowGap}px`;
+		for (let index = 0; index < total; index++) {
+			holder.append(<span className="devtools-grid-cell">{index + 1}</span>);
+		}
+		$preview.append(holder);
+		$output.textContent = css;
+	} else if (activeTool === "radius") {
+		const css = radiusCSS(state.radius);
+		const box = <div className="devtools-radius-box" />;
+		box.style.borderRadius = `${state.radius.tl}px ${state.radius.tr}px ${state.radius.br}px ${state.radius.bl}px`;
+		$preview.append(box);
+		$output.textContent = css;
 	}
 }
 
@@ -1075,6 +1131,71 @@ function buildControls() {
 	if (activeTool === "slug") {
 		const s = state.slug;
 		return [textRow(t("dev tools text", "Text"), s.text, (v) => (s.text = v))];
+	}
+	if (activeTool === "grid") {
+		const g = state.grid;
+		return [
+			rangeRow(
+				t("dev tools columns", "Columns"),
+				1,
+				12,
+				g.columns,
+				(v) => (g.columns = v),
+			),
+			rangeRow(t("dev tools rows", "Rows"), 0, 12, g.rows, (v) => (g.rows = v)),
+			rangeRow(
+				t("dev tools column gap", "Column gap"),
+				0,
+				96,
+				g.columnGap,
+				(v) => (g.columnGap = v),
+			),
+			rangeRow(
+				t("dev tools row gap", "Row gap"),
+				0,
+				96,
+				g.rowGap,
+				(v) => (g.rowGap = v),
+			),
+			checkRow(
+				t("dev tools minmax", "Auto-fill minmax(140px, 1fr)"),
+				g.minmax,
+				(v) => (g.minmax = v),
+			),
+		];
+	}
+	if (activeTool === "radius") {
+		const r = state.radius;
+		return [
+			rangeRow(
+				t("dev tools top left", "Top left"),
+				0,
+				100,
+				r.tl,
+				(v) => (r.tl = v),
+			),
+			rangeRow(
+				t("dev tools top right", "Top right"),
+				0,
+				100,
+				r.tr,
+				(v) => (r.tr = v),
+			),
+			rangeRow(
+				t("dev tools bottom right", "Bottom right"),
+				0,
+				100,
+				r.br,
+				(v) => (r.br = v),
+			),
+			rangeRow(
+				t("dev tools bottom left", "Bottom left"),
+				0,
+				100,
+				r.bl,
+				(v) => (r.bl = v),
+			),
+		];
 	}
 	const p = state.placeholder;
 	return [

@@ -710,6 +710,136 @@
 			"downloads": 80,
 			"supported_editor": "all",
 			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.regex-tester",
+			"name": "Regex Tester",
+			"version": "1.0.0",
+			"description": "Test regular expressions against text and optionally replace the matches.\n\n**Regex Tester** runs a regular expression against the current selection — or sample text you type — and shows every match with its capture groups. From the same dialog you can jump straight to a replace-all pass with `$1` group references.\n\n## Usage\nRun **Regex tester** (`Ctrl-Alt-V`), fill in the pattern and flags, then choose *Show matches* or *Replace matches*. Invalid patterns and catastrophic empty matches are handled safely.\n\n## Português\n**Testador de regex**: testa expressões regulares sobre a seleção (ou texto informado), mostra todos os matches com grupos e permite substituir usando `$1`. Atalho `Ctrl-Alt-V`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/regex-tester/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/regex-tester/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/regex-tester/icon.png",
+			"keywords": [
+				"regex",
+				"regular",
+				"expression",
+				"test",
+				"replace",
+				"pattern"
+			],
+			"downloads": 95,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.html-to-jsx",
+			"name": "HTML to JSX",
+			"version": "1.0.0",
+			"description": "Convert HTML to JSX: class→className, void tags self-close, comments become {/* */}.\n\n**HTML to JSX** rewrites HTML so it compiles inside JSX/React: `class` becomes `className`, `for` becomes `htmlFor`, dozens of HTML attributes get their React names (`tabindex`→`tabIndex`, `maxlength`→`maxLength`…), `onclick` and friends become `onClick`, void tags turn into `<br />`, inline `style` attributes become object literals and comments become `{/* */}`.\n\n## Usage\nSelect the HTML you want (or run on the whole document) and execute **HTML to JSX: convert** (`Ctrl-Alt-X`). The toast reports how many attributes were rewritten.\n\n## Português\n**HTML para JSX**: converte atributos HTML para os nomes do React (class→className, for→htmlFor…), fecha tags void, transforma style em objeto e comentários em `{/* */}`. Atalho `Ctrl-Alt-X`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-to-jsx/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-to-jsx/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-to-jsx/icon.png",
+			"keywords": [
+				"html",
+				"jsx",
+				"react",
+				"convert",
+				"attributes",
+				"tags"
+			],
+			"downloads": 88,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.css-beautify",
+			"name": "CSS Beautify",
+			"version": "1.0.0",
+			"description": "Expand CSS to one declaration per line, or minify it back to a single line.\n\n**CSS Beautify** formats stylesheets in both directions. *Beautify* expands every rule to one declaration per line with tab indentation and blank lines between rules; *Minify* strips comments and collapses all whitespace into a compact single line ready for production.\n\n## Usage\nSelect some CSS (or run on the whole document) and execute **CSS beautify: run**, then pick the mode. Works on plain CSS as well as rules embedded in HTML.\n\n## Português\n**CSS Beautify**: formata CSS nos dois sentidos — *Beautify* expande uma declaração por linha com indentação, *Minify* remove comentários e espaços para produção.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/css-beautify/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-beautify/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-beautify/icon.png",
+			"keywords": [
+				"css",
+				"beautify",
+				"minify",
+				"format",
+				"pretty",
+				"style"
+			],
+			"downloads": 76,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.sql-format",
+			"name": "SQL Format",
+			"version": "1.0.0",
+			"description": "Format SQL queries: uppercase keywords, one major clause per line.\n\n**SQL Format** normalizes SQL queries: keywords are uppercased (`SELECT`, `FROM`, `LEFT JOIN`…), major clauses start on their own line and trailing whitespace is cleaned. String literals are preserved untouched — keywords inside quotes are never modified.\n\n## Usage\nSelect a query (or run on the whole document) and execute **SQL format: format**. Handy before committing queries or sharing them in documentation.\n\n## Português\n**SQL Format**: formata consultas SQL — palavras-chave em maiúsculas, cláusulas principais em linhas próprias, literais de string preservados.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sql-format/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sql-format/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sql-format/icon.png",
+			"keywords": [
+				"sql",
+				"format",
+				"query",
+				"uppercase",
+				"keywords",
+				"database"
+			],
+			"downloads": 64,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.text-wrap",
+			"name": "Text Wrap",
+			"version": "1.0.0",
+			"description": "Reflow the selection or document at a column width (default 80).\n\n**Text Wrap** reflows paragraphs to a maximum column width using a greedy word-wrap algorithm. Leading indentation is preserved for every produced line, so wrapped Markdown lists and indented prose keep their structure.\n\n## Usage\nSelect the text (or run on the whole document) and execute **Text wrap: wrap**, then type the width (10–500, default 80). Great for README files, commit messages and plain-text email.\n\n## Português\n**Text Wrap**: refluí o texto numa largura máxima de coluna (padrão 80), preservando a indentação. Ideal para README, mensagens de commit e prosa em texto puro.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/text-wrap/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/text-wrap/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/text-wrap/icon.png",
+			"keywords": [
+				"wrap",
+				"text",
+				"column",
+				"width",
+				"reflow",
+				"markdown"
+			],
+			"downloads": 52,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
 		}
 	]
 }

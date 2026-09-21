@@ -1558,5 +1558,17 @@
 	"github bad token": "Invalid or revoked token — reconnect your account or paste a new token.",
 	"github rate limit": "GitHub rate limit reached — try again in a few minutes.",
 	"github network error": "No response from GitHub — check your connection.",
-	"github pat shape": "This does not look like a GitHub PAT (ghp_... / github_pat_...) — trying anyway."
+	"github pat shape": "This does not look like a GitHub PAT (ghp_... / github_pat_...) — trying anyway.",
+	"dev tools grid": "Grid",
+	"dev tools grid desc": "CSS grid layout generator",
+	"dev tools radius desc": "Border-radius playground (4 corners)",
+	"dev tools column gap": "Column gap",
+	"dev tools row gap": "Row gap",
+	"dev tools minmax": "Auto-fill minmax(140px, 1fr)",
+	"dev tools top left": "Top left",
+	"dev tools top right": "Top right",
+	"dev tools bottom right": "Bottom right",
+	"dev tools bottom left": "Bottom left",
+	"dev tools border radius": "Border radius",
+	"dev tools border radius desc": "Border-radius playground (4 corners)"
 }
