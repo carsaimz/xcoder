@@ -10,6 +10,8 @@ import {
 	colorConvert,
 	ctaSnippet,
 	formatJson,
+	formSnippet,
+	gradientCSS,
 	gridCSS,
 	loremText,
 	placeholderSnippet,
@@ -281,6 +283,8 @@ const state = {
 };
 
 let activeTool = "shadow";
+/** @type {HTMLElement} */
+let $root = null;
 /** @type {HTMLElement} */
 let $panel = null;
 /** @type {HTMLElement} */
@@ -1259,8 +1263,10 @@ function buildActions() {
 /** Switches tool and re-renders the panel. */
 function setTool(id) {
 	activeTool = id;
-	const $list = document.querySelector(".devtools-tool-list");
-	const $header = document.querySelector(".devtools-tool-header");
+	// scope to the app root: the picker exists on the DETACHED tree
+	// at init time, where document.querySelector finds nothing
+	const $list = $root?.get(".devtools-tool-list");
+	const $header = $root?.get(".devtools-tool-header");
 	if ($list) {
 		$list.classList.remove("open");
 		$list.get?.(".active")?.classList.remove("active");
@@ -1354,12 +1360,10 @@ function buildToolPicker() {
 
 /** Retranslates picker + panel labels when the language changes. */
 function onLangChange() {
-	const $header = document.querySelector(".devtools-tool-header");
+	const $header = $root?.get(".devtools-tool-header");
 	if ($header) fillToolHeader($header);
 	for (const [id, key, fallback, descKey, descFallback] of TOOL_LIST) {
-		const $row = document.querySelector(
-			`.devtools-tool-item[data-tool="${id}"]`,
-		);
+		const $row = $root?.get(`.devtools-tool-item[data-tool="${id}"]`);
 		if (!$row) continue;
 		$row.get(".devtools-tool-item-title").textContent = t(key, fallback);
 		$row.get(".devtools-tool-item-desc").textContent = t(descKey, descFallback);
@@ -1370,6 +1374,7 @@ function onLangChange() {
 /** Sidebar app init — runs once at install. */
 function initApp(el) {
 	el.classList.add("devtools-app");
+	$root = el;
 	el.append(
 		<div className="devtools-root">
 			{buildToolPicker()}
@@ -1386,6 +1391,10 @@ function initApp(el) {
 }
 
 function onSelected(el) {
+	// renderPanel() early-returns while the container is detached
+	// (init time), so the FIRST activation must (re)render the panel
+	// here - otherwise tapping the palette icon shows an empty panel.
+	setTool(activeTool);
 	el?.querySelector(".devtools-output")?.scrollTo?.(0, 0);
 }
 

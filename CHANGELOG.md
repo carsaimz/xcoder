@@ -33,6 +33,24 @@ resumo em inglês.
 - Nada nesta versão — correções de regressão contínua nos testes
   (936 testes, 104 ficheiros).
 
+## [1.8.3] - 2026-09-22
+
+### Corrigido
+- **"Ícone de tools não faz nada"** — o painel das Dev Tools nunca
+  renderizava ao abrir: `renderPanel()` saía cedo enquanto o container
+  estava fora da árvore de documento (no arranque) e o `onSelected()`
+  só fazia scroll. Agora o painel renderiza em TODA ativação (padrão
+  refresh-on-open do app Git) e as consultas do `setTool()`/
+  `onLangChange()` usam a raiz do app (funcionam também na árvore
+  destacada). Cobertura nova: teste comportamental que passa pelo
+  módulo REAL de sidebarApps (add + clique delegado) e clica nas 18
+  ferramentas.
+- **Ferramentas Gradiente e Formulário quebravam** — `gradientCSS` e
+  `formSnippet` eram usados em `refresh()` mas NÃO estavam na lista de
+  imports de `lib/webdevTools`: ReferenceError logo que a ferramenta
+  renderizava. Apanhados pelo teste novo que percorre as 18
+  ferramentas e exige saída não vazia de cada uma.
+
 ## [1.8.2] - 2026-09-21
 
 ### Added
@@ -948,6 +966,23 @@ Every notable change to **XCoder** is documented here. Historical entries
 are written in Brazilian Portuguese; from v1.6.2 onward each release also
 carries a short English summary right below the Portuguese one.
 
+## [1.8.3] - 2026-09-22
+
+### Fixed — Dev Tools sidebar app dead on tap
+
+- **"The tools icon does nothing"**: the Dev Tools panel never rendered
+  on activation. `renderPanel()` early-returned while the container was
+  detached from the document (init time) and `onSelected()` only
+  scrolled — the first tap on the palette icon showed an empty panel.
+  The panel now renders on EVERY activation (the Git app's
+  refresh-on-open pattern) and `setTool()`/`onLangChange()` query the
+  app root, which also works on the detached tree. New behavioral test
+  drives the REAL sidebarApps module (add + delegated click) and taps
+  all 18 tools.
+- **Gradient and Form tools crashed** — `gradientCSS` and `formSnippet`
+  were used in `refresh()` but missing from the `lib/webdevTools`
+  import list: ReferenceError as soon as the tool rendered. Caught by
+  the new test, which requires non-empty output from every tool.
 
 ## [1.6.1] - 2026-09-10
 
