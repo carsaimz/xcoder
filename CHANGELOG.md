@@ -33,6 +33,26 @@ resumo em inglês.
 - Nada nesta versão — correções de regressão contínua nos testes
   (936 testes, 104 ficheiros).
 
+## [1.8.4] - 2026-10-10
+
+### Corrigido
+- **Códigos QR das formas de apoio agora aparecem no app** — os QR
+  (Ko-fi, Patreon, M-Pesa, e-Mola…) vivem na base de dados do site
+  (`qr_image_url`) e já eram servidos pelo `/api/config`, mas o
+  `normalizeMethod()` (lib/premium) reconstruía cada linha SEM o
+  campo: a página Apoie nunca os recebia. O campo agora passa direto
+  (mesmo nome da BD) e métodos só com QR (sem url nem conta) deixam
+  de ser descartados. Testes: passthrough no `supportInfo` (Ko-fi +
+  M-Pesa + e-Mola só-QR) e renderização do `img.support-method-qr`
+  na página de apoio.
+- **/admin do site agora explica a rejeição da BD antiga** — bases
+  criadas antes dos canais novos ainda têm o CHECK constraint com 8
+  métodos, e a mensagem crua do Postgres (check_violation) não
+  ajudava. O endpoint de pagamentos traduz agora esse caso numa
+  orientação clara: abrir /setup e clicar «Aplicar schema», que
+  reaplica a lista completa (pix, kofi, patreon, liberapay,
+  opencollective, crypto) sem perder dados.
+
 ## [1.8.3] - 2026-09-22
 
 ### Corrigido
@@ -965,6 +985,22 @@ total).
 Every notable change to **XCoder** is documented here. Historical entries
 are written in Brazilian Portuguese; from v1.6.2 onward each release also
 carries a short English summary right below the Portuguese one.
+
+## [1.8.4] - 2026-10-10
+
+### Fixed — support QR codes + clearer admin errors
+
+- **Payment-method QR codes now show in the app**: Ko-fi/Patreon/
+  M-Pesa/e-Mola QR images live in the site database (`qr_image_url`)
+  and were already served by `/api/config`, but `normalizeMethod()`
+  (lib/premium) rebuilt every row WITHOUT the field, so the support
+  page never received them. The field now passes through (same DB
+  name) and QR-only methods (no url, no account) are no longer
+  dropped. Tests: supportInfo passthrough + support-page rendering.
+- **Site /admin translates the old-database rejection** into a clear
+  hint: open /setup › «Aplicar schema» to re-apply the full
+  channel list (pix, kofi, patreon, liberapay, opencollective,
+  crypto) — no data is lost.
 
 ## [1.8.3] - 2026-09-22
 

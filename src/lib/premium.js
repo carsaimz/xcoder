@@ -331,7 +331,12 @@ function normalizeMethod(raw) {
 	const label = String(raw.label || "").slice(0, 60);
 	const url = String(raw.url || "").trim();
 	const account = String(raw.account || "").trim();
-	if (!label || (!url && !account)) return null;
+	// QR code image URL (site DB column `qr_image_url`; some payloads
+	// may use `qr`) — a QR-only method (no url/account) is still valid
+	const qr = String(raw.qr_image_url ?? raw.qr ?? "")
+		.trim()
+		.slice(0, 500);
+	if (!label || (!url && !account && !qr)) return null;
 	return {
 		method,
 		label,
@@ -343,13 +348,16 @@ function normalizeMethod(raw) {
 			60,
 		),
 		instructions: String(raw.instructions || "").slice(0, 300),
+		// same name as the site DB row so the support page renders it
+		// without any mapping (pages/support reads method.qr_image_url)
+		qr_image_url: qr || null,
 	};
 }
 
 /**
  * Payment methods from the project database (served by the site remote
  * config), falling back to the built-in donation links.
- * @returns {{methods: {method: string, label: string, url: string, account: string, accountLabel: string, instructions: string}[], links: {id: string, label: string, url: string}[]}}
+ * @returns {{methods: {method: string, label: string, url: string, account: string, accountLabel: string, instructions: string, qr_image_url: string | null}[], links: {id: string, label: string, url: string}[]}}
  */
 export function supportInfo() {
 	const support = backendConfig()?.support || {};

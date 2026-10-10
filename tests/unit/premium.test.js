@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { backendConfig } from "lib/backend";
+
 vi.mock("lib/backend", () => ({
 	backendConfig: vi.fn(() => null),
 }));
@@ -14,6 +16,7 @@ import {
 	PREMIUM_MAX_TOKENS,
 	PREMIUM_THEMES,
 	requirePremium,
+	supportInfo,
 } from "lib/premium";
 
 /** localStorage is not available in the node test environment. */
@@ -102,5 +105,52 @@ describe("themes are free (v1.4.18)", () => {
 		}
 		setState({ active: true, kind: "lifetime", expiresAt: 0 });
 		expect(canUseTheme("neon")).toBe(true);
+	});
+});
+
+describe("supportInfo (payment methods from the site remote config)", () => {
+	it("keeps qr_image_url and normalizes snake_case fields", () => {
+		backendConfig.mockReturnValueOnce({
+			support: {
+				methods: [
+					{
+						method: "kofi",
+						label: "Ko-fi",
+						url: "https://ko-fi.com/carsaimz",
+						account: null,
+						account_label: "Ko-fi page",
+						instructions: "Apoie no Ko-fi",
+						qr_image_url: "https://cdn.example.com/kofi-qr.png",
+					},
+					{
+						method: "mpesa",
+						label: "M-Pesa",
+						url: null,
+						account: "258841234567",
+						qr_image_url: "https://cdn.example.com/mpesa-qr.png",
+					},
+					// QR-only row (no url, no account) must NOT be dropped
+					{
+						method: "emola",
+						label: "e-Mola",
+						url: null,
+						account: null,
+						qr_image_url: "https://cdn.example.com/emola-qr.png",
+					},
+				],
+			},
+		});
+		const { methods } = supportInfo();
+		expect(methods.length).toBe(3);
+		expect(methods[0].qr_image_url).toBe("https://cdn.example.com/kofi-qr.png");
+		expect(methods[0].accountLabel).toBe("Ko-fi page");
+		expect(methods[1].account).toBe("258841234567");
+		expect(methods[2].qr_image_url).toBe("https://cdn.example.com/emola-qr.png");
+	});
+
+	it("falls back to built-in methods without remote config", () => {
+		backendConfig.mockReturnValueOnce(null);
+		const { methods } = supportInfo();
+		expect(methods.length).toBeGreaterThan(0);
 	});
 });

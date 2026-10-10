@@ -230,4 +230,27 @@ describe("support page (Apoie o projeto — página própria, não modal)", () =
                 );
                 document.querySelector("wc-page .support-page")?.remove();
         });
+
+        test("renders QR codes carried by remote methods (qr_image_url)", async () => {
+                state.methods = [
+                        {
+                                method: "kofi",
+                                label: "Ko-fi",
+                                url: "https://ko-fi.com/carsaimz",
+                                account: "",
+                                accountLabel: "",
+                                instructions: "",
+                                qr_image_url: "https://cdn.example.com/kofi-qr.png",
+                        },
+                ];
+                const { showSupportDialog } = await import("lib/premiumUI");
+                await showSupportDialog();
+                const $qr = document.querySelector(
+                        ".support-page img.support-method-qr",
+                );
+                assert.ok($qr, "QR img rendered for the remote method");
+                assert.equal($qr.getAttribute("src"), "https://cdn.example.com/kofi-qr.png");
+                document.querySelector("wc-page .support-page")?.remove();
+                state.methods = [];
+        });
 });
