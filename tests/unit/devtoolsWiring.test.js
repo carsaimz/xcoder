@@ -20,7 +20,9 @@ describe("devtools sidebar app wiring", () => {
                 );
                 expect(source).toContain('"svg:palette"');
                 expect(source).toContain('"devtools"');
-                expect(source).toContain("{ titleKey: \"dev tools\" }");
+                expect(source).toContain(
+					'{ titleKey: "dev tools", group: "tools" }',
+				);
         });
 
         it("generators live in lib/webdevTools.js (not the Eruda devTools)", () => {

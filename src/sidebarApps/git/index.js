@@ -1,4 +1,5 @@
 import "./style.scss";
+import sidebarApps from "sidebarApps";
 import toast from "components/toast";
 import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
@@ -48,7 +49,7 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "git panel" },
+	{ titleKey: "git panel", group: "primary" },
 ];
 
 /**
@@ -436,6 +437,7 @@ async function signOutGitHub() {
  * @param {Error} error
  */
 function renderError(el, error) {
+	sidebarApps.setBadge?.("git", null);
 	el.content = (
 		<div className="git-empty">{`git: ${error.message || error}`}</div>
 	);
@@ -443,6 +445,9 @@ function renderError(el, error) {
 
 function renderStatus(status) {
 	const { changes } = status;
+
+	// VS Code-style badge: number of pending changes on the rail icon
+	sidebarApps.setBadge?.("git", countChanges(changes) || null);
 
 	if (!status.hasRepo && !countChanges(status.changes)) {
 		$statusBody.content = (

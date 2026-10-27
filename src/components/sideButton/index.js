@@ -17,7 +17,7 @@ export default function SideButtons({
 			onclick={onclick}
 			style={{ backgroundColor, color: textColor }}
 		>
-			<spam className={`icon ${icon}`}></spam>
+			<span className={`icon ${icon}`}></span>
 			<span>{text}</span>
 		</button>
 	);

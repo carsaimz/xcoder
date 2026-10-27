@@ -33,5 +33,5 @@ export default [
 				);
 			});
 	}, // onSelected function
-	{ launcher: true, titleKey: "profile" }, // opts
+	{ launcher: true, titleKey: "profile", group: "bottom" }, // opts
 ];

@@ -69,7 +69,6 @@ body.no-animation {
       padding: 8px 0;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 4px;
 
       @supports not (gap: 1px) {
@@ -81,6 +80,60 @@ body.no-animation {
 
       &::-webkit-scrollbar {
         display: none;
+      }
+
+      // VS Code activity-bar groups: primary views on top, tools behind a
+      // separator, account/settings/about pinned to the bottom.
+      .apps-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        width: 100%;
+        flex: 0 0 auto;
+
+        @supports not (gap: 1px) {
+          > * + * { margin-top: 4px; }
+        }
+
+        &.tools:not(:empty) {
+          padding-top: 8px;
+
+          &::before {
+            content: "";
+            display: block;
+            width: 28px;
+            height: 1px;
+            flex-shrink: 0;
+            background-color: rgba(255, 255, 255, 0.22);
+            background-color: color-mix(
+              in srgb,
+              currentColor 22%,
+              transparent
+            );
+            margin-bottom: 2px;
+          }
+        }
+
+        &.bottom {
+          margin-top: auto;
+          padding-top: 8px;
+
+          &::before {
+            content: "";
+            display: block;
+            width: 28px;
+            height: 1px;
+            flex-shrink: 0;
+            background-color: rgba(255, 255, 255, 0.22);
+            background-color: color-mix(
+              in srgb,
+              currentColor 22%,
+              transparent
+            );
+            margin-bottom: 2px;
+          }
+        }
       }
     }
 
@@ -206,6 +259,37 @@ body.no-animation {
           color: #ff6b8a;
           opacity: 1;
           background-color: rgba(255, 107, 138, 0.12);
+        }
+      }
+
+      // VS Code activityBarBadge: count pill / notification dot
+      .app-badge {
+        position: absolute;
+        right: 2px;
+        bottom: 4px;
+        min-width: 16px;
+        height: 15px;
+        padding: 0 4px;
+        border-radius: 9px;
+        box-sizing: border-box;
+        background-color: #0078d4;
+        color: #ffffff;
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 15px;
+        text-align: center;
+        letter-spacing: 0;
+        pointer-events: none;
+        z-index: 1;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.18);
+
+        &.dot {
+          min-width: 8px;
+          width: 8px;
+          height: 8px;
+          padding: 0;
+          right: 6px;
+          bottom: 7px;
         }
       }
     }
@@ -393,14 +477,24 @@ body.no-animation {
     justify-content: center;
     flex-direction: column;
 
+    // VS Code view header: small uppercase label, left-aligned,
+    // separated from the content by a hairline
     .title {
       display: flex;
       width: 100%;
       height: 36px;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      padding: 0 16px;
+      box-sizing: border-box;
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      opacity: 0.75;
+      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid
+        color-mix(in srgb, var(--border-color) 55%, transparent);
     }
   }
 }
@@ -504,5 +598,31 @@ body.no-animation {
     display: block;
     width: 26px;
     height: 26px;
+  }
+}
+
+// Long-press tooltip for activity bar icons (VS Code hover-label
+// equivalent for touch devices) — appended to document.body
+.apps-tooltip {
+  position: fixed;
+  z-index: 2000;
+  max-width: 240px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--popup-background-color, #252526);
+  border: 1px solid var(--border-color);
+  color: var(--popup-text-color, #cccccc);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+
+  &.show {
+    opacity: 1;
   }
 }

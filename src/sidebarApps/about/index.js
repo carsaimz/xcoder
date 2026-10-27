@@ -19,5 +19,5 @@ export default [
 			about();
 		});
 	}, // onSelected function
-	{ launcher: true, titleKey: "about" }, // opts
+	{ launcher: true, titleKey: "about", group: "bottom" }, // opts
 ];

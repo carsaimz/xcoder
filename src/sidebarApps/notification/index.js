@@ -14,7 +14,7 @@ export default [
 	initApp, // init function
 	false, // prepend
 	onSelected, // onSelected function
-	{ titleKey: "notifications" },
+	{ titleKey: "notifications", group: "tools" },
 ];
 
 const $header = (

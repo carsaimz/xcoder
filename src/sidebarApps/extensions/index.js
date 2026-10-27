@@ -97,7 +97,7 @@ export default [
 	initApp, // init function
 	false, // prepend
 	onSelected, // onSelected function
-	{ titleKey: "plugins" },
+	{ titleKey: "plugins", group: "primary" },
 ];
 
 /**

@@ -265,5 +265,5 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "local libs" },
+	{ titleKey: "local libs", group: "tools" },
 ];

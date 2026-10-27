@@ -62,7 +62,7 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "js console" },
+	{ titleKey: "js console", group: "tools" },
 ];
 
 function onSelected(el) {

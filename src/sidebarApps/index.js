@@ -1,4 +1,5 @@
 import toast from "components/toast";
+import tag from "html-tag-js";
 import logger from "lib/logger";
 import appSettings from "lib/settings";
 import SidebarApp from "./sidebarApp";
@@ -78,6 +79,7 @@ function init($el) {
 	$apps = $sidebar.get(".app-icons-container");
 	$apps.addEventListener("click", onclick);
 	SidebarApp.init($el, $apps);
+	attachLongPressTooltips($apps);
 }
 
 /**
@@ -168,6 +170,19 @@ function get(id) {
 }
 
 /**
+ * VS Code-style badge on an activity bar icon.
+ * @param {string} id app id
+ * @param {number|boolean|null} value number -> count pill, true -> dot, falsy -> clear
+ * @returns {boolean} false when no app with that id exists
+ */
+function setBadge(id, value) {
+	const app = apps.find((candidate) => candidate.id === id);
+	if (!app) return false;
+	app.setBadge(value);
+	return true;
+}
+
+/**
  * Handles click on sidebar apps
  * @param {MouseEvent} e
  */
@@ -239,8 +254,81 @@ export default {
 	add,
 	get,
 	remove,
+	setBadge,
 	loadApps,
 	ensureActiveApp,
 	setActiveApp,
 	pulseApp,
 };
+
+// --- long-press tooltip (VS Code shows view labels on hover; on touch we
+// show them on hold, since the native title attribute never appears) ------
+const TOOLTIP_HOLD_MS = 500;
+/**@type {ReturnType<typeof setTimeout>|null} */
+let tooltipTimer = null;
+/**@type {HTMLElement|null} */
+let $tooltip = null;
+
+/**
+ * Shows the app title when an activity bar icon is pressed and held.
+ * @param {HTMLElement} $container the .app-icons-container element
+ * @returns {void}
+ */
+function attachLongPressTooltips($container) {
+	$container.addEventListener("touchstart", onTooltipTouchStart, {
+		passive: true,
+	});
+	$container.addEventListener("touchmove", dismissTooltip, { passive: true });
+	$container.addEventListener("touchend", dismissTooltip, { passive: true });
+	$container.addEventListener("touchcancel", dismissTooltip, {
+		passive: true,
+	});
+}
+
+/**
+ * @param {TouchEvent} e
+ * @returns {void}
+ */
+function onTooltipTouchStart(e) {
+	const $icon = e.target?.closest?.('[data-action="sidebar-app"]');
+	if (!$icon) return;
+	clearTimeout(tooltipTimer);
+	tooltipTimer = setTimeout(() => showTooltip($icon), TOOLTIP_HOLD_MS);
+}
+
+/**
+ * @param {HTMLElement} $icon
+ * @returns {void}
+ */
+function showTooltip($icon) {
+	dismissTooltip();
+	const app = apps.find((candidate) => candidate.id === $icon.dataset.id);
+	const title = app?.title || $icon.title || "";
+	if (!title) return;
+
+	$tooltip = tag("div", { className: "apps-tooltip", textContent: title });
+	document.body.append($tooltip);
+
+	const rect = $icon.getBoundingClientRect();
+	const tip = $tooltip.getBoundingClientRect();
+	const top = Math.min(
+		Math.max(rect.top + rect.height / 2 - tip.height / 2, 8),
+		window.innerHeight - tip.height - 8,
+	);
+	const left = Math.min(rect.right + 10, window.innerWidth - tip.width - 8);
+	$tooltip.style.top = `${Math.max(top, 8)}px`;
+	$tooltip.style.left = `${Math.max(left, 8)}px`;
+	$tooltip.classList.add("show");
+}
+
+/**
+ * @returns {void}
+ */
+function dismissTooltip() {
+	clearTimeout(tooltipTimer);
+	tooltipTimer = null;
+	if ($tooltip) {
+		$tooltip.remove();
+		$tooltip = null;
+	}
+}

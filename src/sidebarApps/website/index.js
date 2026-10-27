@@ -199,5 +199,5 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "website" },
+	{ titleKey: "website", group: "tools" },
 ];

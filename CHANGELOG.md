@@ -13,6 +13,36 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.5] - 2026-10-27
+
+### Added
+- **Barra lateral com rosto VS Code** — a barra de atividades agora
+  organiza-se em grupos: vistas principais (Ficheiros, Busca, Plugins,
+  IA, Git) em cima, ferramentas (Consola JS, Dev Tools, Bibliotecas,
+  Website, Notificações) depois de um separador, e Conta / Definições /
+  Sobre apanhados no fundo da barra (padrão do VS Code). Apps
+  registadas por plugins continuam a chegar ao grupo principal.
+- **Badges na barra de atividades** — o ícone do Git mostra o número de
+  mudanças pendentes (atualiza a cada leitura de estado e limpa em
+  erro) e o sino mostra o número de notificações por ler. A API nova
+  `setBadge(id, valor)` no registry aceita número (pílula, teto «99+»),
+  `true` (ponto) ou `null` (limpa).
+- **Tooltip de toque longo** — manter o dedo num ícone da barra
+  (meio segundo) mostra o nome do painel numa bolha estilo VS Code; o
+  atributo nativo `title` nunca aparece no toque, e isto devolve a
+  descoberta «o que faz este ícone?».
+
+### Changed
+- **Cabeçalhos das vistas ao estilo VS Code** — título alinhado à
+  esquerda, maiúsculas pequenas com espaçamento de letras e linha
+  divisória por baixo (Plugins e Notificações), em vez do título
+  centrado antigo.
+
+### Corrigido
+- **Ícone dos side-buttons não renderizava** — typo JSX `<spam>` no
+  componente de botões laterais impedia o glifo de aparecer; agora é
+  `<span>`.
+
 ## [1.8.2] - 2026-09-21
 
 ### Added
@@ -985,6 +1015,35 @@ total).
 Every notable change to **XCoder** is documented here. Historical entries
 are written in Brazilian Portuguese; from v1.6.2 onward each release also
 carries a short English summary right below the Portuguese one.
+
+## [1.8.5] - 2026-10-27
+
+### Added — VS Code-style activity bar
+
+- **Grouped activity bar**: primary views (Files, Search, Plugins, AI,
+  Git) on top, tools (JS Console, Dev Tools, Libraries, Website,
+  Notifications) behind a separator, and Account / Settings / About
+  pinned to the bottom of the rail — the VS Code layout. Plugin-added
+  apps keep landing in the primary group.
+- **Activity bar badges**: the Git icon shows the number of pending
+  changes (refreshed on every status read, cleared on error) and the
+  bell shows unread notifications. New registry API `setBadge(id,
+  value)` accepts a number (pill, capped at «99+»), `true` (dot) or
+  `null` (clear).
+- **Long-press tooltip**: holding a rail icon for half a second shows
+  the panel name in a VS Code-style bubble — the native `title`
+  attribute never appears on touch.
+
+### Changed
+
+- **VS Code-style view headers**: left-aligned small-caps title with
+  letter spacing and a hairline divider (Plugins, Notifications)
+  instead of the old centered title.
+
+### Fixed
+
+- **Side-button icons never rendered**: JSX typo `<spam>` in the
+  side-button component prevented the glyph from showing; now `<span>`.
 
 ## [1.8.4] - 2026-10-10
 

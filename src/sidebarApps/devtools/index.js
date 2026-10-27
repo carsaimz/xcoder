@@ -1405,5 +1405,5 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "dev tools" },
+	{ titleKey: "dev tools", group: "tools" },
 ];

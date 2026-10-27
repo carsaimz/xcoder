@@ -30,6 +30,8 @@ export default class SidebarApp {
 	#launcher;
 	/**@type {string|null} strings key used to retranslate the icon tooltip on language change */
 	#titleKey = null;
+	/**@type {string} activity-bar group: "primary" (top), "tools" (mid), "bottom" (pinned) */
+	#group = "primary";
 
 	/**
 	 * Creates a new sidebar app.
@@ -51,6 +53,10 @@ export default class SidebarApp {
 		this.#onselect = onselect || emptyFunc;
 		this.#tabbed = !!opts.tabbed;
 		this.#launcher = !!opts.launcher;
+		this.#group =
+			opts.group === "bottom" || opts.group === "tools"
+				? opts.group
+				: "primary";
 		const cleanup = this.#init(this.#container);
 		if (typeof cleanup === "function") {
 			this.#cleanup = cleanup;
@@ -72,12 +78,56 @@ export default class SidebarApp {
 	 * @returns {void}
 	 */
 	install(prepend = false) {
-		if (prepend) {
-			$apps.prepend(this.#icon);
+		const $target = SidebarApp.groupContainer(this.#group);
+		if (!$target) {
+			// registry not initialized yet - fall back to the flat list
+			if (prepend) {
+				$apps?.prepend(this.#icon);
+				return;
+			}
+			$apps?.append(this.#icon);
 			return;
 		}
 
-		$apps.append(this.#icon);
+		if (prepend) {
+			$target.prepend(this.#icon);
+			return;
+		}
+
+		$target.append(this.#icon);
+	}
+
+	/**
+	 * Creates (once) and returns the activity-bar group container.
+	 * VS Code-style layout: primary views on top, tools behind a
+	 * separator and account/settings/about pinned to the bottom
+	 * (CSS margin-top:auto on .apps-group.bottom).
+	 * @param {"primary"|"tools"|"bottom"} group
+	 * @returns {HTMLElement|null}
+	 */
+	static groupContainer(group) {
+		if (!$apps) return null;
+
+		const existing = $apps.get(`:scope > .apps-group.${group}`);
+		if (existing) return existing;
+
+		const $group = <div className={`apps-group ${group}`}></div>;
+		const $bottom = $apps.get(":scope > .apps-group.bottom");
+
+		if (group === "primary") {
+			const $next = $apps.get(":scope > .apps-group");
+			if ($next) {
+				$next.before($group);
+			} else {
+				$apps.append($group);
+			}
+		} else if (group === "tools" && $bottom) {
+			$bottom.before($group);
+		} else {
+			$apps.append($group);
+		}
+
+		return $group;
 	}
 
 	/**
@@ -148,6 +198,51 @@ export default class SidebarApp {
 	/**@type {HTMLElement} */
 	get container() {
 		return this.#container;
+	}
+
+	/**
+	 * VS Code-style activity bar badge.
+	 * @param {number|boolean|null} value number -> count pill ("99+" cap),
+	 *   true -> dot, anything else -> removes the badge
+	 * @returns {void}
+	 */
+	setBadge(value) {
+		const icon = this.#icon;
+		if (!icon) return;
+
+		let badge = icon.querySelector(":scope > .app-badge");
+		const count =
+			typeof value === "number" && Number.isFinite(value)
+				? Math.floor(value)
+				: 0;
+
+		if (count <= 0 && value !== true) {
+			badge?.remove();
+			return;
+		}
+
+		if (!badge) {
+			badge = <span className="app-badge"></span>;
+			icon.append(badge);
+		}
+
+		if (value === true) {
+			badge.textContent = "";
+			badge.classList.add("dot");
+			badge.classList.remove("count");
+			return;
+		}
+
+		badge.textContent = count > 99 ? "99+" : String(count);
+		badge.classList.add("count");
+		badge.classList.remove("dot");
+	}
+
+	/**@type {string|null} current badge text (null when there is no badge) */
+	get badge() {
+		return (
+			this.#icon?.querySelector(":scope > .app-badge")?.textContent || null
+		);
 	}
 
 	/**@type {boolean} tabbed apps open their UI in an editor tab (like the terminal) */

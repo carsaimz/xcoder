@@ -20,5 +20,5 @@ export default [
 			mainSettings();
 		});
 	}, // onSelected function
-	{ launcher: true, titleKey: "settings" }, // opts
+	{ launcher: true, titleKey: "settings", group: "bottom" }, // opts
 ];

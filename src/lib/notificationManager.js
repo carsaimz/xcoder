@@ -77,6 +77,8 @@ class NotificationManager {
 	}
 
 	renderNotifications() {
+		// badge update must run even when the panel is detached
+		sidebarApps.setBadge?.("notification", this.notifications.length || null);
 		const container = sidebarApps
 			.get("notification")
 			?.querySelector(".notifications-container");

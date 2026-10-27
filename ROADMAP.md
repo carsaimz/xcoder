@@ -16,7 +16,13 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.4
+## ✅ Concluído até a v1.8.5
+
+- **v1.8.5 — barra lateral com rosto VS Code:** grupos na barra de
+  atividades (principais / ferramentas / conta+definições no fundo),
+  badges de atividade (mudanças Git, notificações), tooltip de toque
+  longo com o nome do painel e cabeçalhos de vista em maiúsculas
+  pequenas; fix do ícone dos side-buttons (`<spam>` → `<span>`).
 
 - **v1.8.4 — QR das formas de apoio:** os códigos QR (Ko-fi, Patreon,
   M-Pesa…) guardados na base de dados do site passam agora pelo
@@ -595,7 +601,13 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.8.4
+## ✅ Done through v1.8.5
+
+- **v1.8.5 — VS Code-style sidebar:** activity bar groups (primary /
+  tools / bottom-pinned account+settings), activity badges (Git
+  changes, notifications), long-press tooltip with the panel name and
+  small-caps view headers; side-button icon typo fix (`<spam>` →
+  `<span>`).
 
 - **v1.8.4 — support QR codes:** payment QR images (Ko-fi, Patreon,
   M-Pesa…) stored in the site database now survive `normalizeMethod()`

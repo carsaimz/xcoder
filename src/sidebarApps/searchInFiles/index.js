@@ -350,7 +350,7 @@ export default [
 	},
 	false, // show as first item
 	() => {},
-	{ titleKey: "search in files" },
+	{ titleKey: "search in files", group: "primary" },
 ];
 
 /**
