@@ -16,7 +16,39 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.7.8
+## ✅ Concluído até a v1.8.4
+
+- **v1.8.4 — QR das formas de apoio:** os códigos QR (Ko-fi, Patreon,
+  M-Pesa…) guardados na base de dados do site passam agora pelo
+  `normalizeMethod()` e renderizam na página Apoie; métodos só-QR deixam
+  de ser descartados. No site, o /admin explica a rejeição de bases de
+  dados antigas (CHECK de 8 canais) e aponta para /setup › «Aplicar schema».
+
+- **v1.8.3 — Dev Tools vivas ao abrir:** o painel renderiza em TODA
+  ativação do ícone (paleta) e as consultas usam a raiz do app; imports
+  em falta no Gradiente/Formulário apanhados por teste comportamental
+  que percorre as 18 ferramentas.
+
+- **v1.8.2 — grid CSS + border-radius (18 tools):** duas ferramentas
+  novas nas Dev Tools e no site, mais 5 plugins no marketplace (Regex
+  Tester, HTML to JSX, CSS Beautify, SQL Format, Text Wrap) — 33 no total.
+
+- **v1.8.1 — marketplace +5 plugins (28):** unidades CSS, entidades
+  HTML, tabelas Markdown, RGB↔hex e aparar espaços a fim de linha.
+
+- **v1.8.0 — sessão GitHub PAT + lista vertical de tools:** normalização
+  do token (espaços/zero-width/BOM) antes de guardar e em cada pedido,
+  erro 401 com mensagem clara, «Atualizar perfil» no sidebar; Dev Tools
+  passam a lista vertical com título+descrição e ganham 7 ferramentas de
+  programador (JSON, Base64, IDs/UUID, Timestamp, Cor, Lorem, Slug).
+
+- **v1.7.9 — Path de modelos + libs offline + 7 plugins:** fix do
+  download de modelos (criação da cadeia de diretórios na 1.ª instalação),
+  Bibliotecas offline copiáveis para o projeto (htmx, Alpine, jQuery,
+  Bootstrap, Bootstrap Icons, Boxicons, Font Awesome, Chart.js) e 7
+  plugins novos (tag-wrapper, quote-converter, html-skeleton, sort-json,
+  url-tools, slugify, blank-lines) — 23 no total.
+
 
 - **v1.7.8 — atualização dentro do app + ferramentas de webdev:** a
   notificação/verificação de atualização baixa o APK da release
@@ -214,47 +246,340 @@
 - Release assinado automático, build de preview por rótulo (app + site),
   CI com checagem de traduções e typos, Dependabot + bot de dependências
 
-## 🎯 Próximo (v1.7.x)
+## 🗂️ Lotes alfabéticos (A–Z)
 
-1. **Mais plugins portados do Acode** 💡 — compilador Sass ao vivo, runner
-   avançado, visualizador de documentos. (Linter ✅ v1.7.5, formatter
-   Prettier ✅ já integrado via `registerFormatter`; Ruff fica de fora —
-   binário nativo, pesado demais para o build WebView.)
-2. ~~**API de plugins expandida**~~ ✅ CONCLUÍDA — ativar/desativar sem
-   reiniciar (`plugins.js` monta/desmonta ao vivo), segredos seguros
-   (`pluginContext.js` + `Tee.java` com EncryptedSharedPreferences por
-   plugin), ratings (`plugin/reviewUtils.js` + API do site) e exposição
-   de CM6 (`xcoder.require("codemirror")` + pacotes
-   `@codemirror/*`/`@lezer/*`).
+> **Como ler:** os lotes são temáticos (A–Z), não por prioridade —
+> cada release escolhe itens de vários lotes. Item feito muda para
+> `- [x]` e sobe para «✅ Concluído» na release correspondente.
+> Tags: 💡 Acode (PR/issue upstream) · 🖥️ inspirado noutros editores
+> (VS Code, Zed, Spck, JetBrains…) · ✨ ideia XCoder · 🔁 carregado do
+> roadmap anterior.
 
-## 🚀 Depois (v1.8+)
+## Lote A — Acessibilidade & Aparência
 
-3. **Anúncios recompensados** 💡 — assistir um anúncio dá tempo extra sem
-   anúncios; horário silencioso (Acode v1.12.0 #1918 / v1.11.8 #1779).
-4. **Novos idiomas** — a infra bilíngue pt/en do site e do app abre caminho
-   para es/fr (dicionários por área já estão modularizados).
-5. **Painel do bot de release** — administrar os posts automáticos
-   (editar/apagar o anúncio do release) na área /admin do site.
-6. **Colaboração/backup** — sincronizar settings + sessões de IA via
-   ghBackend já existente (backup/restore agendado, diff visual).
-7. **Editor de temas avançado** — editor visual de tokens (fundo,
-    primária, syntax colors) com export/import JSON compartilhável.
+- [ ] **Alto contraste + paletas para daltonismo** ✨ — Temas
+  deuteranopia/protanopia/tritanopia e modo alto contraste verificado contra
+  WCAG AA nos tokens de sintaxe.
+- [ ] **Editor visual de temas** 🔁 — Editor de tokens (fundo, primária,
+  cores de sintaxe) com export/import JSON partilhável.
+- [ ] **Tipografia por linguagem** 🖥️ inspirado no VS Code — Tamanho,
+  altura de linha e família configuráveis por modo de linguagem (ex.: mono
+  grande em Markdown).
+- [ ] **TalkBack nos menus principais** ✨ — Rótulos de conteúdo nos
+  ícones, alvos de toque ≥48dp e navegação de foco coerente no sidebar, abas
+  e dialogs.
+- [ ] **Respeitar prefers-reduced-motion** ✨ — Desativar animações
+  decorativas (pulso, transições de página) quando o SO pede movimento
+  reduzido.
+
+## Lote B — Busca & Build
+
+- [ ] **Streaming na busca global** 💡 Acode #2883 — Resultados a chegar em
+  fluxo sem reiniciar a descoberta (upstream evita restarts e streamiza de
+  forma eficiente).
+- [ ] **Globs na busca/substituição** ✨ — Incluir/excluir por padrão
+  (`src/**`, `*.min.js`) e histórico de buscas persistente entre sessões.
+- [ ] **«Ir para ficheiro» fuzzy** 🖥️ inspirado no VS Code — Abertura
+  rápida por nome com ranking (abertos recentes primeiro), acessível da
+  barra superior.
+- [ ] **Build recipes por projeto** ✨ — `scripts.json` com build/test/run
+  executados no console com ambiente do projeto e botão de parar.
+- [ ] **Pré-visualização inline das ocorrências** 🖥️ inspirado no Spck —
+  Cada resultado mostra a linha com realce e contexto, permitindo substituir
+  individualmente.
+
+## Lote C — Código, Console & Colaboração
+
+- [ ] **Consola virtualizada** 💡 Acode #2882 — Milhares de linhas de log
+  sem travar (upstream melhorou a virtualização do console).
+- [ ] **Filtro por nível no console** ✨ — Filtrar log/warn/error com
+  contagem por nível e limpar com gesto (deslizar).
+- [ ] **Rainbow brackets + indent guides** 🖥️ inspirado no VS Code — Pares
+  de chavetas coloridos por profundidade e guias de indentação opcionais nas
+  configurações.
+- [ ] **Backup agendado via ghBackend** 🔁 — Sincronizar settings + sessões
+  de IA com backup/restore agendado e diff visual antes de aplicar.
+- [ ] **Partilha de código via link/QR** ✨ — Gerar link temporário (gist
+  anónimo) ou QR do ficheiro/seleção ativa para partilhar rapidamente.
+
+## Lote D — Depuração & Dados
+
+- [ ] **Watch expressions no console** 🖥️ inspirado no VS Code —
+  Inspecionar objetos com árvore expansível e fixar expressões observadas
+  entre execuções.
+- [ ] **Painel de inspeção Eruda melhorado** ✨ — DOM/CSS em tempo real no
+  preview web com editáveis inline (o módulo devTools já embarca Eruda).
+- [ ] **Timeline local por ficheiro** 🖥️ inspirado no VS Code Timeline —
+  Snapshots automáticos ao guardar (janela de tempo configurável) com diff e
+  restauração.
+- [ ] **Export/restore do estado do app** ✨ — Zip com settings, plugins,
+  modelos instalados e sessões — para migrar de aparelho.
+- [ ] **Visualizador de Logcat** ✨ — Ver logcat filtrado (por tag/app)
+  enquanto executa builds Cordova, sem sair do app.
+
+## Lote E — Editor & Extensões
+
+- [ ] **Renderer canvas experimental** 💡 Acode #2988 — Motor de
+  renderização por canvas atrás de flag (upstream lançou como experimental
+  com @acode.app/canvas-view).
+- [ ] **Sticky scroll** 🖥️ inspirado no VS Code — Cabeçalho do bloco atual
+  fixo no topo ao navegar dentro de funções longas.
+- [ ] **Minimapa opcional** 🖥️ inspirado no VS Code — Miniatura do
+  ficheiro com viewport arrastável; desligada por defeito no telemóvel.
+- [ ] **Multi-cursor: findAll e selectMore** 💡 Acode #2129 — Corrigir
+  selectMoreAfter/Before e findAll (upstream reporta não funcionarem).
+- [ ] **Dobragem fiável em ficheiros grandes** 💡 Acode #2912 — «Dobrar
+  tudo» não deve congelar em ficheiros grandes (fix upstream a verificar no
+  nosso build).
+- [ ] **Quicktool adapter para plugins** 💡 Acode #2898 — Plugins podem
+  registar ações rápidas na barra (adaptador upstream).
+
+## Lote F — Ficheiros & Formatação
+
+- [ ] **«Guardar como» fiável** 💡 Acode #1583 — Issue antigo (10💬):
+  caminho, conflito de ficheiro existente e codificação corretos.
+- [ ] **Botão «Recarregar» na aba** 💡 Acode #2390 — Reverter o ficheiro
+  para o estado do disco com confirmação quando há alterações não guardadas.
+- [ ] **Renomear unificado** 💡 Acode #2958 — Consolidar o fluxo de rename
+  do file-browser com tratamento de erros claro (refatoração upstream).
+- [ ] **Formatters entre modos de plugin** 💡 Acode #2976 — Modos de plugin
+  podem reusar o formatter de outro modo (upstream #2976).
+- [ ] **Fixar/favoritos no explorador** ✨ — Pins no topo do explorador
+  para ficheiros de trabalho frequentes, sincronizados por projeto.
+
+## Lote G — Git & GitHub
+
+- [ ] **Diff side-by-side no app Git** 🖥️ inspirado no VS Code — Duas
+  colunas sincronizadas com realce por linha (atualmente só inline).
+- [ ] **Gists: guardar/abrir** ✨ — Guardar seleção/ficheiro como gist
+  (secret ou público) e abrir gist existente como aba.
+- [ ] **Status das GitHub Actions** ✨ — Badge dos workflows do repo aberto
+  no painel Git (verde/vermelho + link para o run).
+- [ ] **Pull requests do app** ✨ — Criar branch + PR a partir do app Git
+  (API REST) e listar PRs abertos do repo.
+
+## Lote H — HTML & Hosting
+
+- [ ] **Tamanho de dispositivo padrão no preview** 💡 Acode #2966 — Definir
+  viewport padrão (ex.: 390×844) para o preview in-app (upstream #2966).
+- [ ] **Auto-refresh do preview HTML** 💡 Acode #2765 — Issue aberto:
+  recarregar o preview ao guardar (live reload simples sem servidor).
+- [ ] **Webview de preview melhorada** 💡 Acode #2924 — Melhorias upstream
+  na webview (#2924) — avaliar e portar para o nosso preview.
+- [ ] **Servidor HTTP local com partilha LAN** ✨ — Servir a pasta do
+  projeto na rede (URL + QR) para testar no telemóvel/PC ao lado.
+
+## Lote I — Interface & Internacionalização
+
+- [ ] **Idiomas es/fr no app** 🔁 — A infra bilíngue pt/en e os dicionários
+  modulares por área abrem caminho para es/fr.
+- [ ] **Fullscreen imersivo + orientação** 💡 Acode #2919 — API de
+  fullscreen imersivo e controlo de orientação (upstream #2919).
+- [ ] **Split view** 🖥️ inspirado no VS Code — Dois ficheiros lado a lado
+  no telemóvel (paisagem) e tablet; sync de scroll opcional.
+- [ ] **Nav bar configurável** ✨ — Reordenar/esconder ícones da barra
+  inferior e escolher apps do sidebar fixados.
+- [ ] **Arrastar para reordenar abas** ✨ — Reordenação por arrasto com
+  haptics e drop entre abas abertas.
+
+## Lote J — JavaScript & JSON
+
+- [ ] **Runner de scripts do package.json** ✨ — Detetar scripts npm e
+  executar com node disponível (ou avisar a falta) — saída no console.
+- [ ] **Schemas JSON catalogadas** 🖥️ inspirado no VS Code — Validação +
+  hover para tsconfig/package.json/manifest com schemas embutidas offline.
+- [ ] **Console como REPL persistente** 🖥️ inspirado no Zed — Histórico
+  persistente entre sessões e envio de seleção para o REPL.
+- [ ] **Deteção de imports ausentes** ✨ — No preview, import que falha →
+  sugerir CDN ou copiar lib local (integra com o app libs).
+
+## Lote K — Keyboard & Atalhos
+
+- [ ] **Paleta de comandos** 🖥️ inspirado no VS Code — Todas as ações do
+  app pesquisáveis num só lugar (com usage ranking).
+- [ ] **Keybindings reconfiguráveis** 🖥️ inspirado no VS Code — Remapear
+  atalhos com suporte a chords; export/import do perfil de teclas.
+- [ ] **Gestos multi-toque** ✨ — 3 dedos ←/→ para desfazer/refazer, 4
+  dedos para trocar de aba (configurável).
+- [ ] **Modo vi/emacs básico** 🖥️ inspirado no Vim — Movimentos/modos
+  essenciais como plugin (normal/insert/visual para vi).
+
+## Lote L — Linguagens & Linters
+
+- [ ] **Tailwind CSS LSP** 💡 Acode #2896 — Issue aberto: tailwind LSP não
+  funciona — investigar e portar o fix se aplicável.
+- [ ] **Realce JS/TS mais rico** 💡 Acode #2971 — JSDoc e métodos com
+  realce próprio (upstream #2971) no nosso modo JS/TS.
+- [ ] **Mermaid no markdown** 💡 Acode #2987 — Renderizar diagramas mermaid
+  no preview de markdown (upstream usa a lib pele).
+- [ ] **GFM no modo markdown** 💡 Acode #2922 — Tabelas, checkboxes e
+  strikethrough (GFM) no realce e no preview.
+- [ ] **Sass ao vivo** 🔁 — Compilador Sass do marketplace compilando ao
+  vivo para CSS no guardar (plugin portado).
+
+## Lote M — Marketplace & Modelos
+
+- [ ] **Review inline na página do plugin** 💡 Acode #2925 — Botão de
+  avaliação direto na página do plugin (upstream #2925) sobre a nossa API de
+  ratings.
+- [ ] **+modelos locais** ✨ — Novos LLM/STT/TTS no catálogo
+  (Qwen3/Phi/Gemma novos) com tamanhos 50MB–2GB.
+- [ ] **Filtros por tarefa no catálogo** ✨ — Separadores
+  chat/código/STT/TTS com requisitos de RAM e espaço estimados.
+- [ ] **Selo «Made for XCoder»** ✨ — Checklist de qualidade (manifest,
+  i18n, permissões) e selo nas submissões aprovadas.
+
+## Lote N — Navegação & Notificações
+
+- [ ] **Breadcrumbs** 🖥️ inspirado no VS Code — Caminho do ficheiro
+  navegável no topo do editor (pastas + símbolo atual).
+- [ ] **Outline de símbolos** 🖥️ inspirado no VS Code — Lista de símbolos
+  do ficheiro via LSP documentSymbol com salto direto.
+- [ ] **Centro de notificações no app** ✨ — Consumir os producer hooks de
+  notificações do site (user_notifications já existem).
+- [ ] **Pilha de ficheiros recentes** ✨ — Voltar ao ficheiro anterior com
+  um toque (stack de navegação).
+
+## Lote O — Offline & Organização
+
+- [ ] **Workspaces com estado** 🖥️ inspirado no VS Code — Abrir projeto
+  restaura abas, scroll e sessão de IA (por workspace).
+- [ ] **+bibliotecas offline** ✨ — Tailwind offline, Prism, KaTeX no
+  seletor de libs (mesmo padrão de cópia para o projeto).
+- [ ] **Cache SFTP/FTP robusta** 💡 Acode #1276 — Erro de cache antigo
+  (#1276) — listar/purgar cache remota e invalidação por mtime.
+- [ ] **Recuperação pós-crash** ✨ — Autossave em memória + restauração da
+  sessão completa (abas não guardadas inclusive).
+
+## Lote P — Performance & Plugins
+
+- [ ] **Hang/flicker do CodeMirror novo** 💡 Acode #1968 — Issue mais
+  quente (17💬): editor trava/cintila com CM novo — monitorizar upstream e
+  portar fix.
+- [ ] **Velocidade de carregamento de texto** 💡 Acode #2318 — Ficheiros
+  grandes abrem mais rápido (streaming de ficheiro + render incremental).
+- [ ] **Spam-paste performance** 💡 Acode #2364 — Colar repetidamente não
+  deve degradar (batch de transações CM).
+- [ ] **Arranque mais rápido — com cautela** 💡 Acode #2933 — Upstream
+  lançou #2930/#2931 e REVERTEU (#2933): medir antes/depois no nosso build
+  antes de copiar qualquer técnica.
+- [ ] **Efeito ao segurar delete** 💡 Acode #2303 — Apagamento contínuo com
+  artefactos visuais (#2303) — corrigir no nosso input pipeline.
+
+## Lote Q — Qualidade & Testes
+
+- [ ] **Suíte ftp/sftp/file-ops** 💡 Acode #2928 — Inspirar-se nos testes
+  upstream (#2928) para cobrir os nossos providers remotos.
+- [ ] **Fumo de UI em emulador** ✨ — Job agendado no CI que instala o APK
+  num emulador e valida boot + apps do sidebar.
+- [ ] **Regressão visual de temas** ✨ — Screenshots golden por tema em
+  testes (apanhar regressões de cor/contraste).
+- [ ] **Revisitar r8** 💡 Acode #2891 — Já estudado e adiado: exigir
+  passada em dispositivo real (roturas só aparecem em runtime).
+
+## Lote R — Runtime & Refatoração
+
+- [ ] **Renomear símbolo via LSP** 🖥️ inspirado no LSP — Rename workspace
+  edit com pré-visualização de ficheiros afetados.
+- [ ] **Runner avançado** 🔁 — Executar scripts com env vars/argumentos
+  guardados por projeto.
+- [ ] **Visualizador de documentos** 🔁 — Abrir pdf/docx apenas para
+  leitura a partir do explorador.
+- [ ] **API USB experimental** 💡 Acode #2719 — Issue upstream pedindo
+  acesso a USB — avaliar plugin OTG serial para hardware DIY.
+
+## Lote S — Segurança & Sincronização
+
+- [ ] **Segredos por projeto** ✨ — Além dos segredos de plugin: .env
+  seguro por projeto com injeção no runner/console.
+- [ ] **Sessões de terminal nomeadas** 💡 Acode #2894 — Sessões
+  persistentes/nomeadas (retomar após fechar o app).
+- [ ] **Build CLI sem terminal embutido** 💡 Acode #2897 — Opção de build
+  que omite assets do terminal → APK menor para quem usa Termux.
+- [ ] **Sync de settings entre dispositivos** 🔁 — ghBackend como
+  transporte (mesma conta) com resolução de conflitos manual.
+
+## Lote T — Terminal, Temas & TTS
+
+- [ ] **Terminal não arranca em alguns aparelhos** 💡 Acode #2824 — Issue
+  aberto — reproduzir em aparelhos reportados (proot/ABI) e portar correção.
+- [ ] **Temas e fontes do terminal** ✨ — Paletas (Dracula/Nord/…) e font
+  mono selecionáveis para o terminal embutido.
+- [ ] **Vozes TTS configuráveis** ✨ — Velocidade/voz/tom do texto→voz
+  local guardadas por persona do chat.
+
+## Lote U — UI/UX & Updates
+
+- [ ] **Anúncios recompensados** 🔁 (Acode Acode #1918/#1779) — Assistir um
+  anúncio dá tempo extra sem anúncios; horário silencioso (padrão upstream).
+- [ ] **Painel do bot de release** 🔁 — Administrar posts automáticos
+  (editar/apagar anúncio do release) na área /admin do site.
+- [ ] **Delta updates** ✨ — Baixar só o diff entre APKs quando a release o
+  publicar (menor consumo de dados).
+- [ ] **Changelog in-app renderizado** ✨ — Página Apoie/About liga ao
+  CHANGELOG.md renderizado (versão atual em destaque).
+
+## Lote V — Voz & Visualização
+
+- [ ] **Preview Mermaid reutilizável** 💡 Acode #2987 — Painel de diagramas
+  (pele) reutilizável por plugins/READMEs.
+- [ ] **Voz→texto nas entradas** ✨ — Ditar nas caixas de busca/prompt
+  usando o runtime STT local já embarcado.
+- [ ] **Grafo de imports do projeto** 🖥️ inspirado no Zed — Diagrama
+  simples de dependências (mermaid gerado) para orientar refatorações.
+
+## Lote W — Web & Widgets
+
+- [ ] **Widgets de homescreen por projeto** ✨ — Atalho «abrir projeto X»
+  direto do launcher (shortcuts do Android).
+- [ ] **Site PWA instalável** ✨ — Manifest + service worker mínimo para
+  leitura offline de docs/ferramentas.
+- [ ] **Web Share Target** ✨ — Partilhar ficheiro de outro app → XCoder
+  abre direto (import para o projeto).
+
+## Lote X — eXport & eXperimental
+
+- [ ] **Exportar projeto em zip** ✨ — Zip da pasta do projeto (com/sem
+  node_modules) partilhável por intents.
+- [ ] **Deep link para Codespaces** 🖥️ inspirado no GitHub Codespaces —
+  Abrir o repo atual num Codespace/gitpod quando o aparelho não dá conta.
+- [ ] **Plugins em worker dedicado** ✨ — Experimental: correr plugins
+  pesados num Web Worker isolado (sem travar o editor).
+
+## Lote Y — YAML & Config-as-code
+
+- [ ] **.xcoder/config.json por projeto** ✨ — Settings do projeto
+  versionadas (tabs, build recipe, formatação) no repo.
+- [ ] **Validação YAML com esquema** ✨ — GitHub Actions/workflows
+  validados offline (schema embutida) com hover.
+
+## Lote Z — Zen & Zoom
+
+- [ ] **Zen mode** 🖥️ inspirado no VS Code — Esconder tudo
+  (sidebar/abas/nav) com saída fácil — foco total no texto.
+- [ ] **Zoom global** ✨ — Escalar editor + UI de uma vez (pinça ou Ctrl
+  +/- com teclado).
+- [ ] **Modo leitura** ✨ — Dobrar tudo + fullscreen + tipografia de
+  leitura para revisar código longo.
 
 ## 🧭 Direção contínua
 
 - Manter o CI verde e a pt-br 100% traduzida (`npm run lang:check`).
-- **Acode triado até 16/09 (v1.13.5):** indentação de word wrap portada
-  (#2886 + #2880) e API oficial de fileIcons com pacotes de ícones
-  portada (#2887). **#2891 (r8) estudado e ADIADO:** as regras do
-  upstream são sólidas (keep para CordovaPlugin via reflexão, bridge
-  JS, BuildConfig, dontwarn do java.lang.management para o SSH), mas
-  exigem validação em dispositivo real — roturas de r8 só aparecem em
-  runtime (precedente v1.4.8 no nosso fork), stack traces ficam
-  ofuscados nos crash reports e o soak time upstream tem só 3 dias.
-  Revisitar quando houver passada de testes em dispositivo; diff é
-  pequeno (build-extras.gradle + proguard-rules.pro + config.xml).
-  Já cobertos aqui: menu de contexto de abas (#2863), recuperação
-  de migração SFTP (#2840), corrida do cordova.exec (#2851).
+- **Acode triado até 26/10 (v1.13.x):** PRs mesados recentes catalogados
+  nos Lotes — canvas renderer (#2988), mermaid no markdown (#2987),
+  webview melhorada (#2924), fullscreen/orientação (#2919), GFM (#2922),
+  quicktool de plugins (#2898), consola virtualizada (#2882), busca em
+  streaming (#2883), dobragem fiável (#2912), formatter entre modos
+  (#2976), realce JSDoc (#2971), preview com tamanho padrão (#2966) e
+  review inline (#2925). **Atenção:** #2930/#2931 (startup) foram
+  REVERTIDOS upstream (#2933) — medir no nosso build antes de copiar.
+  Issues quentes mapeados nos Lotes: #1968 (17💬), #1583, #2318, #2129,
+  #2824, #2765, #1276, #2894, #2896, #2719, #2897, #2390, #2303, #2364,
+  #2590. Já portados: #2886+#2880 (wrap indentado), #2887 (fileIcons),
+  #2863 (menu de contexto de abas), #2840 (recuperação SFTP), #2851
+  (corrida do cordova.exec). **#2891 (r8) segue ADIADO** — regras
+  sólidas, mas exige passada em dispositivo real (roturas só aparecem
+  em runtime; precedente v1.4.8 no nosso fork).
 - Verificar o CHANGELOG do Acode a cada release upstream e portar o que
   for útil (workflows, plugins, IA, editor).
 - Nunca travar recursos atrás do Premium — doar é opcional.
@@ -270,7 +595,38 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.7.8
+## ✅ Done through v1.8.4
+
+- **v1.8.4 — support QR codes:** payment QR images (Ko-fi, Patreon,
+  M-Pesa…) stored in the site database now survive `normalizeMethod()`
+  and render on the support page; QR-only methods are no longer dropped.
+  On the site, /admin explains old-database rejection (8-channel CHECK)
+  and points to /setup › «Aplicar schema».
+
+- **v1.8.3 — Dev Tools alive on open:** the panel renders on EVERY
+  activation of the palette icon and queries use the app root; missing
+  Gradient/Form imports caught by a behavioral test driving all 18 tools.
+
+- **v1.8.2 — CSS grid + border-radius (18 tools):** two new tools in the
+  Dev Tools and on the site, plus 5 marketplace plugins (Regex Tester,
+  HTML to JSX, CSS Beautify, SQL Format, Text Wrap) — 33 total.
+
+- **v1.8.1 — marketplace +5 plugins (28):** CSS units, HTML entities,
+  Markdown tables, RGB↔hex and trim trailing spaces.
+
+- **v1.8.0 — GitHub PAT session + vertical tool list:** token
+  normalization (whitespace/zero-width/BOM) before save and on every
+  request, friendly 401 mapping, «Refresh profile» on the sidebar; Dev
+  Tools become a vertical list with title+description and gain 7
+  programmer tools (JSON, Base64, IDs/UUID, Timestamp, Color, Lorem, Slug).
+
+- **v1.7.9 — model path fix + offline libs + 7 plugins:** model download
+  fix (full directory chain created on first install), offline Libraries
+  copyable into projects (htmx, Alpine, jQuery, Bootstrap, Bootstrap
+  Icons, Boxicons, Font Awesome, Chart.js) and 7 new plugins
+  (tag-wrapper, quote-converter, html-skeleton, sort-json, url-tools,
+  slugify, blank-lines) — 23 total.
+
 
 - **v1.7.8 — in-app update + webdev tools:** the update
   notification/check now downloads the release APK inside the app
@@ -450,48 +806,331 @@
 - Auto-signed releases, label-based preview builds (app + site), CI with
   translation and typos checks, Dependabot + deps bot
 
-## 🎯 Next (v1.7.x)
+## 🗂️ Batches in alphabetical order (A–Z)
 
-1. **More plugins ported from Acode** 💡 — live Sass compiler, advanced
-   runner, document viewer. (Linter ✅ v1.7.5, Prettier formatter ✅
-   already integrated via `registerFormatter`; Ruff stays out — a native
-   binary, too heavy for the WebView build.)
-2. ~~**Expanded plugin API**~~ ✅ DONE — toggle without restart
-   (`plugins.js` mounts/unmounts live), secure secrets
-   (`pluginContext.js` + `Tee.java` with per-plugin
-   EncryptedSharedPreferences), ratings (`plugin/reviewUtils.js` + site
-   API) and CM6 exposure (`xcoder.require("codemirror")` + the
-   `@codemirror/*`/`@lezer/*` packages).
+> **How to read:** batches are thematic (A–Z), not priority-ordered —
+> every release picks items from several batches. A done item flips to
+> `- [x]` and moves up to «✅ Done» in the matching release.
+> Tags: 💡 Acode (upstream PR/issue) · 🖥️ inspired by other editors
+> (VS Code, Zed, Spck, JetBrains…) · ✨ XCoder idea · 🔁 carried over
+> from the previous roadmap.
 
-## 🚀 Later (v1.8+)
+## Batch A — Accessibility & Appearance
 
-3. **Rewarded ads** 💡 — watching an ad grants extra ad-free time;
-   quiet hours (Acode v1.12.0 #1918 / v1.11.8 #1779).
-4. **New languages** — the pt/en bilingual infra paves the way for es/fr
-   (per-area dictionaries are already modular).
-5. **Release bot dashboard** — manage automatic announcements
-   (edit/delete the release post) in the site's /admin area.
-6. **Collaboration/backup** — sync settings + AI sessions via the
-   existing ghBackend (scheduled backup/restore, visual diff).
-7. **Advanced theme editor** — visual token editor (background,
-    primary, syntax colors) with shareable JSON export/import.
+- [ ] **High contrast + color-blind palettes** ✨ —
+  Deuteranopia/protanopia/tritanopia themes plus a high-contrast mode
+  checked against WCAG AA on syntax tokens.
+- [ ] **Visual theme editor** 🔁 — Token editor (background, primary,
+  syntax colors) with shareable JSON export/import.
+- [ ] **Per-language typography** 🖥️ inspired by VS Code — Font size, line
+  height and family configurable per language mode (e.g. larger serif for
+  Markdown).
+- [ ] **TalkBack on the main surfaces** ✨ — Content labels on icons, ≥48dp
+  touch targets and coherent focus order across sidebar, tabs and dialogs.
+- [ ] **Honor prefers-reduced-motion** ✨ — Disable decorative animations
+  (pulses, page transitions) when the OS requests reduced motion.
+
+## Batch B — Search & Build
+
+- [ ] **Streamed global search** 💡 Acode #2883 — Results flowing in
+  without discovery restarts (upstream prevents restarts and streams
+  efficiently).
+- [ ] **Glob search/replace** ✨ — Include/exclude patterns (`src/**`,
+  `*.min.js`) and a search history persisted across sessions.
+- [ ] **Fuzzy «Go to file»** 🖥️ inspired by VS Code — Quick open by name
+  with ranking (recently opened first), reachable from the top bar.
+- [ ] **Per-project build recipes** ✨ — `scripts.json` with build/test/run
+  executed in the console with project env and a stop button.
+- [ ] **Inline match preview** 🖥️ inspired by Spck — Each result shows the
+  highlighted line with context and can be replaced individually.
+
+## Batch C — Code, Console & Collaboration
+
+- [ ] **Virtualised console** 💡 Acode #2882 — Thousands of log lines
+  without freezing (upstream improved console virtualisation).
+- [ ] **Console level filter** ✨ — Filter log/warn/error with per-level
+  counters and clear-on-swipe.
+- [ ] **Rainbow brackets + indent guides** 🖥️ inspired by VS Code —
+  Depth-colored bracket pairs and optional indent guides in settings.
+- [ ] **Scheduled ghBackend backup** 🔁 — Sync settings + AI sessions with
+  scheduled backup/restore and a visual diff before applying.
+- [ ] **Share code via link/QR** ✨ — Generate a temporary link (anonymous
+  gist) or QR of the active file/selection for quick sharing.
+
+## Batch D — Debugging & Data
+
+- [ ] **Console watch expressions** 🖥️ inspired by VS Code — Inspect
+  objects with an expandable tree and pin watched expressions across runs.
+- [ ] **Improved Eruda inspector** ✨ — Real-time DOM/CSS in the web
+  preview with inline editing (the devTools module already ships Eruda).
+- [ ] **Per-file local timeline** 🖥️ inspired by VS Code Timeline —
+  Automatic snapshots on save (configurable window) with diff and restore.
+- [ ] **Full app state export/restore** ✨ — Zip with settings, plugins,
+  installed models and sessions — for device migration.
+- [ ] **Logcat viewer** ✨ — Filtered logcat (by tag/app) while running
+  Cordova builds, without leaving the app.
+
+## Batch E — Editor & Extensions
+
+- [ ] **Experimental canvas renderer** 💡 Acode #2988 — Canvas-based
+  rendering behind a flag (upstream shipped it as experimental with
+  @acode.app/canvas-view).
+- [ ] **Sticky scroll** 🖥️ inspired by VS Code — Current block header
+  pinned to the top while scrolling inside long functions.
+- [ ] **Optional minimap** 🖥️ inspired by VS Code — File thumbnail with a
+  draggable viewport; off by default on phones.
+- [ ] **Multi-cursor: findAll & selectMore** 💡 Acode #2129 — Fix
+  selectMoreAfter/Before and findAll (reported broken upstream).
+- [ ] **Reliable folding on large files** 💡 Acode #2912 — «Fold all» must
+  not freeze on large files (upstream fix to verify in our build).
+- [ ] **Plugin quicktool adapter** 💡 Acode #2898 — Plugins can register
+  quick actions on the bar (upstream adapter).
+
+## Batch F — Files & Formatting
+
+- [ ] **Reliable «Save as»** 💡 Acode #1583 — Long-standing issue (10💬):
+  correct path, existing-file conflict and encoding.
+- [ ] **«Reload» button on the tab** 💡 Acode #2390 — Revert the file to
+  its on-disk state, confirming when unsaved changes exist.
+- [ ] **Unified rename flow** 💡 Acode #2958 — Consolidate the file-browser
+  rename flow with clear error handling (upstream refactor).
+- [ ] **Formatter reuse across plugin modes** 💡 Acode #2976 — Plugin modes
+  can reuse another mode's formatter (upstream #2976).
+- [ ] **Pins/favorites in the file browser** ✨ — Pins at the top of the
+  browser for frequent files, synced per project.
+
+## Batch G — Git & GitHub
+
+- [ ] **Side-by-side diff in the Git app** 🖥️ inspired by VS Code — Two
+  synchronized columns with per-line highlighting (currently inline only).
+- [ ] **Gists: save & open** ✨ — Save selection/file as a gist (secret or
+  public) and open an existing gist as a tab.
+- [ ] **GitHub Actions status** ✨ — Workflow badge for the open repo in
+  the Git panel (green/red + link to the run).
+- [ ] **Pull requests from the app** ✨ — Create branch + PR from the Git
+  app (REST API) and list open PRs of the repo.
+
+## Batch H — HTML & Hosting
+
+- [ ] **Default device size for preview** 💡 Acode #2966 — Set a default
+  viewport (e.g. 390×844) for the in-app preview (upstream #2966).
+- [ ] **HTML preview auto-refresh** 💡 Acode #2765 — Open issue: reload the
+  preview on save (simple live reload without a server).
+- [ ] **Improved preview webview** 💡 Acode #2924 — Upstream webview
+  improvements (#2924) — evaluate and port to our preview.
+- [ ] **Local HTTP server with LAN share** ✨ — Serve the project folder on
+  the network (URL + QR) to test on a phone/PC nearby.
+
+## Batch I — UI & Internationalization
+
+- [ ] **es/fr app languages** 🔁 — The pt/en bilingual infra and modular
+  per-area dictionaries pave the way for es/fr.
+- [ ] **Immersive fullscreen + orientation** 💡 Acode #2919 — Immersive
+  fullscreen API and orientation control (upstream #2919).
+- [ ] **Split view** 🖥️ inspired by VS Code — Two files side by side on
+  phones (landscape) and tablets; optional scroll sync.
+- [ ] **Configurable nav bar** ✨ — Reorder/hide bottom-bar icons and
+  choose pinned sidebar apps.
+- [ ] **Drag to reorder tabs** ✨ — Drag-and-drop tab reordering with
+  haptics and drop between open tabs.
+
+## Batch J — JavaScript & JSON
+
+- [ ] **package.json script runner** ✨ — Detect npm scripts and run them
+  with node available (or warn) — output in the console.
+- [ ] **Cataloged JSON schemas** 🖥️ inspired by VS Code — Validation +
+  hover for tsconfig/package.json/manifest with offline embedded schemas.
+- [ ] **Persistent REPL console** 🖥️ inspired by Zed — History persisted
+  across sessions and send-selection-to-REPL.
+- [ ] **Missing import detection** ✨ — In preview, failed import → suggest
+  CDN or copy the local lib (integrates with the libs app).
+
+## Batch K — Keyboard & Shortcuts
+
+- [ ] **Command palette** 🖥️ inspired by VS Code — Every app action
+  searchable in one place (with usage ranking).
+- [ ] **Rebindable keybindings** 🖥️ inspired by VS Code — Remap shortcuts
+  with chord support; export/import the key profile.
+- [ ] **Multi-touch gestures** ✨ — 3-finger ←/→ for undo/redo, 4-finger to
+  switch tab (configurable).
+- [ ] **Basic vi/emacs mode** 🖥️ inspired by Vim — Essential motions/modes
+  as a plugin (normal/insert/visual for vi).
+
+## Batch L — Languages & Linters
+
+- [ ] **Tailwind CSS LSP** 💡 Acode #2896 — Open issue: tailwind LSP not
+  working — investigate and port the fix if applicable.
+- [ ] **Richer JS/TS highlighting** 💡 Acode #2971 — JSDoc and methods with
+  dedicated highlighting (upstream #2971) in our JS/TS mode.
+- [ ] **Mermaid in markdown** 💡 Acode #2987 — Render mermaid diagrams in
+  the markdown preview (upstream uses the pele lib).
+- [ ] **GFM for markdown mode** 💡 Acode #2922 — Tables, checkboxes and
+  strikethrough (GFM) in highlighting and preview.
+- [ ] **Live Sass** 🔁 — Marketplace Sass compiler building live to CSS on
+  save (ported plugin).
+
+## Batch M — Marketplace & Models
+
+- [ ] **Inline review on plugin page** 💡 Acode #2925 — Direct review
+  button on the plugin page (upstream #2925) on top of our ratings API.
+- [ ] **More local models** ✨ — New LLM/STT/TTS in the catalog
+  (Qwen3/Phi/Gemma new) sized 50MB–2GB.
+- [ ] **Task filters in the catalog** ✨ — Chat/code/STT/TTS tabs with RAM
+  and storage requirements estimated.
+- [ ] **«Made for XCoder» badge** ✨ — Quality checklist (manifest, i18n,
+  permissions) and a badge on approved submissions.
+
+## Batch N — Navigation & Notifications
+
+- [ ] **Breadcrumbs** 🖥️ inspired by VS Code — Navigable file path at the
+  top of the editor (folders + current symbol).
+- [ ] **Symbol outline** 🖥️ inspired by VS Code — File symbol list via LSP
+  documentSymbol with direct jump.
+- [ ] **In-app notification center** ✨ — Consume the site's notification
+  producer hooks (user_notifications already exist).
+- [ ] **Recent files stack** ✨ — Return to the previous file with one tap
+  (navigation stack).
+
+## Batch O — Offline & Organization
+
+- [ ] **Stateful workspaces** 🖥️ inspired by VS Code — Opening a project
+  restores tabs, scroll and AI session (per workspace).
+- [ ] **More offline libraries** ✨ — Offline Tailwind, Prism, KaTeX in the
+  libs picker (same copy-to-project pattern).
+- [ ] **Robust SFTP/FTP cache** 💡 Acode #1276 — Old cache bug (#1276) —
+  list/purge remote cache and mtime-based invalidation.
+- [ ] **Crash recovery** ✨ — In-memory autosave + full session restore
+  (unsaved tabs included).
+
+## Batch P — Performance & Plugins
+
+- [ ] **New CodeMirror hang/flicker** 💡 Acode #1968 — Hottest issue (17💬):
+  editor hangs/flickers with new CM — track upstream and port the fix.
+- [ ] **Text load speed** 💡 Acode #2318 — Large files open faster (file
+  streaming + incremental rendering).
+- [ ] **Spam-paste performance** 💡 Acode #2364 — Repeated pasting must not
+  degrade (batch CM transactions).
+- [ ] **Faster startup — carefully** 💡 Acode #2933 — Upstream shipped
+  #2930/#2931 and REVERTED (#2933): measure before/after in our build before
+  copying any technique.
+- [ ] **Hold-delete visual glitch** 💡 Acode #2303 — Continuous deletion
+  shows visual artifacts (#2303) — fix in our input pipeline.
+
+## Batch Q — Quality & Tests
+
+- [ ] **ftp/sftp/file-ops suite** 💡 Acode #2928 — Use upstream tests
+  (#2928) as inspiration to cover our remote providers.
+- [ ] **Emulator UI smoke** ✨ — Scheduled CI job installing the APK on an
+  emulator validating boot + sidebar apps.
+- [ ] **Theme visual regression** ✨ — Golden screenshots per theme in
+  tests (catch color/contrast regressions).
+- [ ] **Revisit r8** 💡 Acode #2891 — Already studied and deferred:
+  requires a real-device pass (breakages only show at runtime).
+
+## Batch R — Runtime & Refactoring
+
+- [ ] **LSP symbol rename** 🖥️ inspired by LSP — Rename workspace edit
+  with a preview of affected files.
+- [ ] **Advanced runner** 🔁 — Run scripts with env vars/arguments saved
+  per project.
+- [ ] **Document viewer** 🔁 — Read-only pdf/docx opening from the file
+  browser.
+- [ ] **Experimental USB API** 💡 Acode #2719 — Upstream issue asking for
+  USB access — evaluate an OTG serial plugin for DIY hardware.
+
+## Batch S — Security & Sync
+
+- [ ] **Per-project secrets** ✨ — Beyond plugin secrets: a safe .env per
+  project injected into runner/console.
+- [ ] **Named terminal sessions** 💡 Acode #2894 — Persistent/named
+  sessions (resume after closing the app).
+- [ ] **CLI build without embedded terminal** 💡 Acode #2897 — Build option
+  omitting terminal assets → smaller APK for Termux users.
+- [ ] **Settings sync across devices** 🔁 — ghBackend as transport (same
+  account) with manual conflict resolution.
+
+## Batch T — Terminal, Themes & TTS
+
+- [ ] **Terminal not starting on some devices** 💡 Acode #2824 — Open issue
+  — reproduce on reported devices (proot/ABI) and port a fix.
+- [ ] **Terminal themes & fonts** ✨ — Palettes (Dracula/Nord/…) and
+  selectable mono fonts for the embedded terminal.
+- [ ] **Configurable TTS voices** ✨ — Local text→voice speed/voice/pitch
+  saved per chat persona.
+
+## Batch U — UI/UX & Updates
+
+- [ ] **Rewarded ads** 🔁 (Acode Acode #1918/#1779) — Watching an ad grants
+  extra ad-free time; quiet hours (upstream pattern).
+- [ ] **Release bot dashboard** 🔁 — Manage automatic announcements
+  (edit/delete the release post) in the site's /admin area.
+- [ ] **Delta updates** ✨ — Download only the APK diff when the release
+  publishes one (less data usage).
+- [ ] **Rendered in-app changelog** ✨ — Support/About page links to the
+  rendered CHANGELOG.md (current version highlighted).
+
+## Batch V — Voice & Visualization
+
+- [ ] **Reusable Mermaid preview** 💡 Acode #2987 — Diagram panel (pele)
+  reusable by plugins/READMEs.
+- [ ] **Voice→text in inputs** ✨ — Dictate into search/prompt boxes using
+  the embedded local STT runtime.
+- [ ] **Project import graph** 🖥️ inspired by Zed — Simple dependency
+  diagram (generated mermaid) to guide refactors.
+
+## Batch W — Web & Widgets
+
+- [ ] **Per-project homescreen widgets** ✨ — «Open project X» shortcut
+  straight from the launcher (Android shortcuts).
+- [ ] **Installable PWA site** ✨ — Manifest + minimal service worker for
+  offline docs/tools reading.
+- [ ] **Web Share Target** ✨ — Share a file from another app → XCoder
+  opens it directly (import into the project).
+
+## Batch X — eXport & eXperimental
+
+- [ ] **Export project as zip** ✨ — Project folder zip (with/without
+  node_modules) shareable via intents.
+- [ ] **Codespaces deep link** 🖥️ inspired by GitHub Codespaces — Open the
+  current repo in a Codespace/gitpod when the phone is not enough.
+- [ ] **Plugins on a dedicated worker** ✨ — Experimental: run heavy
+  plugins on an isolated Web Worker (editor never blocks).
+
+## Batch Y — YAML & Config-as-code
+
+- [ ] **Per-project .xcoder/config.json** ✨ — Versioned project settings
+  (tabs, build recipe, formatting) in the repo.
+- [ ] **Schema YAML validation** ✨ — GitHub Actions/workflows validated
+  offline (embedded schema) with hover.
+
+## Batch Z — Zen & Zoom
+
+- [ ] **Zen mode** 🖥️ inspired by VS Code — Hide everything
+  (sidebar/tabs/nav) with an easy exit — full focus on text.
+- [ ] **Global zoom** ✨ — Scale editor + UI at once (pinch or Ctrl +/-
+  with keyboard).
+- [ ] **Reading mode** ✨ — Fold all + fullscreen + reading typography for
+  reviewing long code.
 
 ## 🧭 Ongoing direction
 
 - Keep CI green and pt-br 100% translated (`npm run lang:check`).
-- **Acode triaged through 16/09 (v1.13.5):** word wrap indentation
-  ported (#2886 + #2880) and the official fileIcons API with icon
-  packs ported (#2887). **#2891 (r8) studied and DEFERRED:** upstream's
-  rules are solid (keep for reflectively-instantiated CordovaPlugin
-  classes, JS bridge, BuildConfig, java.lang.management dontwarn for
-  the SSH library), but they need real-device validation — r8
-  breakages only show at runtime (v1.4.8 precedent in this fork),
-  stack traces become obfuscated in crash reports and upstream soak
-  time is only 3 days. Revisit when a device-testing pass is
-  available; the diff is small (build-extras.gradle +
-  proguard-rules.pro + config.xml). Already covered here: tab context
-  menu (#2863), SFTP migration recovery (#2840), cordova.exec race
-  (#2851).
+- **Acode triaged through 26/10 (v1.13.x):** recently merged PRs are
+  catalogued in the Batches — canvas renderer (#2988), mermaid in
+  markdown (#2987), improved webview (#2924), fullscreen/orientation
+  (#2919), GFM (#2922), plugin quicktool (#2898), virtualised console
+  (#2882), streamed search (#2883), reliable folding (#2912), formatter
+  reuse across modes (#2976), richer JSDoc highlighting (#2971),
+  default preview device size (#2966) and inline plugin review (#2925).
+  **Careful:** #2930/#2931 (startup) were REVERTED upstream (#2933) —
+  measure in our build before copying anything. Hot issues mapped to
+  the Batches: #1968 (17💬), #1583, #2318, #2129, #2824, #2765, #1276,
+  #2894, #2896, #2719, #2897, #2390, #2303, #2364, #2590. Already
+  ported: #2886+#2880 (wrap indentation), #2887 (fileIcons), #2863 (tab
+  context menu), #2840 (SFTP migration recovery), #2851 (cordova.exec
+  race). **#2891 (r8) stays DEFERRED** — solid rules, but requires a
+  real-device pass (breakages only show at runtime; v1.4.8 precedent
+  in this fork).
 - Check the Acode CHANGELOG on every upstream release and port what is
   useful (workflows, plugins, AI, editor).
 - Never gate features behind Premium — donating is optional.
