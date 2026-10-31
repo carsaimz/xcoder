@@ -13,6 +13,37 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.6] - 2026-10-31
+
+### Corrigido
+- **Ícone de livro (Bibliotecas) não abria nada** — a lista de
+  bibliotecas offline renderizava durante o arranque, enquanto o
+  contentor ainda estava FORA do DOM, e `render()` abortava cedo
+  (`$panel?.isConnected === false`); o `onSelected` apenas rolava a
+  vista, logo o painel ficava vazio para sempre. Exactamente o bug que
+  a paleta das Dev Tools teve antes da v1.8.3: agora o `onSelected`
+  renderiza em toda ativação e o teste de regressão percorre o caminho
+  real (add → toque → pulseApp → setActiveApp → onSelected).
+
+### Changed
+- **Renomear pré-seleciona o nome sem extensão** (polish do Acode
+  #3004) — o prompt de «Renomear» no gestor de ficheiros seleciona
+  apenas o basename (`index` em `index.html`, `app.min` em
+  `app.min.js`, tudo em `.gitignore`), por isso escrever substitui o
+  nome e mantém a extensão. Novo helper puro `helpers.basenameRange()`
+  e opção `selection: "basename"` no diálogo `prompt()`.
+
+### Added
+- **Roadmap atualizado com o upstream** — novidades do Acode
+  verificadas na API a 31-10-2026 (v1.13.5 + nightlies): #2999
+  multi-seleção/arrastar na árvore, #2966 tamanhos de dispositivo na
+  pré-visualização, #2987 Mermaid em Markdown, #2988 canvas
+  experimental, dores abertas (#2980, #3006/#3007, #2336, #2979) e
+  PRs revertidos a não seguir (#2864, #2526, #2930/#2931).
+- **Limpeza** — imagens de QA locais removidas; auditoria a
+  ferramentas/páginas/assets não encontrou recursos mortos (todas as
+  16 páginas alcançáveis, 18 ferramentas e 33 plugins funcionais).
+
 ## [1.8.5] - 2026-10-27
 
 ### Added
@@ -1015,6 +1046,32 @@ total).
 Every notable change to **XCoder** is documented here. Historical entries
 are written in Brazilian Portuguese; from v1.6.2 onward each release also
 carries a short English summary right below the Portuguese one.
+
+## [1.8.6] - 2026-10-31
+
+### Fixed
+- **Book icon (Libraries) opened nothing** — the offline libraries
+  list rendered at boot while its container was still DETACHED and
+  `render()` early-returned (`$panel?.isConnected === false`);
+  `onSelected` only scrolled, so the panel stayed empty forever. Same
+  bug the Dev Tools palette had before v1.8.3 — now `onSelected`
+  renders on every activation, with a regression test walking the real
+  path (add → tap → pulseApp → setActiveApp → onSelected).
+
+### Changed
+- **Rename pre-selects the basename** (Acode #3004 polish) — the file
+  manager rename prompt selects only the name (`index` in
+  `index.html`, everything in `.gitignore`), so typing replaces the
+  name and keeps the extension. New pure helper
+  `helpers.basenameRange()` and a `selection: "basename"` option on
+  the `prompt()` dialog.
+
+### Added
+- **Roadmap refreshed with upstream** — Acode news API-verified on
+  2026-10-31 (v1.13.5 + nightlies): #2999 file-tree multi-select/drag,
+  #2966 preview device sizes, #2987 Mermaid in Markdown, #2988
+  experimental canvas, open pain points (#2980, #3006/#3007, #2336,
+  #2979) and reverted PRs not to follow (#2864, #2526, #2930/#2931).
 
 ## [1.8.5] - 2026-10-27
 

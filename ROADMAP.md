@@ -16,6 +16,14 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
+## ✅ Concluído até a v1.8.6
+
+- **v1.8.6 — ícone de livro vivo + rename esperto:** o painel
+  «Bibliotecas» (ícone de livro) renderiza em TODA ativação — antes
+  abria vazio (mesmo bug da paleta das Dev Tools antes da v1.8.3);
+  «Renomear» pré-seleciona o nome sem extensão (Acode #3004);
+  roadmap atualizado com o upstream de 31-10-2026.
+
 ## ✅ Concluído até a v1.8.5
 
 - **v1.8.5 — barra lateral com rosto VS Code:** grupos na barra de
@@ -260,6 +268,23 @@
 > Tags: 💡 Acode (PR/issue upstream) · 🖥️ inspirado noutros editores
 > (VS Code, Zed, Spck, JetBrains…) · ✨ ideia XCoder · 🔁 carregado do
 > roadmap anterior.
+
+📡 **Novidades do upstream (verificadas na API a 31-10-2026):** estável
+v1.13.5 (13-09) + nightlies 30-10. Merged desde então: **#2999**
+multi-seleção + arrastar-e-largar na árvore de ficheiros (long-press
+→ Selecionar, barra de ações flutuante, clipboard entre pastas, botão
+voltar sai da seleção — funciona em WebViews antigas), **#3004** polish
+de diálogos (rename pré-seleciona o nome sem extensão — já adotado
+na v1.8.6, ponto de não-lidas no sino, erros nativos legíveis),
+**#2966** tamanhos de dispositivo pré-definidos na pré-visualização,
+**#2987** diagramas Mermaid na pré-visualização Markdown, **#2988**
+renderizador canvas experimental (WebGL2/WebGPU), **#2924** webview
+melhorada, **#2971** realce JSDoc mais rico. Dores abertas que o XCoder
+pode evitar: #2980 (sidebar congela ao selecionar pasta), #3006/#3007
+(scrollbar no topo / sem opção de opacidade), #2336 (permissão pedida
+duas vezes), #2979 (FTPS ignorado). Recusados/upstream revertido:
+#2864, #2526, #2930/#2931 (revertidos em #2933) — não usar como
+referência.
 
 ## Lote A — Acessibilidade & Aparência
 
@@ -601,6 +626,14 @@
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
+## ✅ Done through v1.8.6
+
+- **v1.8.6 — live book icon + smart rename:** the «Libraries» panel
+  (book icon) renders on EVERY activation — it used to open empty
+  (same bug the Dev Tools palette had before v1.8.3); «Rename»
+  pre-selects the basename without the extension (Acode #3004);
+  roadmap refreshed with the 2026-10-31 upstream delta.
+
 ## ✅ Done through v1.8.5
 
 - **v1.8.5 — VS Code-style sidebar:** activity bar groups (primary /
@@ -826,6 +859,21 @@
 > Tags: 💡 Acode (upstream PR/issue) · 🖥️ inspired by other editors
 > (VS Code, Zed, Spck, JetBrains…) · ✨ XCoder idea · 🔁 carried over
 > from the previous roadmap.
+
+📡 **Upstream news (API-verified on 2026-10-31):** stable v1.13.5
+(09-13) + nightlies 10-30. Merged since: **#2999** multi-select +
+drag-and-drop file tree (long-press → Select, floating action bar,
+cross-folder clipboard, back button exits selection — works on older
+WebViews), **#3004** dialog polish (rename pre-selects the basename —
+already adopted in v1.8.6, unread dot on the bell, readable native
+errors), **#2966** preview device-size presets, **#2987** Mermaid
+diagrams in Markdown preview, **#2988** experimental canvas renderer
+(WebGL2/WebGPU), **#2924** improved webview, **#2971** richer JSDoc
+highlighting. Open pain points XCoder can avoid: #2980 (sidebar
+freezes on folder select), #3006/#3007 (scrollbar at top / no opacity
+option), #2336 (permission asked twice), #2979 (FTPS ignored).
+Rejected/reverted upstream: #2864, #2526, #2930/#2931 (reverted in
+#2933) — do not use as reference.
 
 ## Batch A — Accessibility & Appearance
 

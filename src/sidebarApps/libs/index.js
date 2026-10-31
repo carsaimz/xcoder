@@ -255,6 +255,11 @@ function initApp(el) {
 }
 
 function onSelected(el) {
+	// render() early-returns while the container is detached (init
+	// time), so the FIRST activation must (re)render the list here -
+	// otherwise tapping the book icon shows an empty panel (same bug
+	// the devtools palette icon had before v1.8.3).
+	render();
 	el?.querySelector(".libs-root")?.scrollTo?.(0, 0);
 }
 

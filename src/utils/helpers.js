@@ -305,6 +305,20 @@ export default {
 		return name.replace(/(\r\n)+|\r+|\n+|\t+/g, "").trim();
 	},
 	/**
+	 * [start, end] selection range covering the basename (everything
+	 * before the last extension dot) - the rename prompt pre-selects
+	 * this so typing replaces only the name and keeps the extension
+	 * (Acode #3004 polish).
+	 * @param {string} name
+	 * @returns {[number, number]}
+	 */
+	basenameRange(name) {
+		const value = String(name ?? "");
+		const dot = value.lastIndexOf(".");
+		const end = dot > 0 ? dot : value.length;
+		return [0, end];
+	},
+	/**
 	 * Creates a debounced function that delays invoking the input function until after 'wait' milliseconds have elapsed
 	 * since the last time the debounced function was invoked. Useful for implementing behavior that should only happen
 	 * after the input is complete.

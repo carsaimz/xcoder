@@ -2,6 +2,7 @@ import autosize from "autosize";
 import actionStack from "lib/actionStack";
 import restoreTheme from "lib/restoreTheme";
 import appSettings from "lib/settings";
+import helpers from "utils/helpers";
 
 /**
  * @typedef {Object} PromptOptions
@@ -9,6 +10,9 @@ import appSettings from "lib/settings";
  * @property {boolean} [required]
  * @property {string} [placeholder]
  * @property {boolean} [capitalize] - If true, the first letter of the input will be capitalized
+ * @property {[number, number]|"basename"} [selection] - Range pre-selected when the
+ * dialog opens; "basename" selects the name without the last extension so typing
+ * a replacement keeps the extension (used by rename).
  * @property {(any)=>boolean} [test]
  */
 
@@ -142,8 +146,13 @@ export default function prompt(
 		input.focus();
 		if (input.value) {
 			try {
-				const col = input.value.length;
-				input.setSelectionRange(col, col);
+				// pre-select the requested range; "basename" keeps the extension
+				// when the user types a replacement name (cursor-at-end otherwise)
+				const range =
+					options.selection === "basename"
+						? helpers.basenameRange(input.value)
+						: [input.value.length, input.value.length];
+				input.setSelectionRange(range[0], range[1]);
 			} catch (error) {
 				// ignore
 			}
