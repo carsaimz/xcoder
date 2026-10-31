@@ -29,6 +29,10 @@ let $title = null;
 let currentId = null;
 /** @type {(()=>void)|null} */
 let onClose = null;
+/** whether the window was maximized before it was minimized */
+let wasMaximized = false;
+/** timestamp of the last drag end — suppresses the restore click */
+let lastDragEnd = 0;
 
 /** Whether floating windows are enabled (default ON). */
 export function floatingEnabled() {
@@ -77,6 +81,8 @@ export function show(id, title, container, closeCallback) {
 	// move the SAME container node in (keeps listeners and scroll state)
 	$body.textContent = "";
 	$body.append(container);
+	$win.classList.remove("minimized");
+	wasMaximized = false;
 	$win.classList.add("show");
 
 	restorePos();
@@ -95,6 +101,7 @@ export function show(id, title, container, closeCallback) {
 /** Hides the window without touching the registry. */
 export function close() {
 	if (!$win) return;
+	wasMaximized = false;
 	$win.classList.remove("show");
 	currentId = null;
 	if (onClose) {
@@ -113,6 +120,7 @@ export function close() {
 export function reset() {
 	currentId = null;
 	onClose = null;
+	wasMaximized = false;
 	if ($win) $win.classList.remove("show");
 	try {
 		actionStack.remove("sidebar-float");
@@ -124,6 +132,11 @@ export function reset() {
 /** Toggles maximize (inset:0). */
 export function toggleMaximize() {
 	if (!$win) return;
+	if ($win.classList.contains("minimized")) {
+		$win.classList.remove("minimized");
+		wasMaximized = false;
+		syncMinIcon();
+	}
 	const max = $win.classList.toggle("maximized");
 	localStorage.setItem("sidebarFloatMax", max ? "1" : "0");
 	syncMaxIcon();
@@ -137,6 +150,39 @@ function syncMaxIcon() {
 	$icon.className = `icon ${max ? "fullscreen_exit" : "fullscreen"} sidebar-float-max`;
 }
 
+/**
+ * Toggles minimize: the window collapses to its header bar
+ * ("Deve dar para minimizar janelas (apps) quando não forem usados").
+ * A maximized window is restored to its saved geometry while
+ * minimized and re-maximized when the header is expanded again.
+ */
+export function toggleMinimize() {
+	if (!$win) return;
+	const min = $win.classList.toggle("minimized");
+	if (min) {
+		wasMaximized = $win.classList.contains("maximized");
+		if (wasMaximized) $win.classList.remove("maximized");
+	} else if (wasMaximized) {
+		$win.classList.add("maximized");
+		wasMaximized = false;
+		syncMaxIcon();
+	}
+	syncMinIcon();
+}
+
+/** Whether the window is currently collapsed to its header. */
+export function isMinimized() {
+	return Boolean($win?.classList.contains("minimized"));
+}
+
+function syncMinIcon() {
+	if (!$win) return;
+	const $icon = $win.get(".sidebar-float-min");
+	if (!$icon) return;
+	const min = $win.classList.contains("minimized");
+	$icon.className = `icon ${min ? "expand_less" : "expand_more"} sidebar-float-min`;
+}
+
 function buildWindow() {
 	$title = tag("span", { className: "sidebar-float-title" });
 	const $close = tag("span", {
@@ -144,13 +190,23 @@ function buildWindow() {
 		title: strings?.close || "Close",
 		onclick: () => close(),
 	});
+	const $min = tag("span", {
+		className: "icon expand_more sidebar-float-min",
+		title: strings?.["sidebar float minimize"] || "Minimize",
+		onclick: () => toggleMinimize(),
+	});
 	const $max = tag("span", {
 		className: "icon fullscreen sidebar-float-max",
 		title: strings?.["sidebar float maximize"] || "Maximize",
 		onclick: () => toggleMaximize(),
 	});
 	const $header = tag("div", { className: "sidebar-float-header" });
-	$header.append($title, $max, $close);
+	$header.append($title, $min, $max, $close);
+	// tap the title of a collapsed window to restore it
+	$title.addEventListener("click", () => {
+		if (Date.now() - lastDragEnd < 250) return;
+		if ($win.classList.contains("minimized")) toggleMinimize();
+	});
 	$body = tag("div", { className: "sidebar-float-body scroll" });
 	const $resize = tag("div", { className: "sidebar-float-resize" });
 	$win = tag("div", { className: "sidebar-float" });
@@ -178,7 +234,12 @@ function clampRect(left, top, width, height) {
 }
 
 function savePos() {
-	if (!$win || $win.classList.contains("maximized")) return;
+	if (
+		!$win ||
+		$win.classList.contains("maximized") ||
+		$win.classList.contains("minimized")
+	)
+		return;
 	localStorage.setItem(
 		POS_KEY,
 		JSON.stringify({
@@ -237,6 +298,7 @@ function makeDraggable($handle, $target) {
 		const up = () => {
 			window.removeEventListener("pointermove", move);
 			window.removeEventListener("pointerup", up);
+			lastDragEnd = Date.now();
 			savePos();
 		};
 		window.addEventListener("pointermove", move);
@@ -283,4 +345,6 @@ export default {
 	close,
 	reset,
 	toggleMaximize,
+	toggleMinimize,
+	isMinimized,
 };

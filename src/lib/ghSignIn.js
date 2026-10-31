@@ -22,7 +22,11 @@ import {
 	pollForToken,
 	requestDeviceCode,
 } from "lib/ghAuth";
-import { ghWebFlowEnabled, signInWithGitHubApp } from "lib/ghWebFlow";
+import {
+	ghWebFlowEnabled,
+	signInWithGitHubApp,
+	siteGhWebConfigured,
+} from "lib/ghWebFlow";
 import settings from "lib/settings";
 
 /**
@@ -66,7 +70,10 @@ export function resolveGhClientId() {
  */
 export async function chooseGhSignInMethod() {
 	const options = [];
-	if (ghWebFlowEnabled()) {
+	// only offer the browser route when the site deployment really has
+	// the GitHub App credentials — otherwise it dead-ends on the site's
+	// "não configurada" error page and the account stays empty
+	if (ghWebFlowEnabled() && (await siteGhWebConfigured())) {
 		options.push([
 			"web",
 			strings["github web sign in"] || "Connect with GitHub (browser)",

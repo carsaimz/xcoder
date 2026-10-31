@@ -1583,5 +1583,9 @@
 	"dev tools bottom right": "Bottom right",
 	"dev tools bottom left": "Bottom left",
 	"dev tools border radius": "Border radius",
-	"dev tools border radius desc": "Border-radius playground (4 corners)"
+	"dev tools border radius desc": "Border-radius playground (4 corners)",
+	"sidebar menu title": "Panels",
+	"sidebar menu hint": "Tap to open in a window",
+	"sidebar float minimize": "Minimize",
+	"sidebar float restore": "Restore"
 }

@@ -1700,5 +1700,9 @@
 	"dev tools bottom right": "Inferior direita",
 	"dev tools bottom left": "Inferior esquerda",
 	"dev tools border radius": "Raio da borda",
-	"dev tools border radius desc": "Laboratório de border-radius (4 cantos)"
+	"dev tools border radius desc": "Laboratório de border-radius (4 cantos)",
+	"sidebar menu title": "Painéis",
+	"sidebar menu hint": "Toque para abrir numa janela",
+	"sidebar float minimize": "Minimizar",
+	"sidebar float restore": "Restaurar"
 }

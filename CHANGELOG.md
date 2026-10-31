@@ -13,6 +13,42 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.8] - 2026-11-01
+
+### Fixed
+- **Conta GitHub no Git, de verdade** — a rota «Entrar com o GitHub
+  (navegador)» morria na página «Integração GitHub não configurada» do
+  site: a hospedagem nunca recebeu as variáveis
+  «GITHUB_APP_CLIENT_ID/SECRET», e o app oferecia a rota quebrada como
+  primeira opção. Agora o site expõe «/api/github/status» (só booleans,
+  com CORS) e o app sonda o endpoint (cache de 10 min, advanced-http
+  sem CORS + fallback fetch): a opção de navegador só aparece quando a
+  integração existe; sem isso, o fluxo por código (device flow,
+  verificado a funcionar com o client id embutido) vem primeiro e o PAT
+  fica sempre disponível. A página de erro do site passa a apontar para
+  o device flow/PAT enquanto as variáveis não estiverem definidas.
+
+### Added
+- **Menu do sidebar no espaço dos painéis** — com as janelas flutuantes,
+  a área onde os painéis viviam não fica mais vazia: mostra os títulos
+  das opções agrupados por categoria (Vistas, Ferramentas, Conta), com
+  ícone, nome, badge ao vivo e affordance de abertura; tocar numa linha
+  abre a janela flutuante do app (no telefone o sidebar recolhe para a
+  janela ocupar o ecrã); o menu segue a língua do app e desmonta no modo
+  acoplado.
+
+### Changed
+- **Minimizar janelas flutuantes** — novo botão minimizar (ordem
+  minimizar/maximizar/fechar): a janela colapsa para a barra de título
+  («header só com botões»); restaurar tocando no título, no botão
+  (agora «expandir») ou no ícone do app na barra de atividades (que em
+  vez de fechar, restaura); ativar outro app re-expande automaticamente;
+  maximizar a partir de minimizado expande e o estado maximizado
+  anterior é memorizado; a geometria salva não é corrompida enquanto
+  minimizada.
+- **Testes** — 15 novos (menu do sidebar 5, minimizar/restaurar 4,
+  escolha honesta de sessão GitHub 6): 1006/1006 no total.
+
 ## [1.8.7] - 2026-10-31
 
 ### Added
@@ -1086,6 +1122,39 @@ total).
 Every notable change to **XCoder** is documented here. Historical entries
 are written in Brazilian Portuguese; from v1.6.2 onward each release also
 carries a short English summary right below the Portuguese one.
+
+## [1.8.8] - 2026-11-01
+
+### Fixed — GitHub account in Git, for real
+- The «Connect with GitHub (browser)» route dead-ended on the site's
+  "Integração GitHub não configurada" page: the hosting never received
+  the «GITHUB_APP_CLIENT_ID/SECRET» env vars, yet the app offered the
+  broken route first. The site now exposes «/api/github/status»
+  (booleans only, CORS-enabled) and the app probes it (10 min cache,
+  CORS-free advanced-http + fetch fallback): the browser option only
+  shows up when the integration exists; otherwise the device flow
+  (verified working with the built-in client id) comes first and the
+  PAT route is always available. The site's error page now points to
+  the device flow / PAT until the vars are set.
+
+### Added — sidebar menu in the freed panel area
+- With floating windows, the area where panels used to dock is no
+  longer empty: it shows the option titles grouped by category (Views,
+  Tools, Account) with icon, name, live badge and an open affordance;
+  tapping a row opens the app's floating window (on phones the sidebar
+  steps aside so the window takes the screen); the menu follows the app
+  language and unmounts in docked mode.
+
+### Changed — minimize floating windows
+- New minimize button (minimize/maximize/close order): the window
+  collapses to its title bar ("header with buttons only"); restore via
+  the title, the button (now "expand") or the app icon on the activity
+  bar (which restores instead of closing); activating another app
+  re-expands automatically; maximizing from minimized expands and the
+  previous maximized state is remembered; saved geometry is not
+  corrupted while minimized.
+- Tests — 15 new (sidebar menu 5, minimize/restore 4, honest GitHub
+  sign-in chooser 6): 1006/1006 total.
 
 ## [1.8.7] - 2026-10-31
 

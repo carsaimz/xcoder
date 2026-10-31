@@ -16,7 +16,18 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.7
+## ✅ Concluído até a v1.8.8
+
+- **v1.8.8 — menu do sidebar, minimizar janelas e conta GitHub real:**
+  o espaço dos painéis acoplados agora mostra o menu de opções por
+  categoria (títulos + ícones + badges ao vivo; tocar abre a janela
+  flutuante; telefone recolhe o sidebar); janelas flutuantes ganham
+  botão minimizar (colapsam para a barra de título; restaurar pelo
+  título/botão/ícone; trocar de app re-expande; maximizar a partir de
+  minimizado memoriza o estado); o escolhedor de sessão GitHub sonda
+  «/api/github/status» do site e só oferece a rota de navegador quando
+  a integração existe (device flow + PAT ficam sempre disponíveis);
+  página de erro do callback aponta para device flow/PAT.
 
 - **v1.8.7 — downloads, 59 libs, terminal no projeto, publicar no
   GitHub, plugins Codex/Claude Code e painéis flutuantes:** gestor
@@ -638,7 +649,18 @@ referência.
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.8.7
+## ✅ Done through v1.8.8
+
+- **v1.8.8 — sidebar menu, window minimize and a real GitHub account:**
+  the freed docked-panel area now hosts the categorized option menu
+  (titles + icons + live badges; tapping opens the floating window;
+  phones step the sidebar aside); floating windows gain a minimize
+  button (collapse to the title bar; restore via title/button/icon;
+  switching apps re-expands; maximize-from-minimized remembers the
+  state); the GitHub sign-in chooser probes the site's
+  «/api/github/status» and only offers the browser route when the
+  integration exists (device flow + PAT always available); the callback
+  error page points to the device flow / PAT.
 
 - **v1.8.7 — downloads, 59 libs, project-aware terminal, GitHub
   publish, Codex/Claude Code plugins and floating panels:**

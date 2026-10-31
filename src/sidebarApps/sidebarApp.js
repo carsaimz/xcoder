@@ -33,6 +33,8 @@ export default class SidebarApp {
 	#titleKey = null;
 	/**@type {string} activity-bar group: "primary" (top), "tools" (mid), "bottom" (pinned) */
 	#group = "primary";
+	/**@type {string} raw icon spec ("svg:<id>" or icon-font class) */
+	#iconName = "";
 
 	/**
 	 * Creates a new sidebar app.
@@ -54,6 +56,7 @@ export default class SidebarApp {
 		this.#onselect = onselect || emptyFunc;
 		this.#tabbed = !!opts.tabbed;
 		this.#launcher = !!opts.launcher;
+		this.#iconName = icon || "";
 		this.#group =
 			opts.group === "bottom" || opts.group === "tools"
 				? opts.group
@@ -173,6 +176,16 @@ export default class SidebarApp {
 	/**@type {string} */
 	get title() {
 		return this.#title;
+	}
+
+	/**@type {string} raw icon spec used to build the icon element */
+	get iconName() {
+		return this.#iconName;
+	}
+
+	/**@type {string} activity bar group this icon is pinned to */
+	get group() {
+		return this.#group;
 	}
 
 	/**@type {boolean} */

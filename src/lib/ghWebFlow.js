@@ -31,6 +31,93 @@ export function ghWebFlowEnabled() {
 	);
 }
 
+const STATUS_TTL_MS = 10 * 60 * 1000;
+/** @type {{at: number, configured: boolean}} cached /api/github/status probe */
+let webStatusCache = { at: 0, configured: false };
+
+/** Clears the site status probe cache (tests). */
+export function resetGhWebStatusCache() {
+	webStatusCache = { at: 0, configured: false };
+}
+
+/**
+ * CORS-free GET inside the webview (cordova-plugin-advanced-http, same
+ * strategy as lib/ghAuth for github.com), with a fetch fallback for
+ * tests and plain browsers.
+ * @param {string} url
+ * @param {typeof fetch} [fetchImpl]
+ * @returns {Promise<any>} parsed JSON
+ */
+async function getJson(url, fetchImpl) {
+	if (typeof cordova !== "undefined" && cordova?.plugin?.http) {
+		return new Promise((resolve, reject) => {
+			cordova.plugin.http.get(
+				url,
+				{},
+				{},
+				(response) => {
+					let data = response.data;
+					if (typeof data === "string") {
+						try {
+							data = JSON.parse(data);
+						} catch {
+							data = null;
+						}
+					}
+					resolve(data);
+				},
+				(error) => {
+					reject(new Error(error?.error || error?.status || "Network error"));
+				},
+			);
+		});
+	}
+	const doFetch = fetchImpl || (typeof fetch !== "undefined" ? fetch : null);
+	if (!doFetch) throw new Error("No HTTP client available");
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), 4000);
+	try {
+		const res = await doFetch(url, {
+			signal: controller.signal,
+			headers: { Accept: "application/json" },
+		});
+		if (!res.ok) throw new Error(`status ${res.status}`);
+		return await res.json();
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
+/**
+ * Whether THIS deployment of the site actually has the GitHub App
+ * credentials (GITHUB_APP_CLIENT_ID/SECRET). The client id baked into
+ * the app only says the flow exists — the code exchange happens
+ * server-side, and when the site lacks the env vars the "browser"
+ * option just landed on the site's error page and the account stayed
+ * empty ("Git até agora fica sem conta"). The sign-in chooser probes
+ * this cheap status endpoint (10 min cache) and hides the web option
+ * when it is not configured, leaving the device flow (no backend) and
+ * the PAT route, which always work.
+ * @param {{fetchImpl?: typeof fetch}} [opts]
+ * @returns {Promise<boolean>}
+ */
+export async function siteGhWebConfigured(opts = {}) {
+	if (!ghWebFlowEnabled()) return false;
+	const site = String(config.WEBSITE_URL || "").replace(/\/+$/, "");
+	if (!site) return false;
+	const now = Date.now();
+	if (now - webStatusCache.at < STATUS_TTL_MS) return webStatusCache.configured;
+	let configured = false;
+	try {
+		const json = await getJson(`${site}/api/github/status`, opts.fetchImpl);
+		configured = json?.configured === true;
+	} catch {
+		configured = false;
+	}
+	webStatusCache = { at: now, configured };
+	return configured;
+}
+
 /**
  * Builds the authorize URL opened in the system browser.
  * @param {string} state random nonce echoed back by the callback

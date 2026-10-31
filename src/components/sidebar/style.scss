@@ -691,6 +691,158 @@ body.no-animation {
 }
 
 // ---------------------------------------------------------------------------
+// Sidebar menu — with floating windows the docked-panel area of the sidebar
+// stays empty, so it hosts the option titles grouped by category
+// (Views / Tools / Account), each row opening its floating window.
+.sidebar-menu {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 10px 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // the docked-panel container stays out of the way while the menu shows
+  & ~ .container {
+    display: none;
+  }
+
+  .sidebar-menu-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 2px 8px 4px;
+  }
+
+  .sidebar-menu-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  .sidebar-menu-hint {
+    font-size: 10px;
+    opacity: 0.55;
+  }
+
+  .sidebar-menu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sidebar-menu-caption {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    opacity: 0.5;
+    padding: 6px 8px 2px;
+    pointer-events: none;
+  }
+
+  .sidebar-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 4px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.08);
+      background-color: color-mix(in srgb, currentColor 8%, transparent);
+    }
+
+    &.active {
+      background-color: rgba(255, 255, 255, 0.06);
+      background-color: color-mix(in srgb, currentColor 6%, transparent);
+
+      .sidebar-menu-name {
+        opacity: 1;
+      }
+    }
+
+    .icon {
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      font-size: 1.05em;
+      flex-shrink: 0;
+      text-align: center;
+
+      &.xc-svgicon {
+        svg {
+          width: 20px;
+          height: 20px;
+          display: block;
+          margin: auto;
+        }
+      }
+    }
+
+    .sidebar-menu-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.85;
+    }
+
+    // same pill as the rail badges, inline after the name
+    .app-badge {
+      position: static;
+      min-width: 16px;
+      height: 15px;
+      padding: 0 4px;
+      border-radius: 9px;
+      box-sizing: border-box;
+      background-color: #0078d4;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 15px;
+      text-align: center;
+      letter-spacing: 0;
+      pointer-events: none;
+      flex-shrink: 0;
+
+      &.dot {
+        min-width: 8px;
+        width: 8px;
+        height: 8px;
+        padding: 0;
+      }
+    }
+
+    .sidebar-menu-open {
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+      font-size: 0.9em;
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Floating sidebar windows — panels open as independent windows above the
 // editor instead of living inside the narrow sidebar overlay.
 .sidebar-float {
@@ -720,6 +872,21 @@ body.no-animation {
     width: 100vw !important;
     height: 100vh !important;
     border-radius: 0;
+  }
+
+  // collapsed to the header bar only (minimize button / tap the rail icon)
+  &.minimized {
+    height: auto !important;
+    min-height: 0;
+
+    .sidebar-float-body,
+    .sidebar-float-resize {
+      display: none;
+    }
+
+    .sidebar-float-header {
+      border-bottom: none;
+    }
   }
 
   .sidebar-float-header {

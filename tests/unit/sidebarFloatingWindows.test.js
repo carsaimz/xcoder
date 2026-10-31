@@ -144,6 +144,83 @@ describe("floating sidebar windows", () => {
 		);
 	});
 
+	describe("minimize / restore", () => {
+		test("the minimize button collapses the window to its header", async () => {
+			const $icon = await installLibs();
+			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			const $win = document.body.querySelector(".sidebar-float");
+			assert.ok($win?.classList.contains("show"), "window not shown");
+
+			const $min = $win.get(".sidebar-float-min");
+			assert.ok($min, "minimize button missing");
+			$min.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+			assert.ok($win.classList.contains("minimized"), "not minimized");
+			assert.ok(
+				!$win.get(".sidebar-float-body").offsetParent,
+				"body still visible (CSS hides it)",
+			);
+			// header stays: title + min/max/close
+			assert.ok($win.get(".sidebar-float-title"), "title missing");
+			assert.ok($win.get(".sidebar-float-max"), "maximize missing");
+			assert.ok($win.get(".sidebar-float-close"), "close missing");
+
+			// restore via the same button
+			$min.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			assert.ok(!$win.classList.contains("minimized"), "not restored");
+		});
+
+		test("tapping the rail icon of a minimized app restores it", async () => {
+			const $icon = await installLibs();
+			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			floatingWindow.toggleMinimize();
+			assert.ok(floatingWindow.isMinimized(), "precondition failed");
+
+			// second tap would normally close - on a minimized window it restores
+			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			assert.ok(!floatingWindow.isMinimized(), "not restored by icon tap");
+			assert.ok(floatingWindow.isOpenFor("libs"), "window lost");
+
+			// a third tap closes (VS Code toggle again)
+			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			assert.ok(!floatingWindow.isOpenFor("libs"), "toggle broken");
+		});
+
+		test("maximizing from minimized expands the window", async () => {
+			const $icon = await installLibs();
+			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			const $win = document.body.querySelector(".sidebar-float");
+			floatingWindow.toggleMinimize();
+
+			$win.get(".sidebar-float-max").dispatchEvent(
+				new MouseEvent("click", { bubbles: true }),
+			);
+			assert.ok(
+				!$win.classList.contains("minimized"),
+				"still minimized after maximize",
+			);
+			assert.ok($win.classList.contains("maximized"), "not maximized");
+		});
+
+		test("activating another app un-minimizes the window", async () => {
+			await installLibs();
+			const $icon = $apps.get('[data-id="libs"]');
+			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			floatingWindow.toggleMinimize();
+			assert.ok(floatingWindow.isMinimized(), "precondition failed");
+
+			const website = (await import("sidebarApps/website")).default;
+			sidebarApps.add(...website);
+			const $web = $apps.get('[data-id="websiteApp"]');
+			$web.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+			const $win = document.body.querySelector(".sidebar-float");
+			assert.ok(!$win.classList.contains("minimized"), "still minimized");
+			assert.equal($win.dataset.app, "websiteApp", "content not swapped");
+			sidebarApps.remove("websiteApp");
+		});
+	});
+
 	test("icon labels are rendered and captions categorize the groups", async () => {
 		const $icon = await installLibs();
 		const $label = $icon.querySelector(":scope > .app-label");

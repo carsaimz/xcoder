@@ -206,6 +206,9 @@ declare type LangStrings = {
   "don't ask again": string;
   "download xcoder pro": string;
   "downloading file": string;
+  "download from url": string;
+  "downloading": string;
+  "download complete": string;
   "downloading...": string;
   "downloads": string;
   "earn ad-free time": string;
@@ -299,6 +302,13 @@ declare type LangStrings = {
   "sign in failed": string;
   "git commit": string;
   "git commit msg": string;
+  "git publish": string;
+  "git publish done": string;
+  "git publish empty": string;
+  "sidebar group primary": string;
+  "sidebar group tools": string;
+  "sidebar group bottom": string;
+  "sidebar float maximize": string;
   "git commits": string;
   "git confirm restore": string;
   "git copied": string;
@@ -1518,6 +1528,9 @@ declare type LangStrings = {
   "local libs copy cdn": string;
   "local libs copy project": string;
   "local libs tag local": string;
+  "local libs offline": string;
+  "local libs cdn": string;
+  "local libs tag cdn": string;
   "dev tools json": string;
   "dev tools base64": string;
   "dev tools ids": string;
@@ -1574,6 +1587,10 @@ declare type LangStrings = {
   "dev tools bottom left": string;
   "dev tools border radius": string;
   "dev tools border radius desc": string;
+  "sidebar menu title": string;
+  "sidebar menu hint": string;
+  "sidebar float minimize": string;
+  "sidebar float restore": string;
 };
 
 declare var strings: LangStrings;
