@@ -197,7 +197,20 @@
                         }
                 }
 
-                .git-commit-btn {
+                .git-publish-btn {
+          border: none;
+          border-radius: 10px;
+          background: linear-gradient(135deg, #238636, #2ea043);
+          color: #ffffff;
+          font-weight: 600;
+          padding: 10px 14px;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .git-commit-btn {
                         border: none;
                         border-radius: 10px;
                         background: linear-gradient(

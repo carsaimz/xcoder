@@ -1,3 +1,4 @@
+import floatingWindow from "components/sidebar/floatingWindow";
 import toast from "components/toast";
 import tag from "html-tag-js";
 import logger from "lib/logger";
@@ -41,8 +42,14 @@ function add(
 	apps.push(app);
 	app.install(prepend);
 
-	// tabbed and launcher apps never own the sidebar panel on restore
-	if (currentSection === id && !opts.tabbed && !opts.launcher) {
+	// tabbed and launcher apps never own the sidebar panel on restore;
+	// floating mode boots with NO open panel (first tap opens it)
+	if (
+		currentSection === id &&
+		!opts.tabbed &&
+		!opts.launcher &&
+		!floatingWindow.floatingEnabled()
+	) {
 		setActiveApp(id);
 	}
 }
@@ -80,6 +87,17 @@ function init($el) {
 	$apps.addEventListener("click", onclick);
 	SidebarApp.init($el, $apps);
 	attachLongPressTooltips($apps);
+	// icon names under the glyphs (categorized views)
+	if (localStorage.getItem("sidebarIconLabels") !== "0") {
+		$apps.classList.add("with-labels");
+	}
+	// floating window closed by its header button
+	document.addEventListener("sidebar-float-closed", (e) => {
+		if (currentSection === e.detail?.id) {
+			currentSection = null;
+			localStorage.removeItem(SIDEBAR_APPS_LAST_SECTION);
+		}
+	});
 }
 
 /**
@@ -234,6 +252,15 @@ function pulseApp(id) {
 		}
 		if (app.tabbed) {
 			app.pulse();
+			return;
+		}
+		// tap again on the open panel = close it (VS Code toggle)
+		if (
+			app.active &&
+			floatingWindow.floatingEnabled() &&
+			floatingWindow.isOpenFor(id)
+		) {
+			floatingWindow.close();
 			return;
 		}
 		setActiveApp(id);

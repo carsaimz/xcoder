@@ -84,8 +84,11 @@ window.strings = {
 // pretend another section was last active so libs does NOT
 // auto-activate when added — the test then exercises the real tap path
 localStorage.setItem("sidebarAppsLastSection", "files");
+// the regression taps the icon like a user - boot restore is over
+floatingWindow.setBootHold(false);
 
 import sidebarApps from "sidebarApps";
+import floatingWindow from "components/sidebar/floatingWindow";
 
 // minimal sidebar shell — sidebarApps.init stores both nodes
 const $sidebar = tag("div", { className: "sidebar" });
@@ -110,12 +113,20 @@ async function installAndTap() {
         $icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 }
 
+/** The panel lives in the floating window (default mode), not the sidebar. */
+function $panelRoot() {
+	return (
+		document.body.querySelector(".sidebar-float .libs-root") ||
+		$sidebar.get(".libs-root")
+	);
+}
+
 describe("libs sidebar app activation (book icon)", () => {
         test("first tap on the book icon renders the library list", async () => {
                 await installAndTap();
 
-                const $root = $sidebar.get(".libs-root");
-                assert.ok($root, "libs root not attached to the sidebar");
+                const $root = $panelRoot();
+                assert.ok($root, "libs root not rendered after activation");
 
                 // THE BUG: the panel stayed empty before the fix (render
                 // early-returned while detached and onSelected never rendered)
@@ -136,13 +147,13 @@ describe("libs sidebar app activation (book icon)", () => {
         test("opening a card shows the detail view with actions", async () => {
                 await installAndTap();
 
-                const $card = $sidebar.get(".libs-card");
+                const $card = $panelRoot().querySelector(".libs-card");
                 $card.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
-                const $detail = $sidebar.get(".libs-detail");
+                const $detail = $panelRoot().querySelector(".libs-detail");
                 assert.ok($detail, "detail view missing after tapping a card");
                 assert.ok(
-                        $sidebar.get(".libs-actions"),
+                        $panelRoot().querySelector(".libs-actions"),
                         "detail view has no action buttons",
                 );
         });

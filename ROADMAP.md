@@ -16,7 +16,19 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.6
+## ✅ Concluído até a v1.8.7
+
+- **v1.8.7 — downloads, 59 libs, terminal no projeto, publicar no
+  GitHub, plugins Codex/Claude Code e painéis flutuantes:** gestor
+  de descargas (fila + notificações + cancelar; entrada no
+  navegador de ficheiros e no Website), catálogo de bibliotecas
+  8 offline + 51 CDN (URLs verificados), terminal faz cd para a
+  pasta ativa, botão «Publicar no GitHub» via API git data com a
+  conta conectada, marketplace com Codex + Claude Code (35 plugins)
+  e skills /skill codex + /skill claude-code; sidebar com nomes,
+  legendas por categoria e janelas flutuantes arrastáveis/
+  redimensionáveis/maximizáveis.
+
 
 - **v1.8.6 — ícone de livro vivo + rename esperto:** o painel
   «Bibliotecas» (ícone de livro) renderiza em TODA ativação — antes
@@ -626,7 +638,19 @@ referência.
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.8.6
+## ✅ Done through v1.8.7
+
+- **v1.8.7 — downloads, 59 libs, project-aware terminal, GitHub
+  publish, Codex/Claude Code plugins and floating panels:**
+  download manager (queue + notifications + cancel; entries in the
+  file browser and the Website app), library catalog 8 offline +
+  51 CDN (URLs verified), terminal cds into the active folder,
+  «Publish to GitHub» via the git data API using the connected
+  account, marketplace with Codex + Claude Code (35 plugins) and
+  /skill codex + /skill claude-code playbooks; sidebar with icon
+  names, category captions and draggable/resizable/maximizable
+  floating windows.
+
 
 - **v1.8.6 — live book icon + smart rename:** the «Libraries» panel
   (book icon) renders on EVERY activation — it used to open empty

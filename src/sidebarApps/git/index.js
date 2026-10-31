@@ -5,9 +5,11 @@ import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import vshell from "lib/ai/vshell";
+import { planCommit, publishToGitHub, splitRepo } from "lib/ghPublish";
 import { pickAndApplyGhRepo } from "lib/ghRepos";
 import { refreshGhProfile, signInGitHubFlow } from "lib/ghSignIn";
 import {
+	collectWorkspace,
 	commit,
 	getStatus,
 	preparedCommands,
@@ -188,6 +190,9 @@ function buildUi() {
 				{$message}
 				<button className="git-commit-btn" onclick={onCommit}>
 					{strings["git commit"] || "Commit"}
+				</button>
+				<button className="git-publish-btn" onclick={onPublish}>
+					{strings["git publish"] || "Publicar no GitHub"}
 				</button>
 			</div>
 			<div className="git-prefixes">
@@ -543,6 +548,64 @@ async function onCommit() {
 		refresh();
 	} catch (error) {
 		toast(`commit: ${error.message || error}`);
+	}
+}
+
+/**
+ * Publishes the workspace text files to the configured GitHub
+ * repository as ONE real commit using the connected account (PAT).
+ * collectWorkspace() already filters text files and sizes.
+ */
+async function onPublish() {
+	const values = settings.value;
+	if (!values.ghToken) {
+		toast(strings["github sign in desc"] || "Sign in to GitHub first");
+		return;
+	}
+	if (!values.ghRepo) {
+		toast(strings["git repo card"] || "Choose a repository first");
+		return;
+	}
+	const parsed = splitRepo(values.ghRepo);
+	if (!parsed) {
+		toast(
+			`${values.ghRepo}: ${strings["git repo card"] || "invalid owner/name"}`,
+		);
+		return;
+	}
+	const message = ($message?.value || "").trim() || "update from XCoder";
+	const $publishLoader = loader.create(
+		strings["git publish"] || "Publicar no GitHub",
+		values.ghRepo,
+		{ timeout: 0 },
+	);
+	try {
+		const workspace = await collectWorkspace();
+		const files = Object.entries(workspace).map(([path, content]) => ({
+			path,
+			content,
+		}));
+		const plan = planCommit(files);
+		if (plan.ups + plan.dels === 0) {
+			toast(strings["git publish empty"] || "No text files to publish");
+			return;
+		}
+		const result = await publishToGitHub({
+			token: values.ghToken,
+			ghRepo: values.ghRepo,
+			branch: values.ghBranch || undefined,
+			message,
+			files,
+		});
+		toast(
+			`${strings["git publish done"] || "Published"}: ${parsed.owner}/${parsed.repo} (${result.branch})`,
+			4500,
+		);
+		if ($message) $message.value = "";
+	} catch (error) {
+		toast(`publish: ${error.message || error}`);
+	} finally {
+		$publishLoader.destroy();
 	}
 }
 

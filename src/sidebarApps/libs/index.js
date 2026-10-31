@@ -5,10 +5,10 @@ import { applyToEditor } from "lib/ai/editorBridge";
 import editorManager from "lib/editorManager";
 import lang from "lib/lang";
 import {
+	ALL_LIBS,
 	cdnTags,
 	copyPlan,
 	formatBytes,
-	LOCAL_LIBS,
 	libSize,
 	localTags,
 } from "lib/localLibs";
@@ -131,7 +131,12 @@ function libCard(lib) {
 			</span>
 			<span className="libs-desc">{desc(lib)}</span>
 			<span className="libs-meta">
-				<span>{formatBytes(libSize(lib))}</span>
+				<span className="libs-badge">
+					{lib.bundled
+						? t("local libs offline", "Offline")
+						: t("local libs cdn", "CDN")}
+				</span>
+				{libSize(lib) > 0 ? `<span>${formatBytes(libSize(lib))}</span>` : ""}
 				<span>
 					{lib.files.length} {lib.files.length === 1 ? "file" : "files"}
 				</span>
@@ -172,20 +177,31 @@ function libDetail(lib) {
 		$btn.onclick = onclick;
 		$actions.append($btn);
 	};
-	action(t("local libs copy local", "Copy local tag"), true, () =>
-		copyText(localTags(lib)),
-	);
-	action(t("local libs copy cdn", "Copy CDN tag"), false, () =>
-		copyText(cdnTags(lib)),
-	);
-	action(t("dev tools insert", "Insert"), false, () =>
-		insertText(localTags(lib)),
-	);
-	action(t("local libs copy project", "Copy to project"), false, () =>
-		copyToProject(lib).catch((error) =>
-			toast(`copy: ${error.message || error}`),
-		),
-	);
+	if (lib.bundled) {
+		action(t("local libs copy local", "Copy local tag"), true, () =>
+			copyText(localTags(lib)),
+		);
+		action(t("local libs copy cdn", "Copy CDN tag"), false, () =>
+			copyText(cdnTags(lib)),
+		);
+		action(t("dev tools insert", "Insert"), false, () =>
+			insertText(localTags(lib)),
+		);
+		action(t("local libs copy project", "Copy to project"), false, () =>
+			copyToProject(lib).catch((error) =>
+				toast(`copy: ${error.message || error}`),
+			),
+		);
+	} else {
+		// catalog-only entry: the files live on jsDelivr, so the
+		// useful actions are the CDN tag and inserting it
+		action(t("local libs copy cdn", "Copy CDN tag"), true, () =>
+			copyText(cdnTags(lib)),
+		);
+		action(t("dev tools insert", "Insert"), false, () =>
+			insertText(cdnTags(lib)),
+		);
+	}
 
 	$view.append(
 		<div className="libs-detail-head">
@@ -193,7 +209,7 @@ function libDetail(lib) {
 			<h2 className="libs-title">{lib.name}</h2>
 			<div className="libs-meta">
 				<span>v{lib.version}</span>
-				<span>{formatBytes(libSize(lib))}</span>
+				{libSize(lib) > 0 ? `<span>${formatBytes(libSize(lib))}</span>` : ""}
 				<span>{lib.license}</span>
 				<span>{lib.site.replace(/^https?:\/\//, "")}</span>
 			</div>
@@ -210,9 +226,13 @@ function libDetail(lib) {
 		</div>,
 		<div className="libs-snippet">
 			<span className="libs-snippet-label">
-				{t("local libs tag local", "Local tag (after copy)")}
+				{lib.bundled
+					? t("local libs tag local", "Local tag (after copy)")
+					: t("local libs tag cdn", "CDN tag")}
 			</span>
-			<pre className="libs-snippet-code scroll">{localTags(lib)}</pre>
+			<pre className="libs-snippet-code scroll">
+				{lib.bundled ? localTags(lib) : cdnTags(lib)}
+			</pre>
 		</div>,
 	);
 	return $view;
@@ -223,7 +243,7 @@ function render() {
 	if (!$panel?.isConnected) return;
 	$panel.textContent = "";
 	if (selectedId) {
-		const lib = LOCAL_LIBS.find((entry) => entry.id === selectedId);
+		const lib = ALL_LIBS.find((entry) => entry.id === selectedId);
 		if (lib) {
 			$panel.append(libDetail(lib));
 			return;
@@ -232,7 +252,7 @@ function render() {
 	}
 	$panel.append(
 		<div className="libs-list scroll">
-			{LOCAL_LIBS.map((lib) => libCard(lib))}
+			{ALL_LIBS.map((lib) => libCard(lib))}
 		</div>,
 	);
 }

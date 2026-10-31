@@ -13,6 +13,7 @@ import openFile from "lib/openFile";
 import openFolder from "lib/openFolder";
 import appSettings from "lib/settings";
 import { getHostHomeDir, resolveInitialDirectory } from "lib/sshSessions";
+import { activeProjectCd } from "lib/terminalCwd";
 import helpers from "utils/helpers";
 import Url from "utils/Url";
 import TerminalComponent from "./terminal";
@@ -343,6 +344,22 @@ class TerminalManager {
 						// Connect to session if in server mode
 						if (terminalComponent.serverMode) {
 							await terminalComponent.connectToSession(terminalOptions.pid);
+							// Fresh sessions drop straight into the active project
+							// folder (reconnected ones keep their previous cwd). The
+							// PTY input buffer holds the line until the shell reads it,
+							// so a short defer is enough to let init finish first.
+							if (!terminalOptions.pid && !terminalComponent.remoteSsh) {
+								const cdCommand = activeProjectCd(editorManager.activeFile);
+								if (cdCommand) {
+									setTimeout(() => {
+										try {
+											terminalComponent.write(`${cdCommand}\r`);
+										} catch {
+											/* session died before the cd landed */
+										}
+									}, 700);
+								}
+							}
 						} else {
 							// For local mode, just write a welcome message
 							terminalComponent.write(

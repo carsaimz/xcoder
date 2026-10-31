@@ -657,6 +657,10 @@ async function loadApp() {
 	quickToolsInit();
 	sidebarApps.init($sidebar);
 	await sidebarApps.loadApps();
+	// boot restore done - floating windows may now open on user taps
+	(await import("components/sidebar/floatingWindow")).default.setBootHold(
+		false,
+	);
 	editorManager.onupdate = onEditorUpdate;
 	root.on("show", mainPageOnShow);
 	app.addEventListener("click", onClickApp);

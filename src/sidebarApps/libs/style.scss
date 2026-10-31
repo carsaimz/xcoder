@@ -54,6 +54,18 @@
 		opacity: 0.85;
 	}
 
+	.libs-badge {
+		padding: 1px 7px;
+		border-radius: 999px;
+		font-size: 0.62em;
+		font-weight: 600;
+		letter-spacing: 0.4px;
+		text-transform: uppercase;
+		background-color: rgba(124, 58, 237, 0.18);
+		color: #a78bfa;
+		align-self: flex-start;
+	}
+
 	.libs-meta {
 		display: flex;
 		flex-wrap: wrap;

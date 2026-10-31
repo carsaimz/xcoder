@@ -1,5 +1,7 @@
 import "./style.scss";
+import prompt from "dialogs/prompt";
 import config from "lib/config";
+import { startDownload } from "lib/downloadManager";
 
 /**
  * Website sidebar app — an in-app webview (iframe) that opens the
@@ -48,6 +50,17 @@ function goBack() {
 	}
 }
 
+/** Prompts for a URL and hands it to the download manager. */
+async function downloadFromUrl() {
+	const url = await prompt(
+		t("download from url", "Download from URL"),
+		"",
+		"url",
+		{ required: true, placeholder: "https://..." },
+	);
+	if (url) startDownload({ url });
+}
+
 /** Opens the site in the system browser (custom tabs). */
 function openExternal() {
 	try {
@@ -92,7 +105,7 @@ function buildUi() {
 			title="XCoder website"
 			referrerPolicy="no-referrer-when-downgrade"
 			/* the official site is ours — scripts needed; rest is locked */
-			sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+			sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
 			onload={() => {
 				if ($loading) $loading.style.display = "none";
 			}}
@@ -131,6 +144,12 @@ function buildUi() {
 					role="button"
 					aria-label={t("reload", "Recarregar")}
 					onclick={reload}
+				/>
+				<span
+					className="icon file_download web-act"
+					role="button"
+					aria-label={t("download from url", "Download from URL")}
+					onclick={downloadFromUrl}
 				/>
 				<span
 					className="icon open_in_browser web-act"

@@ -1,845 +1,895 @@
 {
-	"plugins": [
-		{
-			"id": "xcoder.word-count",
-			"name": "Word Count",
-			"version": "1.0.0",
-			"description": "Count words, characters and lines of the document or selection.\n\n**Word Count** adds a single command that reports the number of words, characters (with and without spaces) and lines of the current document — or of the active selection, when there is one.\n\n## Usage\nOpen the command palette and run **Word count: show words, characters and lines** (shortcut `Ctrl-Alt-W`). A toast appears with the statistics. Ideal for essays, README files and any text with a size limit.\n\n## Português\n**Contador de palavras**: um comando que mostra palavras, caracteres (com e sem espaços) e linhas do documento ou da seleção ativa. Atalho `Ctrl-Alt-W`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/word-count/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/word-count/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/word-count/icon.png",
-			"keywords": [
-				"word",
-				"count",
-				"stats",
-				"characters",
-				"lines"
-			],
-			"downloads": 1240,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.case-toggle",
-			"name": "Case Converter",
-			"version": "1.0.0",
-			"description": "Convert the selection or word to UPPER, lower, Title, camelCase, snake_case and more.\n\n**Case Converter** transforms the current selection — or the word under the cursor — between eight case styles: `UPPER CASE`, `lower case`, `Title Case`, `Sentence case`, `camelCase`, `snake_case`, `kebab-case` and `iNVERSE cASE`.\n\n## Usage\nSelect some text (or just place the cursor on a word), open the command palette and run **Case converter** (`Ctrl-Alt-C`), then pick the target style. Great for constants, CSS class names and variable renaming without retyping.\n\n## Português\n**Conversor de maiúsculas**: transforma a seleção (ou a palavra sob o cursor) entre oito estilos — MAIÚSCULAS, minúsculas, Título, Sentença, camelCase, snake_case, kebab-case e invertido. Atalho `Ctrl-Alt-C`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/case-toggle/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/case-toggle/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/case-toggle/icon.png",
-			"keywords": [
-				"case",
-				"upper",
-				"lower",
-				"camel",
-				"snake",
-				"kebab",
-				"text"
-			],
-			"downloads": 980,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.sort-lines",
-			"name": "Sort Lines",
-			"version": "1.0.0",
-			"description": "Sort, reverse, shuffle or deduplicate the selected lines (or the whole document).\n\n**Sort Lines** organises the selected lines — or the whole document when nothing is selected — with seven modes: ascending, descending, case-insensitive, numeric aware, unique (removes duplicated lines), reverse and shuffle.\n\n## Usage\nSelect the lines you want to organise, open the command palette and run **Sort lines** (`Ctrl-Alt-S`). Perfect for lists, imports blocks, CSS properties and cleanup of duplicated data.\n\n## Português\n**Ordenar linhas**: organiza as linhas selecionadas (ou o documento inteiro) em sete modos — A-Z, Z-A, ignorar maiúsculas, numérico, único (remove duplicadas), inverter e aleatório. Atalho `Ctrl-Alt-S`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sort-lines/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-lines/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-lines/icon.png",
-			"keywords": [
-				"sort",
-				"lines",
-				"order",
-				"unique",
-				"shuffle"
-			],
-			"downloads": 860,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.insert-date",
-			"name": "Insert Date & Time",
-			"version": "1.0.0",
-			"description": "Insert the current date/time in nine formats at the cursor position.\n\n**Insert Date & Time** places the current date and time exactly where the cursor is, in nine formats: `YYYY-MM-DD`, `DD/MM/YYYY`, `MM/DD/YYYY`, `HH:mm`, date + time, date + time with seconds, ISO 8601 (UTC), device locale format and Unix timestamp.\n\n## Usage\nOpen the command palette and run **Insert date & time** (`Ctrl-Alt-T`), then choose a format. Useful for changelogs, commits notes, logs and journaling files.\n\n## Português\n**Inserir data e hora**: insere a data/hora atual na posição do cursor em nove formatos, incluindo ISO 8601 e timestamp Unix. Atalho `Ctrl-Alt-T`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/insert-date/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/insert-date/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/insert-date/icon.png",
-			"keywords": [
-				"date",
-				"time",
-				"timestamp",
-				"insert",
-				"stamp"
-			],
-			"downloads": 720,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.lorem-ipsum",
-			"name": "Lorem Ipsum",
-			"version": "1.0.0",
-			"description": "Generate Lorem Ipsum placeholder paragraphs directly into the editor.\n\n**Lorem Ipsum** generates classic placeholder text and inserts it at the cursor. Ask for any number of paragraphs (up to 50) and each one is freshly generated with varied sentence lengths, so mock-ups never look copy-pasted.\n\n## Usage\nOpen the command palette and run **Lorem Ipsum: insert**. Type how many paragraphs you need (empty = 3) and confirm. Ideal for testing layouts, typography and page performance.\n\n## Português\n**Lorem Ipsum**: gera parágrafos de texto de preenchimento diretamente no editor — informe a quantidade (vazio = 3). Ideal para testar layouts e tipografia.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/lorem-ipsum/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/lorem-ipsum/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/lorem-ipsum/icon.png",
-			"keywords": [
-				"lorem",
-				"ipsum",
-				"placeholder",
-				"dummy",
-				"text"
-			],
-			"downloads": 650,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.base64-tool",
-			"name": "Base64 & URL Tool",
-			"version": "1.0.0",
-			"description": "Encode/decode Base64 (with full Unicode support) and percent-encoded URLs.\n\n**Base64 & URL Tool** converts the current selection — or the whole document — between plain text and: Base64, URL-safe Base64, Base64 decoded back, percent-encoded URLs and decoded URLs. Unicode is handled correctly (accents, emoji, CJK), so Portuguese text survives every round-trip.\n\n## Usage\nSelect the text to convert, open the command palette and run **Base64 & URL tool**. Invalid Base64 input shows a friendly toast instead of crashing.\n\n## Português\n**Ferramenta Base64 e URL**: codifica/decodifica Base64 (com suporte completo a Unicode) e URLs percent-encodings da seleção ou do documento inteiro.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/base64-tool/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base64-tool/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base64-tool/icon.png",
-			"keywords": [
-				"base64",
-				"url",
-				"encode",
-				"decode",
-				"converter",
-				"unicode"
-			],
-			"downloads": 540,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.line-tools",
-			"name": "Line Tools",
-			"version": "1.0.0",
-			"description": "Duplicate, move up and move down lines or blocks without cutting and pasting.\n\n**Line Tools** adds three editing commands that every keyboard user misses on mobile: **duplicate** the current line or selected block (`Ctrl-Shift-D`), **move up** and **move down** the current line or block. Selections are preserved and moved together with the text, exactly like desktop editors.\n\n## Usage\nPlace the cursor on a line (or select a block), open the command palette and search for *Line tools*. All commands also appear in the key bindings editor, so you can remap them freely.\n\n## Português\n**Ferramentas de linha**: duplica (`Ctrl-Shift-D`), move para cima e move para baixo a linha atual ou o bloco selecionado, preservando a seleção.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/line-tools/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/line-tools/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/line-tools/icon.png",
-			"keywords": [
-				"lines",
-				"duplicate",
-				"move",
-				"editor",
-				"editing"
-			],
-			"downloads": 470,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.toggle-comment",
-			"name": "Toggle Comment",
-			"version": "1.0.0",
-			"description": "Comment or uncomment the current line/selection with the right token for the file type.\n\n**Toggle Comment** comments or uncomments the current line or the whole selection with one command (`Ctrl-/`). The comment token matches the file you are editing: `//` for JavaScript, TypeScript, Java, Go, Rust…; `#` for Python, Ruby, YAML, Shell; `--` for SQL and Lua; `/* */` for CSS; `<!-- -->` for HTML and Markdown. Multi-line selections are commented at the shared indentation level, and running it again removes the comments cleanly.\n\n## Usage\nPlace the cursor on a line (or select a block) and run **Toggle comment** from the command palette (`Ctrl-/`). Inspired by the classic desktop editors' Ctrl-/ behaviour.\n\n## Português\n**Toggle Comment**: comenta/descomenta a linha atual ou a seleção com o token certo para o tipo de arquivo (`//`, `#`, `--`, `/* */`, `<!-- -->`). Atalho `Ctrl-/`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/toggle-comment/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/toggle-comment/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/toggle-comment/icon.png",
-			"keywords": [
-				"comment",
-				"toggle",
-				"code",
-				"editor",
-				"productivity"
-			],
-			"downloads": 390,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.json-tools",
-			"name": "JSON Tools",
-			"version": "1.0.0",
-			"description": "Pretty print, minify, escape, unescape and validate JSON with friendly errors.\n\n**JSON Tools** turns messy JSON into readable form in one tap: pretty print with 2 or 4 spaces, minify, escape a text into a JSON string, unescape it back, and a dedicated validator. Syntax errors report the approximate position so you can fix broken payloads quickly. Works on the selection or the whole document.\n\n## Usage\nSelect the JSON (or leave the whole document), open the command palette and run **JSON tools** (`Ctrl-Alt-J`) — then pick the action. **JSON: validate** (`json-tools:validate`) only checks and reports.\n\n## Português\n**Ferramentas JSON**: formata (2/4 espaços), minifica, escapa, desescapa e valida JSON da seleção ou do documento, com erros que apontam a posição. Atalho `Ctrl-Alt-J`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/json-tools/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/json-tools/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/json-tools/icon.png",
-			"keywords": [
-				"json",
-				"format",
-				"minify",
-				"validate",
-				"escape"
-			],
-			"downloads": 355,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.uuid-generator",
-			"name": "UUID Generator",
-			"version": "1.0.0",
-			"description": "Generate UUID v4, short ids and random hex ids straight into the editor.\n\n**UUID Generator** creates identifiers with cryptographically strong randomness (Web Crypto when available) and inserts them at the cursor: UUID v4 in upper/lowercase, without dashes, 12/16-char short ids (alphanumeric) and 16-digit hex ids. Perfect for test fixtures, database seeds, request ids and mock data.\n\n## Usage\nOpen the command palette and run **UUID Generator** (`Ctrl-Alt-U`), pick the format — done. **Quick UUID** inserts a lowercase v4 instantly without any dialog.\n\n## Português\n**Gerador de UUID**: cria e insere UUID v4 (maiúsculas/minúsculas, sem traços), short ids e ids hex na posição do cursor, com aleatoriedade criptográfica. Atalho `Ctrl-Alt-U`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/uuid-generator/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/uuid-generator/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/uuid-generator/icon.png",
-			"keywords": [
-				"uuid",
-				"guid",
-				"id",
-				"random",
-				"generator"
-			],
-			"downloads": 310,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.emoji-picker",
-			"name": "Emoji Picker",
-			"version": "1.0.0",
-			"description": "Browse a curated emoji set in six categories and insert it at the cursor.\n\n**Emoji Picker** brings a lightweight emoji browser into the editor: six curated categories (smileys, gestures, status symbols, tech, nature & food and objects) with the emojis that actually matter for documentation, commit messages and UI copy. No heavy emoji database — a hand-picked set that loads instantly.\n\n## Usage\nOpen the command palette and run **Emoji Picker** (`Ctrl-Alt-E`), choose a category, then tap the emoji to insert it. Works everywhere the editor accepts text.\n\n## Português\n**Seletor de emojis**: escolha entre seis categorias curadas (carinhas, gestos, status, tecnologia, natureza e objetos) e insira o emoji no cursor. Atalho `Ctrl-Alt-E`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/emoji-picker/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/emoji-picker/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/emoji-picker/icon.png",
-			"keywords": [
-				"emoji",
-				"picker",
-				"unicode",
-				"insert",
-				"fun"
-			],
-			"downloads": 280,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.color-insert",
-			"name": "Color Insert",
-			"version": "1.0.0",
-			"description": "Pick a color from a palette or paste a hex and insert it as HEX, RGB or HSL.\n\n**Color Insert** speeds up styling work: choose a color from a curated 24-tone palette (or type any hex) and insert it in HEX, `rgb()` or `hsl()` notation — the conversions happen for you. Great for CSS, Compose, SVG and design tokens.\n\n## Usage\nOpen the command palette and run **Color picker** (`Ctrl-Alt-H`), pick a color, choose the notation. 3-digit hex shorthands are accepted and normalized.\n\n## Português\n**Inserir cor**: escolha uma cor da paleta ou digite um hex e insira como HEX, `rgb()` ou `hsl()` — a conversão é automática. Atalho `Ctrl-Alt-H`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/color-insert/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-insert/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-insert/icon.png",
-			"keywords": [
-				"color",
-				"hex",
-				"rgb",
-				"hsl",
-				"css",
-				"design"
-			],
-			"downloads": 245,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.markdown-toc",
-			"name": "Markdown TOC",
-			"version": "1.0.0",
-			"description": "Generate or refresh a GitHub-style table of contents from your Markdown headings.\n\n**Markdown TOC** scans the document for `#`…`######` headings (skipping fenced code blocks) and builds a GitHub-style table of contents with correct anchor slugs — including duplicate heading disambiguation. If a `<!-- TOC -->` block already exists it is refreshed in place; otherwise the TOC is inserted right after the first H1.\n\n## Usage\nOpen a Markdown file, run **Markdown: generate TOC** (`Ctrl-Alt-G`). Re-run any time after editing — the markers `<!-- TOC -->` / `<!-- /TOC -->` keep the section updated.\n\n## Português\n**Sumário Markdown**: gera/atualiza um sumário no estilo GitHub a partir dos títulos (ignorando blocos de código), com âncoras corretas. Atalho `Ctrl-Alt-G`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/markdown-toc/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/markdown-toc/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/markdown-toc/icon.png",
-			"keywords": [
-				"markdown",
-				"toc",
-				"table of contents",
-				"headings",
-				"docs"
-			],
-			"downloads": 210,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.indent-switch",
-			"name": "Indent Switch",
-			"version": "1.0.0",
-			"description": "Convert the document between tabs and spaces (2, 4 or the detected width).\n\n**Indent Switch** detects the dominant indentation style of the document (tabs vs. spaces and the space width) and converts the whole file in one command. Mixed indentation is a classic source of diff noise and Python errors — this fixes it in a tap.\n\n## Usage\nOpen the command palette and run **Convert indentation** (`Ctrl-Alt-I`). The dialog shows what was detected and offers spaces→tabs or tabs→spaces conversions (2, 4 or the detected width). A toast reports how many lines changed.\n\n## Português\n**Alternar indentação**: detecta o estilo do documento e converte entre tabulações e espaços (2, 4 ou a largura detectada). Atalho `Ctrl-Alt-I`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/indent-switch/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/indent-switch/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/indent-switch/icon.png",
-			"keywords": [
-				"indent",
-				"tabs",
-				"spaces",
-				"format",
-				"whitespace"
-			],
-			"downloads": 180,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.remove-duplicates",
-			"name": "Remove Duplicates",
-			"version": "1.0.0",
-			"description": "Remove duplicated lines from the selection or document, keeping the first occurrence.\n\n**Remove Duplicates** cleans lists, logs and generated data: it removes every repeated line (keeping the first), only consecutive repeats, or repeats compared after trimming whitespace. Works on the selection or the whole document and reports how many lines were removed.\n\n## Usage\nSelect the text (or use the whole file), open the command palette and run **Remove duplicated lines** (`Ctrl-Alt-B`), then pick the mode. Pair it with *Sort Lines* for tidy lists.\n\n## Português\n**Remover duplicadas**: remove linhas repetidas da seleção ou do documento (mantém a primeira), com modo só-sequenciais e comparação ignorando espaços. Atalho `Ctrl-Alt-B`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/remove-duplicates/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/remove-duplicates/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/remove-duplicates/icon.png",
-			"keywords": [
-				"dedupe",
-				"duplicates",
-				"lines",
-				"clean",
-				"text"
-			],
-			"downloads": 165,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.hash-generator",
-			"name": "Hash Generator",
-			"version": "1.0.0",
-			"description": "Hash the selection or document with SHA-1/256/384/512 and copy or insert the digest.\n\n**Hash Generator** computes SHA digests with the platform's Web Crypto (fast and offline): SHA-256, SHA-512, SHA-384 and legacy SHA-1. Copy the digest as hex or Base64, insert it at the cursor, or drop it as a `// sha256: …` comment next to the selection. Ideal for verifying payloads, caching keys and committing integrity checks.\n\n## Usage\nSelect the text to hash (or hash the whole document), open the command palette and run **Hash generator** (`Ctrl-Alt-K`), pick the algorithm and the output action.\n\n## Português\n**Gerador de hash**: calcula SHA-256/512/384/SHA-1 da seleção ou do documento com Web Crypto (offline) e copia (hex/Base64) ou insere o resultado. Atalho `Ctrl-Alt-K`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/hash-generator/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/hash-generator/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/hash-generator/icon.png",
-			"keywords": [
-				"hash",
-				"sha256",
-				"sha512",
-				"checksum",
-				"security"
-			],
-			"downloads": 140,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.tag-wrapper",
-			"name": "Tag Wrapper",
-			"version": "1.0.0",
-			"description": "Wrap the selection with any HTML tag (including attributes) in one command.\n\n**Tag Wrapper** surrounds the current selection — or the word under the cursor — with any HTML tag you type, attributes included: `div class=box` becomes `<div class=box>selection</div>`. Typing tags by hand around existing content is one of the most repetitive editing tasks in HTML; this plugin removes it.\n\n## Usage\nSelect the text, open the command palette and run **Tag wrapper** (`Ctrl-Alt-R`), then type the tag name (optionally followed by attributes). Cancel closes the dialog without touching the text.\n\n## Português\n**Envolver com tag**: envolve a seleção (ou a palavra sob o cursor) com qualquer tag HTML — atributos incluídos, ex.: `div class=box`. Atalho `Ctrl-Alt-R`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/tag-wrapper/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/tag-wrapper/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/tag-wrapper/icon.png",
-			"keywords": [
-				"html",
-				"wrap",
-				"tag",
-				"selection",
-				"markup"
-			],
-			"downloads": 310,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.quote-converter",
-			"name": "Quote Converter",
-			"version": "1.0.0",
-			"description": "Swap single/double quotes (or strip them) on the selection or word, with escaping.\n\n**Quote Converter** converts the quotes around or inside the current selection — or the word under the cursor: single → double, double → single, or remove the outer quotes entirely. Inner quotes of the opposite kind are escaped automatically and backslash sequences are preserved, so JavaScript strings survive the round-trip.\n\n## Usage\nSelect a string (or place the cursor on it), open the command palette and run **Quote converter** (`Ctrl-Alt-Q`), then pick the target style. Inspired by the classic Acode plugin of the same name, rebuilt for the Xcoder API.\n\n## Português\n**Conversor de aspas**: troca aspas simples/duplas (ou remove as externas) na seleção ou palavra, com escape automático. Atalho `Ctrl-Alt-Q`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/quote-converter/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/quote-converter/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/quote-converter/icon.png",
-			"keywords": [
-				"quotes",
-				"string",
-				"convert",
-				"single",
-				"double"
-			],
-			"downloads": 280,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.html-skeleton",
-			"name": "HTML Skeleton",
-			"version": "1.0.0",
-			"description": "Insert a complete HTML5 page scaffold (charset, viewport, title, reset CSS).\n\n**HTML Skeleton** inserts a ready-to-edit HTML5 document: doctype, `lang` attribute (pt/en), UTF-8 charset, responsive viewport meta, a `<title>` and a small reset CSS (border-box, clean margins, system font stack). Inspired by the classic 'HTML Page Generator' idea from Acode's catalog.\n\n## Usage\nOpen an empty (or new) html file, run **HTML skeleton** (`Ctrl-Alt-O`) and choose the language. The scaffold replaces an empty selection or the whole document.\n\n## Português\n**Esqueleto HTML5**: insere um documento completo — doctype, charset, viewport, título e reset CSS. Atalho `Ctrl-Alt-O`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-skeleton/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-skeleton/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-skeleton/icon.png",
-			"keywords": [
-				"html",
-				"boilerplate",
-				"skeleton",
-				"page",
-				"template"
-			],
-			"downloads": 420,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.sort-json",
-			"name": "Sort JSON",
-			"version": "1.0.0",
-			"description": "Sort JSON object keys recursively (A→Z or Z→A) while keeping arrays intact.\n\n**Sort JSON** alphabetically sorts every object key of the selected JSON — or the whole document — recursively, producing a stable, diff-friendly output. Arrays keep their order (only their object items get their keys sorted). Invalid JSON shows a friendly toast instead of failing silently.\n\n## Usage\nSelect the JSON (or nothing for the whole document), run **Sort JSON** (`Ctrl-Alt-D`) and choose A→Z or Z→A. Great before committing configs, translations and API fixtures.\n\n## Português\n**Ordenar JSON**: ordena recursivamente as chaves dos objetos (A→Z ou Z→A) mantendo a ordem dos arrays. Atalho `Ctrl-Alt-D`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sort-json/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-json/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-json/icon.png",
-			"keywords": [
-				"json",
-				"sort",
-				"keys",
-				"alphabetical",
-				"diff"
-			],
-			"downloads": 240,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.url-tools",
-			"name": "URL Tools",
-			"version": "1.0.0",
-			"description": "encodeURIComponent / decodeURIComponent (and URI variants) on the selection.\n\n**URL Tools** encodes or decodes the current selection — or the whole document — with the four native browser functions: `encodeURIComponent`, `decodeURIComponent`, `encodeURI` and `decodeURI`. Perfect for building query strings, testing APIs and cleaning copy-pasted links with %20 everywhere.\n\n## Usage\nSelect the text (or nothing for the whole file), run **URL tools** (`Ctrl-Alt-N`) and pick the operation. Invalid sequences show a friendly toast.\n\n## Português\n**Ferramentas de URL**: codifica/decodifica a seleção com encodeURIComponent, decodeURIComponent, encodeURI e decodeURI. Atalho `Ctrl-Alt-N`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/url-tools/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/url-tools/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/url-tools/icon.png",
-			"keywords": [
-				"url",
-				"encode",
-				"decode",
-				"percent",
-				"query"
-			],
-			"downloads": 210,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.slugify",
-			"name": "Slugify",
-			"version": "1.0.0",
-			"description": "Turn any text into an URL-friendly slug (kebab-case, accents stripped).\n\n**Slugify** converts the selected text — or the word under the cursor — into a clean URL slug: lowercase, accents removed (NFD), spaces and punctuation collapsed into single hyphens. 'Bem-vindo ao Verão!' becomes `bem-vindo-ao-verao`. Ideal for blog routes, file names and ids.\n\n## Usage\nSelect the text (or place the cursor on a word) and run **Slugify** (`Ctrl-Alt-L`). The result replaces the selection in place.\n\n## Português\n**Slugify**: converte o texto em slug URL-friendly — minúsculas, sem acentos, hífenes únicos. Atalho `Ctrl-Alt-L`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/slugify/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/slugify/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/slugify/icon.png",
-			"keywords": [
-				"slug",
-				"url",
-				"kebab",
-				"case",
-				"accent"
-			],
-			"downloads": 190,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.blank-lines",
-			"name": "Blank Lines",
-			"version": "1.0.0",
-			"description": "Remove or collapse empty lines, trim trailing spaces and rejoin wrapped lines.\n\n**Blank Lines** cleans up whitespace noise in one command: remove ALL empty lines, collapse them down to a single one, trim trailing spaces per line, or rejoin lines that were wrapped mid-sentence (paragraph mode keeps blank-line breaks). Works on the selection or the whole document.\n\n## Usage\nSelect the messy region (or nothing for the whole file), run **Blank lines** (`Ctrl-Alt-A`) and pick the cleaning mode.\n\n## Português\n**Linhas vazias**: remove/colapsa linhas vazias, corta espaços no fim das linhas e junta linhas quebradas. Atalho `Ctrl-Alt-A`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/blank-lines/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/blank-lines/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/blank-lines/icon.png",
-			"keywords": [
-				"blank",
-				"lines",
-				"clean",
-				"trim",
-				"whitespace",
-				"join"
-			],
-			"downloads": 170,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.css-units",
-			"name": "CSS Unit Converter",
-			"version": "1.0.0",
-			"description": "Convert px ↔ rem ↔ em across the selection or document (root 16px).\n\n**CSS Unit Converter** rewrites every length value in the selection — or the whole document — between `px`, `rem` and `em`. Decimal values are handled (`1.5rem`), results are rounded to three decimals and untouched units are left alone. Ideal when migrating a stylesheet to a root-relative scale.\n\n## Usage\nSelect the rules to convert (or nothing for the whole file), run **CSS unit converter** (`Ctrl-Alt-P`) and pick the direction — e.g. `px → rem (root 16px)`.\n\n## Português\n**Conversor de unidades CSS**: converte px ↔ rem ↔ em na seleção ou no documento inteiro (raiz 16px), decimais incluídos. Atalho `Ctrl-Alt-P`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/css-units/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-units/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-units/icon.png",
-			"keywords": [
-				"css",
-				"px",
-				"rem",
-				"em",
-				"units",
-				"converter",
-				"responsive"
-			],
-			"downloads": 140,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.html-entities",
-			"name": "HTML Entities",
-			"version": "1.0.0",
-			"description": "Encode/decode HTML entities (&, <, >, quotes) including numeric references.\n\n**HTML Entities** escapes the five markup-critical characters (`&`, `<`, `>`, `\"`, `'`) to their named entities and decodes them back — including numeric references (`&#39;`, `&#x27;`) and `&nbsp;`. Essential when embedding code samples in HTML or cleaning generated markup.\n\n## Usage\nSelect the text (or place the cursor on a word), run **HTML entities** (`Ctrl-Alt-M`) and choose encode or decode.\n\n## Português\n**Entidades HTML**: codifica/decodifica &, <, >, aspas e referências numéricas na seleção. Atalho `Ctrl-Alt-M`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-entities/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-entities/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-entities/icon.png",
-			"keywords": [
-				"html",
-				"entities",
-				"escape",
-				"unescape",
-				"encode",
-				"decode"
-			],
-			"downloads": 120,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.md-table",
-			"name": "Markdown Table Formatter",
-			"version": "1.0.0",
-			"description": "Format and align markdown tables with padded columns and preserved alignments.\n\n**Markdown Table Formatter** takes messy, hand-typed markdown tables and aligns every column to the widest cell. Alignment markers (`:---`, `:---:`, `---:`) are preserved, escaped pipes (`\\|`) survive, and multiple tables in one pass are all formatted at once. Great for READMEs and documentation.\n\n## Usage\nSelect the table (or nothing for the whole document) and run **Markdown table formatter** (`Ctrl-Alt-F`).\n\n## Português\n**Formatador de tabelas Markdown**: alinha colunas na célula mais larga, preservando alinhamentos e pipes escapados. Atalho `Ctrl-Alt-F`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/md-table/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/md-table/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/md-table/icon.png",
-			"keywords": [
-				"markdown",
-				"table",
-				"format",
-				"align",
-				"gfm",
-				"readme"
-			],
-			"downloads": 110,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.rgb-hex",
-			"name": "RGB ↔ Hex Converter",
-			"version": "1.0.0",
-			"description": "Convert every color in the selection between hex and rgb()/rgba(), alpha included.\n\n**RGB ↔ Hex Converter** finds every color token in the selection — short/long hex, with or without alpha, and `rgb()`/`rgba()` with comma or slash alpha — and converts all of them in one pass. Alpha values are kept as-is, so `#7c3aed80` becomes `rgba(124, 58, 237, 0.5)` and back.\n\n## Usage\nSelect the colors (or place the cursor on one), run **RGB ↔ Hex** (`Ctrl-Alt-Y`) and pick the direction.\n\n## Português\n**Conversor RGB ↔ Hex**: converte todas as cores da seleção entre hex e rgb()/rgba(), mantendo o canal alfa. Atalho `Ctrl-Alt-Y`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/rgb-hex/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/rgb-hex/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/rgb-hex/icon.png",
-			"keywords": [
-				"color",
-				"hex",
-				"rgb",
-				"rgba",
-				"converter",
-				"css"
-			],
-			"downloads": 95,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.trim-trailing",
-			"name": "Trim Trailing",
-			"version": "1.0.0",
-			"description": "Remove trailing whitespace from every line, optionally expanding tabs to spaces.\n\n**Trim Trailing** strips trailing spaces and tabs from every line of the selection or document in one command, reporting how many lines were cleaned. The second mode also expands tabs to four spaces first — handy before saving files that must pass a whitespace linter.\n\n## Usage\nRun **Trim trailing** (`Ctrl-Alt-Z`) with or without a selection and pick the mode.\n\n## Português\n**Cortar espaços finais**: remove espaços/tabs do fim de cada linha (seleção ou documento) e expande tabs para espaços. Atalho `Ctrl-Alt-Z`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/trim-trailing/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/trim-trailing/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/trim-trailing/icon.png",
-			"keywords": [
-				"whitespace",
-				"trim",
-				"clean",
-				"tabs",
-				"spaces",
-				"lint"
-			],
-			"downloads": 80,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.regex-tester",
-			"name": "Regex Tester",
-			"version": "1.0.0",
-			"description": "Test regular expressions against text and optionally replace the matches.\n\n**Regex Tester** runs a regular expression against the current selection — or sample text you type — and shows every match with its capture groups. From the same dialog you can jump straight to a replace-all pass with `$1` group references.\n\n## Usage\nRun **Regex tester** (`Ctrl-Alt-V`), fill in the pattern and flags, then choose *Show matches* or *Replace matches*. Invalid patterns and catastrophic empty matches are handled safely.\n\n## Português\n**Testador de regex**: testa expressões regulares sobre a seleção (ou texto informado), mostra todos os matches com grupos e permite substituir usando `$1`. Atalho `Ctrl-Alt-V`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/regex-tester/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/regex-tester/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/regex-tester/icon.png",
-			"keywords": [
-				"regex",
-				"regular",
-				"expression",
-				"test",
-				"replace",
-				"pattern"
-			],
-			"downloads": 95,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.html-to-jsx",
-			"name": "HTML to JSX",
-			"version": "1.0.0",
-			"description": "Convert HTML to JSX: class→className, void tags self-close, comments become {/* */}.\n\n**HTML to JSX** rewrites HTML so it compiles inside JSX/React: `class` becomes `className`, `for` becomes `htmlFor`, dozens of HTML attributes get their React names (`tabindex`→`tabIndex`, `maxlength`→`maxLength`…), `onclick` and friends become `onClick`, void tags turn into `<br />`, inline `style` attributes become object literals and comments become `{/* */}`.\n\n## Usage\nSelect the HTML you want (or run on the whole document) and execute **HTML to JSX: convert** (`Ctrl-Alt-X`). The toast reports how many attributes were rewritten.\n\n## Português\n**HTML para JSX**: converte atributos HTML para os nomes do React (class→className, for→htmlFor…), fecha tags void, transforma style em objeto e comentários em `{/* */}`. Atalho `Ctrl-Alt-X`.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-to-jsx/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-to-jsx/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-to-jsx/icon.png",
-			"keywords": [
-				"html",
-				"jsx",
-				"react",
-				"convert",
-				"attributes",
-				"tags"
-			],
-			"downloads": 88,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.css-beautify",
-			"name": "CSS Beautify",
-			"version": "1.0.0",
-			"description": "Expand CSS to one declaration per line, or minify it back to a single line.\n\n**CSS Beautify** formats stylesheets in both directions. *Beautify* expands every rule to one declaration per line with tab indentation and blank lines between rules; *Minify* strips comments and collapses all whitespace into a compact single line ready for production.\n\n## Usage\nSelect some CSS (or run on the whole document) and execute **CSS beautify: run**, then pick the mode. Works on plain CSS as well as rules embedded in HTML.\n\n## Português\n**CSS Beautify**: formata CSS nos dois sentidos — *Beautify* expande uma declaração por linha com indentação, *Minify* remove comentários e espaços para produção.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/css-beautify/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-beautify/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-beautify/icon.png",
-			"keywords": [
-				"css",
-				"beautify",
-				"minify",
-				"format",
-				"pretty",
-				"style"
-			],
-			"downloads": 76,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.sql-format",
-			"name": "SQL Format",
-			"version": "1.0.0",
-			"description": "Format SQL queries: uppercase keywords, one major clause per line.\n\n**SQL Format** normalizes SQL queries: keywords are uppercased (`SELECT`, `FROM`, `LEFT JOIN`…), major clauses start on their own line and trailing whitespace is cleaned. String literals are preserved untouched — keywords inside quotes are never modified.\n\n## Usage\nSelect a query (or run on the whole document) and execute **SQL format: format**. Handy before committing queries or sharing them in documentation.\n\n## Português\n**SQL Format**: formata consultas SQL — palavras-chave em maiúsculas, cláusulas principais em linhas próprias, literais de string preservados.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sql-format/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sql-format/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sql-format/icon.png",
-			"keywords": [
-				"sql",
-				"format",
-				"query",
-				"uppercase",
-				"keywords",
-				"database"
-			],
-			"downloads": 64,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		},
-		{
-			"id": "xcoder.text-wrap",
-			"name": "Text Wrap",
-			"version": "1.0.0",
-			"description": "Reflow the selection or document at a column width (default 80).\n\n**Text Wrap** reflows paragraphs to a maximum column width using a greedy word-wrap algorithm. Leading indentation is preserved for every produced line, so wrapped Markdown lists and indented prose keep their structure.\n\n## Usage\nSelect the text (or run on the whole document) and execute **Text wrap: wrap**, then type the width (10–500, default 80). Great for README files, commit messages and plain-text email.\n\n## Português\n**Text Wrap**: refluí o texto numa largura máxima de coluna (padrão 80), preservando a indentação. Ideal para README, mensagens de commit e prosa em texto puro.",
-			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-			"author": {
-				"name": "Xcoder Team",
-				"github": "carsaimz"
-			},
-			"author_verified": true,
-			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/text-wrap/plugin.zip",
-			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/text-wrap/plugin.zip",
-			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/text-wrap/icon.png",
-			"keywords": [
-				"wrap",
-				"text",
-				"column",
-				"width",
-				"reflow",
-				"markdown"
-			],
-			"downloads": 52,
-			"supported_editor": "all",
-			"repository": "https://github.com/carsaimz/xcoder-plugins"
-		}
-	]
+ "plugins": [
+  {
+   "id": "xcoder.word-count",
+   "name": "Word Count",
+   "version": "1.0.0",
+   "description": "Count words, characters and lines of the document or selection.\n\n**Word Count** adds a single command that reports the number of words, characters (with and without spaces) and lines of the current document — or of the active selection, when there is one.\n\n## Usage\nOpen the command palette and run **Word count: show words, characters and lines** (shortcut `Ctrl-Alt-W`). A toast appears with the statistics. Ideal for essays, README files and any text with a size limit.\n\n## Português\n**Contador de palavras**: um comando que mostra palavras, caracteres (com e sem espaços) e linhas do documento ou da seleção ativa. Atalho `Ctrl-Alt-W`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/word-count/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/word-count/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/word-count/icon.png",
+   "keywords": [
+    "word",
+    "count",
+    "stats",
+    "characters",
+    "lines"
+   ],
+   "downloads": 1240,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.case-toggle",
+   "name": "Case Converter",
+   "version": "1.0.0",
+   "description": "Convert the selection or word to UPPER, lower, Title, camelCase, snake_case and more.\n\n**Case Converter** transforms the current selection — or the word under the cursor — between eight case styles: `UPPER CASE`, `lower case`, `Title Case`, `Sentence case`, `camelCase`, `snake_case`, `kebab-case` and `iNVERSE cASE`.\n\n## Usage\nSelect some text (or just place the cursor on a word), open the command palette and run **Case converter** (`Ctrl-Alt-C`), then pick the target style. Great for constants, CSS class names and variable renaming without retyping.\n\n## Português\n**Conversor de maiúsculas**: transforma a seleção (ou a palavra sob o cursor) entre oito estilos — MAIÚSCULAS, minúsculas, Título, Sentença, camelCase, snake_case, kebab-case e invertido. Atalho `Ctrl-Alt-C`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/case-toggle/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/case-toggle/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/case-toggle/icon.png",
+   "keywords": [
+    "case",
+    "upper",
+    "lower",
+    "camel",
+    "snake",
+    "kebab",
+    "text"
+   ],
+   "downloads": 980,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.sort-lines",
+   "name": "Sort Lines",
+   "version": "1.0.0",
+   "description": "Sort, reverse, shuffle or deduplicate the selected lines (or the whole document).\n\n**Sort Lines** organises the selected lines — or the whole document when nothing is selected — with seven modes: ascending, descending, case-insensitive, numeric aware, unique (removes duplicated lines), reverse and shuffle.\n\n## Usage\nSelect the lines you want to organise, open the command palette and run **Sort lines** (`Ctrl-Alt-S`). Perfect for lists, imports blocks, CSS properties and cleanup of duplicated data.\n\n## Português\n**Ordenar linhas**: organiza as linhas selecionadas (ou o documento inteiro) em sete modos — A-Z, Z-A, ignorar maiúsculas, numérico, único (remove duplicadas), inverter e aleatório. Atalho `Ctrl-Alt-S`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sort-lines/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-lines/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-lines/icon.png",
+   "keywords": [
+    "sort",
+    "lines",
+    "order",
+    "unique",
+    "shuffle"
+   ],
+   "downloads": 860,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.insert-date",
+   "name": "Insert Date & Time",
+   "version": "1.0.0",
+   "description": "Insert the current date/time in nine formats at the cursor position.\n\n**Insert Date & Time** places the current date and time exactly where the cursor is, in nine formats: `YYYY-MM-DD`, `DD/MM/YYYY`, `MM/DD/YYYY`, `HH:mm`, date + time, date + time with seconds, ISO 8601 (UTC), device locale format and Unix timestamp.\n\n## Usage\nOpen the command palette and run **Insert date & time** (`Ctrl-Alt-T`), then choose a format. Useful for changelogs, commits notes, logs and journaling files.\n\n## Português\n**Inserir data e hora**: insere a data/hora atual na posição do cursor em nove formatos, incluindo ISO 8601 e timestamp Unix. Atalho `Ctrl-Alt-T`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/insert-date/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/insert-date/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/insert-date/icon.png",
+   "keywords": [
+    "date",
+    "time",
+    "timestamp",
+    "insert",
+    "stamp"
+   ],
+   "downloads": 720,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.lorem-ipsum",
+   "name": "Lorem Ipsum",
+   "version": "1.0.0",
+   "description": "Generate Lorem Ipsum placeholder paragraphs directly into the editor.\n\n**Lorem Ipsum** generates classic placeholder text and inserts it at the cursor. Ask for any number of paragraphs (up to 50) and each one is freshly generated with varied sentence lengths, so mock-ups never look copy-pasted.\n\n## Usage\nOpen the command palette and run **Lorem Ipsum: insert**. Type how many paragraphs you need (empty = 3) and confirm. Ideal for testing layouts, typography and page performance.\n\n## Português\n**Lorem Ipsum**: gera parágrafos de texto de preenchimento diretamente no editor — informe a quantidade (vazio = 3). Ideal para testar layouts e tipografia.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/lorem-ipsum/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/lorem-ipsum/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/lorem-ipsum/icon.png",
+   "keywords": [
+    "lorem",
+    "ipsum",
+    "placeholder",
+    "dummy",
+    "text"
+   ],
+   "downloads": 650,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.base64-tool",
+   "name": "Base64 & URL Tool",
+   "version": "1.0.0",
+   "description": "Encode/decode Base64 (with full Unicode support) and percent-encoded URLs.\n\n**Base64 & URL Tool** converts the current selection — or the whole document — between plain text and: Base64, URL-safe Base64, Base64 decoded back, percent-encoded URLs and decoded URLs. Unicode is handled correctly (accents, emoji, CJK), so Portuguese text survives every round-trip.\n\n## Usage\nSelect the text to convert, open the command palette and run **Base64 & URL tool**. Invalid Base64 input shows a friendly toast instead of crashing.\n\n## Português\n**Ferramenta Base64 e URL**: codifica/decodifica Base64 (com suporte completo a Unicode) e URLs percent-encodings da seleção ou do documento inteiro.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/base64-tool/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base64-tool/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base64-tool/icon.png",
+   "keywords": [
+    "base64",
+    "url",
+    "encode",
+    "decode",
+    "converter",
+    "unicode"
+   ],
+   "downloads": 540,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.line-tools",
+   "name": "Line Tools",
+   "version": "1.0.0",
+   "description": "Duplicate, move up and move down lines or blocks without cutting and pasting.\n\n**Line Tools** adds three editing commands that every keyboard user misses on mobile: **duplicate** the current line or selected block (`Ctrl-Shift-D`), **move up** and **move down** the current line or block. Selections are preserved and moved together with the text, exactly like desktop editors.\n\n## Usage\nPlace the cursor on a line (or select a block), open the command palette and search for *Line tools*. All commands also appear in the key bindings editor, so you can remap them freely.\n\n## Português\n**Ferramentas de linha**: duplica (`Ctrl-Shift-D`), move para cima e move para baixo a linha atual ou o bloco selecionado, preservando a seleção.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/line-tools/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/line-tools/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/line-tools/icon.png",
+   "keywords": [
+    "lines",
+    "duplicate",
+    "move",
+    "editor",
+    "editing"
+   ],
+   "downloads": 470,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.toggle-comment",
+   "name": "Toggle Comment",
+   "version": "1.0.0",
+   "description": "Comment or uncomment the current line/selection with the right token for the file type.\n\n**Toggle Comment** comments or uncomments the current line or the whole selection with one command (`Ctrl-/`). The comment token matches the file you are editing: `//` for JavaScript, TypeScript, Java, Go, Rust…; `#` for Python, Ruby, YAML, Shell; `--` for SQL and Lua; `/* */` for CSS; `<!-- -->` for HTML and Markdown. Multi-line selections are commented at the shared indentation level, and running it again removes the comments cleanly.\n\n## Usage\nPlace the cursor on a line (or select a block) and run **Toggle comment** from the command palette (`Ctrl-/`). Inspired by the classic desktop editors' Ctrl-/ behaviour.\n\n## Português\n**Toggle Comment**: comenta/descomenta a linha atual ou a seleção com o token certo para o tipo de arquivo (`//`, `#`, `--`, `/* */`, `<!-- -->`). Atalho `Ctrl-/`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/toggle-comment/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/toggle-comment/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/toggle-comment/icon.png",
+   "keywords": [
+    "comment",
+    "toggle",
+    "code",
+    "editor",
+    "productivity"
+   ],
+   "downloads": 390,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.json-tools",
+   "name": "JSON Tools",
+   "version": "1.0.0",
+   "description": "Pretty print, minify, escape, unescape and validate JSON with friendly errors.\n\n**JSON Tools** turns messy JSON into readable form in one tap: pretty print with 2 or 4 spaces, minify, escape a text into a JSON string, unescape it back, and a dedicated validator. Syntax errors report the approximate position so you can fix broken payloads quickly. Works on the selection or the whole document.\n\n## Usage\nSelect the JSON (or leave the whole document), open the command palette and run **JSON tools** (`Ctrl-Alt-J`) — then pick the action. **JSON: validate** (`json-tools:validate`) only checks and reports.\n\n## Português\n**Ferramentas JSON**: formata (2/4 espaços), minifica, escapa, desescapa e valida JSON da seleção ou do documento, com erros que apontam a posição. Atalho `Ctrl-Alt-J`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/json-tools/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/json-tools/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/json-tools/icon.png",
+   "keywords": [
+    "json",
+    "format",
+    "minify",
+    "validate",
+    "escape"
+   ],
+   "downloads": 355,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.uuid-generator",
+   "name": "UUID Generator",
+   "version": "1.0.0",
+   "description": "Generate UUID v4, short ids and random hex ids straight into the editor.\n\n**UUID Generator** creates identifiers with cryptographically strong randomness (Web Crypto when available) and inserts them at the cursor: UUID v4 in upper/lowercase, without dashes, 12/16-char short ids (alphanumeric) and 16-digit hex ids. Perfect for test fixtures, database seeds, request ids and mock data.\n\n## Usage\nOpen the command palette and run **UUID Generator** (`Ctrl-Alt-U`), pick the format — done. **Quick UUID** inserts a lowercase v4 instantly without any dialog.\n\n## Português\n**Gerador de UUID**: cria e insere UUID v4 (maiúsculas/minúsculas, sem traços), short ids e ids hex na posição do cursor, com aleatoriedade criptográfica. Atalho `Ctrl-Alt-U`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/uuid-generator/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/uuid-generator/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/uuid-generator/icon.png",
+   "keywords": [
+    "uuid",
+    "guid",
+    "id",
+    "random",
+    "generator"
+   ],
+   "downloads": 310,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.emoji-picker",
+   "name": "Emoji Picker",
+   "version": "1.0.0",
+   "description": "Browse a curated emoji set in six categories and insert it at the cursor.\n\n**Emoji Picker** brings a lightweight emoji browser into the editor: six curated categories (smileys, gestures, status symbols, tech, nature & food and objects) with the emojis that actually matter for documentation, commit messages and UI copy. No heavy emoji database — a hand-picked set that loads instantly.\n\n## Usage\nOpen the command palette and run **Emoji Picker** (`Ctrl-Alt-E`), choose a category, then tap the emoji to insert it. Works everywhere the editor accepts text.\n\n## Português\n**Seletor de emojis**: escolha entre seis categorias curadas (carinhas, gestos, status, tecnologia, natureza e objetos) e insira o emoji no cursor. Atalho `Ctrl-Alt-E`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/emoji-picker/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/emoji-picker/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/emoji-picker/icon.png",
+   "keywords": [
+    "emoji",
+    "picker",
+    "unicode",
+    "insert",
+    "fun"
+   ],
+   "downloads": 280,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.color-insert",
+   "name": "Color Insert",
+   "version": "1.0.0",
+   "description": "Pick a color from a palette or paste a hex and insert it as HEX, RGB or HSL.\n\n**Color Insert** speeds up styling work: choose a color from a curated 24-tone palette (or type any hex) and insert it in HEX, `rgb()` or `hsl()` notation — the conversions happen for you. Great for CSS, Compose, SVG and design tokens.\n\n## Usage\nOpen the command palette and run **Color picker** (`Ctrl-Alt-H`), pick a color, choose the notation. 3-digit hex shorthands are accepted and normalized.\n\n## Português\n**Inserir cor**: escolha uma cor da paleta ou digite um hex e insira como HEX, `rgb()` ou `hsl()` — a conversão é automática. Atalho `Ctrl-Alt-H`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/color-insert/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-insert/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-insert/icon.png",
+   "keywords": [
+    "color",
+    "hex",
+    "rgb",
+    "hsl",
+    "css",
+    "design"
+   ],
+   "downloads": 245,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.markdown-toc",
+   "name": "Markdown TOC",
+   "version": "1.0.0",
+   "description": "Generate or refresh a GitHub-style table of contents from your Markdown headings.\n\n**Markdown TOC** scans the document for `#`…`######` headings (skipping fenced code blocks) and builds a GitHub-style table of contents with correct anchor slugs — including duplicate heading disambiguation. If a `<!-- TOC -->` block already exists it is refreshed in place; otherwise the TOC is inserted right after the first H1.\n\n## Usage\nOpen a Markdown file, run **Markdown: generate TOC** (`Ctrl-Alt-G`). Re-run any time after editing — the markers `<!-- TOC -->` / `<!-- /TOC -->` keep the section updated.\n\n## Português\n**Sumário Markdown**: gera/atualiza um sumário no estilo GitHub a partir dos títulos (ignorando blocos de código), com âncoras corretas. Atalho `Ctrl-Alt-G`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/markdown-toc/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/markdown-toc/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/markdown-toc/icon.png",
+   "keywords": [
+    "markdown",
+    "toc",
+    "table of contents",
+    "headings",
+    "docs"
+   ],
+   "downloads": 210,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.indent-switch",
+   "name": "Indent Switch",
+   "version": "1.0.0",
+   "description": "Convert the document between tabs and spaces (2, 4 or the detected width).\n\n**Indent Switch** detects the dominant indentation style of the document (tabs vs. spaces and the space width) and converts the whole file in one command. Mixed indentation is a classic source of diff noise and Python errors — this fixes it in a tap.\n\n## Usage\nOpen the command palette and run **Convert indentation** (`Ctrl-Alt-I`). The dialog shows what was detected and offers spaces→tabs or tabs→spaces conversions (2, 4 or the detected width). A toast reports how many lines changed.\n\n## Português\n**Alternar indentação**: detecta o estilo do documento e converte entre tabulações e espaços (2, 4 ou a largura detectada). Atalho `Ctrl-Alt-I`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/indent-switch/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/indent-switch/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/indent-switch/icon.png",
+   "keywords": [
+    "indent",
+    "tabs",
+    "spaces",
+    "format",
+    "whitespace"
+   ],
+   "downloads": 180,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.remove-duplicates",
+   "name": "Remove Duplicates",
+   "version": "1.0.0",
+   "description": "Remove duplicated lines from the selection or document, keeping the first occurrence.\n\n**Remove Duplicates** cleans lists, logs and generated data: it removes every repeated line (keeping the first), only consecutive repeats, or repeats compared after trimming whitespace. Works on the selection or the whole document and reports how many lines were removed.\n\n## Usage\nSelect the text (or use the whole file), open the command palette and run **Remove duplicated lines** (`Ctrl-Alt-B`), then pick the mode. Pair it with *Sort Lines* for tidy lists.\n\n## Português\n**Remover duplicadas**: remove linhas repetidas da seleção ou do documento (mantém a primeira), com modo só-sequenciais e comparação ignorando espaços. Atalho `Ctrl-Alt-B`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/remove-duplicates/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/remove-duplicates/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/remove-duplicates/icon.png",
+   "keywords": [
+    "dedupe",
+    "duplicates",
+    "lines",
+    "clean",
+    "text"
+   ],
+   "downloads": 165,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.hash-generator",
+   "name": "Hash Generator",
+   "version": "1.0.0",
+   "description": "Hash the selection or document with SHA-1/256/384/512 and copy or insert the digest.\n\n**Hash Generator** computes SHA digests with the platform's Web Crypto (fast and offline): SHA-256, SHA-512, SHA-384 and legacy SHA-1. Copy the digest as hex or Base64, insert it at the cursor, or drop it as a `// sha256: …` comment next to the selection. Ideal for verifying payloads, caching keys and committing integrity checks.\n\n## Usage\nSelect the text to hash (or hash the whole document), open the command palette and run **Hash generator** (`Ctrl-Alt-K`), pick the algorithm and the output action.\n\n## Português\n**Gerador de hash**: calcula SHA-256/512/384/SHA-1 da seleção ou do documento com Web Crypto (offline) e copia (hex/Base64) ou insere o resultado. Atalho `Ctrl-Alt-K`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/hash-generator/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/hash-generator/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/hash-generator/icon.png",
+   "keywords": [
+    "hash",
+    "sha256",
+    "sha512",
+    "checksum",
+    "security"
+   ],
+   "downloads": 140,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.tag-wrapper",
+   "name": "Tag Wrapper",
+   "version": "1.0.0",
+   "description": "Wrap the selection with any HTML tag (including attributes) in one command.\n\n**Tag Wrapper** surrounds the current selection — or the word under the cursor — with any HTML tag you type, attributes included: `div class=box` becomes `<div class=box>selection</div>`. Typing tags by hand around existing content is one of the most repetitive editing tasks in HTML; this plugin removes it.\n\n## Usage\nSelect the text, open the command palette and run **Tag wrapper** (`Ctrl-Alt-R`), then type the tag name (optionally followed by attributes). Cancel closes the dialog without touching the text.\n\n## Português\n**Envolver com tag**: envolve a seleção (ou a palavra sob o cursor) com qualquer tag HTML — atributos incluídos, ex.: `div class=box`. Atalho `Ctrl-Alt-R`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/tag-wrapper/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/tag-wrapper/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/tag-wrapper/icon.png",
+   "keywords": [
+    "html",
+    "wrap",
+    "tag",
+    "selection",
+    "markup"
+   ],
+   "downloads": 310,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.quote-converter",
+   "name": "Quote Converter",
+   "version": "1.0.0",
+   "description": "Swap single/double quotes (or strip them) on the selection or word, with escaping.\n\n**Quote Converter** converts the quotes around or inside the current selection — or the word under the cursor: single → double, double → single, or remove the outer quotes entirely. Inner quotes of the opposite kind are escaped automatically and backslash sequences are preserved, so JavaScript strings survive the round-trip.\n\n## Usage\nSelect a string (or place the cursor on it), open the command palette and run **Quote converter** (`Ctrl-Alt-Q`), then pick the target style. Inspired by the classic Acode plugin of the same name, rebuilt for the Xcoder API.\n\n## Português\n**Conversor de aspas**: troca aspas simples/duplas (ou remove as externas) na seleção ou palavra, com escape automático. Atalho `Ctrl-Alt-Q`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/quote-converter/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/quote-converter/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/quote-converter/icon.png",
+   "keywords": [
+    "quotes",
+    "string",
+    "convert",
+    "single",
+    "double"
+   ],
+   "downloads": 280,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.html-skeleton",
+   "name": "HTML Skeleton",
+   "version": "1.0.0",
+   "description": "Insert a complete HTML5 page scaffold (charset, viewport, title, reset CSS).\n\n**HTML Skeleton** inserts a ready-to-edit HTML5 document: doctype, `lang` attribute (pt/en), UTF-8 charset, responsive viewport meta, a `<title>` and a small reset CSS (border-box, clean margins, system font stack). Inspired by the classic 'HTML Page Generator' idea from Acode's catalog.\n\n## Usage\nOpen an empty (or new) html file, run **HTML skeleton** (`Ctrl-Alt-O`) and choose the language. The scaffold replaces an empty selection or the whole document.\n\n## Português\n**Esqueleto HTML5**: insere um documento completo — doctype, charset, viewport, título e reset CSS. Atalho `Ctrl-Alt-O`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-skeleton/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-skeleton/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-skeleton/icon.png",
+   "keywords": [
+    "html",
+    "boilerplate",
+    "skeleton",
+    "page",
+    "template"
+   ],
+   "downloads": 420,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.sort-json",
+   "name": "Sort JSON",
+   "version": "1.0.0",
+   "description": "Sort JSON object keys recursively (A→Z or Z→A) while keeping arrays intact.\n\n**Sort JSON** alphabetically sorts every object key of the selected JSON — or the whole document — recursively, producing a stable, diff-friendly output. Arrays keep their order (only their object items get their keys sorted). Invalid JSON shows a friendly toast instead of failing silently.\n\n## Usage\nSelect the JSON (or nothing for the whole document), run **Sort JSON** (`Ctrl-Alt-D`) and choose A→Z or Z→A. Great before committing configs, translations and API fixtures.\n\n## Português\n**Ordenar JSON**: ordena recursivamente as chaves dos objetos (A→Z ou Z→A) mantendo a ordem dos arrays. Atalho `Ctrl-Alt-D`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sort-json/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-json/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sort-json/icon.png",
+   "keywords": [
+    "json",
+    "sort",
+    "keys",
+    "alphabetical",
+    "diff"
+   ],
+   "downloads": 240,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.url-tools",
+   "name": "URL Tools",
+   "version": "1.0.0",
+   "description": "encodeURIComponent / decodeURIComponent (and URI variants) on the selection.\n\n**URL Tools** encodes or decodes the current selection — or the whole document — with the four native browser functions: `encodeURIComponent`, `decodeURIComponent`, `encodeURI` and `decodeURI`. Perfect for building query strings, testing APIs and cleaning copy-pasted links with %20 everywhere.\n\n## Usage\nSelect the text (or nothing for the whole file), run **URL tools** (`Ctrl-Alt-N`) and pick the operation. Invalid sequences show a friendly toast.\n\n## Português\n**Ferramentas de URL**: codifica/decodifica a seleção com encodeURIComponent, decodeURIComponent, encodeURI e decodeURI. Atalho `Ctrl-Alt-N`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/url-tools/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/url-tools/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/url-tools/icon.png",
+   "keywords": [
+    "url",
+    "encode",
+    "decode",
+    "percent",
+    "query"
+   ],
+   "downloads": 210,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.slugify",
+   "name": "Slugify",
+   "version": "1.0.0",
+   "description": "Turn any text into an URL-friendly slug (kebab-case, accents stripped).\n\n**Slugify** converts the selected text — or the word under the cursor — into a clean URL slug: lowercase, accents removed (NFD), spaces and punctuation collapsed into single hyphens. 'Bem-vindo ao Verão!' becomes `bem-vindo-ao-verao`. Ideal for blog routes, file names and ids.\n\n## Usage\nSelect the text (or place the cursor on a word) and run **Slugify** (`Ctrl-Alt-L`). The result replaces the selection in place.\n\n## Português\n**Slugify**: converte o texto em slug URL-friendly — minúsculas, sem acentos, hífenes únicos. Atalho `Ctrl-Alt-L`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/slugify/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/slugify/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/slugify/icon.png",
+   "keywords": [
+    "slug",
+    "url",
+    "kebab",
+    "case",
+    "accent"
+   ],
+   "downloads": 190,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.blank-lines",
+   "name": "Blank Lines",
+   "version": "1.0.0",
+   "description": "Remove or collapse empty lines, trim trailing spaces and rejoin wrapped lines.\n\n**Blank Lines** cleans up whitespace noise in one command: remove ALL empty lines, collapse them down to a single one, trim trailing spaces per line, or rejoin lines that were wrapped mid-sentence (paragraph mode keeps blank-line breaks). Works on the selection or the whole document.\n\n## Usage\nSelect the messy region (or nothing for the whole file), run **Blank lines** (`Ctrl-Alt-A`) and pick the cleaning mode.\n\n## Português\n**Linhas vazias**: remove/colapsa linhas vazias, corta espaços no fim das linhas e junta linhas quebradas. Atalho `Ctrl-Alt-A`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/blank-lines/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/blank-lines/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/blank-lines/icon.png",
+   "keywords": [
+    "blank",
+    "lines",
+    "clean",
+    "trim",
+    "whitespace",
+    "join"
+   ],
+   "downloads": 170,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.css-units",
+   "name": "CSS Unit Converter",
+   "version": "1.0.0",
+   "description": "Convert px ↔ rem ↔ em across the selection or document (root 16px).\n\n**CSS Unit Converter** rewrites every length value in the selection — or the whole document — between `px`, `rem` and `em`. Decimal values are handled (`1.5rem`), results are rounded to three decimals and untouched units are left alone. Ideal when migrating a stylesheet to a root-relative scale.\n\n## Usage\nSelect the rules to convert (or nothing for the whole file), run **CSS unit converter** (`Ctrl-Alt-P`) and pick the direction — e.g. `px → rem (root 16px)`.\n\n## Português\n**Conversor de unidades CSS**: converte px ↔ rem ↔ em na seleção ou no documento inteiro (raiz 16px), decimais incluídos. Atalho `Ctrl-Alt-P`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/css-units/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-units/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-units/icon.png",
+   "keywords": [
+    "css",
+    "px",
+    "rem",
+    "em",
+    "units",
+    "converter",
+    "responsive"
+   ],
+   "downloads": 140,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.html-entities",
+   "name": "HTML Entities",
+   "version": "1.0.0",
+   "description": "Encode/decode HTML entities (&, <, >, quotes) including numeric references.\n\n**HTML Entities** escapes the five markup-critical characters (`&`, `<`, `>`, `\"`, `'`) to their named entities and decodes them back — including numeric references (`&#39;`, `&#x27;`) and `&nbsp;`. Essential when embedding code samples in HTML or cleaning generated markup.\n\n## Usage\nSelect the text (or place the cursor on a word), run **HTML entities** (`Ctrl-Alt-M`) and choose encode or decode.\n\n## Português\n**Entidades HTML**: codifica/decodifica &, <, >, aspas e referências numéricas na seleção. Atalho `Ctrl-Alt-M`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-entities/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-entities/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-entities/icon.png",
+   "keywords": [
+    "html",
+    "entities",
+    "escape",
+    "unescape",
+    "encode",
+    "decode"
+   ],
+   "downloads": 120,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.md-table",
+   "name": "Markdown Table Formatter",
+   "version": "1.0.0",
+   "description": "Format and align markdown tables with padded columns and preserved alignments.\n\n**Markdown Table Formatter** takes messy, hand-typed markdown tables and aligns every column to the widest cell. Alignment markers (`:---`, `:---:`, `---:`) are preserved, escaped pipes (`\\|`) survive, and multiple tables in one pass are all formatted at once. Great for READMEs and documentation.\n\n## Usage\nSelect the table (or nothing for the whole document) and run **Markdown table formatter** (`Ctrl-Alt-F`).\n\n## Português\n**Formatador de tabelas Markdown**: alinha colunas na célula mais larga, preservando alinhamentos e pipes escapados. Atalho `Ctrl-Alt-F`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/md-table/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/md-table/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/md-table/icon.png",
+   "keywords": [
+    "markdown",
+    "table",
+    "format",
+    "align",
+    "gfm",
+    "readme"
+   ],
+   "downloads": 110,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.rgb-hex",
+   "name": "RGB ↔ Hex Converter",
+   "version": "1.0.0",
+   "description": "Convert every color in the selection between hex and rgb()/rgba(), alpha included.\n\n**RGB ↔ Hex Converter** finds every color token in the selection — short/long hex, with or without alpha, and `rgb()`/`rgba()` with comma or slash alpha — and converts all of them in one pass. Alpha values are kept as-is, so `#7c3aed80` becomes `rgba(124, 58, 237, 0.5)` and back.\n\n## Usage\nSelect the colors (or place the cursor on one), run **RGB ↔ Hex** (`Ctrl-Alt-Y`) and pick the direction.\n\n## Português\n**Conversor RGB ↔ Hex**: converte todas as cores da seleção entre hex e rgb()/rgba(), mantendo o canal alfa. Atalho `Ctrl-Alt-Y`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/rgb-hex/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/rgb-hex/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/rgb-hex/icon.png",
+   "keywords": [
+    "color",
+    "hex",
+    "rgb",
+    "rgba",
+    "converter",
+    "css"
+   ],
+   "downloads": 95,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.trim-trailing",
+   "name": "Trim Trailing",
+   "version": "1.0.0",
+   "description": "Remove trailing whitespace from every line, optionally expanding tabs to spaces.\n\n**Trim Trailing** strips trailing spaces and tabs from every line of the selection or document in one command, reporting how many lines were cleaned. The second mode also expands tabs to four spaces first — handy before saving files that must pass a whitespace linter.\n\n## Usage\nRun **Trim trailing** (`Ctrl-Alt-Z`) with or without a selection and pick the mode.\n\n## Português\n**Cortar espaços finais**: remove espaços/tabs do fim de cada linha (seleção ou documento) e expande tabs para espaços. Atalho `Ctrl-Alt-Z`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/trim-trailing/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/trim-trailing/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/trim-trailing/icon.png",
+   "keywords": [
+    "whitespace",
+    "trim",
+    "clean",
+    "tabs",
+    "spaces",
+    "lint"
+   ],
+   "downloads": 80,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.regex-tester",
+   "name": "Regex Tester",
+   "version": "1.0.0",
+   "description": "Test regular expressions against text and optionally replace the matches.\n\n**Regex Tester** runs a regular expression against the current selection — or sample text you type — and shows every match with its capture groups. From the same dialog you can jump straight to a replace-all pass with `$1` group references.\n\n## Usage\nRun **Regex tester** (`Ctrl-Alt-V`), fill in the pattern and flags, then choose *Show matches* or *Replace matches*. Invalid patterns and catastrophic empty matches are handled safely.\n\n## Português\n**Testador de regex**: testa expressões regulares sobre a seleção (ou texto informado), mostra todos os matches com grupos e permite substituir usando `$1`. Atalho `Ctrl-Alt-V`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/regex-tester/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/regex-tester/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/regex-tester/icon.png",
+   "keywords": [
+    "regex",
+    "regular",
+    "expression",
+    "test",
+    "replace",
+    "pattern"
+   ],
+   "downloads": 95,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.html-to-jsx",
+   "name": "HTML to JSX",
+   "version": "1.0.0",
+   "description": "Convert HTML to JSX: class→className, void tags self-close, comments become {/* */}.\n\n**HTML to JSX** rewrites HTML so it compiles inside JSX/React: `class` becomes `className`, `for` becomes `htmlFor`, dozens of HTML attributes get their React names (`tabindex`→`tabIndex`, `maxlength`→`maxLength`…), `onclick` and friends become `onClick`, void tags turn into `<br />`, inline `style` attributes become object literals and comments become `{/* */}`.\n\n## Usage\nSelect the HTML you want (or run on the whole document) and execute **HTML to JSX: convert** (`Ctrl-Alt-X`). The toast reports how many attributes were rewritten.\n\n## Português\n**HTML para JSX**: converte atributos HTML para os nomes do React (class→className, for→htmlFor…), fecha tags void, transforma style em objeto e comentários em `{/* */}`. Atalho `Ctrl-Alt-X`.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/html-to-jsx/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-to-jsx/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/html-to-jsx/icon.png",
+   "keywords": [
+    "html",
+    "jsx",
+    "react",
+    "convert",
+    "attributes",
+    "tags"
+   ],
+   "downloads": 88,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.css-beautify",
+   "name": "CSS Beautify",
+   "version": "1.0.0",
+   "description": "Expand CSS to one declaration per line, or minify it back to a single line.\n\n**CSS Beautify** formats stylesheets in both directions. *Beautify* expands every rule to one declaration per line with tab indentation and blank lines between rules; *Minify* strips comments and collapses all whitespace into a compact single line ready for production.\n\n## Usage\nSelect some CSS (or run on the whole document) and execute **CSS beautify: run**, then pick the mode. Works on plain CSS as well as rules embedded in HTML.\n\n## Português\n**CSS Beautify**: formata CSS nos dois sentidos — *Beautify* expande uma declaração por linha com indentação, *Minify* remove comentários e espaços para produção.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/css-beautify/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-beautify/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/css-beautify/icon.png",
+   "keywords": [
+    "css",
+    "beautify",
+    "minify",
+    "format",
+    "pretty",
+    "style"
+   ],
+   "downloads": 76,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.sql-format",
+   "name": "SQL Format",
+   "version": "1.0.0",
+   "description": "Format SQL queries: uppercase keywords, one major clause per line.\n\n**SQL Format** normalizes SQL queries: keywords are uppercased (`SELECT`, `FROM`, `LEFT JOIN`…), major clauses start on their own line and trailing whitespace is cleaned. String literals are preserved untouched — keywords inside quotes are never modified.\n\n## Usage\nSelect a query (or run on the whole document) and execute **SQL format: format**. Handy before committing queries or sharing them in documentation.\n\n## Português\n**SQL Format**: formata consultas SQL — palavras-chave em maiúsculas, cláusulas principais em linhas próprias, literais de string preservados.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/sql-format/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sql-format/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/sql-format/icon.png",
+   "keywords": [
+    "sql",
+    "format",
+    "query",
+    "uppercase",
+    "keywords",
+    "database"
+   ],
+   "downloads": 64,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.text-wrap",
+   "name": "Text Wrap",
+   "version": "1.0.0",
+   "description": "Reflow the selection or document at a column width (default 80).\n\n**Text Wrap** reflows paragraphs to a maximum column width using a greedy word-wrap algorithm. Leading indentation is preserved for every produced line, so wrapped Markdown lists and indented prose keep their structure.\n\n## Usage\nSelect the text (or run on the whole document) and execute **Text wrap: wrap**, then type the width (10–500, default 80). Great for README files, commit messages and plain-text email.\n\n## Português\n**Text Wrap**: refluí o texto numa largura máxima de coluna (padrão 80), preservando a indentação. Ideal para README, mensagens de commit e prosa em texto puro.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/text-wrap/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/text-wrap/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/text-wrap/icon.png",
+   "keywords": [
+    "wrap",
+    "text",
+    "column",
+    "width",
+    "reflow",
+    "markdown"
+   ],
+   "downloads": 52,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.codex",
+   "name": "Codex",
+   "version": "1.0.0",
+   "description": "Replica do OpenAI Codex CLI para o XCoder: gera um AGENTS.md completo para o projeto, transforma a seleção em tarefas executáveis estilo Codex e cria prompts de revisão de código prontos para colar no ChatGPT/Codex.\n\n## Comandos\n- Codex: generate AGENTS.md (Ctrl-Alt-8) — AGENTS.md na raiz do projeto.\n- Codex: task from selection (Ctrl-Alt-7) — seleção → tarefa estruturada.\n- Codex: review prompt (Ctrl-Alt-6) — revisão sénior no clipboard.\n\n## English\nOffline-working Codex replica: AGENTS.md generation, structured task prompts and senior review prompts.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/codex/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/codex/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/codex/icon.png",
+   "keywords": [
+    "codex",
+    "openai",
+    "agents",
+    "prompt",
+    "ai"
+   ],
+   "downloads": 0,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  },
+  {
+   "id": "xcoder.claude-code",
+   "name": "Claude Code",
+   "version": "1.0.0",
+   "description": "Replica do Claude Code (Anthropic) para o XCoder: gera o CLAUDE.md do projeto, prepara prompts em modo plan (planejar antes de editar) e produz mensagens de commit convencionais a partir do código selecionado.\n\n## Comandos\n- Claude Code: generate CLAUDE.md (Ctrl-Alt-5) — CLAUDE.md na raiz do projeto.\n- Claude Code: plan prompt (Ctrl-Alt-4) — seleção → prompt plan-first.\n- Claude Code: commit message (Ctrl-Alt-0) — mensagem convencional no clipboard.\n\n## English\nOffline-working Claude Code replica: CLAUDE.md generation, plan-first prompts and conventional-commit messages.",
+   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+   "author": {
+    "name": "Xcoder Team",
+    "github": "carsaimz"
+   },
+   "author_verified": true,
+   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/claude-code/plugin.zip",
+   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/claude-code/plugin.zip",
+   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/claude-code/icon.png",
+   "keywords": [
+    "claude",
+    "anthropic",
+    "plan",
+    "prompt",
+    "ai"
+   ],
+   "downloads": 0,
+   "supported_editor": "all",
+   "repository": "https://github.com/carsaimz/xcoder-plugins"
+  }
+ ]
 }

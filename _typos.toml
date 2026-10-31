@@ -45,6 +45,8 @@ extend-exclude = [
     # --- arquivos gerados (nomes de glifos de fontes / registry com prose pt+en) ---
     "src/res/iconNames.json",
     "src/res/plugin-registry.json",
+    # --- catalogo CDN de bibliotecas (descricoes pt+en geradas) ---
+    "src/lib/catalogLibs.js",
     # --- bibliotecas web de terceiros (minificadas / unicode-ranges) ---
     "src/res/libs",
     # --- conteúdo primário em pt-br (o typos não sabe português; v1.4.19+) ---

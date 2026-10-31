@@ -1,3 +1,4 @@
+import floatingWindow from "components/sidebar/floatingWindow";
 import svgIcon from "utils/svgIcons";
 
 /**@type {HTMLElement} */
@@ -70,7 +71,18 @@ export default class SidebarApp {
 		if (!text) return;
 		this.#title = text;
 		this.#icon.title = text;
+		const $label = this.#icon.querySelector(":scope > .app-label");
+		if ($label) $label.textContent = text;
 	};
+
+	/** Window close button - deactivate the app and tell the registry. */
+	#onFloatClosed() {
+		this.#active = false;
+		this.#icon.classList.remove("active");
+		document.dispatchEvent(
+			new CustomEvent("sidebar-float-closed", { detail: { id: this.#id } }),
+		);
+	}
 
 	/**
 	 * Installs the app in the sidebar.
@@ -111,7 +123,15 @@ export default class SidebarApp {
 		const existing = $apps.get(`:scope > .apps-group.${group}`);
 		if (existing) return existing;
 
-		const $group = <div className={`apps-group ${group}`}></div>;
+		// category caption (small-caps label above the group)
+		const captions = {
+			primary: strings["sidebar group primary"] || "Views",
+			tools: strings["sidebar group tools"] || "Tools",
+			bottom: strings["sidebar group bottom"] || "Account",
+		};
+		const $group = (
+			<div className={`apps-group ${group}`} data-label={captions[group]} />
+		);
 		const $bottom = $apps.get(":scope > .apps-group.bottom");
 
 		if (group === "primary") {
@@ -168,28 +188,13 @@ export default class SidebarApp {
 		this.#active = nextValue;
 		this.#icon.classList.toggle("active", this.#active);
 		if (this.#active && !this.#tabbed) {
-			const oldContainer = getContainer(this.#container);
-			// Try to replace the old container, or append if it's not in the DOM
-			try {
-				if (oldContainer && oldContainer.parentNode === $sidebar) {
-					$sidebar.replaceChild($container, oldContainer);
-				} else {
-					// Old container not in sidebar, just append the new one
-					const existingContainer = $sidebar.get(".container");
-					if (existingContainer) {
-						$sidebar.replaceChild($container, existingContainer);
-					} else {
-						$sidebar.appendChild($container);
-					}
-				}
-			} catch (error) {
-				// Fallback: append the new container
-				console.warn("Error switching sidebar container:", error);
-				const existingContainer = $sidebar.get(".container");
-				if (existingContainer) {
-					existingContainer.remove();
-				}
-				$sidebar.appendChild($container);
+			if (floatingWindow.floatingEnabled()) {
+				// independent window above the editor (VS Code style)
+				floatingWindow.show(this.#id, this.#title, this.#container, () =>
+					this.#onFloatClosed(),
+				);
+			} else {
+				dockContainer(this.#container, $sidebar);
 			}
 			this.#onselect(this.#container);
 		}
@@ -312,6 +317,9 @@ export default class SidebarApp {
  * @returns {HTMLElement}
  */
 function Icon({ icon, id, title }) {
+	// name shown under the glyph (visible when .app-icons-container
+	// has the .with-labels class - user request: nomes no sidebar)
+	const $label = <small className="app-label">{title}</small>;
 	// SVG icon pack (Lucide): icons registered as "svg:<name>" render as inline
 	// vectors — tier 1 of the hybrid icon convention (docs/ICONS.md).
 	if (icon?.startsWith("svg:")) {
@@ -325,6 +333,7 @@ function Icon({ icon, id, title }) {
 					className="icon xc-svgicon"
 				>
 					{$svg}
+					{$label}
 				</span>
 			);
 		}
@@ -337,8 +346,39 @@ function Icon({ icon, id, title }) {
 			data-id={id}
 			title={title}
 			className={className}
-		></span>
+		>
+			{$label}
+		</span>
 	);
+}
+
+/**
+ * Docks a container into the sidebar (classic full-height panel)
+ * when floating windows are disabled.
+ * @param {HTMLElement} $container
+ * @param {HTMLElement} $sidebarEl
+ */
+function dockContainer($container, $sidebarEl) {
+	const oldContainer = getContainer($container);
+	try {
+		if (oldContainer && oldContainer.parentNode === $sidebarEl) {
+			$sidebarEl.replaceChild($container, oldContainer);
+			return;
+		}
+		const existingContainer = $sidebarEl.get(".container");
+		if (existingContainer) {
+			$sidebarEl.replaceChild($container, existingContainer);
+		} else {
+			$sidebarEl.appendChild($container);
+		}
+	} catch (error) {
+		console.warn("Error switching sidebar container:", error);
+		const existingContainer = $sidebarEl.get(".container");
+		if (existingContainer) {
+			existingContainer.remove();
+		}
+		$sidebarEl.appendChild($container);
+	}
 }
 
 /**

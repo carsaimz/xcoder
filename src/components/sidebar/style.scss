@@ -626,3 +626,179 @@ body.no-animation {
     opacity: 1;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Icon labels under the activity bar glyphs ("expandir para nomes") plus
+// small-caps category captions on the group separators.
+.app-icons-container.with-labels {
+  .icon {
+    height: 58px;
+    line-height: 40px;
+
+    // keep the badge clear of the label
+    .app-badge {
+      bottom: auto;
+      top: 1px;
+      right: 2px;
+    }
+
+    .app-label {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 3px;
+      display: block;
+      font-size: 8px;
+      font-weight: 500;
+      line-height: 9px;
+      letter-spacing: 0.1px;
+      text-align: center;
+      opacity: 0.65;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0 2px;
+      pointer-events: none;
+      font-family: inherit;
+    }
+
+    &.active .app-label {
+      opacity: 1;
+    }
+  }
+}
+
+// category captions: "Vistas" / "Ferramentas" / "Conta"
+.app-icons-container .apps-group[data-label]:not(:empty) {
+  &::after {
+    content: attr(data-label);
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 7px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    opacity: 0.45;
+    padding-top: 2px;
+    pointer-events: none;
+  }
+
+  &.tools::before,
+  &.bottom::before {
+    margin-bottom: 4px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Floating sidebar windows — panels open as independent windows above the
+// editor instead of living inside the narrow sidebar overlay.
+.sidebar-float {
+  position: fixed;
+  z-index: 250;
+  display: none;
+  flex-direction: column;
+  min-width: 240px;
+  min-height: 200px;
+  max-width: 98vw;
+  max-height: 96vh;
+  background-color: var(--primary-color);
+  color: var(--primary-text-color);
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  touch-action: none;
+
+  &.show {
+    display: flex;
+  }
+
+  &.maximized {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0;
+  }
+
+  .sidebar-float-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0 6px 0 14px;
+    background-color: rgba(0, 0, 0, 0.18);
+    border-bottom: 1px solid var(--border-color);
+    cursor: move;
+    user-select: none;
+    touch-action: none;
+
+    .sidebar-float-title {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .icon {
+      width: 34px;
+      height: 34px;
+      line-height: 34px;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 1.15em;
+      opacity: 0.75;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  .sidebar-float-body {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    // app containers expect to fill their host
+    > .container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+  }
+
+  .sidebar-float-resize {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 22px;
+    height: 22px;
+    cursor: nwse-resize;
+    touch-action: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid rgba(255, 255, 255, 0.4);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 2px;
+    }
+  }
+}

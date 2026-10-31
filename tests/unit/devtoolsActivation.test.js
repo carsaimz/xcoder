@@ -89,8 +89,11 @@ window.strings = {
 // pretend another section was last active so devtools does NOT
 // auto-activate when added — the test then exercises the real tap path
 localStorage.setItem("sidebarAppsLastSection", "files");
+// taps simulate a real user - boot restore is over
+floatingWindow.setBootHold(false);
 
 import sidebarApps from "sidebarApps";
+import floatingWindow from "components/sidebar/floatingWindow";
 
 // all 18 tools registered in src/sidebarApps/devtools/index.js TOOL_LIST
 const TOOL_ORDER = [
@@ -141,7 +144,9 @@ describe("devtools sidebar app activation", () => {
         test("first tap on the palette icon renders the tool UI", async () => {
                 await installAndTap();
 
-                const $root = $sidebar.get(".devtools-root");
+                const $root =
+			document.body.querySelector(".sidebar-float .devtools-root") ||
+			$sidebar.get(".devtools-root");
                 assert.ok($root, "devtools root not attached to the sidebar");
 
                 const $panel = $root.get(".devtools-panel");
@@ -175,12 +180,19 @@ describe("devtools sidebar app activation", () => {
                 await installAndTap();
 
                 for (const id of TOOL_ORDER) {
-                        const $row = $sidebar.get(`.devtools-tool-item[data-tool="${id}"]`);
+                        const $row = (
+				document.body.querySelector(
+					`.sidebar-float .devtools-tool-item[data-tool="${id}"]`,
+				) || $sidebar.get(`.devtools-tool-item[data-tool="${id}"]`)
+			);
                         assert.ok($row, `${id} row missing from the picker`);
                         $row.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
-                        const $panel = $sidebar.get(".devtools-panel");
-                        const output = $panel?.get(".devtools-output")?.textContent || "";
+                        const $panel =
+			document.body.querySelector(".sidebar-float .devtools-panel") ||
+			$sidebar.get(".devtools-panel");
+                        const output =
+				$panel?.get(".devtools-output")?.textContent || "";
                         assert.ok(
                                 output.trim().length > 0,
                                 `${id} produced empty output`,
@@ -191,10 +203,17 @@ describe("devtools sidebar app activation", () => {
         test("gradient tool renders CSS (missing import regression)", async () => {
                 await installAndTap();
 
-                const $row = $sidebar.get('.devtools-tool-item[data-tool="gradient"]');
+                const $row = (
+			document.body.querySelector(
+				'.sidebar-float .devtools-tool-item[data-tool="gradient"]',
+			) || $sidebar.get('.devtools-tool-item[data-tool="gradient"]')
+		);
                 $row.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
-                const output = $sidebar.get(".devtools-output").textContent || "";
+                const output = (
+				document.body.querySelector(".sidebar-float .devtools-output") ||
+				$sidebar.get(".devtools-output")
+			)?.textContent || "";
                 assert.match(
                         output,
                         /linear-gradient|radial-gradient|conic-gradient/,

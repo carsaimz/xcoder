@@ -16,6 +16,7 @@ import JSZip from "jszip";
 import actionStack from "lib/actionStack";
 import checkFiles from "lib/checkFiles";
 import config from "lib/config";
+import { startDownload } from "lib/downloadManager";
 import openFolder from "lib/openFolder";
 import projects from "lib/projects";
 import recents from "lib/recents";
@@ -188,6 +189,8 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		$lead.onclick = close;
 		$content.addEventListener("click", handleClick);
 		$content.addEventListener("contextmenu", handleContextMenu, true);
+		// refresh the listing when a background download lands here
+		document.addEventListener("download-finished", reload);
 		$page.body = $content;
 		$page.header.append($search);
 		if (IS_FILE_MODE) $page.header.append($selectDocument);
@@ -291,6 +294,25 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 						reload();
 					} catch (error) {
 						window.log("error", error);
+						helpers.error(error);
+					}
+					break;
+				}
+
+				case "download-url": {
+					try {
+						const url = await prompt(
+							strings["download from url"] || "Download from URL",
+							"",
+							"url",
+							{ required: true, placeholder: "https://..." },
+						);
+						if (!url) break;
+						startDownload({
+							url,
+							dir: currentDir.url === "/" ? undefined : currentDir.url,
+						});
+					} catch (error) {
 						helpers.error(error);
 					}
 					break;

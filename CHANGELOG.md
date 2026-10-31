@@ -13,6 +13,46 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.7] - 2026-10-31
+
+### Added
+- **Gestor de descargas dentro do app** — o «download dentro do app não
+  funciona» fica resolvido: `lib/downloadManager.js` descarrega QUALQUER
+  URL (zips, APKs, imagens) para a pasta Download do app com transporte
+  nativo (advanced-http, streaming para o disco e progresso byte-a-byte)
+  e fallback fetch; fila sequencial, notificações com progresso vivo e
+  ação «Cancelar». Entradas: gestor de ficheiros › «Descarregar de URL»
+  (no menu +) e Website › botão de descarga no cabeçalho; o iframe passa
+  a permitir `allow-downloads`.
+- **Catálogo de bibliotecas: 59 (8 offline + 51 CDN)** — React, Vue,
+  Tailwind, Bulma, Pico, Lodash, D3, Three.js, GSAP, Swiper, Leaflet,
+  ECharts, Mermaid, Highlight.js, KaTeX, MathJax, Supabase, Lucide e
+  mais. Cada URL foi verificado (HTTP 200) na geração; entradas CDN têm
+  badge próprio e oferecem a tag pronta a colar/insertar.
+- **Terminal abre no projeto ativo** — sessões novas fazem `cd` para a
+  pasta do ficheiro ativo (mapeamento file:// → caminhos ligados ao
+  proot: /sdcard, /storage, /data); SAF/https ficam como estavam.
+- **Publicar no GitHub a partir do Git** — novo botão «Publicar no
+  GitHub» usa a conta conectada (PAT) para criar UM commit real via API
+  git data (blobs → tree → commit → ref), cobrindo branch existente,
+  branch ausente e repositório vazio.
+- **Plugins Codex e Claude Code** — réplicas funcionais (offline) no
+  marketplace (35 no total): geram AGENTS.md/CLAUDE.md na raiz do
+  projeto, transformam a seleção em tarefas estruturadas, prompts de
+  revisão/plan e mensagens de commit convencionais. O agente embutido
+  ganha as skills /skill codex e /skill claude-code.
+- **Sidebar: nomes e categorias** — nomes sob os ícones da barra de
+  atividades e legendas em maiúsculas pequenas por grupo (Vistas,
+  Ferramentas, Conta).
+
+### Changed
+- **Painéis do sidebar como janelas flutuantes** — ao tocar num ícone,
+  o painel abre numa janela independente (arrastável pelo cabeçalho,
+  redimensionável no canto, maximizável, fecho no botão ou tocando no
+  ícone outra vez; posição/tamanho persistidos). Definição
+  «sidebarFloatingWindows = 0» devolve o modo acoplado clássico; no
+  arranque nenhum painel abre sozinho.
+
 ## [1.8.6] - 2026-10-31
 
 ### Corrigido
@@ -1046,6 +1086,44 @@ total).
 Every notable change to **XCoder** is documented here. Historical entries
 are written in Brazilian Portuguese; from v1.6.2 onward each release also
 carries a short English summary right below the Portuguese one.
+
+## [1.8.7] - 2026-10-31
+
+### Added
+- **In-app download manager** — "downloads inside the app don't work"
+  is fixed: `lib/downloadManager.js` downloads ANY url (zips, APKs,
+  images) into the app Download folder with a native transport
+  (advanced-http, disk streaming, byte-accurate progress) and a fetch
+  fallback; sequential queue, live progress notifications and a Cancel
+  action. Entry points: file browser › «Download from URL» (+ menu) and
+  the Website app header button; the embedded iframe now allows
+  `allow-downloads`.
+- **Library catalog: 59 entries (8 offline + 51 CDN)** — React, Vue,
+  Tailwind, Bulma, Pico, Lodash, D3, Three.js, GSAP, Swiper, Leaflet,
+  ECharts, Mermaid, Highlight.js, KaTeX, MathJax, Supabase, Lucide and
+  more. Every URL was verified (HTTP 200) at generation time; CDN
+  entries carry their own badge and offer ready-to-paste tags.
+- **Terminal opens in the active project** — fresh sessions `cd` into
+  the active file's folder (file:// → proot-bound paths: /sdcard,
+  /storage, /data); SAF/https targets are skipped.
+- **Publish to GitHub from the Git panel** — a new «Publish to GitHub»
+  button uses the connected account (PAT) to create ONE real commit via
+  the git data API (blobs → tree → commit → ref), covering existing
+  branches, missing branches and empty repositories.
+- **Codex and Claude Code plugins** — working offline replicas on the
+  marketplace (35 total): they generate AGENTS.md/CLAUDE.md at the
+  project root, turn selections into structured tasks, review/plan
+  prompts and conventional commit messages. The built-in agent gains
+  the /skill codex and /skill claude-code playbooks.
+- **Sidebar: names and categories** — icon names under the activity bar
+  glyphs and small-caps captions per group (Views, Tools, Account).
+
+### Changed
+- **Sidebar panels as floating windows** — tapping an icon opens the
+  panel in an independent window (draggable header, resizable corner,
+  maximize, close via button or by tapping the icon again; position and
+  size persisted). Setting «sidebarFloatingWindows = 0» restores the
+  classic docked mode; no panel opens by itself at boot.
 
 ## [1.8.6] - 2026-10-31
 

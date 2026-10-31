@@ -1,4 +1,5 @@
 import Url from "utils/Url";
+import { CATALOG_LIBS } from "./catalogLibs";
 
 /**
  * Local (bundled) web libraries — htmx, Alpine.js, jQuery, Bootstrap,
@@ -155,6 +156,16 @@ export const LOCAL_LIBS = [
 	},
 ];
 
+/**
+ * All libs shown in the sidebar: the 8 bundled (offline, copyable to the
+ * project) plus the 50+ jsDelivr catalog entries (verified CDN tags only).
+ * `bundled` drives the Offline/CDN badge and which actions are offered.
+ */
+export const ALL_LIBS = [
+	...LOCAL_LIBS.map((lib) => ({ ...lib, bundled: true })),
+	...CATALOG_LIBS.map((lib) => ({ ...lib, bundled: false })),
+];
+
 /** Bundled libs root inside the app assets (www/res/libs). */
 export function assetsLibsRoot() {
 	const assets = globalThis.ASSETS_DIRECTORY || "";
@@ -245,4 +256,5 @@ export default {
 	libSize,
 	formatBytes,
 	copyPlan,
+	ALL_LIBS,
 };
