@@ -15,6 +15,27 @@ const MAX_EDITOR_READ_CHARS = 12000;
 const MAX_APPLY_CHARS = 30000;
 
 /**
+ * Picks the best editor-type file to receive an edit when the active
+ * tab is not an editor (terminal, preview…): the most recently active
+ * editor file from the tab history, else the first open one.
+ * @param {object} manager editorManager-like
+ * @returns {object|null} file record with makeActive(), or null
+ */
+export function pickEditorFile(manager) {
+	const open = (Array.isArray(manager?.files) ? manager.files : []).filter(
+		(file) => file?.type === "editor",
+	);
+	if (!open.length) return null;
+	const history = Array.isArray(manager?.editorHistory)
+		? manager.editorHistory
+		: [];
+	for (let index = history.length - 1; index >= 0; index--) {
+		if (open.includes(history[index])) return history[index];
+	}
+	return open[open.length - 1];
+}
+
+/**
  * Collects context about the active editor file.
  * @param {object} manager editorManager-like
  * @returns {object} context record (hasFile=false when nothing is open)
@@ -160,11 +181,31 @@ export function listOpenFiles(manager) {
  * @returns {{ok: boolean, message: string}}
  */
 export function applyToEditor(manager, args) {
-	const file = manager?.activeFile;
+	let file = manager?.activeFile;
+	let view = manager.editor;
+	if (
+		!file ||
+		file.type !== "editor" ||
+		!view?.state ||
+		typeof view.dispatch !== "function"
+	) {
+		// The active tab is not an editor (terminal, preview, nothing
+		// open): fall back to the last editor tab instead of failing —
+		// tools must be able to insert into the file the user edits.
+		const recovery = pickEditorFile(manager);
+		if (recovery) {
+			try {
+				recovery.makeActive?.();
+			} catch {
+				/* keep the plain error path when activation fails */
+			}
+			file = manager?.activeFile;
+			view = manager.editor;
+		}
+	}
 	if (!file || file.type !== "editor") {
 		return { ok: false, message: "ERROR: no file is open in the editor." };
 	}
-	const view = manager.editor;
 	if (!view?.state || typeof view.dispatch !== "function") {
 		return { ok: false, message: "ERROR: the active editor is not ready." };
 	}

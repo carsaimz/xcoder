@@ -4,6 +4,7 @@ import {
 	formatEditorContext,
 	getEditorContext,
 	listOpenFiles,
+	pickEditorFile,
 	readActiveBuffer,
 } from "lib/ai/editorBridge";
 
@@ -234,5 +235,95 @@ describe("applyToEditor", () => {
 			applyToEditor(makeManager(view), { action: "insert", text: "a".repeat(40000) })
 				.message,
 		).toContain("too large");
+	});
+});
+
+describe("pickEditorFile + applyToEditor recovery", () => {
+	it("prefers the most recent editor tab from the history", () => {
+		const terminalFile = {
+			type: "terminal",
+			uri: "terminal:1",
+			filename: "Terminal 1",
+		};
+		const jsFile = { type: "editor", uri: "u:js", filename: "app.js" };
+		const htmlFile = {
+			type: "editor",
+			uri: "u:html",
+			filename: "index.html",
+		};
+		const manager = {
+			activeFile: terminalFile,
+			files: [jsFile, htmlFile, terminalFile],
+			editorHistory: [jsFile, terminalFile, htmlFile],
+		};
+		expect(pickEditorFile(manager)).toBe(htmlFile);
+	});
+
+	it("falls back to the last open editor tab when history is empty", () => {
+		const jsFile = { type: "editor", uri: "u:js", filename: "app.js" };
+		const manager = { activeFile: null, files: [jsFile], editorHistory: [] };
+		expect(pickEditorFile(manager)).toBe(jsFile);
+	});
+
+	it("returns null when nothing editable is open", () => {
+		const terminalFile = { type: "terminal", uri: "t:1", filename: "T" };
+		expect(
+			pickEditorFile({ files: [terminalFile], editorHistory: [terminalFile] }),
+		).toBeNull();
+	});
+
+	it("activates the last editor tab when a terminal tab is active", () => {
+		const htmlView = makeView("<p>page</p>", 11, 11);
+		const htmlFile = {
+			type: "editor",
+			uri: "file:///project/index.html",
+			filename: "index.html",
+			isUnsaved: false,
+		};
+		const terminalFile = {
+			type: "terminal",
+			uri: "terminal:1",
+			filename: "Terminal 1",
+		};
+		const manager = {
+			activeFile: terminalFile,
+			editor: null,
+			files: [htmlFile, terminalFile],
+			editorHistory: [terminalFile, htmlFile],
+		};
+		htmlFile.makeActive = () => {
+			manager.activeFile = htmlFile;
+			manager.editor = htmlView;
+		};
+
+		const result = applyToEditor(manager, {
+			action: "insert",
+			text: "<b>hi</b>",
+		});
+
+		expect(result.ok).toBe(true);
+		expect(manager.activeFile).toBe(htmlFile);
+		expect(htmlView.transactions[0].changes).toEqual({
+			from: 11,
+			to: 11,
+			insert: "<b>hi</b>",
+		});
+	});
+
+	it("still reports no file when only non-editor tabs exist", () => {
+		const terminalFile = {
+			type: "terminal",
+			uri: "terminal:1",
+			filename: "Terminal 1",
+		};
+		const manager = {
+			activeFile: terminalFile,
+			editor: null,
+			files: [terminalFile],
+			editorHistory: [terminalFile],
+		};
+		const result = applyToEditor(manager, { action: "insert", text: "x" });
+		expect(result.ok).toBe(false);
+		expect(result.message).toContain("no file is open");
 	});
 });

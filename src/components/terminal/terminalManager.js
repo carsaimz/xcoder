@@ -10,7 +10,7 @@ import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import EditorFile from "lib/editorFile";
 import openFile from "lib/openFile";
-import openFolder from "lib/openFolder";
+import openFolder, { addedFolder } from "lib/openFolder";
 import appSettings from "lib/settings";
 import { getHostHomeDir, resolveInitialDirectory } from "lib/sshSessions";
 import { activeProjectCd } from "lib/terminalCwd";
@@ -349,7 +349,10 @@ class TerminalManager {
 							// PTY input buffer holds the line until the shell reads it,
 							// so a short defer is enough to let init finish first.
 							if (!terminalOptions.pid && !terminalComponent.remoteSsh) {
-								const cdCommand = activeProjectCd(editorManager.activeFile);
+								const cdCommand = activeProjectCd(
+									editorManager.activeFile,
+									addedFolder.map((folder) => folder?.url).filter(Boolean),
+								);
 								if (cdCommand) {
 									setTimeout(() => {
 										try {

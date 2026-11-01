@@ -1585,6 +1585,8 @@
 	"dev tools insert": "Inserir",
 	"dev tools copied": "Copiado para a área de transferência",
 	"dev tools inserted": "Inserido no cursor",
+	"dev tools inserted in": "Inserido em {file}",
+	"dev tools insert failed": "Não foi possível inserir",
 	"dev tools saved": "Salvo: {file}",
 	"dev tools no editor": "Nenhum arquivo aberto no editor",
 	"dev tools offset x": "Deslocamento X",

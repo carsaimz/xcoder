@@ -1496,6 +1496,8 @@ declare type LangStrings = {
   "dev tools insert": string;
   "dev tools copied": string;
   "dev tools inserted": string;
+  "dev tools inserted in": string;
+  "dev tools insert failed": string;
   "dev tools saved": string;
   "dev tools no editor": string;
   "dev tools offset x": string;

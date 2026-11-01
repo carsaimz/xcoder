@@ -1,7 +1,7 @@
 import "./style.scss";
 import fsOperation from "fileSystem";
 import toast from "components/toast";
-import { applyToEditor } from "lib/ai/editorBridge";
+import { applyToEditor, pickEditorFile } from "lib/ai/editorBridge";
 import editorManager from "lib/editorManager";
 import {
 	base64Convert,
@@ -13,6 +13,7 @@ import {
 	formSnippet,
 	gradientCSS,
 	gridCSS,
+	isHtmlFile,
 	loremText,
 	placeholderSnippet,
 	radiusCSS,
@@ -22,6 +23,7 @@ import {
 	tableSnippet,
 	timestampConvert,
 	uuidIds,
+	wrapHtmlSnippet,
 } from "lib/webdevTools";
 import Url from "utils/Url";
 
@@ -352,6 +354,8 @@ const state = {
 };
 
 let activeTool = "shadow";
+/** Kind of the current output: css | html | mixed | text. */
+let outputKind = "text";
 /** @type {HTMLElement} */
 let $root = null;
 /** @type {HTMLElement} */
@@ -399,16 +403,40 @@ function copyText(text) {
 		.catch((error) => toast(`clipboard: ${error.message || error}`));
 }
 
-/** Inserts generated code at the editor cursor. */
+/**
+ * Inserts generated code at the editor cursor. When the receiving tab
+ * is an HTML document and the tool produces bare CSS, the snippet is
+ * wrapped in <style>…</style> first (same rule as the mixed tools).
+ */
 function insertText(text) {
+	const active = editorManager.activeFile;
+	const target =
+		active?.type === "editor" ? active : pickEditorFile(editorManager);
+	const payload =
+		outputKind === "css" && isHtmlFile(target?.filename)
+			? wrapHtmlSnippet({ css: text })
+			: text;
 	const result = applyToEditor(editorManager, {
 		action: "insert",
-		text,
+		text: payload,
 	});
 	if (result.ok) {
-		toast(t("dev tools inserted", "Inserted at cursor"));
+		const name = editorManager.activeFile?.filename;
+		toast(
+			name
+				? t("dev tools inserted in", "Inserted in {file}").replace(
+						/\{file\}/g,
+						name,
+					)
+				: t("dev tools inserted", "Inserted at cursor"),
+		);
 	} else {
-		toast(result.message);
+		toast(
+			`${t(
+				"dev tools insert failed",
+				"Não foi possível inserir",
+			)}: ${result.message}`,
+		);
 	}
 }
 
@@ -439,6 +467,7 @@ function refresh() {
 	$preview.textContent = "";
 	$output.textContent = "";
 	delete $preview.dataset.svg;
+	outputKind = "text";
 
 	if (activeTool === "shadow") {
 		const css = shadowCSS(state.shadow);
@@ -449,6 +478,7 @@ function refresh() {
 		box.style.borderRadius = "12px";
 		$preview.append(box);
 		$output.textContent = css;
+		outputKind = "css";
 	} else if (activeTool === "gradient") {
 		const css = gradientCSS(state.gradient);
 		const box = <div className="devtools-gradient-box" />;
@@ -457,8 +487,9 @@ function refresh() {
 		)[1];
 		$preview.append(box);
 		$output.textContent = css;
+		outputKind = "css";
 	} else if (activeTool === "card") {
-		const { css } = cardSnippet(state.card);
+		const { css, html } = cardSnippet(state.card);
 		const card = (
 			<div className="devtools-card-preview">
 				<h2>{state.card.title}</h2>
@@ -475,7 +506,8 @@ function refresh() {
 		card.style.boxShadow =
 			cardSnippet(state.card).css.match(/box-shadow: ([^;]+);/)?.[1] || "none";
 		$preview.append(card);
-		$output.textContent = `${css}\n\n${cardSnippet(state.card).html}`;
+		$output.textContent = wrapHtmlSnippet({ css, html });
+		outputKind = "mixed";
 	} else if (activeTool === "cta") {
 		const { css, html } = ctaSnippet(state.cta);
 		const link = (
@@ -497,7 +529,8 @@ function refresh() {
 			link.style.textAlign = "center";
 		}
 		$preview.append(link);
-		$output.textContent = `${css}\n\n${html}`;
+		$output.textContent = wrapHtmlSnippet({ css, html });
+		outputKind = "mixed";
 	} else if (activeTool === "section") {
 		const { css, html } = sectionSnippet(state.section);
 		const hero = (
@@ -520,7 +553,8 @@ function refresh() {
 		hero.style.padding = `${state.section.padding}px 16px`;
 		hero.style.textAlign = state.section.align;
 		$preview.append(hero);
-		$output.textContent = `${css}\n\n${html}`;
+		$output.textContent = wrapHtmlSnippet({ css, html });
+		outputKind = "mixed";
 	} else if (activeTool === "form") {
 		const { html, css } = formSnippet(state.form);
 		const holder = <div className="devtools-form-preview" />;
@@ -528,13 +562,15 @@ function refresh() {
 		const $form = holder.querySelector("form");
 		if ($form) $form.onsubmit = (event) => event.preventDefault();
 		$preview.append(holder);
-		$output.textContent = `${html}\n\n${css}`;
+		$output.textContent = wrapHtmlSnippet({ css, html });
+		outputKind = "mixed";
 	} else if (activeTool === "table") {
 		const { html, css } = tableSnippet(state.table);
 		const holder = <div className="devtools-table-preview" />;
 		holder.innerHTML = html;
 		$preview.append(holder);
-		$output.textContent = `${html}\n\n${css}`;
+		$output.textContent = wrapHtmlSnippet({ css, html });
+		outputKind = "mixed";
 	} else if (activeTool === "boilerplate") {
 		const { html } = boilerplateSnippet(state.boilerplate);
 		const doc = (
@@ -545,11 +581,13 @@ function refresh() {
 		);
 		$preview.append(doc);
 		$output.textContent = html;
+		outputKind = "html";
 	} else if (activeTool === "placeholder") {
 		const { svg, dataUri, imgTag } = placeholderSnippet(state.placeholder);
 		const img = <img src={dataUri} alt="placeholder preview" />;
 		$preview.append(img);
 		$output.textContent = imgTag;
+		outputKind = "html";
 		// keep the raw SVG reachable for the save action
 		$preview.dataset.svg = svg;
 	} else if (activeTool === "json") {
@@ -625,12 +663,14 @@ function refresh() {
 		}
 		$preview.append(holder);
 		$output.textContent = css;
+		outputKind = "css";
 	} else if (activeTool === "radius") {
 		const css = radiusCSS(state.radius);
 		const box = <div className="devtools-radius-box" />;
 		box.style.borderRadius = `${state.radius.tl}px ${state.radius.tr}px ${state.radius.br}px ${state.radius.bl}px`;
 		$preview.append(box);
 		$output.textContent = css;
+		outputKind = "css";
 	} else if (activeTool === "regex") {
 		const result = regexTest(
 			state.regex.pattern,
@@ -683,12 +723,14 @@ function refresh() {
 		}
 		$preview.append(holder);
 		$output.textContent = css;
+		outputKind = "css";
 	} else if (activeTool === "markdown") {
 		const html = markdownToHtml(state.markdown.text);
 		const holder = <div className="devtools-markdown-preview" />;
 		holder.innerHTML = html;
 		$preview.append(holder);
 		$output.textContent = html;
+		outputKind = "html";
 	}
 }
 

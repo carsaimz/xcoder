@@ -951,6 +951,38 @@ export function flexCSS(state, selector = ".flex") {
 	].join("\n");
 }
 
+/**
+ * Wraps generator parts into one HTML-ready snippet: CSS goes inside
+ * <style>…</style> and JS inside <script>…</script>, so mixed output
+ * can be pasted straight into an .html file and just work.
+ * @param {{css?: string, html?: string, js?: string}} parts generator parts
+ * @returns {string} single snippet with the style/script tags applied
+ */
+export function wrapHtmlSnippet(parts = {}) {
+	const { css, html, js } = parts || {};
+	const parts2 = [];
+	if (String(css ?? "").trim()) {
+		parts2.push(`<style>\n${String(css).trim()}\n</style>`);
+	}
+	if (String(html ?? "").trim()) {
+		parts2.push(String(html).trim());
+	}
+	if (String(js ?? "").trim()) {
+		parts2.push(`<script>\n${String(js).trim()}\n</script>`);
+	}
+	return parts2.join("\n\n");
+}
+
+/**
+ * Whether a filename is an HTML document — the kind of file where
+ * bare CSS/JS needs <style>/<script> wrapping before an insert.
+ * @param {string} filename file name ("index.html")
+ * @returns {boolean}
+ */
+export function isHtmlFile(filename) {
+	return /\.(html?|xhtml|vue|svelte)$/i.test(String(filename || ""));
+}
+
 export default {
 	shadowCSS,
 	gradientCSS,
@@ -975,5 +1007,7 @@ export default {
 	hashConvert,
 	jwtDecode,
 	flexCSS,
+	wrapHtmlSnippet,
+	isHtmlFile,
 	CARD_SHADOWS,
 };

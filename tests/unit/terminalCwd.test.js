@@ -72,4 +72,74 @@ describe("terminalCwd.activeProjectCd", () => {
                 );
                 expect(activeProjectCd({})).toBeNull();
         });
+
+        test("maps the XCoder public SAF tree to /public", () => {
+                expect(
+                        sandboxPathOf(
+                                "content://com.carsaimz.xcoder.documents/tree/%2Fdata%2Fuser%2F0%2Fcom.carsaimz.xcoder%2Ffiles%2Fpublic::public%3AProjetos%2Fsite",
+                        ),
+                ).toBe("/public/Projetos/site");
+                expect(
+                        sandboxPathOf(
+                                "content://com.carsaimz.xcoder.documents/tree/%2Fdata%2Fuser%2F0%2Fcom.carsaimz.xcoder%2Ffiles%2Fpublic",
+                        ),
+                ).toBe("/public");
+        });
+
+        test("maps Android external-storage SAF documents to /storage/emulated/0", () => {
+                expect(
+                        sandboxPathOf(
+                                "content://com.android.externalstorage.documents/document/primary%3AProjects%2Fsite%2Findex.html",
+                        ),
+                ).toBe("/storage/emulated/0/Projects/site/index.html");
+                expect(
+                        sandboxPathOf(
+                                "content://com.android.externalstorage.documents/tree/primary%3AProjects%2Fsite",
+                        ),
+                ).toBe("/storage/emulated/0/Projects/site");
+                expect(
+                        sandboxPathOf("content://com.android.externalstorage.documents/document/secondary%3Ax"),
+                ).toBeNull();
+        });
+
+        test("maps app-owned file trees to their sandbox mounts", () => {
+                expect(
+                        sandboxPathOf(
+                                "file:///data/user/0/com.carsaimz.xcoder/files/public/site/index.html",
+                        ),
+                ).toBe("/public/site/index.html");
+                expect(
+                        sandboxPathOf(
+                                "file:///data/user/0/com.carsaimz.xcoder/files/alpine/home/x",
+                        ),
+                ).toBe("/home/x");
+        });
+
+        test("falls back to the open project folder when no file is active", () => {
+                expect(
+                        activeProjectCd(null, [
+                                "content://com.android.externalstorage.documents/tree/primary%3AProjects%2Fsite",
+                        ]),
+                ).toBe("cd '/storage/emulated/0/Projects/site'");
+        });
+
+        test("active file wins over the open folders", () => {
+                expect(
+                        activeProjectCd(
+                                { uri: "file:///sdcard/Note/app.py" },
+                                [
+                                        "content://com.android.externalstorage.documents/tree/primary%3AProjects%2Fsite",
+                                ],
+                        ),
+                ).toBe("cd '/sdcard/Note'");
+        });
+
+        test("skips unmappable folders and returns null when nothing maps", () => {
+                expect(
+                        activeProjectCd(null, [
+                                "content://com.termux.documents/tree/abc",
+                                "https://example.com/x",
+                        ]),
+                ).toBeNull();
+        });
 });

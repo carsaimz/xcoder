@@ -1468,6 +1468,8 @@
 	"dev tools insert": "Insert",
 	"dev tools copied": "Copied to clipboard",
 	"dev tools inserted": "Inserted at cursor",
+	"dev tools inserted in": "Inserted in {file}",
+	"dev tools insert failed": "Could not insert",
 	"dev tools saved": "Saved: {file}",
 	"dev tools no editor": "No file is open in the editor",
 	"dev tools offset x": "Offset X",

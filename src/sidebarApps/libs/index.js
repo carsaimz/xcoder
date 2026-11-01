@@ -49,16 +49,30 @@ function copyText(text) {
 		.catch((error) => toast(`clipboard: ${error.message || error}`));
 }
 
-/** Inserts a snippet at the editor cursor. */
+/** Inserts a snippet at the editor cursor (activates the last editor
+ * tab when the current one is not editable — terminal, preview…). */
 function insertText(text) {
 	const result = applyToEditor(editorManager, {
 		action: "insert",
 		text,
 	});
 	if (result.ok) {
-		toast(t("dev tools inserted", "Inserted at cursor"));
+		const name = editorManager.activeFile?.filename;
+		toast(
+			name
+				? t("dev tools inserted in", "Inserted in {file}").replace(
+						/\{file\}/g,
+						name,
+					)
+				: t("dev tools inserted", "Inserted at cursor"),
+		);
 	} else {
-		toast(result.message);
+		toast(
+			`${t(
+				"dev tools insert failed",
+				"Não foi possível inserir",
+			)}: ${result.message}`,
+		);
 	}
 }
 
