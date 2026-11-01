@@ -517,3 +517,43 @@
                 background: color-mix(in srgb, var(--primary-color) 20%, transparent);
         }
 }
+
+/* easing playground: animated dot driven by animation-timing-function */
+@keyframes devtools-easing-demo {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(min(180px, 42vw));
+	}
+}
+
+.devtools-easing-track {
+	position: relative;
+	height: 48px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+
+	.devtools-easing-dot {
+		position: absolute;
+		top: 50%;
+		left: 8px;
+		width: 32px;
+		height: 32px;
+		margin-top: -16px;
+		border-radius: 50%;
+		background: var(--primary-color);
+	}
+}
+
+/* toast/modal/tabs component previews (fixed positioning is relaxed
+   to absolute inside this frame so overlays stay contained) */
+.devtools-component-frame {
+	position: relative;
+	min-height: 220px;
+	overflow: hidden;
+	padding: 12px;
+	border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+	border-radius: 12px;
+}

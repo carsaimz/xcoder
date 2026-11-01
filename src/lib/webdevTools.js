@@ -983,6 +983,533 @@ export function isHtmlFile(filename) {
 	return /\.(html?|xhtml|vue|svelte)$/i.test(String(filename || ""));
 }
 
+// --- easing ----------------------------------------------------------------
+
+/**
+ * cubic-bezier rule for the easing playground (x1/x2 must stay in 0..1,
+ * y1/y2 may overshoot for bounce effects).
+ * @param {{x1?: number, y1?: number, x2?: number, y2?: number}} state
+ * @param {string} [selector]
+ * @returns {string}
+ */
+export function easingCSS(state, selector = ".element") {
+	const x1 = clamp(state?.x1 ?? 0.42, 0, 1).toFixed(2);
+	const y1 = clamp(state?.y1 ?? 0, -2, 2).toFixed(2);
+	const x2 = clamp(state?.x2 ?? 1, 0, 1).toFixed(2);
+	const y2 = clamp(state?.y2 ?? 1, -2, 2).toFixed(2);
+	return `.${String(selector).replace(/^\./, "")} {\n\ttransition-timing-function: cubic-bezier(${x1}, ${y1}, ${x2}, ${y2});\n}`;
+}
+
+// --- unit converter --------------------------------------------------------
+
+/** Formats a number for the unit table (trailing zeros trimmed). */
+function unitNumber(value) {
+	return String(Number(Number(value ?? 0).toFixed(4)));
+}
+
+/**
+ * Converts a length between px, rem and em (rem/em both resolve against
+ * the root font size, so they share the same numeric value).
+ * @param {{value?: string|number, from?: "px"|"rem"|"em", root?: number}} args
+ * @returns {{ok: boolean, output: string, error: string}}
+ */
+export function convertUnits(args = {}) {
+	const root = Number(args.root ?? 16);
+	if (!Number.isFinite(root) || root <= 0) {
+		return {
+			ok: false,
+			output: "",
+			error: "root size must be a positive number",
+		};
+	}
+	const value = Number.parseFloat(String(args.value ?? "").replace(",", "."));
+	if (!Number.isFinite(value)) {
+		return { ok: false, output: "", error: "value must be a number" };
+	}
+	const from = args.from === "rem" || args.from === "em" ? args.from : "px";
+	const px = from === "px" ? value : value * root;
+	const rem = from === "px" ? value / root : value;
+	return {
+		ok: true,
+		output: `${unitNumber(px)}px\n${unitNumber(rem)}rem\n${unitNumber(rem)}em`,
+		error: "",
+	};
+}
+
+// --- case converter --------------------------------------------------------
+
+/**
+ * Converts text between naming conventions (camelCase, PascalCase,
+ * snake_case, kebab-case, CONSTANT_CASE and Title Case).
+ * @param {string} text
+ * @param {"camel"|"pascal"|"snake"|"kebab"|"constant"|"title"} mode
+ * @returns {{ok: boolean, output: string, error: string}}
+ */
+export function caseConvert(text, mode = "camel") {
+	const words = String(text ?? "")
+		.replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+		.replace(/[_\-\s]+/g, " ")
+		.trim()
+		.toLowerCase()
+		.split(" ")
+		.filter(Boolean);
+	if (!words.length) {
+		return { ok: false, output: "", error: "type a text to convert" };
+	}
+	const cap = (word) => word.charAt(0).toUpperCase() + word.slice(1);
+	const modes = {
+		camel: () =>
+			words.map((word, index) => (index ? cap(word) : word)).join(""),
+		pascal: () => words.map(cap).join(""),
+		snake: () => words.join("_"),
+		kebab: () => words.join("-"),
+		constant: () => words.join("_").toUpperCase(),
+		title: () => words.map(cap).join(" "),
+	};
+	const kind = Object.prototype.hasOwnProperty.call(modes, mode)
+		? mode
+		: "camel";
+	return { ok: true, output: modes[kind](), error: "" };
+}
+
+// --- HTML entities ---------------------------------------------------------
+
+/** Basic escape map (always applied on escape). */
+const ENTITY_MAP = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': "&quot;",
+	"'": "&#39;",
+};
+
+/** Practical named-entity set for unescape (plus numeric refs). */
+const NAMED_ENTITIES = {
+	amp: "&",
+	lt: "<",
+	gt: ">",
+	quot: '"',
+	apos: "'",
+	nbsp: " ",
+	copy: "©",
+	reg: "®",
+	trade: "™",
+	hellip: "…",
+	mdash: "—",
+	ndash: "–",
+	laquo: "«",
+	raquo: "»",
+	times: "×",
+	divide: "÷",
+	deg: "°",
+	plusmn: "±",
+	middot: "·",
+	euro: "€",
+	cent: "¢",
+	pound: "£",
+};
+
+/** Code point → char, never throwing on invalid values. */
+function charFromCode(code) {
+	try {
+		return String.fromCodePoint(code);
+	} catch {
+		return "";
+	}
+}
+
+/**
+ * Escapes or unescapes HTML entities (&, <, >, quotes + numeric refs and
+ * a practical named-entity set on the way back).
+ * @param {string} text
+ * @param {"escape"|"unescape"} mode
+ * @returns {{ok: boolean, output: string, error: string}}
+ */
+export function entitiesConvert(text, mode = "escape") {
+	const input = String(text ?? "");
+	if (!input) {
+		return { ok: false, output: "", error: "type a text to convert" };
+	}
+	if (mode === "unescape") {
+		const output = input
+			.replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
+				charFromCode(Number.parseInt(hex, 16)),
+			)
+			.replace(/&#(\d+);/g, (_, dec) => charFromCode(Number(dec)))
+			.replace(
+				/&([a-z]+);/gi,
+				(match, name) => NAMED_ENTITIES[name.toLowerCase()] ?? match,
+			);
+		return { ok: true, output, error: "" };
+	}
+	return {
+		ok: true,
+		output: input.replace(/[&<>"']/g, (ch) => ENTITY_MAP[ch]),
+		error: "",
+	};
+}
+
+// --- CSV ↔ JSON ------------------------------------------------------------
+
+/** Parses one CSV line honoring double-quoted fields and "" escapes. */
+function parseCsvLine(line, delimiter) {
+	const fields = [];
+	let field = "";
+	let inQuotes = false;
+	for (let index = 0; index < line.length; index++) {
+		const ch = line[index];
+		if (inQuotes) {
+			if (ch === '"') {
+				if (line[index + 1] === '"') {
+					field += '"';
+					index++;
+				} else {
+					inQuotes = false;
+				}
+			} else {
+				field += ch;
+			}
+		} else if (ch === '"') {
+			inQuotes = true;
+		} else if (ch === delimiter) {
+			fields.push(field);
+			field = "";
+		} else {
+			field += ch;
+		}
+	}
+	fields.push(field);
+	return fields.map((value) => value.trim());
+}
+
+/** Quotes a CSV cell when it contains the delimiter, quotes or newlines. */
+function csvCell(value, delimiter) {
+	const text =
+		value == null
+			? ""
+			: typeof value === "object"
+				? JSON.stringify(value)
+				: String(value);
+	const needsQuotes = new RegExp(
+		`[",\\n;${delimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]`,
+	).test(text);
+	return needsQuotes ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+/**
+ * Converts CSV text to JSON (array of objects) or JSON rows back to CSV.
+ * @param {string} text source text
+ * @param {"csv2json"|"json2csv"} mode direction
+ * @param {string} [delimiter] single-character field separator
+ * @returns {{ok: boolean, output: string, error: string}}
+ */
+export function csvConvert(text, mode = "csv2json", delimiter = ",") {
+	const input = String(text ?? "").trim();
+	if (!input) {
+		return { ok: false, output: "", error: "paste CSV or JSON first" };
+	}
+	const sep = delimiter === "\\t" ? "\t" : String(delimiter || ",");
+	try {
+		if (mode === "json2csv") {
+			const rows = JSON.parse(input);
+			if (
+				!Array.isArray(rows) ||
+				!rows.length ||
+				typeof rows[0] !== "object" ||
+				rows[0] == null
+			) {
+				return {
+					ok: false,
+					output: "",
+					error: "JSON must be a non-empty array of objects",
+				};
+			}
+			const headers = [
+				...new Set(rows.flatMap((row) => Object.keys(row ?? {}))),
+			];
+			const lines = [headers.map((h) => csvCell(h, sep)).join(sep)];
+			for (const row of rows) {
+				lines.push(headers.map((h) => csvCell(row?.[h], sep)).join(sep));
+			}
+			return { ok: true, output: lines.join("\n"), error: "" };
+		}
+		const lines = input.split(/\r?\n/).filter((line) => line.trim().length);
+		if (lines.length < 2) {
+			return {
+				ok: false,
+				output: "",
+				error: "CSV needs a header row and at least one data row",
+			};
+		}
+		const headers = parseCsvLine(lines[0], sep);
+		const rows = lines.slice(1).map((line) => {
+			const values = parseCsvLine(line, sep);
+			const row = {};
+			headers.forEach((header, index) => {
+				row[header || `col${index + 1}`] = values[index] ?? "";
+			});
+			return row;
+		});
+		return { ok: true, output: JSON.stringify(rows, null, 2), error: "" };
+	} catch (error) {
+		return { ok: false, output: "", error: error?.message || String(error) };
+	}
+}
+
+// --- toast / modal / tabs components (HTML + CSS + JS) ----------------------
+
+/** Anchor map for the six toast positions. */
+const TOAST_POSITIONS = {
+	"top-left": { block: "top", inline: "left", base: "" },
+	"top-center": {
+		block: "top",
+		inline: "left",
+		center: true,
+		base: "translateX(-50%)",
+	},
+	"top-right": { block: "top", inline: "right", base: "" },
+	"bottom-left": { block: "bottom", inline: "left", base: "" },
+	"bottom-center": {
+		block: "bottom",
+		inline: "left",
+		center: true,
+		base: "translateX(-50%)",
+	},
+	"bottom-right": { block: "bottom", inline: "right", base: "" },
+};
+
+/**
+ * Ready-to-paste toast notification component (HTML + CSS + JS). The
+ * parts are meant to go through wrapHtmlSnippet so the result lands as
+ * one working <style>+markup+<script> block.
+ * @param {{message?: string, position?: string, background?: string, color?: string, radius?: number}} state
+ * @returns {{html: string, css: string, js: string}}
+ */
+export function toastSnippet(state = {}) {
+	const message = String(state.message ?? "Salvo com sucesso");
+	const pos =
+		TOAST_POSITIONS[state.position] || TOAST_POSITIONS["bottom-right"];
+	const background = state.background || "#1f1f1f";
+	const foreground = state.color || "#ffffff";
+	const radius = Math.round(clamp(state.radius ?? 12, 0, 32));
+	const hidden = [pos.base, "translateY(12px)"].filter(Boolean).join(" ");
+	const shown = pos.base || "none";
+
+	const css = [
+		".xc-toast {",
+		"\tposition: fixed;",
+		`\t${pos.block}: 16px;`,
+		pos.center ? "\tleft: 50%;" : `\t${pos.inline}: 16px;`,
+		"\tbackground: " + background + ";",
+		"\tcolor: " + foreground + ";",
+		`\tborder-radius: ${radius}px;`,
+		"\tpadding: 12px 20px;",
+		"\tbox-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);",
+		"\tfont: inherit;",
+		"\topacity: 0;",
+		"\tvisibility: hidden;",
+		`\ttransform: ${hidden};`,
+		"\ttransition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;",
+		"\tz-index: 9999;",
+		"\tmax-width: min(90vw, 360px);",
+		"}",
+		".xc-toast.show {",
+		"\topacity: 1;",
+		"\tvisibility: visible;",
+		`\ttransform: ${shown};`,
+		"}",
+	].join("\n");
+
+	const html =
+		'<button class="xc-toast-demo" type="button">' +
+		escapeHTML(message) +
+		"</button>\n" +
+		'<div class="xc-toast" role="status">' +
+		escapeHTML(message) +
+		"</div>";
+
+	const js = [
+		"const toast = document.querySelector('.xc-toast');",
+		"let toastTimer;",
+		"function showToast(text) {",
+		"\ttoast.textContent = text;",
+		"\ttoast.classList.add('show');",
+		"\tclearTimeout(toastTimer);",
+		"\ttoastTimer = setTimeout(() => toast.classList.remove('show'), 3000);",
+		"}",
+		"document",
+		"\t.querySelector('.xc-toast-demo')",
+		"\t.addEventListener('click', () => showToast(" +
+			JSON.stringify(message) +
+			"));",
+	].join("\n");
+
+	return { html, css, js };
+}
+
+/**
+ * Ready-to-paste modal dialog component (HTML + CSS + JS): overlay,
+ * close button, optional close-on-overlay-tap and Escape key handling.
+ * @param {{title?: string, width?: number, overlayClose?: boolean}} state
+ * @returns {{html: string, css: string, js: string}}
+ */
+export function modalSnippet(state = {}) {
+	const title = String(state.title ?? "Confirmar ação");
+	const width = Math.round(clamp(state.width ?? 480, 280, 720));
+	const overlayClose = state.overlayClose !== false;
+
+	const css = [
+		".xc-modal-overlay {",
+		"\tposition: fixed;",
+		"\tinset: 0;",
+		"\tbackground: rgba(0, 0, 0, 0.45);",
+		"\tdisplay: none;",
+		"\talign-items: center;",
+		"\tjustify-content: center;",
+		"\tpadding: 16px;",
+		"\tz-index: 9998;",
+		"}",
+		".xc-modal-overlay.open {",
+		"\tdisplay: flex;",
+		"}",
+		".xc-modal {",
+		"\tbackground: #ffffff;",
+		"\tcolor: #1f1f1f;",
+		"\tborder-radius: 16px;",
+		`\twidth: min(${width}px, 92vw);`,
+		"\tmax-height: 86vh;",
+		"\toverflow: auto;",
+		"\tpadding: 24px;",
+		"\tbox-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);",
+		"}",
+		".xc-modal h3 {",
+		"\tmargin: 0 0 12px;",
+		"\tfont-size: 1.15rem;",
+		"}",
+		".xc-modal-close {",
+		"\tfloat: right;",
+		"\tbackground: none;",
+		"\tborder: 0;",
+		"\tfont-size: 1.25rem;",
+		"\tline-height: 1;",
+		"\tcursor: pointer;",
+		"\tcolor: inherit;",
+		"}",
+	].join("\n");
+
+	const html =
+		'<div class="xc-modal-overlay"' +
+		(overlayClose ? ' data-overlay-close="true"' : "") +
+		">\n" +
+		'\t<div class="xc-modal" role="dialog" aria-modal="true">\n' +
+		'\t\t<button class="xc-modal-close" type="button" aria-label="Fechar">&times;</button>\n' +
+		"\t\t<h3>" +
+		escapeHTML(title) +
+		"</h3>\n" +
+		"\t\t<p>Conteúdo do modal…</p>\n" +
+		"\t</div>\n" +
+		"</div>\n" +
+		'<button class="xc-modal-open" type="button">Abrir modal</button>';
+
+	const js = [
+		"const overlay = document.querySelector('.xc-modal-overlay');",
+		"function openModal() {",
+		"\toverlay.classList.add('open');",
+		"}",
+		"function closeModal() {",
+		"\toverlay.classList.remove('open');",
+		"}",
+		"document.querySelector('.xc-modal-open').addEventListener('click', openModal);",
+		"document.querySelector('.xc-modal-close').addEventListener('click', closeModal);",
+		overlayClose
+			? "overlay.addEventListener('click', (event) => {\n\tif (event.target === overlay) closeModal();\n});"
+			: "",
+		"document.addEventListener('keydown', (event) => {\n\tif (event.key === 'Escape') closeModal();\n});",
+	]
+		.filter(Boolean)
+		.join("\n");
+
+	return { html, css, js };
+}
+
+/**
+ * Ready-to-paste tabs component (HTML + CSS + JS) with underline or pill
+ * styling; labels come from a comma-separated list.
+ * @param {{labels?: string, style?: "underline"|"pills"}} state
+ * @returns {{html: string, css: string, js: string}}
+ */
+export function tabsSnippet(state = {}) {
+	const labels = String(state.labels ?? "Um, Dois, Três")
+		.split(",")
+		.map((label) => label.trim())
+		.filter(Boolean)
+		.slice(0, 6);
+	const safeLabels = labels.length ? labels : ["Um", "Dois", "Três"];
+	const pills = state.style === "pills";
+
+	const css = [
+		".xc-tab-list {",
+		"\tdisplay: flex;",
+		pills ? "\tgap: 8px;" : "\tgap: 4px;\n\tborder-bottom: 1px solid #e0e0e0;",
+		"}",
+		".xc-tab {",
+		"\tborder: 0;",
+		"\tbackground: none;",
+		"\tfont: inherit;",
+		"\tcursor: pointer;",
+		pills
+			? "\tpadding: 8px 18px;\n\tborder-radius: 999px;\n\tbackground: #ececf1;\n\tcolor: #333333;"
+			: "\tpadding: 10px 16px;\n\tcolor: #555555;\n\tborder-bottom: 2px solid transparent;\n\tmargin-bottom: -1px;",
+		"}",
+		".xc-tab.active {",
+		pills
+			? "\tbackground: #7c3aed;\n\tcolor: #ffffff;"
+			: "\tcolor: #7c3aed;\n\tborder-bottom-color: #7c3aed;\n\tfont-weight: 600;",
+		"}",
+		".xc-tab-panel {",
+		"\tdisplay: none;",
+		"\tpadding: 16px 4px;",
+		"}",
+		".xc-tab-panel.active {",
+		"\tdisplay: block;",
+		"}",
+	].join("\n");
+
+	const buttons = safeLabels
+		.map(
+			(label, index) =>
+				`\t<button class="xc-tab${index === 0 ? " active" : ""}" role="tab" type="button">${escapeHTML(label)}</button>`,
+		)
+		.join("\n");
+	const panels = safeLabels
+		.map(
+			(_, index) =>
+				`\t<div class="xc-tab-panel${index === 0 ? " active" : ""}">Conteúdo ${index + 1}…</div>`,
+		)
+		.join("\n");
+
+	const html =
+		`<div class="xc-tabs" data-style="${pills ? "pills" : "underline"}">\n` +
+		'\t<div class="xc-tab-list" role="tablist">\n' +
+		buttons +
+		"\n\t</div>\n" +
+		panels +
+		"\n</div>";
+
+	const js = [
+		"const tabs = [...document.querySelectorAll('.xc-tab')];",
+		"const panels = [...document.querySelectorAll('.xc-tab-panel')];",
+		"tabs.forEach((tab, index) => {",
+		"\ttab.addEventListener('click', () => {",
+		"\t\ttabs.forEach((item) => item.classList.toggle('active', item === tab));",
+		"\t\tpanels.forEach((panel, i) => panel.classList.toggle('active', i === index));",
+		"\t});",
+		"});",
+	].join("\n");
+
+	return { html, css, js };
+}
+
 export default {
 	shadowCSS,
 	gradientCSS,
@@ -1009,5 +1536,13 @@ export default {
 	flexCSS,
 	wrapHtmlSnippet,
 	isHtmlFile,
+	easingCSS,
+	convertUnits,
+	caseConvert,
+	entitiesConvert,
+	csvConvert,
+	toastSnippet,
+	modalSnippet,
+	tabsSnippet,
 	CARD_SHADOWS,
 };

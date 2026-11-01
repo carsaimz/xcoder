@@ -7,21 +7,29 @@ import {
 	base64Convert,
 	boilerplateSnippet,
 	cardSnippet,
+	caseConvert,
 	colorConvert,
+	convertUnits,
+	csvConvert,
 	ctaSnippet,
+	easingCSS,
+	entitiesConvert,
 	formatJson,
 	formSnippet,
 	gradientCSS,
 	gridCSS,
 	isHtmlFile,
 	loremText,
+	modalSnippet,
 	placeholderSnippet,
 	radiusCSS,
 	sectionSnippet,
 	shadowCSS,
 	slugText,
 	tableSnippet,
+	tabsSnippet,
 	timestampConvert,
+	toastSnippet,
 	uuidIds,
 	wrapHtmlSnippet,
 } from "lib/webdevTools";
@@ -204,6 +212,62 @@ const TOOL_LIST = [
 		"dev tools markdown desc",
 		"Markdown to HTML preview and code",
 	],
+	[
+		"easing",
+		"dev tools easing",
+		"Easing",
+		"dev tools easing desc",
+		"cubic-bezier transition curves with animated preview",
+	],
+	[
+		"units",
+		"dev tools units",
+		"Units",
+		"dev tools units desc",
+		"px ↔ rem ↔ em converter",
+	],
+	[
+		"case",
+		"dev tools case",
+		"Case",
+		"dev tools case desc",
+		"camelCase, snake_case, kebab-case and more",
+	],
+	[
+		"entities",
+		"dev tools entities",
+		"HTML entities",
+		"dev tools entities desc",
+		"Escape and unescape HTML entities",
+	],
+	[
+		"csv",
+		"dev tools csv",
+		"CSV ↔ JSON",
+		"dev tools csv desc",
+		"Convert CSV tables to JSON and back",
+	],
+	[
+		"toast",
+		"dev tools toast",
+		"Toast",
+		"dev tools toast desc",
+		"Toast component (HTML + CSS + JS)",
+	],
+	[
+		"modal",
+		"dev tools modal",
+		"Modal",
+		"dev tools modal desc",
+		"Modal dialog component (HTML + CSS + JS)",
+	],
+	[
+		"tabs",
+		"dev tools tabs",
+		"Tabs",
+		"dev tools tabs desc",
+		"Tabs component (HTML + CSS + JS)",
+	],
 ];
 
 const state = {
@@ -351,6 +415,24 @@ const state = {
 	markdown: {
 		text: "# XCoder\n\nUm **editor** com _IA_, Git e terminal.\n\n- item 1\n- item 2\n",
 	},
+	easing: { x1: 0.42, y1: 0, x2: 1, y2: 1, preset: "custom" },
+	units: { value: "24", from: "px", root: 16 },
+	case: { text: "meu novo ProjetoDAO", mode: "camel" },
+	entities: { text: '<a href="/x">Link</a> & "mais"', mode: "escape" },
+	csv: {
+		text: "nome,idade\nAna,30\nBruno,25",
+		mode: "csv2json",
+		delimiter: ",",
+	},
+	toast: {
+		message: "Salvo com sucesso",
+		position: "bottom-right",
+		background: "#1f1f1f",
+		color: "#ffffff",
+		radius: 12,
+	},
+	modal: { title: "Confirmar ação", width: 480, overlayClose: true },
+	tabs: { labels: "Um, Dois, Três", style: "underline" },
 };
 
 let activeTool = "shadow";
@@ -459,6 +541,57 @@ async function savePlaceholder(svg) {
 	} catch (error) {
 		toast(`save: ${error.message || error}`);
 	}
+}
+
+/**
+ * Renders a generated component inside the preview box. The styles
+ * are namespaced (.xc-*) and only their fixed positioning is relaxed
+ * to absolute so toasts/modals stay inside the preview frame; the
+ * demo controls replay the generated behavior without eval.
+ * @param {{html: string, css: string, active?: string}} parts
+ */
+function previewComponent({ html, css, active = "" }) {
+	const frame = <div className="devtools-component-frame" />;
+	const style = <style />;
+	style.textContent = css.replace(/position: fixed;/g, "position: absolute;");
+	const holder = <div className="devtools-component-stage" />;
+	holder.innerHTML = html;
+	if (active) {
+		const [selector, cls] = active.split(" ");
+		holder.querySelector(selector)?.classList.add(cls);
+	}
+	const tabs = [...holder.querySelectorAll(".xc-tab")];
+	if (tabs.length) {
+		const panels = [...holder.querySelectorAll(".xc-tab-panel")];
+		tabs.forEach((tab, index) => {
+			tab.addEventListener("click", () => {
+				tabs.forEach((item) => item.classList.toggle("active", item === tab));
+				panels.forEach((panel, i) =>
+					panel.classList.toggle("active", i === index),
+				);
+			});
+		});
+	}
+	const demo = holder.querySelector(".xc-toast-demo");
+	const toastEl = holder.querySelector(".xc-toast");
+	if (demo && toastEl) {
+		demo.addEventListener("click", () => {
+			toastEl.classList.add("show");
+			setTimeout(() => toastEl.classList.remove("show"), 1600);
+		});
+	}
+	const openBtn = holder.querySelector(".xc-modal-open");
+	const overlay = holder.querySelector(".xc-modal-overlay");
+	const closeBtn = holder.querySelector(".xc-modal-close");
+	if (openBtn && overlay && closeBtn) {
+		openBtn.addEventListener("click", () => overlay.classList.add("open"));
+		closeBtn.addEventListener("click", () => overlay.classList.remove("open"));
+		overlay.addEventListener("click", (event) => {
+			if (event.target === overlay) overlay.classList.remove("open");
+		});
+	}
+	frame.append(holder);
+	$preview.append(style, frame);
 }
 
 /** Rebuilds preview + output for the active tool. */
@@ -731,6 +864,55 @@ function refresh() {
 		$preview.append(holder);
 		$output.textContent = html;
 		outputKind = "html";
+	} else if (activeTool === "easing") {
+		const css = easingCSS(state.easing);
+		const track = <div className="devtools-easing-track" />;
+		const dot = <span className="devtools-easing-dot" />;
+		const curve = css.match(/cubic-bezier\(([^)]+)\)/)[1];
+		dot.style.animation = `devtools-easing-demo 1.6s cubic-bezier(${curve}) infinite alternate`;
+		track.append(dot);
+		$preview.append(track);
+		$output.textContent = css;
+		outputKind = "css";
+	} else if (activeTool === "units") {
+		const result = convertUnits(state.units);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "case") {
+		const result = caseConvert(state.case.text, state.case.mode);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "entities") {
+		const result = entitiesConvert(state.entities.text, state.entities.mode);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "csv") {
+		const result = csvConvert(
+			state.csv.text,
+			state.csv.mode,
+			state.csv.delimiter,
+		);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "toast") {
+		const { html, css, js } = toastSnippet(state.toast);
+		previewComponent({ html, css, active: ".xc-toast show" });
+		$output.textContent = wrapHtmlSnippet({ css, html, js });
+		outputKind = "mixed";
+	} else if (activeTool === "modal") {
+		const { html, css, js } = modalSnippet(state.modal);
+		previewComponent({ html, css, active: ".xc-modal-overlay open" });
+		$output.textContent = wrapHtmlSnippet({ css, html, js });
+		outputKind = "mixed";
+	} else if (activeTool === "tabs") {
+		const { html, css, js } = tabsSnippet(state.tabs);
+		previewComponent({ html, css });
+		$output.textContent = wrapHtmlSnippet({ css, html, js });
+		outputKind = "mixed";
 	}
 }
 
@@ -1517,6 +1699,245 @@ function buildControls() {
 				m.text,
 				(v) => (m.text = v),
 				10,
+			),
+		];
+	}
+	if (activeTool === "easing") {
+		const e = state.easing;
+		return [
+			rangeRow(
+				t("dev tools easing x1", "X1"),
+				0,
+				1,
+				e.x1,
+				(v) => (e.x1 = v),
+				0.05,
+			),
+			rangeRow(
+				t("dev tools easing y1", "Y1"),
+				-2,
+				2,
+				e.y1,
+				(v) => (e.y1 = v),
+				0.05,
+			),
+			rangeRow(
+				t("dev tools easing x2", "X2"),
+				0,
+				1,
+				e.x2,
+				(v) => (e.x2 = v),
+				0.05,
+			),
+			rangeRow(
+				t("dev tools easing y2", "Y2"),
+				-2,
+				2,
+				e.y2,
+				(v) => (e.y2 = v),
+				0.05,
+			),
+			selectRow(
+				t("dev tools type", "Type"),
+				e.preset,
+				[
+					["custom", "Custom"],
+					["ease", "ease"],
+					["ease-in", "ease-in"],
+					["ease-out", "ease-out"],
+					["ease-in-out", "ease-in-out"],
+					["bounce", "Bounce"],
+				],
+				(v) => {
+					e.preset = v;
+					const curves = {
+						ease: [0.25, 0.1, 0.25, 1],
+						"ease-in": [0.42, 0, 1, 1],
+						"ease-out": [0, 0, 0.58, 1],
+						"ease-in-out": [0.42, 0, 0.58, 1],
+						bounce: [0.68, -0.55, 0.265, 1.55],
+					};
+					const curve = curves[v];
+					if (curve) {
+						[e.x1, e.y1, e.x2, e.y2] = curve;
+						renderPanel();
+					}
+				},
+			),
+		];
+	}
+	if (activeTool === "units") {
+		const u = state.units;
+		return [
+			textRow(t("dev tools value", "Value"), u.value, (v) => (u.value = v)),
+			selectRow(
+				t("dev tools unit", "Unit"),
+				u.from,
+				[
+					["px", "px"],
+					["rem", "rem"],
+					["em", "em"],
+				],
+				(v) => (u.from = v),
+			),
+			rangeRow(
+				t("dev tools root size", "Root size"),
+				8,
+				32,
+				u.root,
+				(v) => (u.root = v),
+			),
+		];
+	}
+	if (activeTool === "case") {
+		const c = state.case;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				c.text,
+				(v) => (c.text = v),
+				3,
+			),
+			selectRow(
+				t("dev tools mode", "Mode"),
+				c.mode,
+				[
+					["camel", "camelCase"],
+					["pascal", "PascalCase"],
+					["snake", "snake_case"],
+					["kebab", "kebab-case"],
+					["constant", "CONSTANT_CASE"],
+					["title", "Title Case"],
+				],
+				(v) => (c.mode = v),
+			),
+		];
+	}
+	if (activeTool === "entities") {
+		const en = state.entities;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				en.text,
+				(v) => (en.text = v),
+				4,
+			),
+			selectRow(
+				t("dev tools mode", "Mode"),
+				en.mode,
+				[
+					["escape", "Escape"],
+					["unescape", "Unescape"],
+				],
+				(v) => (en.mode = v),
+			),
+		];
+	}
+	if (activeTool === "csv") {
+		const c = state.csv;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				c.text,
+				(v) => (c.text = v),
+				6,
+			),
+			selectRow(
+				t("dev tools mode", "Mode"),
+				c.mode,
+				[
+					["csv2json", "CSV → JSON"],
+					["json2csv", "JSON → CSV"],
+				],
+				(v) => (c.mode = v),
+			),
+			selectRow(
+				t("dev tools delimiter", "Delimiter"),
+				c.delimiter,
+				[
+					[",", "Comma (,)"],
+					[";", "Semicolon (;)"],
+					["\\t", "Tab"],
+				],
+				(v) => (c.delimiter = v),
+			),
+		];
+	}
+	if (activeTool === "toast") {
+		const s = state.toast;
+		return [
+			textRow(
+				t("dev tools message", "Message"),
+				s.message,
+				(v) => (s.message = v),
+			),
+			selectRow(
+				t("dev tools position", "Position"),
+				s.position,
+				[
+					["bottom-right", "Bottom right"],
+					["bottom-center", "Bottom center"],
+					["bottom-left", "Bottom left"],
+					["top-right", "Top right"],
+					["top-center", "Top center"],
+					["top-left", "Top left"],
+				],
+				(v) => (s.position = v),
+			),
+			colorRow(
+				t("dev tools background", "Background"),
+				s.background,
+				(v) => (s.background = v),
+			),
+			colorRow(
+				t("dev tools text color", "Text color"),
+				s.color,
+				(v) => (s.color = v),
+			),
+			rangeRow(
+				t("dev tools radius", "Corner radius"),
+				0,
+				32,
+				s.radius,
+				(v) => (s.radius = v),
+			),
+		];
+	}
+	if (activeTool === "modal") {
+		const m = state.modal;
+		return [
+			textRow(t("dev tools title", "Title"), m.title, (v) => (m.title = v)),
+			rangeRow(
+				t("dev tools width", "Width"),
+				280,
+				720,
+				m.width,
+				(v) => (m.width = v),
+				20,
+			),
+			checkRow(
+				t("dev tools overlay close", "Close on outside tap"),
+				m.overlayClose,
+				(v) => (m.overlayClose = v),
+			),
+		];
+	}
+	if (activeTool === "tabs") {
+		const tb = state.tabs;
+		return [
+			textRow(
+				t("dev tools labels", "Tabs (comma-separated)"),
+				tb.labels,
+				(v) => (tb.labels = v),
+			),
+			selectRow(
+				t("dev tools style", "Style"),
+				tb.style,
+				[
+					["underline", "Underline"],
+					["pills", "Pills"],
+				],
+				(v) => (tb.style = v),
 			),
 		];
 	}

@@ -27,6 +27,14 @@ import {
         uuidIds,
         wrapHtmlSnippet,
         isHtmlFile,
+        easingCSS,
+        convertUnits,
+        caseConvert,
+        entitiesConvert,
+        csvConvert,
+        toastSnippet,
+        modalSnippet,
+        tabsSnippet,
 } from "../../src/lib/webdevTools";
 
 describe("webdevTools generators", () => {
@@ -706,5 +714,127 @@ describe("isHtmlFile", () => {
         expect(isHtmlFile("app.js")).toBe(false);
         expect(isHtmlFile("")).toBe(false);
         expect(isHtmlFile(null)).toBe(false);
+    });
+});
+
+describe("easingCSS", () => {
+    it("clamps x into 0..1 and keeps y overshoot", () => {
+        const css = easingCSS({ x1: 0.68, y1: -0.55, x2: 0.265, y2: 1.55 });
+        expect(css).toContain(
+            "cubic-bezier(0.68, -0.55, 0.27, 1.55)",
+        );
+    });
+
+    it("defaults to the ease-in-out curve", () => {
+        expect(easingCSS({})).toContain("cubic-bezier(0.42, 0.00, 1.00, 1.00)");
+    });
+});
+
+describe("convertUnits", () => {
+    it("converts px to rem/em against the root size", () => {
+        expect(convertUnits({ value: "24", from: "px", root: 16 }).output).toBe(
+            "24px\n1.5rem\n1.5em",
+        );
+    });
+
+    it("converts rem to px", () => {
+        expect(convertUnits({ value: "1.5", from: "rem", root: 16 }).output).toBe(
+            "24px\n1.5rem\n1.5em",
+        );
+    });
+
+    it("rejects bad numbers", () => {
+        expect(convertUnits({ value: "abc", from: "px" }).ok).toBe(false);
+        expect(convertUnits({ value: 10, from: "px", root: 0 }).ok).toBe(false);
+    });
+});
+
+describe("caseConvert", () => {
+    it("splits camel/kebab/snake input into words", () => {
+        expect(caseConvert("meu novo ProjetoDAO", "camel").output).toBe(
+            "meuNovoProjetoDao",
+        );
+        expect(caseConvert("meu-novo-projeto", "constant").output).toBe(
+            "MEU_NOVO_PROJETO",
+        );
+        expect(caseConvert("AppUser name", "snake").output).toBe("app_user_name");
+    });
+
+    it("errors on empty text", () => {
+        expect(caseConvert("", "camel").ok).toBe(false);
+    });
+});
+
+describe("entitiesConvert", () => {
+    it("escapes the dangerous five", () => {
+        expect(entitiesConvert('a & b <c> "d" \'e\'', "escape").output).toBe(
+            "a &amp; b &lt;c&gt; &quot;d&quot; &#39;e&#39;",
+        );
+    });
+
+    it("round-trips named and numeric entities", () => {
+        const escaped = entitiesConvert("© … — A", "escape").output;
+        expect(entitiesConvert(escaped, "unescape").output).toBe("© … — A");
+        expect(entitiesConvert("&#169; &#x2026;", "unescape").output).toBe("© …");
+    });
+});
+
+describe("csvConvert", () => {
+    it("parses CSV into an array of objects", () => {
+        const result = csvConvert("nome,idade\nAna,30\nBruno,25", "csv2json");
+        expect(result.ok).toBe(true);
+        expect(JSON.parse(result.output)).toEqual([
+            { nome: "Ana", idade: "30" },
+            { nome: "Bruno", idade: "25" },
+        ]);
+    });
+
+    it("honors quoted fields with embedded delimiters", () => {
+        const result = csvConvert('a,b\n"x,y",2', "csv2json");
+        expect(JSON.parse(result.output)[0].a).toBe("x,y");
+    });
+
+    it("converts JSON rows back to CSV and quotes when needed", () => {
+        const result = csvConvert(
+            JSON.stringify([{ a: "x,y", b: 2 }]),
+            "json2csv",
+        );
+        expect(result.output).toBe('a,b\n"x,y",2');
+    });
+
+    it("rejects non-array JSON and short CSV", () => {
+        expect(csvConvert("just,header", "csv2json").ok).toBe(false);
+        expect(csvConvert('{"a":1}', "json2csv").ok).toBe(false);
+        expect(csvConvert("", "csv2json").ok).toBe(false);
+    });
+});
+
+describe("component snippets", () => {
+    it("toastSnippet builds html/css/js that wrap into one snippet", () => {
+        const parts = toastSnippet({ position: "top-center" });
+        expect(parts.html).toContain('class="xc-toast"');
+        expect(parts.css).toContain("top: 16px;");
+        expect(parts.css).toContain("left: 50%;");
+        expect(parts.js).toContain("showToast");
+        const wrapped = wrapHtmlSnippet(parts);
+        expect(wrapped.indexOf("<style>")).toBeLessThan(
+            wrapped.indexOf("<script>"),
+        );
+    });
+
+    it("modalSnippet toggles overlay-close behavior", () => {
+        const withOverlay = modalSnippet({ overlayClose: true });
+        const without = modalSnippet({ overlayClose: false });
+        expect(withOverlay.js).toContain("event.target === overlay");
+        expect(without.js).not.toContain("event.target === overlay");
+        expect(withOverlay.html).toContain("data-overlay-close");
+    });
+
+    it("tabsSnippet renders one button and panel per label", () => {
+        const parts = tabsSnippet({ labels: "Um, Dois, Três", style: "pills" });
+        expect(parts.html.match(/class="xc-tab( |")/g)).toHaveLength(3);
+        expect(parts.html.match(/xc-tab-panel\b/g)).toHaveLength(3);
+        expect(parts.css).toContain("border-radius: 999px;");
+        expect(parts.js).toContain("classList.toggle('active'");
     });
 });
