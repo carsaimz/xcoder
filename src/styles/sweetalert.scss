@@ -14,15 +14,15 @@
   background-color: var(--popup-background-color);
   color: #252525;
   color: var(--popup-text-color);
-  border-radius: 14px;
-  border-radius: max(14px, var(--popup-border-radius));
+  border-radius: 8px;
+  border-radius: max(6px, var(--popup-border-radius));
   border: solid 1px var(--border-color);
   box-shadow: 0 12px 32px var(--box-shadow-color);
   padding: 1.25rem 1.5rem;
 
   .swal2-title.xcoder-swal-title {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 600;
     color: var(--popup-text-color);
     overflow-wrap: anywhere;
   }
@@ -46,17 +46,17 @@
     justify-content: center;
     min-height: 44px;
     padding: 0 1.1rem;
-    border-radius: 10px;
-    border-radius: max(10px, var(--button-border-radius, 10px));
+    border-radius: 6px;
+    border-radius: max(4px, var(--button-border-radius, 4px));
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: 600;
     border: 1px solid transparent;
     cursor: pointer;
     transition: filter 0.15s ease, opacity 0.15s ease;
   }
 
   .xcoder-swal-confirm {
-    background: var(--active-color);
+    background: var(--button-background-color, var(--active-color));
     color: #ffffff;
   }
 

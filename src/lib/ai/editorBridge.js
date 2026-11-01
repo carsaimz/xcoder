@@ -14,6 +14,33 @@ const MAX_EDITOR_READ_CHARS = 12000;
 /** Max characters accepted for a single editor mutation. */
 const MAX_APPLY_CHARS = 30000;
 
+/** Whether the view is a live CodeMirror 6 editor ready to change. */
+function isReadyView(view) {
+	return Boolean(view?.state && typeof view.dispatch === "function");
+}
+
+/**
+ * Collects every editor-type file reachable in the manager, from the
+ * flat files list and from every pane (the two places open tabs live).
+ * @param {object} manager editorManager-like
+ * @returns {object[]} unique editor-type file records
+ */
+export function editorFilesOf(manager) {
+	const seen = new Set();
+	const collected = [];
+	const push = (file) => {
+		if (file && file.type === "editor" && !seen.has(file)) {
+			seen.add(file);
+			collected.push(file);
+		}
+	};
+	(Array.isArray(manager?.files) ? manager.files : []).forEach(push);
+	(Array.isArray(manager?.panes) ? manager.panes : []).forEach((pane) => {
+		(Array.isArray(pane?.files) ? pane.files : []).forEach(push);
+	});
+	return collected;
+}
+
 /**
  * Picks the best editor-type file to receive an edit when the active
  * tab is not an editor (terminal, preview…): the most recently active
@@ -22,9 +49,7 @@ const MAX_APPLY_CHARS = 30000;
  * @returns {object|null} file record with makeActive(), or null
  */
 export function pickEditorFile(manager) {
-	const open = (Array.isArray(manager?.files) ? manager.files : []).filter(
-		(file) => file?.type === "editor",
-	);
+	const open = editorFilesOf(manager);
 	if (!open.length) return null;
 	const history = Array.isArray(manager?.editorHistory)
 		? manager.editorHistory
@@ -33,6 +58,100 @@ export function pickEditorFile(manager) {
 		if (open.includes(history[index])) return history[index];
 	}
 	return open[open.length - 1];
+}
+
+/**
+ * Waits (briefly) for a live CodeMirror view — a freshly activated
+ * file may still be building its editor, so the UI insert path retries
+ * for ~1s instead of failing with "editor not ready".
+ * @param {object} manager editorManager-like
+ * @param {number} [tries] poll attempts
+ * @param {number} [delayMs] delay between attempts
+ * @returns {Promise<object|null>} ready editor view or null
+ */
+export async function waitForEditorView(manager, tries = 20, delayMs = 50) {
+	for (let attempt = 0; attempt < tries; attempt++) {
+		const view = manager?.editor;
+		if (isReadyView(view)) return view;
+		await new Promise((resolve) => setTimeout(resolve, delayMs));
+	}
+	return isReadyView(manager?.editor) ? manager.editor : null;
+}
+
+/**
+ * Inserts text at the cursor of the file the user edits, no matter
+ * which tab is currently active (AI page, terminal, welcome tab…):
+ * activates the best editor file when needed and waits for its view.
+ * This is the single path used by the AI / dev tools / libs buttons.
+ * @param {object} manager editorManager-like
+ * @param {string} text text to insert
+ * @param {{replaceSelection?: boolean}} [options]
+ * @returns {Promise<{ok: boolean, message: string, file: object|null}>}
+ */
+export async function insertIntoEditorFile(manager, text, options = {}) {
+	const body = String(text ?? "");
+	if (body.length > MAX_APPLY_CHARS) {
+		return {
+			ok: false,
+			file: null,
+			message: `ERROR: text is too large (${body.length} chars, max ${MAX_APPLY_CHARS}).`,
+		};
+	}
+
+	let file = manager?.activeFile;
+	if (!file || file.type !== "editor") file = pickEditorFile(manager);
+	if (file && file !== manager?.activeFile) {
+		try {
+			file.makeActive?.();
+		} catch {
+			/* activation is best-effort; the view may still be usable */
+		}
+	}
+
+	let view = isReadyView(manager?.editor) ? manager.editor : null;
+	if (!view && file) view = await waitForEditorView(manager);
+	if (!view) {
+		// last resort: try any other editor file, then wait again
+		const retry = editorFilesOf(manager).find(
+			(candidate) => candidate !== file,
+		);
+		if (retry) {
+			try {
+				retry.makeActive?.();
+			} catch {
+				/* keep the plain error path when activation fails */
+			}
+			view = await waitForEditorView(manager, 8, 50);
+			file = retry;
+		}
+	}
+
+	if (!file && !view) {
+		return {
+			ok: false,
+			file: null,
+			message: "ERROR: no file is open in the editor.",
+		};
+	}
+	if (!view) {
+		return {
+			ok: false,
+			file,
+			message: "ERROR: the active editor is not ready.",
+		};
+	}
+
+	const selection = view.state.selection?.main ?? { from: 0, to: 0 };
+	const replace =
+		Boolean(options.replaceSelection) && selection.to > selection.from;
+	const from = replace ? selection.from : selection.to;
+	const to = replace ? selection.to : selection.to;
+	view.dispatch({ changes: { from, to, insert: body } });
+	return {
+		ok: true,
+		file: file ?? manager?.activeFile ?? null,
+		message: `Inserted ${body.length} chars at ${replace ? "selection" : "cursor"}.`,
+	};
 }
 
 /**

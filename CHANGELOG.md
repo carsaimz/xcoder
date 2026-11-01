@@ -13,6 +13,54 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.11] - 2026-11-02
+
+### Fixed
+- **Inserir no editor (de vez)** — a mensagem «não há arquivo aberto no
+  editor» aparecia mesmo com arquivos abertos: os quatro botões de
+  inserir (IA no chat e nos blocos de código, ferramentas dev e
+  bibliotecas) agora partilham um único caminho
+  («insertIntoEditorFile») que (1) recolhe os arquivos de editor de
+  todas as abas e painéis, (2) activa o mais recente quando a aba atual
+  é uma página (IA, terminal, boas-vindas) e (3) espera até ~1s o
+  CodeMirror ficar pronto antes de falhar. A IA deixou de falhar quando
+  o próprio chat é a aba ativa.
+
+### Changed
+- **Visual VS Code (Dark Modern)** — o tema predefinido «Xcoder» foi
+  repintado com a paleta do VS Code: chrome #181818, editor/menus
+  #1f1f1f, texto #cccccc, azul de acção #0078d4 (botões incluídos — o
+  laranja de CTA foi reformado) e tema do editor «vscodeDark». Cabeçalho
+  plano de 40px com fio de 1px (sem sombra), separadores de arquivos
+  planos (o ativo derrete no editor), janelas flutuantes com raio 6px e
+  cabeçalho transparente, diálogo com cantos 6px e botões VS, e pilha de
+  tipos «Segoe UI» à frente (face do VS Code no desktop).
+- **Menu da barra lateral** — o título fica À FRENTE do ícone em cada
+  linha (pedido do utilizador), com a linha ativa tingida pelo azul de
+  acção; a seta de abertura alinha à direita.
+- **O espaço da barra lateral só para apps da barra lateral** — abrir
+  uma ferramenta em janela flutuante (Git, IA, ferramentas dev,
+  bibliotecas…) fecha a barra lateral em TODOS os layouts (antes só em
+  telemóvel): o painel lateral só fica de pé para apps acoplados
+  (arquivos, notificações, plugins…).
+- **Plugins Codex e Claude Code removidos** — as réplicas do
+  marketplace não eram agentes de verdade (geravam prompts
+  off-line). Removidos do registo; os modos de trabalho «act like
+  Codex/Claude Code» continuam disponíveis como habilidades do agente
+  de IA real (com leitura de AGENTS.md/CLAUDE.md, plano, edição e
+  verificação).
+
+### Fixed (build)
+- **Ícone do splash (Cordova)** — o splash do Android 12+ usava um
+  vector desenhado à mão estilo Acode; agora usa a marca oficial
+  («@mipmap/ic_launcher_fg», o X com os parênteses de código do
+  logo.png). O ícone monocromático temático também passou a usar a marca
+  oficial.
+
+### Tests
+- 11 novos (ponte de inserção 8, tema predefinido 3): 1073/1073 no
+  total.
+
 ## [1.8.10] - 2026-11-01
 
 ### Fixed
@@ -47,6 +95,28 @@ resumo em inglês.
 ### Tests
 - 32 novos (recuperação de inserção 5, mapeamento SAF do terminal 6,
   wrapping e geradores novos 21): 1062/1062 no total.
+
+## [1.8.11] - 2026-11-02
+
+### Summary
+- Insert-anywhere, take three: all four insert buttons (AI chat, AI code
+  blocks, dev tools, libraries) now share one battle-tested path that
+  scans every open editor tab (files list + panes), activates the most
+  recent one when a page tab is in front, and waits up to ~1s for the
+  CodeMirror view to be ready — "no file is open" is gone for real.
+- VS Code Dark Modern look: repainted default theme (#181818 chrome,
+  #1f1f1f surfaces, #cccccc text, #0078d4 blue), vscodeDark editor
+  theme, flat 40px header, flat file tabs, 6px floating windows and
+  dialogs, Segoe UI font stack.
+- Sidebar menu rows show the title before the icon; opening a floating
+  tool now closes the sidebar in every layout (the panel space is for
+  docked apps only).
+- The Codex and Claude Code marketplace replicas are removed (they were
+  prompt generators, not real agents); the real AI agent keeps their
+  playbooks as skills.
+- Cordova splash now shows the official logo mark instead of the
+  hand-drawn vector.
+- 1073/1073 tests.
 
 ## [1.8.10] - 2026-11-01
 

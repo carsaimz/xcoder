@@ -16,7 +16,20 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.10
+## ✅ Concluído até a v1.8.11
+
+- **v1.8.11 — inserir à prova de tudo + visual VS Code:** os quatro
+  botões de inserir (IA, blocos de código, dev tools, bibliotecas)
+  partilham um caminho único que varre abas e painéis, activa o
+  último arquivo do editor e espera o CodeMirror ficar pronto (~1s)
+  antes de falhar; tema predefinido repintado com a paleta Dark
+  Modern do VS Code (#181818/#1f1f1f/#cccccc, azul #0078d4,
+  editor vscodeDark), cabeçalho plano de 40px, separadores planos,
+  janelas e diálogos com cantos 6px, tipos «Segoe UI»; títulos À
+  FRENTE dos ícones no menu da barra lateral; ferramentas flutuantes
+  fecham a barra lateral em todos os layouts; plugins Codex/Claude
+  Code (réplicas) removidos — os playbooks ficam como habilidades do
+  agente de IA real; splash do Cordova com a marca oficial.
 
 - **v1.8.10 — inserir no arquivo à prova de abas, terminal em
   projectos SAF e 32 ferramentas dev:** inserir código (dev tools,

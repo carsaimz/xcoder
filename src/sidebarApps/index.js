@@ -295,6 +295,9 @@ function pulseApp(id) {
 			floatingWindow.close();
 			return;
 		}
+		// opening a floating tool hands the screen to its window: the
+		// sidebar (rail + panel space) only stays up for docked apps
+		const activatesFloat = usesFloat(app) && !app.active;
 		// tap again on a docked panel = classic toggle: hide the
 		// sidebar, keep the panel docked for when it reopens
 		if (app.active && !usesFloat(app)) {
@@ -302,6 +305,7 @@ function pulseApp(id) {
 			return;
 		}
 		setActiveApp(id);
+		if (activatesFloat) hideSidebar();
 	} catch (error) {
 		logger.log(
 			"error",
@@ -389,8 +393,8 @@ function menuRowFor(app) {
 			className={`sidebar-menu-item${app.active ? " active" : ""}`}
 			data-id={app.id}
 		>
-			{glyphFor(app.iconName, app.title)}
 			<span className="sidebar-menu-name">{app.title}</span>
+			{glyphFor(app.iconName, app.title)}
 			{app.badge ? <span className="app-badge count">{app.badge}</span> : null}
 			<span
 				className={`icon ${
@@ -429,9 +433,9 @@ function hideSidebar() {
 function openFromMenu(id) {
 	const app = apps.find((candidate) => candidate.id === id);
 	pulseApp(id);
-	// only floating tools take over the screen — docked panels live
-	// inside the sidebar, which must stay open on phones
-	if (usesFloat(app) && $sidebar?.classList.contains("phone")) {
+	// only floating tools take over the screen — the sidebar space is
+	// for docked panels, so it always yields to the opened window
+	if (usesFloat(app)) {
 		hideSidebar();
 	}
 }

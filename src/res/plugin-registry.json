@@ -840,56 +840,6 @@
    "downloads": 52,
    "supported_editor": "all",
    "repository": "https://github.com/carsaimz/xcoder-plugins"
-  },
-  {
-   "id": "xcoder.codex",
-   "name": "Codex",
-   "version": "1.0.0",
-   "description": "Replica do OpenAI Codex CLI para o XCoder: gera um AGENTS.md completo para o projeto, transforma a seleção em tarefas executáveis estilo Codex e cria prompts de revisão de código prontos para colar no ChatGPT/Codex.\n\n## Comandos\n- Codex: generate AGENTS.md (Ctrl-Alt-8) — AGENTS.md na raiz do projeto.\n- Codex: task from selection (Ctrl-Alt-7) — seleção → tarefa estruturada.\n- Codex: review prompt (Ctrl-Alt-6) — revisão sénior no clipboard.\n\n## English\nOffline-working Codex replica: AGENTS.md generation, structured task prompts and senior review prompts.",
-   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-   "author": {
-    "name": "Xcoder Team",
-    "github": "carsaimz"
-   },
-   "author_verified": true,
-   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/codex/plugin.zip",
-   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/codex/plugin.zip",
-   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/codex/icon.png",
-   "keywords": [
-    "codex",
-    "openai",
-    "agents",
-    "prompt",
-    "ai"
-   ],
-   "downloads": 0,
-   "supported_editor": "all",
-   "repository": "https://github.com/carsaimz/xcoder-plugins"
-  },
-  {
-   "id": "xcoder.claude-code",
-   "name": "Claude Code",
-   "version": "1.0.0",
-   "description": "Replica do Claude Code (Anthropic) para o XCoder: gera o CLAUDE.md do projeto, prepara prompts em modo plan (planejar antes de editar) e produz mensagens de commit convencionais a partir do código selecionado.\n\n## Comandos\n- Claude Code: generate CLAUDE.md (Ctrl-Alt-5) — CLAUDE.md na raiz do projeto.\n- Claude Code: plan prompt (Ctrl-Alt-4) — seleção → prompt plan-first.\n- Claude Code: commit message (Ctrl-Alt-0) — mensagem convencional no clipboard.\n\n## English\nOffline-working Claude Code replica: CLAUDE.md generation, plan-first prompts and conventional-commit messages.",
-   "changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
-   "author": {
-    "name": "Xcoder Team",
-    "github": "carsaimz"
-   },
-   "author_verified": true,
-   "source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/claude-code/plugin.zip",
-   "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/claude-code/plugin.zip",
-   "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/claude-code/icon.png",
-   "keywords": [
-    "claude",
-    "anthropic",
-    "plan",
-    "prompt",
-    "ai"
-   ],
-   "downloads": 0,
-   "supported_editor": "all",
-   "repository": "https://github.com/carsaimz/xcoder-plugins"
   }
  ]
 }

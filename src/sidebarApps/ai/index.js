@@ -13,9 +13,12 @@ import {
         collectArtifacts,
         formatTokenCount,
 } from "lib/ai/artifacts";
-import { explainError, listModels, resolveBaseURL } from "lib/ai/client";
-import { getEditorContext as readEditorContext } from "lib/ai/editorBridge";
 import { activeBot, listBots, setActiveBot } from "lib/ai/bots";
+import { explainError, listModels, resolveBaseURL } from "lib/ai/client";
+import {
+        insertIntoEditorFile,
+        getEditorContext as readEditorContext,
+} from "lib/ai/editorBridge";
 import {
         generateImage,
         parseImageArgs,
@@ -235,7 +238,7 @@ function initApp(el) {
         updateModeSwitch();
         updateModelButton();
         updateToggles();
-		updateBotPill();
+                updateBotPill();
 
         // re-entering the chat (sidebar reopened with the AI app already
         // active) must land on the latest message — request: scroll auto
@@ -1287,21 +1290,22 @@ async function writeClipboard(text) {
 }
 
 /**
- * Inserts text at the cursor of the active editor (CodeMirror 6 view).
+ * Inserts text at the cursor of the file the user edits. Goes through the
+ * shared editor bridge: even when the active tab is an AI/terminal/welcome
+ * page (or the editor is still loading), the best editor tab is activated
+ * and given ~1s to become ready before failing.
  * @param {string} text
  */
-function insertIntoEditor(text) {
-        const editor = window.editorManager?.editor;
-        if (!editor?.dispatch || !editor?.state) {
-                toast(
-                        strings["ai act no editor"] || "Abra um arquivo para inserir o texto",
-                        3000,
-                );
+async function insertIntoEditor(text) {
+        const result = await insertIntoEditorFile(window.editorManager, text);
+        if (result.ok) {
+                toast(strings["ai act inserted"] || "Texto inserido no editor ✓", 2000);
                 return;
         }
-        const sel = editor.state.selection.main;
-        editor.dispatch({ changes: { from: sel.to, insert: text } });
-        toast(strings["ai act inserted"] || "Texto inserido no editor ✓", 2000);
+        toast(
+                strings["ai act no editor"] || "Abra um arquivo para inserir o texto",
+                3000,
+        );
 }
 
 /**
@@ -2475,37 +2479,22 @@ async function copyToClipboard(text) {
 }
 
 /**
- * Inserts (or replaces the selection with) the given code in the active
- * editor file.
+ * Inserts (or replaces the selection with) the given code in the file the
+ * user edits, through the shared bridge (activates an editor tab and waits
+ * for it when the current tab is not an editable file).
  * @param {string} code
  * @param {boolean} replaceSelection
  */
-function insertCode(code, replaceSelection) {
-        const editorManager = window.editorManager;
-        const file = editorManager?.activeFile;
-        const editor = editorManager?.editor;
-
-        if (!file || file.type !== "editor" || !editor) {
+async function insertCode(code, replaceSelection) {
+        const result = await insertIntoEditorFile(window.editorManager, code, {
+                replaceSelection,
+        });
+        if (!result.ok) {
                 toast(strings["ai no file open"] || "Open a file first");
                 return;
         }
-
-        const state = editor.state;
-        const selection = state.selection.main;
-        const useSelection = replaceSelection && !selection.empty;
-        editor.dispatch({
-                changes: {
-                        from: useSelection ? selection.from : selection.to,
-                        to: useSelection ? selection.to : selection.to,
-                        insert: code,
-                },
-                selection: {
-                        anchor: (useSelection ? selection.from : selection.to) + code.length,
-                },
-        });
-        editor.focus();
         toast(
-                useSelection
+                replaceSelection
                         ? strings["code replaced"] || "Selection replaced"
                         : strings["code inserted"] || "Code inserted",
         );

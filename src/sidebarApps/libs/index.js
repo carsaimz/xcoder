@@ -1,7 +1,7 @@
 import "./style.scss";
 import fsOperation from "fileSystem";
 import toast from "components/toast";
-import { applyToEditor } from "lib/ai/editorBridge";
+import { insertIntoEditorFile } from "lib/ai/editorBridge";
 import editorManager from "lib/editorManager";
 import lang from "lib/lang";
 import {
@@ -49,15 +49,13 @@ function copyText(text) {
 		.catch((error) => toast(`clipboard: ${error.message || error}`));
 }
 
-/** Inserts a snippet at the editor cursor (activates the last editor
- * tab when the current one is not editable — terminal, preview…). */
-function insertText(text) {
-	const result = applyToEditor(editorManager, {
-		action: "insert",
-		text,
-	});
+/** Inserts a snippet into the file the user edits — activates the
+ * best editor tab and waits for its view even when the current tab
+ * is a page (terminal, preview, welcome…). */
+async function insertText(text) {
+	const result = await insertIntoEditorFile(editorManager, text);
 	if (result.ok) {
-		const name = editorManager.activeFile?.filename;
+		const name = result.file?.filename;
 		toast(
 			name
 				? t("dev tools inserted in", "Inserted in {file}").replace(

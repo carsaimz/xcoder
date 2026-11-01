@@ -139,6 +139,7 @@ body.resizing-editor-pane {
 .editor-pane-tabs {
   flex: 0 0 30px;
   border-bottom: 1px solid var(--border-color);
+  background-color: var(--primary-color);
 
   li.tile {
     min-width: min(var(--file-tab-width), 44%);
@@ -146,6 +147,13 @@ body.resizing-editor-pane {
 
     &.loading {
       @include mixins.bar-loader(30%, 2px);
+    }
+
+    /* VS Code tabs: flat strips; the active one melts into the editor
+       surface instead of floating as a pill */
+    &.active {
+      background-color: var(--secondary-color);
+      color: var(--primary-text-color);
     }
   }
 }

@@ -755,9 +755,9 @@ body.no-animation {
     display: flex;
     align-items: center;
     gap: 10px;
-    min-height: 40px;
+    min-height: 38px;
     padding: 4px 8px;
-    border-radius: 10px;
+    border-radius: 6px;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -769,7 +769,8 @@ body.no-animation {
 
     &.active {
       background-color: rgba(255, 255, 255, 0.06);
-      background-color: color-mix(in srgb, currentColor 6%, transparent);
+      // VS Code view list: the active row is tinted with the accent
+      background-color: color-mix(in srgb, var(--active-color) 16%, transparent);
 
       .sidebar-menu-name {
         opacity: 1;
@@ -795,7 +796,7 @@ body.no-animation {
     }
 
     .sidebar-menu-name {
-      flex: 1;
+      flex: 0 1 auto;
       min-width: 0;
       font-size: 13px;
       font-weight: 500;
@@ -838,6 +839,9 @@ body.no-animation {
       font-size: 0.9em;
       opacity: 0.4;
       flex-shrink: 0;
+      // the open affordance rides at the row end; name comes first
+      // (user: "títulos na frente do ícone"), glyph right after it
+      margin-left: auto;
     }
   }
 }
@@ -856,9 +860,10 @@ body.no-animation {
   max-height: 96vh;
   background-color: var(--primary-color);
   color: var(--primary-text-color);
-  border-radius: 14px;
+  // VS Code-like window shell: subtle radius, hairline border
+  border-radius: 6px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   touch-action: none;
 
@@ -893,10 +898,10 @@ body.no-animation {
     display: flex;
     align-items: center;
     gap: 4px;
-    height: 42px;
-    min-height: 42px;
+    height: 38px;
+    min-height: 38px;
     padding: 0 6px 0 14px;
-    background-color: rgba(0, 0, 0, 0.18);
+    background-color: transparent;
     border-bottom: 1px solid var(--border-color);
     cursor: move;
     user-select: none;
@@ -904,12 +909,13 @@ body.no-animation {
 
     .sidebar-float-title {
       flex: 1;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+      font-size: 12.5px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      opacity: 0.9;
     }
 
     .icon {

@@ -2,20 +2,21 @@
 header {
   &.tile {
     z-index: 98;
-    height: 45px;
+    height: 40px;
     background-color: rgb(153, 153, 255);
     background-color: var(--primary-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 2px 4px var(--box-shadow-color);
+    // VS Code title bar: flat, a single hairline under the bar
+    box-shadow: none;
+    border-bottom: 1px solid var(--border-color);
     color: rgb(255, 255, 255);
     color: var(--primary-text-color);
 
     >.text {
       pointer-events: all !important;
       margin: auto;
-      font-weight: bold;
-      font-size: 1.2em;
-      letter-spacing: 0.3px;
+      font-weight: 500;
+      font-size: 1.05em;
+      letter-spacing: 0.2px;
       white-space: nowrap;
       overflow: auto;
     }
@@ -95,8 +96,8 @@ header {
   }
 
   .icon {
-    height: 45px;
-    width: 45px;
+    height: 40px;
+    width: 40px;
     font-size: 2em;
 
     background-repeat: no-repeat;

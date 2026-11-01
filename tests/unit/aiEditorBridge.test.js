@@ -327,3 +327,176 @@ describe("pickEditorFile + applyToEditor recovery", () => {
 		expect(result.message).toContain("no file is open");
 	});
 });
+
+describe("insertIntoEditorFile + editorFilesOf + waitForEditorView", () => {
+	it("collects editor files from files and panes without duplicates", async () => {
+		const { editorFilesOf } = await import("lib/ai/editorBridge");
+		const htmlFile = { type: "editor", filename: "index.html" };
+		const cssFile = { type: "editor", filename: "style.css" };
+		const page = { type: "page", filename: "AI" };
+		const manager = {
+			files: [htmlFile, page],
+			panes: [{ files: [htmlFile, cssFile] }, { files: [page] }],
+		};
+		expect(editorFilesOf(manager)).toEqual([htmlFile, cssFile]);
+		expect(editorFilesOf(null)).toEqual([]);
+	});
+
+	it("inserts into the edited file even when a page tab is active", async () => {
+		const { insertIntoEditorFile } = await import("lib/ai/editorBridge");
+		const htmlFile = {
+			type: "editor",
+			filename: "index.html",
+			makeActive() {
+				this.wasActivated = true;
+			},
+		};
+		const aiTab = { type: "page", filename: "AI" };
+		const view = makeView("<html>\n</html>", 0, 0);
+		const manager = {
+			activeFile: aiTab,
+			editor: view,
+			files: [htmlFile, aiTab],
+			editorHistory: [htmlFile, aiTab],
+		};
+
+		const result = await insertIntoEditorFile(manager, "<p>hi</p>");
+
+		expect(result.ok).toBe(true);
+		expect(result.file).toBe(htmlFile);
+		expect(htmlFile.wasActivated).toBe(true);
+		expect(view.transactions[0].changes).toEqual({
+			from: 0,
+			to: 0,
+			insert: "<p>hi</p>",
+		});
+	});
+
+	it("keeps the active editor file and skips re-activation", async () => {
+		const { insertIntoEditorFile } = await import("lib/ai/editorBridge");
+		const htmlFile = {
+			type: "editor",
+			filename: "app.js",
+			makeActive() {
+				throw new Error("should not be needed");
+			},
+		};
+		const view = makeView("const a = 1;", 11, 11);
+		const manager = {
+			activeFile: htmlFile,
+			editor: view,
+			files: [htmlFile],
+			editorHistory: [htmlFile],
+		};
+
+		const result = await insertIntoEditorFile(manager, " // done");
+
+		expect(result.ok).toBe(true);
+		expect(view.transactions[0].changes).toEqual({
+			from: 11,
+			to: 11,
+			insert: " // done",
+		});
+	});
+
+	it("waits for the editor view of a freshly activated file", async () => {
+		const { insertIntoEditorFile } = await import("lib/ai/editorBridge");
+		const htmlFile = {
+			type: "editor",
+			filename: "late.html",
+			makeActive() {
+				/* tab switches synchronously; editor builds later */
+			},
+		};
+		const view = makeView("", 0, 0);
+		let reads = 0;
+		const manager = {
+			activeFile: htmlFile,
+			get editor() {
+				reads += 1;
+				// the view only exists after ~120ms of polling
+				return reads > 3 ? view : null;
+			},
+			files: [htmlFile],
+			editorHistory: [htmlFile],
+		};
+
+		const result = await insertIntoEditorFile(manager, "x");
+
+		expect(result.ok).toBe(true);
+		expect(view.transactions[0].changes.insert).toBe("x");
+	});
+
+	it("replaces the selection when asked", async () => {
+		const { insertIntoEditorFile } = await import("lib/ai/editorBridge");
+		const htmlFile = { type: "editor", filename: "sel.html" };
+		const view = makeView("hello world", 0, 5);
+		const manager = {
+			activeFile: htmlFile,
+			editor: view,
+			files: [htmlFile],
+			editorHistory: [htmlFile],
+		};
+
+		const result = await insertIntoEditorFile(manager, "goodbye", {
+			replaceSelection: true,
+		});
+
+		expect(result.ok).toBe(true);
+		expect(view.transactions[0].changes).toEqual({
+			from: 0,
+			to: 5,
+			insert: "goodbye",
+		});
+	});
+
+	it("reports no file when nothing is open anywhere", async () => {
+		const { insertIntoEditorFile } = await import("lib/ai/editorBridge");
+		const welcome = { type: "page", filename: "Welcome" };
+		const manager = {
+			activeFile: welcome,
+			editor: null,
+			files: [welcome],
+			panes: [{ files: [welcome] }],
+			editorHistory: [welcome],
+		};
+
+		const result = await insertIntoEditorFile(manager, "x");
+
+		expect(result.ok).toBe(false);
+		expect(result.message).toContain("no file is open");
+	});
+
+	it("rejects oversized payloads without touching the editor", async () => {
+		const { insertIntoEditorFile } = await import("lib/ai/editorBridge");
+		const htmlFile = { type: "editor", filename: "big.html" };
+		const view = makeView("content", 0, 0);
+		const manager = {
+			activeFile: htmlFile,
+			editor: view,
+			files: [htmlFile],
+			editorHistory: [htmlFile],
+		};
+
+		const result = await insertIntoEditorFile(manager, "a".repeat(30001));
+
+		expect(result.ok).toBe(false);
+		expect(view.transactions).toHaveLength(0);
+	});
+
+	it("waitForEditorView gives up after the polling budget", async () => {
+		const { waitForEditorView } = await import("lib/ai/editorBridge");
+		const view = makeView("x", 0, 0);
+		let reads = 0;
+		const manager = {
+			get editor() {
+				reads += 1;
+				// only becomes ready far beyond the 8-attempt budget
+				return reads > 100 ? view : null;
+			},
+		};
+
+		const result = await waitForEditorView(manager, 8, 1);
+		expect(result).toBeNull();
+	});
+});

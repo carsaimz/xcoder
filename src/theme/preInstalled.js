@@ -549,31 +549,34 @@ blossom.preferredTerminalTheme = "light";
 const custom = createBuiltInTheme("Custom");
 custom.autoDarkened = true;
 
-// ---- Xcoder brand theme: the icon palette (deep plum + violet/blue) ----
+// ---- Xcoder default theme: VS Code Dark Modern palette ----------------
+// The app follows the VS Code look (user request): #181818 chrome,
+// #1f1f1f editor/menus, #cccccc text and the #0078d4 blue accent.
 const xcoder = createBuiltInTheme("Xcoder", "dark");
-xcoder.darkenedPrimaryColor = "rgb(23, 21, 34)";
-xcoder.primaryColor = "rgb(35, 33, 51)";
-xcoder.primaryTextColor = "rgb(235, 232, 248)";
-xcoder.secondaryColor = "rgb(44, 42, 62)";
-xcoder.secondaryTextColor = "rgb(178, 173, 205)";
-xcoder.activeColor = "rgb(133, 108, 250)";
-xcoder.linkTextColor = "rgb(155, 140, 250)";
-xcoder.borderColor = "rgba(154, 107, 252, 0.22)";
-xcoder.popupIconColor = "rgb(235, 232, 248)";
-xcoder.popupBackgroundColor = "rgb(38, 36, 54)";
-xcoder.popupTextColor = "rgb(235, 232, 248)";
-xcoder.popupActiveColor = "rgb(133, 108, 250)";
-// Accent: orange CTAs over the deep indigo base (brand rule: purple UI,
-// orange highlight — away from the Acode blue).
-xcoder.buttonBackgroundColor = "rgb(255, 138, 61)";
+xcoder.darkenedPrimaryColor = "rgb(11, 11, 12)";
+xcoder.primaryColor = "rgb(24, 24, 24)";
+xcoder.primaryTextColor = "rgb(204, 204, 204)";
+xcoder.secondaryColor = "rgb(31, 31, 31)";
+xcoder.secondaryTextColor = "rgb(157, 157, 157)";
+xcoder.activeColor = "rgb(0, 120, 212)";
+xcoder.activeIconColor = "rgb(77, 170, 252)";
+xcoder.linkTextColor = "rgb(77, 170, 252)";
+xcoder.borderColor = "rgb(43, 43, 43)";
+xcoder.popupIconColor = "rgb(204, 204, 204)";
+xcoder.popupBackgroundColor = "rgb(31, 31, 31)";
+xcoder.popupTextColor = "rgb(204, 204, 204)";
+xcoder.popupActiveColor = "rgb(0, 120, 212)";
+// VS Code blue buttons (hover #005fb8) replace the old orange CTAs.
+xcoder.buttonBackgroundColor = "rgb(0, 120, 212)";
 xcoder.buttonTextColor = "rgb(255, 255, 255)";
-xcoder.buttonActiveColor = "rgb(224, 104, 34)";
-xcoder.boxShadowColor = "rgba(0, 0, 0, 0.5)";
+xcoder.buttonActiveColor = "rgb(0, 95, 173)";
+xcoder.boxShadowColor = "rgba(0, 0, 0, 0.55)";
 xcoder.activeTextColor = "rgb(255, 255, 255)";
-xcoder.errorTextColor = "rgb(255, 160, 120)";
-xcoder.dangerColor = "rgb(225, 80, 90)";
-xcoder.scrollbarColor = "rgba(201, 190, 242, 0.16)";
-xcoder.preferredEditorTheme = "tokyoNight";
+xcoder.errorTextColor = "rgb(241, 76, 76)";
+xcoder.dangerColor = "rgb(228, 70, 70)";
+xcoder.scrollbarColor = "rgba(121, 121, 121, 0.4)";
+xcoder.popupBorderRadius = "6px";
+xcoder.preferredEditorTheme = "vscodeDark";
 xcoder.preferredTerminalTheme = "dark";
 
 const aurora = createBuiltInTheme("Aurora", "dark");

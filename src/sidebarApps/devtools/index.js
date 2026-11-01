@@ -1,7 +1,7 @@
 import "./style.scss";
 import fsOperation from "fileSystem";
 import toast from "components/toast";
-import { applyToEditor, pickEditorFile } from "lib/ai/editorBridge";
+import { insertIntoEditorFile, pickEditorFile } from "lib/ai/editorBridge";
 import editorManager from "lib/editorManager";
 import {
 	base64Convert,
@@ -486,11 +486,13 @@ function copyText(text) {
 }
 
 /**
- * Inserts generated code at the editor cursor. When the receiving tab
- * is an HTML document and the tool produces bare CSS, the snippet is
- * wrapped in <style>…</style> first (same rule as the mixed tools).
+ * Inserts generated code into the file the user edits (activates the
+ * best editor tab and waits for its view when the current tab is a
+ * page). When the receiving tab is an HTML document and the tool
+ * produces bare CSS, the snippet is wrapped in <style>…</style> first
+ * (same rule as the mixed tools).
  */
-function insertText(text) {
+async function insertText(text) {
 	const active = editorManager.activeFile;
 	const target =
 		active?.type === "editor" ? active : pickEditorFile(editorManager);
@@ -498,12 +500,9 @@ function insertText(text) {
 		outputKind === "css" && isHtmlFile(target?.filename)
 			? wrapHtmlSnippet({ css: text })
 			: text;
-	const result = applyToEditor(editorManager, {
-		action: "insert",
-		text: payload,
-	});
+	const result = await insertIntoEditorFile(editorManager, payload);
 	if (result.ok) {
-		const name = editorManager.activeFile?.filename;
+		const name = result.file?.filename;
 		toast(
 			name
 				? t("dev tools inserted in", "Inserted in {file}").replace(

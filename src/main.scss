@@ -11,7 +11,8 @@
 
 :root {
   --scrollbar-width: 4px;
-  --app-font-family: "Roboto", sans-serif;
+  /* VS Code desktop UI face first (Segoe UI), then the Android default */
+  --app-font-family: "Segoe UI", "Roboto", system-ui, sans-serif;
 }
 
 /* Icon enhancer (utils/iconEnhancer.js) inlines an SVG inside the original
