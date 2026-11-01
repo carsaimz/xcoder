@@ -13,6 +13,64 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.10] - 2026-11-01
+
+### Fixed
+- **Inserir código no arquivo (dev tools, bibliotecas, IA)** — as
+  ferramentas falhavam com «sem arquivo aberto» sempre que a aba ativa
+  não era um editor (terminal, pré-visualização) ou não havia aba
+  aberta. Agora a inserção localiza automaticamente o último arquivo do
+  editor aberto (histórico de abas), activa-o e insere lá, com toast a
+  mostrar o arquivo-alvo; as mensagens de falha ficam traduzidas.
+- **Terminal no caminho do projecto (de vez)** — o cd ignorava
+  projectos abertos via SAF: as árvores
+  «content://com.carsaimz.xcoder.documents» agora mapeiam para /public,
+  documentos do armazenamento externo Android («primary:…») para
+  /storage/emulated/0 e as pastas privadas do app (public/alpine) para
+  os respectivos pontos de montagem. Sem arquivo ativo, o terminal cai
+  na pasta do projecto aberto (addedFolder) em vez da home do sandbox.
+
+### Changed
+- **Ferramentas dev: 24 → 32** — oito novas utilidades: Easing (curvas
+  cubic-bezier com pré-visualização animada e presets), Unidades
+  (px ↔ rem ↔ em), Caixa (camelCase/PascalCase/snake/kebab/CONSTANT/
+  Title), Entidades HTML (escapar/des-escapar com refs nomeadas e
+  numéricas), CSV ↔ JSON (campos com aspas e delimitador à escolha) e
+  três componentes prontos para colar — Toast, Modal e Separadores —
+  gerados como HTML + CSS + JS com pré-visualização viva.
+- **CSS e JS dos componentes vêm com tags** — quando uma ferramenta
+  produz código misto, a saída (copiar e inserir) chega embrulhada em
+  «<style>…</style>» e «<script>…</script>»; CSS puro inserido num
+  arquivo .html também é embrulhado automaticamente (nova
+  «wrapHtmlSnippet»/«isHtmlFile» em lib/webdevTools.js).
+
+### Tests
+- 32 novos (recuperação de inserção 5, mapeamento SAF do terminal 6,
+  wrapping e geradores novos 21): 1062/1062 no total.
+
+## [1.8.10] - 2026-11-01
+
+### Fixed — inserting code into files + terminal project path
+- Dev tools, libraries and the AI could fail with "no file is open"
+  whenever the active tab wasn't an editor (terminal, preview, nothing
+  open). Insertion now falls back to the most recent editor tab,
+  activates it and reports the target file in the toast; failure
+  messages are localized.
+- The terminal now lands in the project even for SAF-opened folders:
+  the XCoder public provider maps to /public, Android external-storage
+  documents ("primary:…") to /storage/emulated/0 and app-owned
+  public/alpine dirs to their sandbox mounts; with no active file the
+  session cd's into the first open project folder instead of the
+  sandbox home.
+
+### Changed — 8 new dev tools (24 → 32) + wrapped component output
+- New: Easing (animated cubic-bezier), Units (px/rem/em), Case, HTML
+  entities, CSV ↔ JSON, and three paste-ready components — Toast, Modal
+  and Tabs — generated as HTML + CSS + JS.
+- Mixed tool output (and bare CSS inserted into .html files) now
+  arrives wrapped in <style>/<script> tags.
+- 32 new tests: 1062/1062.
+
 ## [1.8.9] - 2026-11-01
 
 ### Fixed

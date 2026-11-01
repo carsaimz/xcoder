@@ -16,7 +16,19 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.9
+## ✅ Concluído até a v1.8.10
+
+- **v1.8.10 — inserir no arquivo à prova de abas, terminal em
+  projectos SAF e 32 ferramentas dev:** inserir código (dev tools,
+  libs, IA) activa automaticamente o último arquivo do editor quando
+  a aba ativa é o terminal/pré-visualização e mostra o arquivo-alvo
+  no toast; o terminal mapeia árvores SAF (XCoder public → /public,
+  «primary:» → /storage/emulated/0, pastas public/alpine do app) e,
+  sem arquivo ativo, cai na pasta do projecto aberto; saída mista das
+  ferramentas chega embrulhada em «<style>/<script>» (CSS puro em
+  .html também); oito novas ferramentas — Easing (animado), Unidades
+  (px↔rem↔em), Caixa, Entidades HTML, CSV ↔ JSON e os componentes
+  Toast, Modal e Separadores (HTML + CSS + JS com pré-visualização).
 
 - **v1.8.9 — sidebar híbrido (nativos acoplados + ferramentas em
   janelas), descargas do site embutido, 24 ferramentas dev e 69
