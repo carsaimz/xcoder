@@ -16,7 +16,20 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.8
+## ✅ Concluído até a v1.8.9
+
+- **v1.8.9 — sidebar híbrido (nativos acoplados + ferramentas em
+  janelas), descargas do site embutido, 24 ferramentas dev e 69
+  bibliotecas:** ficheiros/plugins/notificações/pesquisa voltam ao
+  painel do sidebar (clássico) e só git/IA/libs/consola/dev tools/site
+  abrem como janelas — o painel acoplado ocupa a área do menu, que
+  volta nas janelas; site deteta modo embutido e manda URLs de descarga
+  ao app por postMessage (APKs abrem o instalador ao terminar; falha
+  total abre no navegador); Regex, URL, Hash, JWT, Flexbox e Markdown
+  juntam-se às Dev Tools; React/ReactDOM/Vue/Axios/Day.js/Lodash
+  embarcados offline + catálogo CDN com RxJS, Immer, Moment, Handlebars,
+  Zod, Quill, Cropper.js, Toastify, SweetAlert2 e Floating UI.
+
 
 - **v1.8.8 — menu do sidebar, minimizar janelas e conta GitHub real:**
   o espaço dos painéis acoplados agora mostra o menu de opções por
@@ -649,7 +662,20 @@ referência.
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.8.8
+## ✅ Done through v1.8.9
+
+- **v1.8.9 — hybrid sidebar (native docked + tool windows), embedded-site
+  downloads, 24 dev tools and 69 libraries:** files/plugins/
+  notifications/search dock back into the sidebar (classic) and only
+  git/AI/libs/console/dev tools/website open as windows — the docked
+  panel takes the menu's area, which returns for windows; the site
+  detects embedded mode and posts download URLs to the app (APKs launch
+  the installer when done; total failure opens the browser); Regex, URL,
+  Hash, JWT, Flexbox and Markdown join the Dev Tools; React/ReactDOM/
+  Vue/Axios/Day.js/Lodash bundled offline + CDN catalog with RxJS,
+  Immer, Moment, Handlebars, Zod, Quill, Cropper.js, Toastify,
+  SweetAlert2 and Floating UI.
+
 
 - **v1.8.8 — sidebar menu, window minimize and a real GitHub account:**
   the freed docked-panel area now hosts the categorized option menu

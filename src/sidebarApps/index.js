@@ -47,12 +47,13 @@ function add(
 	if ($menu?.isConnected) renderSidebarMenu();
 
 	// tabbed and launcher apps never own the sidebar panel on restore;
-	// floating mode boots with NO open panel (first tap opens it)
+	// docked (native) apps restore their panel even in floating mode —
+	// only floating tools boot with no panel (first tap opens it)
 	if (
 		currentSection === id &&
 		!opts.tabbed &&
 		!opts.launcher &&
-		!floatingWindow.floatingEnabled()
+		(!floatingWindow.floatingEnabled() || !opts.floating)
 	) {
 		setActiveApp(id);
 	}
@@ -242,8 +243,14 @@ function onclick(e) {
 function setActiveApp(id) {
 	const app = apps.find((app) => app.id === id);
 	if (!app) return;
-	// docked mode docks the panel over the whole area — the menu goes
-	if (!floatingWindow.floatingEnabled()) $menu?.remove();
+	const floatMode = usesFloat(app);
+	// a docked panel takes the whole area — the menu goes; switching
+	// from an open tool window to a docked app drops the window
+	if (!floatMode) {
+		$menu?.remove();
+		const windowId = floatingWindow.activeWindowId();
+		if (windowId && windowId !== id) floatingWindow.reset();
+	}
 
 	currentSection = id;
 	localStorage.setItem(SIDEBAR_APPS_LAST_SECTION, id);
@@ -251,6 +258,9 @@ function setActiveApp(id) {
 	for (const currentApp of apps) {
 		currentApp.active = currentApp.id === id;
 	}
+	// float mode: the sidebar keeps the categorized menu next to the
+	// rail while the tool lives in its own window
+	if (floatMode) syncSidebarMenu();
 }
 
 /**
@@ -275,18 +285,20 @@ function pulseApp(id) {
 			app.pulse();
 			return;
 		}
-		// tap again on the open panel = close it (VS Code toggle)
-		if (
-			app.active &&
-			floatingWindow.floatingEnabled() &&
-			floatingWindow.isOpenFor(id)
-		) {
+		// tap again on the open window = close it (VS Code toggle);
+		// minimized windows restore instead of closing
+		if (app.active && usesFloat(app) && floatingWindow.isOpenFor(id)) {
 			if (floatingWindow.isMinimized()) {
-				// minimized windows restore instead of closing
 				floatingWindow.toggleMinimize();
 				return;
 			}
 			floatingWindow.close();
+			return;
+		}
+		// tap again on a docked panel = classic toggle: hide the
+		// sidebar, keep the panel docked for when it reopens
+		if (app.active && !usesFloat(app)) {
+			hideSidebar();
 			return;
 		}
 		setActiveApp(id);
@@ -300,6 +312,11 @@ function pulseApp(id) {
 			3500,
 		);
 	}
+}
+
+/** Whether the app opens as a floating window in the current mode. */
+function usesFloat(app) {
+	return Boolean(app?.floating && floatingWindow.floatingEnabled());
 }
 
 // --- sidebar menu ------------------------------------------------------------
@@ -347,7 +364,7 @@ function renderSidebarMenu() {
 				{strings["sidebar menu title"] || "Panels"}
 			</span>
 			<span className="sidebar-menu-hint">
-				{strings["sidebar menu hint"] || "Tap to open in a window"}
+				{strings["sidebar menu hint"] || "Tap to open"}
 			</span>
 		</div>,
 	);
@@ -375,7 +392,11 @@ function menuRowFor(app) {
 			{glyphFor(app.iconName, app.title)}
 			<span className="sidebar-menu-name">{app.title}</span>
 			{app.badge ? <span className="app-badge count">{app.badge}</span> : null}
-			<span className="icon chevron_right sidebar-menu-open" />
+			<span
+				className={`icon ${
+					usesFloat(app) ? "open_in_new" : "chevron_right"
+				} sidebar-menu-open`}
+			/>
 		</div>
 	);
 	$row.addEventListener("click", () => openFromMenu(app.id));
@@ -397,13 +418,21 @@ function glyphFor(iconSpec, title) {
 	return <span className={`icon ${iconSpec || ""}`} title={title} />;
 }
 
-/** Opens an app from the menu; on phones the sidebar yields to the window. */
+/** Hides the sidebar overlay (dynamic import keeps boot order safe). */
+function hideSidebar() {
+	import("components/sidebar")
+		.then(({ default: SidebarModule }) => SidebarModule.hide?.())
+		.catch(() => {});
+}
+
+/** Opens an app from the menu; on phones the sidebar only yields to windows. */
 function openFromMenu(id) {
+	const app = apps.find((candidate) => candidate.id === id);
 	pulseApp(id);
-	if ($sidebar?.classList.contains("phone")) {
-		import("components/sidebar")
-			.then(({ default: SidebarModule }) => SidebarModule.hide?.())
-			.catch(() => {});
+	// only floating tools take over the screen — docked panels live
+	// inside the sidebar, which must stay open on phones
+	if (usesFloat(app) && $sidebar?.classList.contains("phone")) {
+		hideSidebar();
 	}
 }
 

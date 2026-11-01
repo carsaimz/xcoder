@@ -2,6 +2,7 @@ import "./style.scss";
 import prompt from "dialogs/prompt";
 import config from "lib/config";
 import { startDownload } from "lib/downloadManager";
+import { installSiteDownloadBridge } from "lib/siteDownloadBridge";
 
 /**
  * Website sidebar app — an in-app webview (iframe) that opens the
@@ -190,6 +191,8 @@ function retranslate() {
 function initApp(el) {
 	el.classList.add("website-app");
 	el.content = buildUi();
+	// embedded site → download manager (APK links work in-app again)
+	installSiteDownloadBridge();
 
 	const onLangChange = () => retranslate();
 	document.addEventListener("langchange", onLangChange);
@@ -218,5 +221,5 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "website", group: "tools" },
+	{ titleKey: "website", group: "tools", floating: true },
 ];

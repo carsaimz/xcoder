@@ -134,7 +134,7 @@ export default [
         initApp,
         false,
         onSelected,
-        { titleKey: "ai assistant", group: "primary" },
+        { titleKey: "ai assistant", group: "primary", floating: true },
 ];
 
 /**

@@ -290,5 +290,5 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "local libs", group: "tools" },
+	{ titleKey: "local libs", group: "tools", floating: true },
 ];

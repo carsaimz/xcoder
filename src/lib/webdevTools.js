@@ -805,6 +805,152 @@ export function radiusCSS(state, selector = ".rounded") {
 	return `.${name} {\n\tborder-radius: ${value};\n}`;
 }
 
+/**
+ * Tests a regular expression against a text and reports every match
+ * with its index, captured groups and named groups.
+ * @param {string} pattern regex source (without the surrounding slashes)
+ * @param {string} [flags] regex flags (g is forced for full listing)
+ * @param {string} [text] subject text
+ * @returns {ConvertResult}
+ */
+export function regexTest(pattern, flags = "g", text = "") {
+	return convertResult(() => {
+		const source = String(pattern ?? "");
+		if (!source) throw new Error("empty pattern");
+		const cleanFlags =
+			`g${String(flags || "").replace(/[gimsuvdy]/g, (f) => f)}`.slice(0, 9);
+		const uniqueFlags = [...new Set(cleanFlags.split(""))].join("");
+		const regex = new RegExp(source, uniqueFlags);
+		const subject = String(text ?? "");
+		const matches = [];
+		let match;
+		let guard = 0;
+		while ((match = regex.exec(subject)) !== null) {
+			matches.push(match);
+			if (match[0] === "") regex.lastIndex += 1; // zero-length safety
+			if (++guard > 1000) break;
+		}
+		if (!matches.length) return "(0 matches)";
+		return matches
+			.map((m, i) => {
+				const groups = m.groups ? ` ${JSON.stringify(m.groups)}` : "";
+				const captured = m
+					.slice(1)
+					.map(
+						(group, gi) => ` [${gi + 1}] ${group === undefined ? "—" : group}`,
+					)
+					.join("");
+				return `#${i + 1} @${m.index}: "${m[0]}"${captured}${groups}`;
+			})
+			.join("\n");
+	}, pattern);
+}
+
+/**
+ * Encodes, decodes or dissects a URL (component-safe, UTF-8).
+ * @param {string} text input URL or text
+ * @param {"encode"|"decode"|"params"} [mode]
+ * @returns {ConvertResult}
+ */
+export function urlConvert(text, mode = "encode") {
+	return convertResult(() => {
+		const value = String(text ?? "");
+		if (mode === "encode") return encodeURIComponent(value);
+		if (mode === "decode") return decodeURIComponent(value);
+		// params mode: list query string pairs (and hash) of a full URL
+		let parsed;
+		try {
+			parsed = new URL(value);
+		} catch {
+			// tolerate bare query strings ("a=1&b=2")
+			parsed = new URL(
+				`http://x/${value.includes("?") ? "" : "?"}${value.replace(/^\?/, "")}`,
+			);
+		}
+		const lines = [];
+		for (const [key, val] of parsed.searchParams) {
+			lines.push(`${key} = ${val}`);
+		}
+		if (parsed.hash) lines.push(`#hash = ${parsed.hash.slice(1)}`);
+		return lines.length ? lines.join("\n") : "(no params)";
+	}, text);
+}
+
+/**
+ * SHA digest via Web Crypto (available in the WebView and Node 18+).
+ * @param {string} text input text
+ * @param {"SHA-1"|"SHA-256"|"SHA-384"|"SHA-512"} [algorithm]
+ * @returns {Promise<string>} lowercase hex digest
+ */
+export async function hashConvert(text, algorithm = "SHA-256") {
+	const subtle = globalThis.crypto?.subtle;
+	if (!subtle) throw new Error("Web Crypto unavailable");
+	const data = new TextEncoder().encode(String(text ?? ""));
+	const digest = await subtle.digest(algorithm, data);
+	return [...new Uint8Array(digest)]
+		.map((byte) => byte.toString(16).padStart(2, "0"))
+		.join("");
+}
+
+/**
+ * Decodes a JWT (header + payload) without verifying the signature —
+ * an inspection tool, not an auth check. Flags exp expiry state.
+ * @param {string} token JWT in header.payload.signature form
+ * @returns {ConvertResult}
+ */
+export function jwtDecode(token) {
+	return convertResult(() => {
+		const raw = String(token ?? "").trim();
+		const parts = raw.split(".");
+		if (parts.length < 2)
+			throw new Error("not a JWT (header.payload.signature)");
+		const decodePart = (part) => {
+			const base64 = part.replace(/-/g, "+").replace(/_/g, "/");
+			const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+			const json = decodeURIComponent(
+				[...atob(padded)]
+					.map((char) => `%${`00${char.charCodeAt(0).toString(16)}`.slice(-2)}`)
+					.join(""),
+			);
+			return JSON.stringify(JSON.parse(json), null, 2);
+		};
+		const header = decodePart(parts[0]);
+		const payload = decodePart(parts[1]);
+		let expiry = "";
+		try {
+			const claims = JSON.parse(payload);
+			if (Number.isFinite(claims.exp)) {
+				const expired = claims.exp * 1000 < Date.now();
+				expiry = `\n\n${expired ? "⚠ EXPIRED" : "✓ valid"} at ${new Date(claims.exp * 1000).toISOString()}`;
+			}
+		} catch {
+			/* no exp claim */
+		}
+		return `// header\n${header}\n\n// payload\n${payload}${expiry}`;
+	}, token);
+}
+
+/**
+ * Flexbox container rule from the generator state.
+ * @param {{direction: string, justify: string, align: string, wrap: string, gap: number}} state
+ * @param {string} [selector] selector used in the rule (default ".flex")
+ * @returns {string}
+ */
+export function flexCSS(state, selector = ".flex") {
+	const name = String(selector).replace(/^\./, "");
+	const gap = Math.round(clamp(state?.gap, 0, 64));
+	return [
+		`.${name} {`,
+		`\tdisplay: flex;`,
+		`\tflex-direction: ${state?.direction || "row"};`,
+		`\tjustify-content: ${state?.justify || "flex-start"};`,
+		`\talign-items: ${state?.align || "stretch"};`,
+		`\tflex-wrap: ${state?.wrap || "nowrap"};`,
+		`\tgap: ${gap}px;`,
+		`}`,
+	].join("\n");
+}
+
 export default {
 	shadowCSS,
 	gradientCSS,
@@ -824,5 +970,10 @@ export default {
 	slugText,
 	gridCSS,
 	radiusCSS,
+	regexTest,
+	urlConvert,
+	hashConvert,
+	jwtDecode,
+	flexCSS,
 	CARD_SHADOWS,
 };

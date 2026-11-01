@@ -21,7 +21,7 @@ describe("devtools sidebar app wiring", () => {
                 expect(source).toContain('"svg:palette"');
                 expect(source).toContain('"devtools"');
                 expect(source).toContain(
-					'{ titleKey: "dev tools", group: "tools" }',
+					'{ titleKey: "dev tools", group: "tools", floating: true }',
 				);
         });
 

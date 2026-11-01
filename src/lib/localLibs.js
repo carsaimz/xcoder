@@ -3,7 +3,8 @@ import { CATALOG_LIBS } from "./catalogLibs";
 
 /**
  * Local (bundled) web libraries — htmx, Alpine.js, jQuery, Bootstrap,
- * Bootstrap Icons, Boxicons, Font Awesome and Chart.js shipped INSIDE
+ * Bootstrap Icons, Boxicons, Font Awesome, Chart.js, React, React DOM,
+ * Vue, Axios, Day.js and Lodash shipped INSIDE
  * the app (src/res/libs is copied verbatim to www/res/libs at build time
  * by utils/config.js, preserving the relative font paths the css files
  * reference) so projects can use them fully offline.
@@ -154,11 +155,77 @@ export const LOCAL_LIBS = [
 		cdnBase: "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist",
 		files: [{ path: "chart.umd.js", size: 205615 }],
 	},
+	{
+		id: "react",
+		name: "React",
+		version: "18.3.1",
+		license: "MIT",
+		site: "https://react.dev",
+		descPt: "Biblioteca UI declarativa da Meta (build UMD offline). Combine com react-dom para SPAs e componentes reutilizáveis.",
+		descEn: "Meta's declarative UI library (offline UMD build). Pair with react-dom for SPAs and reusable components.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/react@18.3.1/umd",
+		files: [{ path: "react.production.min.js", size: 10751 }],
+	},
+	{
+		id: "react-dom",
+		name: "React DOM",
+		version: "18.3.1",
+		license: "MIT",
+		site: "https://react.dev",
+		descPt: "Renderizador do React para o DOM — par obrigatório do núcleo react (build UMD offline).",
+		descEn: "React's DOM renderer — required companion of the react core (offline UMD build).",
+		cdnBase: "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd",
+		files: [{ path: "react-dom.production.min.js", size: 131835 }],
+	},
+	{
+		id: "vue",
+		name: "Vue.js",
+		version: "3.5.13",
+		license: "MIT",
+		site: "https://vuejs.org",
+		descPt: "Framework progressivo com reatividade fina e templates no HTML — build global completa, funciona offline no app.",
+		descEn: "Progressive framework with fine-grained reactivity and HTML templates — full global build, works offline in the app.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/vue@3.5.13/dist",
+		files: [{ path: "vue.global.prod.js", size: 157924 }],
+	},
+	{
+		id: "axios",
+		name: "Axios",
+		version: "1.7.9",
+		license: "MIT",
+		site: "https://axios-http.com",
+		descPt: "Cliente HTTP baseado em promises com interceptores e cancelamento — funciona em browser e node.",
+		descEn: "Promise-based HTTP client with interceptors and cancellation — works in browser and node.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/axios@1.7.9/dist",
+		files: [{ path: "axios.min.js", size: 54050 }],
+	},
+	{
+		id: "dayjs",
+		name: "Day.js",
+		version: "1.11.13",
+		license: "MIT",
+		site: "https://day.js.org",
+		descPt: "Datas modernas em ~2 KB, API imutável e plugins — alternativa leve ao moment.",
+		descEn: "Modern ~2 KB dates with an immutable API and plugins — the lightweight moment alternative.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/dayjs@1.11.13",
+		files: [{ path: "dayjs.min.js", size: 7160 }],
+	},
+	{
+		id: "lodash",
+		name: "Lodash",
+		version: "4.17.21",
+		license: "MIT",
+		site: "https://lodash.com",
+		descPt: "Utilitários essenciais (debounce, deep clone, agrupamento, ordenação) num único ficheiro.",
+		descEn: "Essential utilities (debounce, deep clone, grouping, ordering) in a single file.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/lodash@4.17.21",
+		files: [{ path: "lodash.min.js", size: 73015 }],
+	},
 ];
 
 /**
- * All libs shown in the sidebar: the 8 bundled (offline, copyable to the
- * project) plus the 50+ jsDelivr catalog entries (verified CDN tags only).
+ * All libs shown in the sidebar: the 14 bundled (offline, copyable to the
+ * project) plus the 55+ jsDelivr catalog entries (verified CDN tags only).
  * `bundled` drives the Offline/CDN badge and which actions are offered.
  */
 export const ALL_LIBS = [

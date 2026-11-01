@@ -10,11 +10,16 @@ import {
         formatJson,
         formSnippet,
         gradientCSS,
+        flexCSS,
         gridCSS,
+        hashConvert,
+        jwtDecode,
         loremText,
         placeholderSnippet,
         radiusCSS,
+        regexTest,
         sectionSnippet,
+        urlConvert,
         shadowCSS,
         slugText,
         tableSnippet,
@@ -503,6 +508,130 @@ describe("slugText", () => {
             });
             expect(css).toContain("repeat(auto-fill, minmax(140px, 1fr))");
             expect(css).toContain("gap: 96px;");
+        });
+    });
+
+    describe("regexTest", () => {
+        it("lists matches with index and groups", () => {
+            const result = regexTest(
+                "\\w+@(\\w+)\\.(\\w+)",
+                "g",
+                "a@b.co and x@y.org",
+            );
+            expect(result.ok).toBe(true);
+            expect(result.output).toContain("#1 @0:");
+            expect(result.output).toContain("#2 @11:");
+            expect(result.output).toContain("[1] b");
+        });
+
+        it("reports named groups and zero matches", () => {
+            const named = regexTest("(?<year>\\d{4})", "g", "in 2026!");
+            expect(named.ok).toBe(true);
+            expect(named.output).toContain('"year":"2026"');
+
+            const none = regexTest("z", "g", "abc");
+            expect(none.ok).toBe(true);
+            expect(none.output).toBe("(0 matches)");
+        });
+
+        it("surfaces invalid patterns as errors", () => {
+            const result = regexTest("([", "g", "abc");
+            expect(result.ok).toBe(false);
+            expect(result.error).toBeTruthy();
+        });
+    });
+
+    describe("urlConvert", () => {
+        it("encodes and decodes UTF-8 components", () => {
+            expect(urlConvert("a b&c=d", "encode").output).toBe(
+                "a%20b%26c%3Dd",
+            );
+            expect(urlConvert("a%20b", "decode").output).toBe("a b");
+        });
+
+        it("dissects query params and hash", () => {
+            const result = urlConvert(
+                "https://xcoder.app/docs?q=editor&lang=pt#top",
+                "params",
+            );
+            expect(result.ok).toBe(true);
+            expect(result.output).toContain("q = editor");
+            expect(result.output).toContain("lang = pt");
+            expect(result.output).toContain("#hash = top");
+        });
+
+        it("tolerates bare query strings", () => {
+            const result = urlConvert("a=1&b=2", "params");
+            expect(result.ok).toBe(true);
+            expect(result.output).toContain("a = 1");
+        });
+    });
+
+    describe("hashConvert", () => {
+        it("produces the SHA-256 hex digest", async () => {
+            const digest = await hashConvert("XCoder", "SHA-256");
+            expect(digest).toMatch(/^[0-9a-f]{64}$/);
+        });
+
+        it("rejects when Web Crypto is unavailable", async () => {
+            const original = globalThis.crypto;
+            Object.defineProperty(globalThis, "crypto", {
+                value: {},
+                configurable: true,
+            });
+            try {
+                await expect(hashConvert("x")).rejects.toThrow(/Web Crypto/);
+            } finally {
+                Object.defineProperty(globalThis, "crypto", {
+                    value: original,
+                    configurable: true,
+                });
+            }
+        });
+    });
+
+    describe("jwtDecode", () => {
+        const b64url = (obj) =>
+            Buffer.from(JSON.stringify(obj)).toString("base64url");
+
+        it("decodes header and payload with expiry state", () => {
+            const token = [
+                b64url({ alg: "HS256", typ: "JWT" }),
+                b64url({ sub: "1", exp: Math.floor(Date.now() / 1000) + 3600 }),
+                "sig",
+            ].join(".");
+            const result = jwtDecode(token);
+            expect(result.ok).toBe(true);
+            expect(result.output).toContain('"alg": "HS256"');
+            expect(result.output).toContain('"sub": "1"');
+            expect(result.output).toContain("✓ valid");
+        });
+
+        it("flags expired tokens and rejects garbage", () => {
+            const expired = [
+                b64url({ alg: "none" }),
+                b64url({ exp: 1000 }),
+            ].join(".");
+            expect(jwtDecode(expired).output).toContain("⚠ EXPIRED");
+            expect(jwtDecode("not-a-jwt").ok).toBe(false);
+        });
+    });
+
+    describe("flexCSS", () => {
+        it("builds the container rule from state", () => {
+            const css = flexCSS({
+                direction: "column",
+                justify: "space-between",
+                align: "center",
+                wrap: "wrap",
+                gap: 16,
+            });
+            expect(css).toContain("display: flex;");
+            expect(css).toContain("flex-direction: column;");
+            expect(css).toContain("justify-content: space-between;");
+            expect(css).toContain("align-items: center;");
+            expect(css).toContain("flex-wrap: wrap;");
+            expect(css).toContain("gap: 16px;");
         });
     });
 

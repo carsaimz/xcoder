@@ -13,6 +13,75 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.9] - 2026-11-01
+
+### Fixed
+- **Descarregar dentro do app (site embutido)** — os links de descarga
+  do site (ex.: o APK na página /download) morriam dentro do iframe do
+  painel Website. Agora o site, ao detetar que corre embutido no app,
+  interceta cliques em links de APK/releases e envia a URL ao app via
+  postMessage; o painel Website entrega-a ao gestor de descargas (novo
+  «lib/siteDownloadBridge.js»), com progresso nas notificações e, para
+  APKs, abertura direta do instalador do Android ao terminar. Se ambos
+  os transportes falharem, a URL abre no navegador do sistema (último
+  recurso) com aviso no toast.
+
+### Changed
+- **Sidebar: apps nativos voltam ao painel; só ferramentas ficam
+  flutuantes** — ficheiros, plugins, notificações e pesquisa abrem
+  novamente acoplados ao sidebar (comportamento clássico do Acode);
+  git, IA, bibliotecas, consola JS, ferramentas dev e o site continuam
+  a abrir como janelas independentes. O painel acoplado ocupa a área do
+  menu (que volta quando uma ferramenta abre em janela), tocar de novo
+  no ícone ativo esconde o sidebar, e ao arrancar o último app nativo
+  restaura o painel sem abrir janelas.
+- **Ferramentas dev: 18 → 24** — seis novas utilidades: Regex (matches
+  com índice, grupos e named groups), URL (codificar/descodificar/
+  dissecar parâmetros), Hash (SHA-1/256/384/512 via Web Crypto), JWT
+  (descodifica header/payload com estado de expiração), Flexbox
+  (gerador com pré-visualização viva) e Markdown (pré-visualização HTML
+  sanitizada + código). Geradores puros em «lib/webdevTools.js».
+- **Bibliotecas: 69 (14 offline + 55 CDN)** — React, React DOM, Vue,
+  Axios, Day.js e Lodash agora EMBARCADOS (offline, copiáveis ao
+  projeto); o catálogo CDN ganha RxJS, Immer, Moment, Handlebars, Zod,
+  Quill, Cropper.js, Toastify JS, SweetAlert2 e Floating UI (URLs e
+  tamanhos verificados com HTTP 200).
+- **Testes** — 24 novos (split do sidebar 6, bridge de descargas 5,
+  gestor de descargas +2, geradores webdev 11): 1030/1030 no total.
+
+## [1.8.9] - 2026-11-01
+
+### Fixed — downloads from the embedded site
+- The site's download links (e.g. the APK on /download) died inside the
+  Website panel's iframe. The site now detects it runs embedded,
+  intercepts APK/release link clicks and postMessages the URL to the
+  app; the Website panel hands it to the download manager (new
+  «lib/siteDownloadBridge.js») with live progress notifications and —
+  for APKs — launches the Android package installer right after. When
+  both transports fail, the URL opens in the system browser (last
+  resort) with a toast.
+
+### Changed — native apps dock again; 6 new dev tools; 69 libraries
+- Sidebar: native apps (files, plugins, notifications, search) dock
+  inline in the sidebar again (classic Acode behavior); git, AI, libs,
+  JS console, dev tools and the website keep opening as independent
+  windows. A docked panel takes the menu's area (the menu returns when
+  a tool opens in a window), tapping the active icon hides the sidebar,
+  and the last native app restores its panel at boot without popping
+  windows.
+- Dev tools: 18 → 24 — six new utilities: Regex (match details with
+  groups), URL (encode/decode/params), Hash (SHA-1/256/384/512 via Web
+  Crypto), JWT (header/payload + expiry state), Flexbox (generator with
+  live preview) and Markdown (sanitized HTML preview + code). Pure
+  generators live in «lib/webdevTools.js».
+- Libraries: 69 (14 offline + 55 CDN) — React, React DOM, Vue, Axios,
+  Day.js and Lodash are now BUNDLED (offline, copyable to projects);
+  the CDN catalog gains RxJS, Immer, Moment, Handlebars, Zod, Quill,
+  Cropper.js, Toastify JS, SweetAlert2 and Floating UI (URLs and sizes
+  verified with HTTP 200).
+- Tests — 24 new (sidebar split 6, download bridge 5, download manager
+  +2, webdev generators 11): 1030/1030 total.
+
 ## [1.8.8] - 2026-11-01
 
 ### Fixed

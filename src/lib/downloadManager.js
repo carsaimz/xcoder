@@ -2,7 +2,7 @@ import fsOperation from "fileSystem";
 import toast from "components/toast";
 import helpers from "utils/helpers";
 import Url from "utils/Url";
-import { formatBytesShort } from "./appUpdateDownload";
+import { formatBytesShort, installApk } from "./appUpdateDownload";
 import notificationManager from "./notificationManager";
 
 /**
@@ -170,7 +170,7 @@ export async function downloadUrl(opts) {
 /**
  * Queued download with notification UI (title = file name, message =
  * live progress, action = Cancel). Sequential on purpose.
- * @param {{url: string, name?: string, dir?: string}} job
+ * @param {{url: string, name?: string, dir?: string, install?: boolean}} job
  * @returns {string} download id (for cancelDownload)
  */
 export function startDownload(job) {
@@ -197,6 +197,20 @@ export function startDownload(job) {
 
 	runQueued(id, job, notification).finally(() => active.delete(id));
 	return id;
+}
+
+/** Opens the URL in the system browser (last-resort download path). */
+function openInSystemBrowser(url) {
+	try {
+		const system = globalThis.window?.system;
+		if (!system?.openInBrowser || !/^https?:\/\//i.test(String(url))) {
+			return false;
+		}
+		system.openInBrowser(url);
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 /** Serial queue — one native stream at a time. */
@@ -243,6 +257,16 @@ async function runDownload(id, job, notification) {
 		// file browser (and any other view) can refresh its listing
 		document.dispatchEvent(new CustomEvent("download-finished"));
 
+		// APKs go straight to the package installer (side-load flow:
+		// "download dentro do app" must end with the app installable)
+		if (job.install && /\.apk(\?|#|$)/i.test(destUrl)) {
+			try {
+				await installApk(destUrl, Url.basename(destUrl));
+			} catch {
+				/* installer unavailable — the file stays in Download */
+			}
+		}
+
 		return destUrl;
 	} catch (error) {
 		const cancelled = entry.abort.signal.aborted || error?.code === "cancelled";
@@ -255,7 +279,15 @@ async function runDownload(id, job, notification) {
 			manager.renderNotifications();
 		}
 		if (!cancelled) {
-			toast(`download: ${error?.message || error}`);
+			// both transports failed — hand the URL to the system
+			// browser so the user can still get the file
+			const opened = openInSystemBrowser(job.url);
+			toast(
+				opened
+					? strings["download failed browser"] ||
+							"Falha no download — aberto no navegador"
+					: `download: ${error?.message || error}`,
+			);
 		}
 	}
 }

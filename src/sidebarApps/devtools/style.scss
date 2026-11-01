@@ -259,6 +259,78 @@
                 }
         }
 
+        .devtools-flex-preview {
+                width: 100%;
+                max-width: 260px;
+                min-height: 96px;
+                padding: 10px;
+                border-radius: 10px;
+                border: 1px dashed
+                        color-mix(in srgb, var(--primary-color) 40%, transparent);
+
+                .devtools-flex-cell {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 40px;
+                        min-height: 32px;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        background: color-mix(
+                                in srgb,
+                                var(--primary-color) 22%,
+                                transparent
+                        );
+                        font-size: 0.72em;
+                        opacity: 0.9;
+                }
+        }
+
+        .devtools-markdown-preview {
+                width: 100%;
+                padding: 12px;
+                border-radius: 10px;
+                background: color-mix(
+                        in srgb,
+                        var(--primary-color) 8%,
+                        transparent
+                );
+                font-size: 0.82em;
+                line-height: 1.5;
+                overflow-wrap: anywhere;
+
+                h1,
+                h2,
+                h3 {
+                        margin: 0.4em 0;
+                }
+                p {
+                        margin: 0.35em 0;
+                }
+                code {
+                        font-family: var(--editor-font, monospace);
+                        background: color-mix(
+                                in srgb,
+                                var(--primary-color) 16%,
+                                transparent
+                        );
+                        border-radius: 4px;
+                        padding: 1px 4px;
+                }
+                pre code {
+                        display: block;
+                        padding: 8px;
+                }
+                ul,
+                ol {
+                        padding-left: 1.4em;
+                        margin: 0.35em 0;
+                }
+                a {
+                        color: var(--primary-color);
+                }
+        }
+
         .devtools-radius-box {
                 width: 96px;
                 height: 72px;

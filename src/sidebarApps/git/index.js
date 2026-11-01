@@ -51,7 +51,7 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "git panel", group: "primary" },
+	{ titleKey: "git panel", group: "primary", floating: true },
 ];
 
 /**

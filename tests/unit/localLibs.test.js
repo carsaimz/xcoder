@@ -27,6 +27,12 @@ describe("localLibs registry", () => {
                         "boxicons",
                         "fontawesome",
                         "chartjs",
+                        "react",
+                        "react-dom",
+                        "vue",
+                        "axios",
+                        "dayjs",
+                        "lodash",
                 ]);
         });
 

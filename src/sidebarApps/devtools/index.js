@@ -160,6 +160,48 @@ const TOOL_LIST = [
 		"dev tools border radius desc",
 		"Border-radius playground (4 corners)",
 	],
+	[
+		"regex",
+		"dev tools regex",
+		"Regex",
+		"dev tools regex desc",
+		"Test regular expressions with match details",
+	],
+	[
+		"url",
+		"dev tools url",
+		"URL",
+		"dev tools url desc",
+		"Encode, decode and dissect URLs",
+	],
+	[
+		"hash",
+		"dev tools hash",
+		"Hash",
+		"dev tools hash desc",
+		"SHA-1/256/384/512 digests (Web Crypto)",
+	],
+	[
+		"jwt",
+		"dev tools jwt",
+		"JWT",
+		"dev tools jwt desc",
+		"Decode JWT headers and payloads",
+	],
+	[
+		"flex",
+		"dev tools flex",
+		"Flexbox",
+		"dev tools flex desc",
+		"Flexbox layout generator with live preview",
+	],
+	[
+		"markdown",
+		"dev tools markdown",
+		"Markdown",
+		"dev tools markdown desc",
+		"Markdown to HTML preview and code",
+	],
 ];
 
 const state = {
@@ -280,6 +322,33 @@ const state = {
 		br: 24,
 		bl: 8,
 	},
+	regex: {
+		pattern: "\\b\\w+@\\w+\\.\\w+\\b",
+		flags: "gi",
+		text: "Olá hello@xcoder.app, world@test.org",
+	},
+	url: {
+		text: "https://xcoder.app/docs?q=editor&lang=pt",
+		mode: "params",
+	},
+	hash: {
+		text: "XCoder",
+		algorithm: "SHA-256",
+		token: 0,
+	},
+	jwt: {
+		token: "",
+	},
+	flex: {
+		direction: "row",
+		justify: "flex-start",
+		align: "stretch",
+		wrap: "nowrap",
+		gap: 12,
+	},
+	markdown: {
+		text: "# XCoder\n\nUm **editor** com _IA_, Git e terminal.\n\n- item 1\n- item 2\n",
+	},
 };
 
 let activeTool = "shadow";
@@ -295,6 +364,22 @@ let $output = null;
 /** Short texts resolved at render time (language can change mid-session). */
 function t(key, fallback) {
 	return strings[key] || fallback;
+}
+
+/**
+ * Renders Markdown to sanitized HTML (shared with the Markdown tool).
+ * html:false escapes raw HTML in the input; DOMPurify double-guards.
+ * @param {string} text markdown source
+ * @returns {string} safe HTML
+ */
+let mdInstance = null;
+function markdownToHtml(text) {
+	mdInstance ??= new markdownIt({
+		html: false,
+		linkify: true,
+		breaks: true,
+	});
+	return DOMPurify.sanitize(mdInstance.render(String(text ?? "")));
 }
 
 /**
@@ -546,6 +631,64 @@ function refresh() {
 		box.style.borderRadius = `${state.radius.tl}px ${state.radius.tr}px ${state.radius.br}px ${state.radius.bl}px`;
 		$preview.append(box);
 		$output.textContent = css;
+	} else if (activeTool === "regex") {
+		const result = regexTest(
+			state.regex.pattern,
+			state.regex.flags,
+			state.regex.text,
+		);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "url") {
+		const result = urlConvert(state.url.text, state.url.mode);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "hash") {
+		const token = ++state.hash.token;
+		if (!String(state.hash.text || "")) {
+			$output.textContent = t(
+				"dev tools hash hint",
+				"Digite um texto para calcular o hash.",
+			);
+		} else {
+			$output.textContent = t("dev tools hashing", "A calcular hash…");
+			hashConvert(state.hash.text, state.hash.algorithm)
+				.then((digest) => {
+					if (token !== state.hash.token || !$output?.isConnected) return;
+					$output.textContent = digest;
+				})
+				.catch((error) => {
+					if (token !== state.hash.token || !$output?.isConnected) return;
+					$output.textContent = `${t("dev tools error", "Erro")}: ${error?.message || error}`;
+				});
+		}
+	} else if (activeTool === "jwt") {
+		const result = jwtDecode(state.jwt.token);
+		$output.textContent = result.ok
+			? result.output
+			: `${t("dev tools error", "Erro")}: ${result.error}`;
+	} else if (activeTool === "flex") {
+		const css = flexCSS(state.flex);
+		const holder = <div className="devtools-flex-preview" />;
+		holder.style.display = "flex";
+		holder.style.flexDirection = state.flex.direction;
+		holder.style.justifyContent = state.flex.justify;
+		holder.style.alignItems = state.flex.align;
+		holder.style.flexWrap = state.flex.wrap;
+		holder.style.gap = `${state.flex.gap}px`;
+		for (let index = 0; index < 5; index++) {
+			holder.append(<span className="devtools-flex-cell">{index + 1}</span>);
+		}
+		$preview.append(holder);
+		$output.textContent = css;
+	} else if (activeTool === "markdown") {
+		const html = markdownToHtml(state.markdown.text);
+		const holder = <div className="devtools-markdown-preview" />;
+		holder.innerHTML = html;
+		$preview.append(holder);
+		$output.textContent = html;
 	}
 }
 
@@ -1201,6 +1344,140 @@ function buildControls() {
 			),
 		];
 	}
+	if (activeTool === "regex") {
+		const rx = state.regex;
+		return [
+			textRow(
+				t("dev tools pattern", "Padrão (regex)"),
+				rx.pattern,
+				(v) => (rx.pattern = v),
+			),
+			textRow(t("dev tools flags", "Flags"), rx.flags, (v) => (rx.flags = v)),
+			textareaRow(
+				t("dev tools text", "Text"),
+				rx.text,
+				(v) => (rx.text = v),
+				6,
+			),
+		];
+	}
+	if (activeTool === "url") {
+		const u = state.url;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				u.text,
+				(v) => (u.text = v),
+				4,
+			),
+			selectRow(
+				t("dev tools mode", "Mode"),
+				u.mode,
+				[
+					["params", t("dev tools url params", "Ver parâmetros")],
+					["encode", t("dev tools encode", "Codificar")],
+					["decode", t("dev tools decode", "Decodificar")],
+				],
+				(v) => (u.mode = v),
+			),
+		];
+	}
+	if (activeTool === "hash") {
+		const h = state.hash;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				h.text,
+				(v) => (h.text = v),
+				4,
+			),
+			selectRow(
+				t("dev tools hash algorithm", "Algoritmo"),
+				h.algorithm,
+				[
+					["SHA-1", "SHA-1"],
+					["SHA-256", "SHA-256"],
+					["SHA-384", "SHA-384"],
+					["SHA-512", "SHA-512"],
+				],
+				(v) => (h.algorithm = v),
+			),
+		];
+	}
+	if (activeTool === "jwt") {
+		const jw = state.jwt;
+		return [
+			textareaRow(
+				t("dev tools jwt token", "Token JWT"),
+				jw.token,
+				(v) => (jw.token = v),
+				6,
+			),
+		];
+	}
+	if (activeTool === "flex") {
+		const f = state.flex;
+		return [
+			selectRow(
+				t("dev tools flex direction", "Direção"),
+				f.direction,
+				[
+					["row", "row"],
+					["row-reverse", "row-reverse"],
+					["column", "column"],
+					["column-reverse", "column-reverse"],
+				],
+				(v) => (f.direction = v),
+			),
+			selectRow(
+				t("dev tools flex justify", "Justificar"),
+				f.justify,
+				[
+					["flex-start", "flex-start"],
+					["center", "center"],
+					["flex-end", "flex-end"],
+					["space-between", "space-between"],
+					["space-around", "space-around"],
+					["space-evenly", "space-evenly"],
+				],
+				(v) => (f.justify = v),
+			),
+			selectRow(
+				t("dev tools flex align", "Alinhar"),
+				f.align,
+				[
+					["stretch", "stretch"],
+					["flex-start", "flex-start"],
+					["center", "center"],
+					["flex-end", "flex-end"],
+					["baseline", "baseline"],
+				],
+				(v) => (f.align = v),
+			),
+			selectRow(
+				t("dev tools flex wrap", "Wrap"),
+				f.wrap,
+				[
+					["nowrap", "nowrap"],
+					["wrap", "wrap"],
+					["wrap-reverse", "wrap-reverse"],
+				],
+				(v) => (f.wrap = v),
+			),
+			rangeRow(t("dev tools gap", "Gap"), 0, 48, f.gap, (v) => (f.gap = v)),
+		];
+	}
+	if (activeTool === "markdown") {
+		const m = state.markdown;
+		return [
+			textareaRow(
+				t("dev tools input", "Input"),
+				m.text,
+				(v) => (m.text = v),
+				10,
+			),
+		];
+	}
 	const p = state.placeholder;
 	return [
 		rangeRow(
@@ -1405,5 +1682,5 @@ export default [
 	initApp,
 	false,
 	onSelected,
-	{ titleKey: "dev tools", group: "tools" },
+	{ titleKey: "dev tools", group: "tools", floating: true },
 ];

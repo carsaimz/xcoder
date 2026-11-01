@@ -1,55 +1,16 @@
 /**
- * CDN catalog libraries — 50+ popular web libraries served from
+ * CDN catalog libraries — 55+ popular web libraries served from
  * jsDelivr. Data-only module (no bundled files): the libs sidebar
  * shows them with a CDN badge and offers the ready-to-paste <script>
  * / <link> tags. Every URL in here was verified reachable (HTTP 200)
- * at generation time by scripts/gen_libs_catalog.py — regenerate
- * there rather than hand-editing, so tags never go stale.
+ * with HTTP-200 + size checks at v1.8.9 — re-verify URLs and sizes
+ * before editing, so tags never go stale.
  */
 
 /** @typedef {import('./localLibs').LocalLib} LocalLib */
 
 /** @type {LocalLib[]} */
 export const CATALOG_LIBS = [
-	{
-		id: "react",
-		name: "React",
-		version: "18.3.1",
-		license: "MIT",
-		site: "https://react.dev",
-		cdnBase: "https://cdn.jsdelivr.net/npm/react@18.3.1",
-		descPt:
-			"Biblioteca de UI declarativa da Meta (build UMD). Use com react-dom para SPAs e componentes reutiliz\u00e1veis.",
-		descEn:
-			"Meta's declarative UI library (UMD build). Pair with react-dom for SPAs and reusable components.",
-		files: [{ path: "umd/react.production.min.js", size: 10751 }],
-	},
-	{
-		id: "react-dom",
-		name: "React DOM",
-		version: "18.3.1",
-		license: "MIT",
-		site: "https://react.dev",
-		cdnBase: "https://cdn.jsdelivr.net/npm/react-dom@18.3.1",
-		descPt:
-			"Renderizador do React para o DOM \u2014 par obrigat\u00f3rio do n\u00facleo react (build UMD).",
-		descEn:
-			"React's DOM renderer \u2014 required companion of the react core (UMD build).",
-		files: [{ path: "umd/react-dom.production.min.js", size: 131835 }],
-	},
-	{
-		id: "vue",
-		name: "Vue.js",
-		version: "3.5.13",
-		license: "MIT",
-		site: "https://vuejs.org",
-		cdnBase: "https://cdn.jsdelivr.net/npm/vue@3.5.13",
-		descPt:
-			"Framework progressivo com reatividade fina e templates no HTML \u2014 build global completa para uso direto.",
-		descEn:
-			"Progressive framework with fine-grained reactivity and HTML templates \u2014 full global build, no tooling needed.",
-		files: [{ path: "dist/vue.global.prod.js", size: 0 }],
-	},
 	{
 		id: "vue-router",
 		name: "Vue Router",
@@ -140,45 +101,6 @@ export const CATALOG_LIBS = [
 		descEn:
 			"Ready-made CSS animations (bounce, fade, flip, zoom) applied with a single class.",
 		files: [{ path: "animate.min.css", size: 71750 }],
-	},
-	{
-		id: "dayjs",
-		name: "Day.js",
-		version: "1.11.13",
-		license: "MIT",
-		site: "https://day.js.org",
-		cdnBase: "https://cdn.jsdelivr.net/npm/dayjs@1.11.13",
-		descPt:
-			"Datas e horas em 2 kB, API imut\u00e1vel estilo Moment e suporte a fuso via plugins.",
-		descEn:
-			"Dates and times in 2 kB with an immutable Moment-like API and timezone support via plugins.",
-		files: [{ path: "dayjs.min.js", size: 7160 }],
-	},
-	{
-		id: "lodash",
-		name: "Lodash",
-		version: "4.17.21",
-		license: "MIT",
-		site: "https://lodash.com",
-		cdnBase: "https://cdn.jsdelivr.net/npm/lodash@4.17.21",
-		descPt:
-			"Utilit\u00e1rios cl\u00e1ssicos para arrays, objetos, strings e fun\u00e7\u00f5es (debounce, cloneDeep, get\u2026).",
-		descEn:
-			"Classic utilities for arrays, objects, strings and functions (debounce, cloneDeep, get\u2026).",
-		files: [{ path: "lodash.min.js", size: 73015 }],
-	},
-	{
-		id: "axios",
-		name: "Axios",
-		version: "1.7.9",
-		license: "MIT",
-		site: "https://axios-http.com",
-		cdnBase: "https://cdn.jsdelivr.net/npm/axios@1.7.9",
-		descPt:
-			"Cliente HTTP com interceptores, cancelamento e progresso \u2014 funciona no navegador e no Node.",
-		descEn:
-			"HTTP client with interceptors, cancellation and progress \u2014 works in the browser and Node.",
-		files: [{ path: "dist/axios.min.js", size: 54050 }],
 	},
 	{
 		id: "date-fns",
@@ -702,6 +624,125 @@ export const CATALOG_LIBS = [
 			{ path: "public/assets/scripts/choices.min.js", size: 89447 },
 			{ path: "public/assets/styles/choices.min.css", size: 7666 },
 		],
+	},
+	{
+		id: "rxjs",
+		name: "RxJS",
+		version: "7.8.1",
+		license: "Apache-2.0",
+		site: "https://rxjs.dev",
+		descPt: "ReactiveX: observables para fluxos assíncronos (eventos, timers, pedidos) com operadores combináveis.",
+		descEn: "ReactiveX: observables for async streams (events, timers, requests) with composable operators.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/rxjs@7.8.1/dist/bundles",
+		files: [{ path: "rxjs.umd.min.js", size: 88037 }],
+	},
+	{
+		id: "immer",
+		name: "Immer",
+		version: "9.0.21",
+		license: "MIT",
+		site: "https://immerjs.github.io/immer",
+		descPt: "Estados imutáveis com conforto mutável: escreve mutations e recebe o next-state congelado.",
+		descEn: "Immutable state with mutable comfort: write mutations, get the frozen next-state.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/immer@9.0.21/dist",
+		files: [{ path: "immer.umd.production.min.js", size: 16200 }],
+	},
+	{
+		id: "moment",
+		name: "Moment.js",
+		version: "2.30.1",
+		license: "MIT",
+		site: "https://momentjs.com",
+		descPt: "Datas clássicas: parse, validar, formatar e durações. Bundle grande — prefira dayjs em projetos novos.",
+		descEn: "Classic dates: parse, validate, format and durations. Large bundle — prefer dayjs in new projects.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/moment@2.30.1/min",
+		files: [{ path: "moment.min.js", size: 58890 }],
+	},
+	{
+		id: "handlebars",
+		name: "Handlebars",
+		version: "4.7.8",
+		license: "MIT",
+		site: "https://handlebarsjs.com",
+		descPt: "Templates {{mustache}} compilados no browser — lógica mínima, helpers e partials.",
+		descEn: "{{mustache}} templates compiled in the browser — minimal logic, helpers and partials.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/handlebars@4.7.8/dist",
+		files: [{ path: "handlebars.min.js", size: 88426 }],
+	},
+	{
+		id: "zod",
+		name: "Zod",
+		version: "3.24.1",
+		license: "MIT",
+		site: "https://zod.dev",
+		descPt: "Validação de schemas com total typesafety — parse de APIs, formulários e configs (build UMD).",
+		descEn: "Fully type-safe schema validation — parse APIs, forms and configs (UMD build).",
+		cdnBase: "https://cdn.jsdelivr.net/npm/zod@3.24.1/lib",
+		files: [{ path: "index.umd.js", size: 176626 }],
+	},
+	{
+		id: "quill",
+		name: "Quill",
+		version: "2.0.3",
+		license: "BSD-3-Clause",
+		site: "https://quilljs.com",
+		descPt: "Editor WYSIWYG rico com toolbar, temas e formato delta (inclui o CSS do tema Snow).",
+		descEn: "Rich WYSIWYG editor with toolbar, themes and delta format (includes the Snow theme CSS).",
+		cdnBase: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist",
+		files: [
+			{ path: "quill.js", size: 209274 },
+			{ path: "quill.snow.css", size: 24606, tag: false },
+		],
+	},
+	{
+		id: "cropperjs",
+		name: "Cropper.js",
+		version: "1.6.2",
+		license: "MIT",
+		site: "https://github.com/fengyuanchen/cropperjs",
+		descPt: "Recorte, rotação e zoom de imagens com gestos touch (inclui o CSS).",
+		descEn: "Image crop, rotate and zoom with touch gestures (includes the CSS).",
+		cdnBase: "https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist",
+		files: [
+			{ path: "cropper.min.js", size: 37369 },
+			{ path: "cropper.css", size: 4978, tag: false },
+		],
+	},
+	{
+		id: "toastify-js",
+		name: "Toastify JS",
+		version: "1.12.0",
+		license: "MIT",
+		site: "https://apvarun.github.io/toastify-js",
+		descPt: "Notificações toast leves e estilizáveis, sem dependências (inclui o CSS).",
+		descEn: "Lightweight, styleable toast notifications with no dependencies (includes the CSS).",
+		cdnBase: "https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src",
+		files: [
+			{ path: "toastify.js", size: 15130 },
+			{ path: "toastify.css", size: 1560, tag: false },
+		],
+	},
+	{
+		id: "sweetalert2",
+		name: "SweetAlert2",
+		version: "11.15.10",
+		license: "MIT",
+		site: "https://sweetalert2.github.io",
+		descPt: "Modais e alertas bonitos, acessíveis e customizáveis — bundle all com CSS embutido.",
+		descEn: "Beautiful, accessible and customizable modals and alerts — all bundle with embedded CSS.",
+		cdnBase: "https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist",
+		files: [{ path: "sweetalert2.all.min.js", size: 72231 }],
+	},
+	{
+		id: "floating-ui",
+		name: "Floating UI",
+		version: "1.6.13",
+		license: "MIT",
+		site: "https://floating-ui.com",
+		descPt: "Posicionamento de tooltips, popovers e dropdowns (@floating-ui/dom, build UMD).",
+		descEn: "Positioning for tooltips, popovers and dropdowns (@floating-ui/dom, UMD build).",
+		cdnBase: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.13/dist",
+		files: [{ path: "floating-ui.dom.umd.min.js", size: 9913 }],
 	},
 ];
 

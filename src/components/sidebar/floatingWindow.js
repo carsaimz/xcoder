@@ -60,6 +60,11 @@ export function isOpenFor(id) {
 	return Boolean($win) && currentId === id;
 }
 
+/** App id currently owning the window (null when closed). */
+export function activeWindowId() {
+	return currentId;
+}
+
 /**
  * Shows (or retargets) the floating window with the app's container.
  * @param {string} id app id
@@ -341,6 +346,7 @@ export default {
 	floatingEnabled,
 	setFloatingEnabled,
 	isOpenFor,
+	activeWindowId,
 	show,
 	close,
 	reset,

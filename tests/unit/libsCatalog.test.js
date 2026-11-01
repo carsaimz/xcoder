@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 /**
  * Library catalog integrity — the CDN catalog (catalogLibs.js) plus the
- * 8 bundled entries must give the libs sidebar a 50+ catalog where every
+ * 14 bundled entries must give the libs sidebar a 60+ catalog where every
  * entry is structurally complete (tags buildable, sizes declared,
  * licenses present) and the offline/CDN split is consistent.
  */
@@ -11,10 +11,10 @@ import CATALOG_LIBS from "lib/catalogLibs";
 import { ALL_LIBS, LOCAL_LIBS, cdnTags, localTags } from "lib/localLibs";
 
 describe("library catalog", () => {
-	test("catalog offers 50+ entries on top of the bundled 8", () => {
-		expect(CATALOG_LIBS.length).toBeGreaterThanOrEqual(50);
-		expect(LOCAL_LIBS.length).toBe(8);
-		expect(ALL_LIBS.length).toBeGreaterThanOrEqual(58);
+	test("catalog offers 55+ entries on top of the bundled 14", () => {
+		expect(CATALOG_LIBS.length).toBeGreaterThanOrEqual(55);
+		expect(LOCAL_LIBS.length).toBe(14);
+		expect(ALL_LIBS.length).toBeGreaterThanOrEqual(69);
 	});
 
 	test("every catalog entry is structurally complete", () => {

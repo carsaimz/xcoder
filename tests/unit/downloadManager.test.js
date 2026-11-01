@@ -177,4 +177,51 @@ describe("downloadManager queue + cancel", () => {
         test("cancelDownload on an unknown id is a no-op", () => {
                 expect(cancelDownload("dl_404")).toBe(false);
         });
+
+        test("failed downloads fall back to the system browser", async () => {
+                fetchMock.mockRejectedValue(new Error("network dead"));
+                const openInBrowser = vi.fn();
+                globalThis.window = Object.assign(globalThis.window || {}, {
+                        system: { openInBrowser },
+                });
+                globalThis.strings["download failed browser"] = "opened in browser";
+                try {
+                        const id = startDownload({ url: "https://example.com/x.bin" });
+                        await new Promise((r) => setTimeout(r, 80));
+                        expect(openInBrowser).toHaveBeenCalledWith(
+                                "https://example.com/x.bin",
+                        );
+                        const notif = notificationStore.list.find(
+                                (item) => item.downloadId === id,
+                        );
+                        assert.ok(notif, "notification missing");
+                        assert.match(notif.message, /✗|browser/);
+                } finally {
+                        delete globalThis.window.system;
+                        delete globalThis.strings["download failed browser"];
+                }
+        });
+
+        test("install:true hands a finished APK to the package installer", async () => {
+                fetchMock.mockResolvedValue(streamResponse([new Uint8Array([7])]));
+                const fileAction = vi.fn();
+                globalThis.window = Object.assign(globalThis.window || {}, {
+                        system: { fileAction },
+                });
+                try {
+                        startDownload({
+                                url: "https://example.com/XCoder-1.8.9.apk",
+                                install: true,
+                        });
+                        await new Promise((r) => setTimeout(r, 450));
+                        expect(fileAction).toHaveBeenCalledTimes(1);
+                        const [fileUrl, filename, mode, mime] = fileAction.mock.calls[0];
+                        assert.match(String(fileUrl), /XCoder-1\.8\.9\.apk$/);
+                        assert.equal(filename, "XCoder-1.8.9.apk");
+                        assert.equal(mode, "VIEW");
+                        assert.equal(mime, "application/vnd.android.package-archive");
+                } finally {
+                        delete globalThis.window.system;
+                }
+        });
 });

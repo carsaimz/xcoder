@@ -35,6 +35,8 @@ export default class SidebarApp {
 	#group = "primary";
 	/**@type {string} raw icon spec ("svg:<id>" or icon-font class) */
 	#iconName = "";
+	/**@type {boolean} float apps open in an independent window; the rest dock in the sidebar */
+	#floating = false;
 
 	/**
 	 * Creates a new sidebar app.
@@ -47,7 +49,7 @@ export default class SidebarApp {
 	 */
 	constructor(icon, id, title, init, onselect, opts = {}) {
 		const emptyFunc = () => {};
-		this.#container = <div className="container"></div>;
+		this.#container = <div className="container" data-app={id}></div>;
 		this.#titleKey = opts.titleKey || null;
 		this.#icon = <Icon icon={icon} id={id} title={title} />;
 		this.#id = id;
@@ -57,6 +59,7 @@ export default class SidebarApp {
 		this.#tabbed = !!opts.tabbed;
 		this.#launcher = !!opts.launcher;
 		this.#iconName = icon || "";
+		this.#floating = !!opts.floating;
 		this.#group =
 			opts.group === "bottom" || opts.group === "tools"
 				? opts.group
@@ -201,8 +204,10 @@ export default class SidebarApp {
 		this.#active = nextValue;
 		this.#icon.classList.toggle("active", this.#active);
 		if (this.#active && !this.#tabbed) {
-			if (floatingWindow.floatingEnabled()) {
-				// independent window above the editor (VS Code style)
+			if (this.#floating && floatingWindow.floatingEnabled()) {
+				// independent window above the editor (VS Code style);
+				// a docked panel yields its place back to the sidebar
+				undockDockedPanel($sidebar);
 				floatingWindow.show(this.#id, this.#title, this.#container, () =>
 					this.#onFloatClosed(),
 				);
@@ -271,6 +276,11 @@ export default class SidebarApp {
 	/**@type {boolean} launcher apps fire onselect on tap and never own the sidebar panel */
 	get launcher() {
 		return this.#launcher;
+	}
+
+	/**@type {boolean} float apps open as independent windows (vs docked panels) */
+	get floating() {
+		return this.#floating;
 	}
 
 	/**
@@ -363,6 +373,25 @@ function Icon({ icon, id, title }) {
 			{$label}
 		</span>
 	);
+}
+
+/**
+ * Removes a docked app panel from the sidebar, restoring the empty
+ * .container placeholder — floating windows open above the editor,
+ * so the sidebar area goes back to the categorized menu.
+ * @param {HTMLElement} $sidebarEl
+ */
+function undockDockedPanel($sidebarEl) {
+	if (!$sidebarEl) return;
+	const docked = getContainer();
+	if (
+		docked &&
+		docked.isConnected &&
+		docked.parentNode === $sidebarEl &&
+		docked.dataset?.app
+	) {
+		$sidebarEl.replaceChild(<div className="container"></div>, docked);
+	}
 }
 
 /**
