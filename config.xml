@@ -36,7 +36,7 @@
         <preference name="AndroidWindowSplashScreenBackground" value="@color/ic_splash_background" />
         <!-- cordova-android validates this preference with fs.existsSync():
              it MUST be a real file path (relative to the project root), not an
-             @mipmap/@drawable reference -- otherwise the Cordova default robot
+             @mipmap/@drawable reference, otherwise the Cordova default robot
              icon is used (that was the v1.8.11 splash regression). The file is
              copied to drawable-nodpi/ic_cdv_splashscreen.png at prepare time. -->
         <preference name="AndroidWindowSplashScreenAnimatedIcon"

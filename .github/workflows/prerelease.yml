@@ -78,7 +78,13 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Add Android platform
-        run: npx cordova platform add android@15 || true
+        run: |
+          # cordova-android is pinned in devDependencies; add it from
+          # node_modules (deterministic) and fall back to the registry.
+          # Failures must be LOUD: a masked failure here surfaces later as
+          # "No platforms added to this project" from the build step.
+          npx cordova platform add ./node_modules/cordova-android \
+            || npx cordova platform add android@15
 
       - name: Build web bundle + debug APK
         run: |
