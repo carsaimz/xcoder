@@ -1,3 +1,4 @@
+import Sidebar from "components/sidebar";
 import floatingWindow from "components/sidebar/floatingWindow";
 import svgIcon from "utils/svgIcons";
 
@@ -206,13 +207,18 @@ export default class SidebarApp {
 		if (this.#active && !this.#tabbed) {
 			if (this.#floating && floatingWindow.floatingEnabled()) {
 				// independent window above the editor (VS Code style);
-				// a docked panel yields its place back to the sidebar
+				// a docked panel yields its place back to the sidebar.
+				// The panel space itself only exists while a docked app
+				// owns it — with only windowed tools active the sidebar
+				// collapses to the icon rail (user request).
 				undockDockedPanel($sidebar);
+				Sidebar.setRailOnly?.(true);
 				floatingWindow.show(this.#id, this.#title, this.#container, () =>
 					this.#onFloatClosed(),
 				);
 			} else {
 				dockContainer(this.#container, $sidebar);
+				Sidebar.setRailOnly?.(false);
 			}
 			this.#onselect(this.#container);
 		}
@@ -340,8 +346,9 @@ export default class SidebarApp {
  * @returns {HTMLElement}
  */
 function Icon({ icon, id, title }) {
-	// name shown under the glyph (visible when .app-icons-container
-	// has the .with-labels class - user request: nomes no sidebar)
+	// name shown in front of the glyph (user request: "títulos na frente
+	// de ícones") — visible when .app-icons-container has the
+	// .with-labels class; DOM order is label first, glyph after
 	const $label = <small className="app-label">{title}</small>;
 	// SVG icon pack (Lucide): icons registered as "svg:<name>" render as inline
 	// vectors — tier 1 of the hybrid icon convention (docs/ICONS.md).
@@ -355,8 +362,8 @@ function Icon({ icon, id, title }) {
 					title={title}
 					className="icon xc-svgicon"
 				>
-					{$svg}
 					{$label}
+					{$svg}
 				</span>
 			);
 		}

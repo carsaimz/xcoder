@@ -2,7 +2,6 @@ import "./style.scss";
 import fsOperation from "fileSystem";
 import toast from "components/toast";
 import { insertIntoEditorFile, pickEditorFile } from "lib/ai/editorBridge";
-import editorManager from "lib/editorManager";
 import {
 	base64Convert,
 	boilerplateSnippet,
@@ -493,14 +492,14 @@ function copyText(text) {
  * (same rule as the mixed tools).
  */
 async function insertText(text) {
-	const active = editorManager.activeFile;
+	const active = window.editorManager?.activeFile;
 	const target =
-		active?.type === "editor" ? active : pickEditorFile(editorManager);
+		active?.type === "editor" ? active : pickEditorFile(window.editorManager);
 	const payload =
 		outputKind === "css" && isHtmlFile(target?.filename)
 			? wrapHtmlSnippet({ css: text })
 			: text;
-	const result = await insertIntoEditorFile(editorManager, payload);
+	const result = await insertIntoEditorFile(window.editorManager, payload);
 	if (result.ok) {
 		const name = result.file?.filename;
 		toast(
@@ -527,7 +526,7 @@ async function insertText(text) {
  */
 async function savePlaceholder(svg) {
 	try {
-		const file = editorManager.activeFile;
+		const file = window.editorManager?.activeFile;
 		let dir = globalThis.DATA_STORAGE || "";
 		if (file?.uri) {
 			dir = Url.dirname(file.uri);

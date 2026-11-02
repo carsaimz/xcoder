@@ -2,7 +2,6 @@ import "./style.scss";
 import fsOperation from "fileSystem";
 import toast from "components/toast";
 import { insertIntoEditorFile } from "lib/ai/editorBridge";
-import editorManager from "lib/editorManager";
 import lang from "lib/lang";
 import {
 	ALL_LIBS,
@@ -53,7 +52,7 @@ function copyText(text) {
  * best editor tab and waits for its view even when the current tab
  * is a page (terminal, preview, welcome…). */
 async function insertText(text) {
-	const result = await insertIntoEditorFile(editorManager, text);
+	const result = await insertIntoEditorFile(window.editorManager, text);
 	if (result.ok) {
 		const name = result.file?.filename;
 		toast(
@@ -109,7 +108,7 @@ function shortDir(url) {
  * @param {LocalLib} lib
  */
 async function copyToProject(lib) {
-	const file = editorManager.activeFile;
+	const file = window.editorManager?.activeFile;
 	const base = file?.uri
 		? Url.dirname(file.uri)
 		: globalThis.DATA_STORAGE || "";

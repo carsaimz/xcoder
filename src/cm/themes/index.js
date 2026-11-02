@@ -28,6 +28,7 @@ import tomorrowNightBright, {
 	config as tomorrowNightBrightConfig,
 } from "./tomorrowNightBright";
 import vscodeDark, { config as vscodeDarkConfig } from "./vscodeDark";
+import vscodeLight, { config as vscodeLightConfig } from "./vscodeLight";
 
 const oneDarkConfig = {
 	name: "one_dark",
@@ -278,6 +279,13 @@ addTheme(
 	!!vscodeDarkConfig.dark,
 	() => vscodeDark(),
 	vscodeDarkConfig,
+);
+addTheme(
+	vscodeLightConfig.name,
+	"VS Code Light",
+	!!vscodeLightConfig.dark,
+	() => vscodeLight(),
+	vscodeLightConfig,
 );
 
 for (const config of catppuccinConfigs) {

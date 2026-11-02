@@ -91,6 +91,8 @@ export function show(id, title, container, closeCallback) {
 	$win.classList.add("show");
 
 	restorePos();
+	// never sit on top of an open sidebar (phone mask or docked panel)
+	avoidSidebar();
 	// one back-button entry per open window
 	try {
 		actionStack.remove("sidebar-float");
@@ -178,6 +180,30 @@ export function toggleMinimize() {
 /** Whether the window is currently collapsed to its header. */
 export function isMinimized() {
 	return Boolean($win?.classList.contains("minimized"));
+}
+
+/**
+ * Slides the open window out of the sidebar's area (user request: "a janela
+ * flutuante não deve cobrir outras janelas e nem sidebar"). Called when the
+ * sidebar shows while a window is visible; maximized windows are left alone.
+ * @returns {void}
+ */
+export function avoidSidebar() {
+	if (!$win || !$win.classList.contains("show")) return;
+	if ($win.classList.contains("maximized")) return;
+	const $sidebarEl = document.getElementById("sidebar");
+	if (!$sidebarEl?.isConnected) return;
+	const edge = $sidebarEl.getBoundingClientRect().right;
+	const rect = $win.getBoundingClientRect();
+	if (rect.left >= edge) return;
+	// keep the window fully on screen, to the right of the sidebar
+	const available = Math.max(window.innerWidth - edge - 16, 0);
+	const width = Math.min(rect.width || $win.offsetWidth, available || 240);
+	const left =
+		available > 0 ? edge + 8 : Math.max(window.innerWidth - width - 4, 0);
+	$win.style.width = `${Math.max(width, 240)}px`;
+	$win.style.left = `${Math.max(left, 0)}px`;
+	savePos();
 }
 
 function syncMinIcon() {

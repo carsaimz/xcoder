@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.carsaimz.xcoder" android-versionCode="10811" version="1.8.11"
+<widget id="com.carsaimz.xcoder" android-versionCode="10812" version="1.8.12"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -34,8 +34,13 @@
         <preference name="DisallowOverscroll" value="true" />
         <preference name="BackgroundColor" value="0xFF313131" />
         <preference name="AndroidWindowSplashScreenBackground" value="@color/ic_splash_background" />
+        <!-- cordova-android validates this preference with fs.existsSync():
+             it MUST be a real file path (relative to the project root), not an
+             @mipmap/@drawable reference -- otherwise the Cordova default robot
+             icon is used (that was the v1.8.11 splash regression). The file is
+             copied to drawable-nodpi/ic_cdv_splashscreen.png at prepare time. -->
         <preference name="AndroidWindowSplashScreenAnimatedIcon"
-            value="@mipmap/ic_launcher_fg" />
+            value="res/splash-icon.png" />
         <preference name="AndroidPostSplashScreenTheme" value="@style/Theme.App.Activity" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
         <preference name="AndroidLaunchMode" value="singleTask" />

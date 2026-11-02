@@ -24,6 +24,28 @@ body.no-animation {
   overflow: hidden;
   box-sizing: border-box;
 
+  // the docked-panel space only exists while a docked app owns it
+  > .container:empty {
+    display: none;
+  }
+
+  // rail-only: no docked app active (windowed tools live in their own
+  // window) — the sidebar collapses to the 52px icon strip
+  &.rail-only {
+    width: auto;
+    min-width: 0;
+
+    > .apps {
+      width: 52px;
+      min-width: 52px;
+      border-right: none;
+    }
+
+    .resize-bar {
+      display: none;
+    }
+  }
+
   &+.mask {
     z-index: 108;
   }
@@ -632,34 +654,44 @@ body.no-animation {
 // small-caps category captions on the group separators.
 .app-icons-container.with-labels {
   .icon {
+    // title stacked in front of the glyph: label first (order -1),
+    // icon-font ::before / inline svg after it
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     height: 58px;
-    line-height: 40px;
+    line-height: 1;
 
-    // keep the badge clear of the label
     .app-badge {
-      bottom: auto;
       top: 1px;
       right: 2px;
+      bottom: auto;
     }
 
     .app-label {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 3px;
+      order: -1;
+      position: static;
       display: block;
+      max-width: 100%;
       font-size: 8px;
       font-weight: 500;
-      line-height: 9px;
+      line-height: 10px;
       letter-spacing: 0.1px;
       text-align: center;
-      opacity: 0.65;
+      opacity: 0.7;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       padding: 0 2px;
       pointer-events: none;
       font-family: inherit;
+    }
+
+    &.xc-svgicon svg {
+      width: 20px;
+      height: 20px;
+      display: block;
     }
 
     &.active .app-label {
@@ -691,167 +723,14 @@ body.no-animation {
 }
 
 // ---------------------------------------------------------------------------
-// Sidebar menu — with floating windows the docked-panel area of the sidebar
-// stays empty, so it hosts the option titles grouped by category
-// (Views / Tools / Account), each row opening its floating window.
-.sidebar-menu {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
-  padding: 10px 8px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  // the docked-panel container stays out of the way while the menu shows
-  & ~ .container {
-    display: none;
-  }
-
-  .sidebar-menu-head {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 2px 8px 4px;
-  }
-
-  .sidebar-menu-title {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-  }
-
-  .sidebar-menu-hint {
-    font-size: 10px;
-    opacity: 0.55;
-  }
-
-  .sidebar-menu-section {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .sidebar-menu-caption {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.9px;
-    text-transform: uppercase;
-    opacity: 0.5;
-    padding: 6px 8px 2px;
-    pointer-events: none;
-  }
-
-  .sidebar-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 38px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-
-    &:active {
-      background-color: rgba(255, 255, 255, 0.08);
-      background-color: color-mix(in srgb, currentColor 8%, transparent);
-    }
-
-    &.active {
-      background-color: rgba(255, 255, 255, 0.06);
-      // VS Code view list: the active row is tinted with the accent
-      background-color: color-mix(in srgb, var(--active-color) 16%, transparent);
-
-      .sidebar-menu-name {
-        opacity: 1;
-      }
-    }
-
-    .icon {
-      width: 26px;
-      height: 26px;
-      line-height: 26px;
-      font-size: 1.05em;
-      flex-shrink: 0;
-      text-align: center;
-
-      &.xc-svgicon {
-        svg {
-          width: 20px;
-          height: 20px;
-          display: block;
-          margin: auto;
-        }
-      }
-    }
-
-    .sidebar-menu-name {
-      flex: 0 1 auto;
-      min-width: 0;
-      font-size: 13px;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      opacity: 0.85;
-    }
-
-    // same pill as the rail badges, inline after the name
-    .app-badge {
-      position: static;
-      min-width: 16px;
-      height: 15px;
-      padding: 0 4px;
-      border-radius: 9px;
-      box-sizing: border-box;
-      background-color: #0078d4;
-      color: #ffffff;
-      font-size: 9px;
-      font-weight: 600;
-      line-height: 15px;
-      text-align: center;
-      letter-spacing: 0;
-      pointer-events: none;
-      flex-shrink: 0;
-
-      &.dot {
-        min-width: 8px;
-        width: 8px;
-        height: 8px;
-        padding: 0;
-      }
-    }
-
-    .sidebar-menu-open {
-      width: 18px;
-      height: 18px;
-      line-height: 18px;
-      font-size: 0.9em;
-      opacity: 0.4;
-      flex-shrink: 0;
-      // the open affordance rides at the row end; name comes first
-      // (user: "títulos na frente do ícone"), glyph right after it
-      margin-left: auto;
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Floating sidebar windows — panels open as independent windows above the
 // editor instead of living inside the narrow sidebar overlay.
 .sidebar-float {
   position: fixed;
-  z-index: 250;
+  /* under the sidebar (109), pages (108), context menus (111) and dialogs
+     (999+): a floating window must never cover other windows or options
+     (user feedback) — only the editor area itself sits below it */
+  z-index: 106;
   display: none;
   flex-direction: column;
   min-width: 240px;

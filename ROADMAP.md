@@ -16,7 +16,24 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.11
+## ✅ Concluído até a v1.8.12
+
+- **v1.8.12 — raiz do «sem arquivo aberto», splash oficial e
+  VS Code por dentro:** dev tools e libs liam «.activeFile» da
+  FUNÇÃO-fábrica «lib/editorManager» (sempre undefined) — agora usam a
+  instância viva «window.editorManager» com teste que proíbe o import
+  errado; splash de Cordova aponta para «res/splash-icon.png» REAL
+  (cordova valida com fs.existsSync; «@mipmap/…» caía no robô
+  predefinido), marca oficial 960×960 com margem para a máscara
+  circular; o espaço do sidebar existe só para apps acoplados (modo
+  «rail-only» de 52px quando só há ferramentas em janela), títulos À
+  FRENTE dos glifos na barra; janelas flutuantes em z 106 (sob
+  sidebar/páginas/menus/diálogos) e desviam-se da sidebar aberta
+  («avoidSidebar»); seis temas VS (Dark+, Light+, Light Modern,
+  Monokai, Solarized D/L) com tema de editor «vscodeLight» novo; barra
+  de estado estilo VS Code (linha/coluna, indentação, codificação,
+  linguagem, diagnósticos LSP) que esconde quando não há arquivo
+  aberto.
 
 - **v1.8.11 — inserir à prova de tudo + visual VS Code:** os quatro
   botões de inserir (IA, blocos de código, dev tools, bibliotecas)

@@ -185,6 +185,22 @@ export default class ThemeBuilder {
 		this.#theme["--scrollbar-color"] = value;
 	}
 
+	get statusBarColor() {
+		return this.#theme["--statusbar-background-color"];
+	}
+
+	set statusBarColor(value) {
+		this.#theme["--statusbar-background-color"] = value;
+	}
+
+	get statusBarTextColor() {
+		return this.#theme["--statusbar-text-color"];
+	}
+
+	set statusBarTextColor(value) {
+		this.#theme["--statusbar-text-color"] = value;
+	}
+
 	get popupBorderColor() {
 		return this.#theme["--popup-border-color"];
 	}

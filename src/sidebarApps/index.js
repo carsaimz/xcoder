@@ -3,7 +3,6 @@ import toast from "components/toast";
 import tag from "html-tag-js";
 import logger from "lib/logger";
 import appSettings from "lib/settings";
-import svgIcon from "utils/svgIcons";
 import SidebarApp from "./sidebarApp";
 
 const SIDEBAR_APPS_LAST_SECTION = "sidebarAppsLastSection";
@@ -16,8 +15,6 @@ let $sidebar;
 let currentSection = localStorage.getItem(SIDEBAR_APPS_LAST_SECTION);
 /**@type {SidebarApp[]} */
 const apps = [];
-/**@type {HTMLElement|null} floating-mode menu (option names + categories) */
-let $menu = null;
 
 /**
  * @param {string} icon icon of the app
@@ -44,7 +41,6 @@ function add(
 	const app = new SidebarApp(icon, id, title, initFunction, onSelected, opts);
 	apps.push(app);
 	app.install(prepend);
-	if ($menu?.isConnected) renderSidebarMenu();
 
 	// tabbed and launcher apps never own the sidebar panel on restore;
 	// docked (native) apps restore their panel even in floating mode —
@@ -70,7 +66,6 @@ function remove(id) {
 	const wasActive = app.active;
 	app.remove();
 	apps.splice(apps.indexOf(app), 1);
-	if ($menu?.isConnected) renderSidebarMenu();
 	if (wasActive && apps.length > 0) {
 		const preferredApp = apps.find((app) => app.id === currentSection);
 		setActiveApp(preferredApp?.id || apps[0].id);
@@ -104,19 +99,13 @@ function init($el) {
 			localStorage.removeItem(SIDEBAR_APPS_LAST_SECTION);
 		}
 	});
-	// floating mode: the freed docked-panel area hosts the categorized menu
-	syncSidebarMenu();
-	// keep it in sync with mode switches and fresh badges on every open
+	// when the sidebar opens while a tool window is visible, slide the
+	// window out of the sidebar's area — options must never sit behind it
 	import("components/sidebar")
 		.then(({ default: SidebarModule }) =>
-			SidebarModule.on?.("show", syncSidebarMenu),
+			SidebarModule.on?.("show", floatingWindow.avoidSidebar),
 		)
 		.catch(() => {});
-	// rebuild after the per-app langchange listeners refreshed their
-	// titles (registry listeners registered before the apps existed)
-	document.addEventListener("langchange", () => {
-		setTimeout(renderSidebarMenu, 0);
-	});
 }
 
 /**
@@ -216,7 +205,6 @@ function setBadge(id, value) {
 	const app = apps.find((candidate) => candidate.id === id);
 	if (!app) return false;
 	app.setBadge(value);
-	updateMenuBadge(id, value);
 	return true;
 }
 
@@ -244,10 +232,8 @@ function setActiveApp(id) {
 	const app = apps.find((app) => app.id === id);
 	if (!app) return;
 	const floatMode = usesFloat(app);
-	// a docked panel takes the whole area — the menu goes; switching
-	// from an open tool window to a docked app drops the window
+	// switching from an open tool window to a docked app drops the window
 	if (!floatMode) {
-		$menu?.remove();
 		const windowId = floatingWindow.activeWindowId();
 		if (windowId && windowId !== id) floatingWindow.reset();
 	}
@@ -258,9 +244,6 @@ function setActiveApp(id) {
 	for (const currentApp of apps) {
 		currentApp.active = currentApp.id === id;
 	}
-	// float mode: the sidebar keeps the categorized menu next to the
-	// rail while the tool lives in its own window
-	if (floatMode) syncSidebarMenu();
 }
 
 /**
@@ -323,148 +306,11 @@ function usesFloat(app) {
 	return Boolean(app?.floating && floatingWindow.floatingEnabled());
 }
 
-// --- sidebar menu ------------------------------------------------------------
-// With floating windows the docked-panel area of the sidebar stays empty;
-// it now hosts a categorized menu of the options ("usar o lugar para títulos
-// de opções e categorias") — names, rail badges and group captions, the
-// floating-window counterpart of VS Code's view list.
-
-const MENU_SECTIONS = [
-	["primary", "sidebar group primary", "Views"],
-	["tools", "sidebar group tools", "Tools"],
-	["bottom", "sidebar group bottom", "Account"],
-];
-
-/** Mounts/unmounts the sidebar menu according to the floating-windows mode. */
-function syncSidebarMenu() {
-	if (!floatingWindow.floatingEnabled()) {
-		$menu?.remove();
-		return;
-	}
-	if (!$sidebar) return;
-	if (!$menu) {
-		$menu = <div className="sidebar-menu scroll" />;
-	}
-	if (!$menu.isConnected) {
-		const $container = $sidebar.get(":scope > .container");
-		if ($container) {
-			$container.before($menu);
-		} else {
-			const $resize = $sidebar.get(":scope > .resize-bar");
-			if ($resize) $resize.before($menu);
-			else $sidebar.append($menu);
-		}
-	}
-	renderSidebarMenu();
-}
-
-/** Rebuilds the menu rows from the registered apps. */
-function renderSidebarMenu() {
-	if (!$menu?.isConnected) return;
-	$menu.textContent = "";
-	$menu.append(
-		<div className="sidebar-menu-head">
-			<span className="sidebar-menu-title">
-				{strings["sidebar menu title"] || "Panels"}
-			</span>
-			<span className="sidebar-menu-hint">
-				{strings["sidebar menu hint"] || "Tap to open"}
-			</span>
-		</div>,
-	);
-	for (const [group, key, fallback] of MENU_SECTIONS) {
-		const items = apps.filter((app) => app.group === group);
-		if (!items.length) continue;
-		const $section = <div className={`sidebar-menu-section ${group}`} />;
-		$section.append(
-			<div className="sidebar-menu-caption">{strings[key] || fallback}</div>,
-		);
-		for (const app of items) {
-			$section.append(menuRowFor(app));
-		}
-		$menu.append($section);
-	}
-}
-
-/** Builds one tappable row (glyph + name + badge + open affordance). */
-function menuRowFor(app) {
-	const $row = (
-		<div
-			className={`sidebar-menu-item${app.active ? " active" : ""}`}
-			data-id={app.id}
-		>
-			<span className="sidebar-menu-name">{app.title}</span>
-			{glyphFor(app.iconName, app.title)}
-			{app.badge ? <span className="app-badge count">{app.badge}</span> : null}
-			<span
-				className={`icon ${
-					usesFloat(app) ? "open_in_new" : "chevron_right"
-				} sidebar-menu-open`}
-			/>
-		</div>
-	);
-	$row.addEventListener("click", () => openFromMenu(app.id));
-	return $row;
-}
-
-/** Builds the glyph span for a menu row from the raw icon spec. */
-function glyphFor(iconSpec, title) {
-	if (iconSpec?.startsWith("svg:")) {
-		const $svg = svgIcon(iconSpec.slice(4));
-		if ($svg) {
-			return (
-				<span className="icon xc-svgicon" title={title}>
-					{$svg}
-				</span>
-			);
-		}
-	}
-	return <span className={`icon ${iconSpec || ""}`} title={title} />;
-}
-
 /** Hides the sidebar overlay (dynamic import keeps boot order safe). */
 function hideSidebar() {
 	import("components/sidebar")
 		.then(({ default: SidebarModule }) => SidebarModule.hide?.())
 		.catch(() => {});
-}
-
-/** Opens an app from the menu; on phones the sidebar only yields to windows. */
-function openFromMenu(id) {
-	const app = apps.find((candidate) => candidate.id === id);
-	pulseApp(id);
-	// only floating tools take over the screen — the sidebar space is
-	// for docked panels, so it always yields to the opened window
-	if (usesFloat(app)) {
-		hideSidebar();
-	}
-}
-
-/** Mirrors a rail badge into the matching menu row (targeted, no rebuild). */
-function updateMenuBadge(id, value) {
-	if (!$menu?.isConnected) return;
-	const $row = $menu.get(`.sidebar-menu-item[data-id="${id}"]`);
-	if (!$row) return;
-	let $badge = $row.get(".app-badge");
-	const count =
-		typeof value === "number" && Number.isFinite(value) ? Math.floor(value) : 0;
-	if (count <= 0 && value !== true) {
-		$badge?.remove();
-		return;
-	}
-	if (!$badge) {
-		$badge = <span className="app-badge" />;
-		$row.get(".sidebar-menu-name")?.after($badge);
-	}
-	if (value === true) {
-		$badge.textContent = "";
-		$badge.classList.add("dot");
-		$badge.classList.remove("count");
-		return;
-	}
-	$badge.textContent = count > 99 ? "99+" : String(count);
-	$badge.classList.add("count");
-	$badge.classList.remove("dot");
 }
 
 export default {

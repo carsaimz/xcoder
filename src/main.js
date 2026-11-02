@@ -26,6 +26,7 @@ import {
 } from "cm/modelist";
 import Contextmenu from "components/contextmenu";
 import Sidebar from "components/sidebar";
+import getStatusBar from "components/statusBar";
 import tile from "components/tile";
 import toast from "components/toast";
 import alert from "dialogs/alert";
@@ -655,6 +656,9 @@ async function loadApp() {
 	//#region Add event listeners
 	initModes();
 	quickToolsInit();
+	// VS Code-style status bar — bottom strip with Ln/Col, indent, encoding,
+	// language mode and LSP diagnostics (hidden while no editor file is open)
+	root.append(getStatusBar());
 	sidebarApps.init($sidebar);
 	await sidebarApps.loadApps();
 	// boot restore done - floating windows may now open on user taps

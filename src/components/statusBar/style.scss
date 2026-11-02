@@ -1,0 +1,133 @@
+// VS Code-style status bar — slim info strip sitting directly above the
+// quicktools rows (or at the very bottom when quicktools are hidden).
+// Colors come from the active theme; themes that define dedicated status
+// bar colors (VS Dark+ / VS Light+ blue strip) override the fallbacks.
+#status-bar {
+  display: none;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 97;
+  min-height: 24px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  font-size: 11px;
+  line-height: 1.2;
+  font-family: var(--app-font-family);
+  background-color: var(--secondary-color);
+  background-color: var(--statusbar-background-color, var(--secondary-color));
+  color: var(--secondary-text-color);
+  color: var(--statusbar-text-color, var(--secondary-text-color));
+  border-top: 1px solid var(--border-color);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &.show {
+    display: flex;
+  }
+
+  .statusbar-side {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+
+    &.right {
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+  }
+
+  .statusbar-item {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 42vw;
+
+    &.clickable {
+      cursor: pointer;
+
+      &:active {
+        background-color: rgba(128, 128, 128, 0.25);
+      }
+    }
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .statusbar-diagnostics {
+    display: none;
+    align-items: center;
+    gap: 6px;
+
+    &.show {
+      display: inline-flex;
+    }
+
+    .statusbar-diag {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 4px;
+
+      &.errors {
+        color: var(--error-text-color, #f14c4c);
+      }
+
+      &.warnings {
+        color: #cca700;
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+// Keep the strip clear of the quicktools rows (40px per row, attr set on
+// wc-page#root) and shift the bottom-positioned open-file tab list up so
+// both stay visible.
+wc-page#root {
+  &[footer-height="1"] #status-bar {
+    bottom: 40px;
+  }
+
+  &[footer-height="2"] #status-bar {
+    bottom: 80px;
+  }
+
+  &[footer-height="3"] #status-bar {
+    bottom: 120px;
+  }
+
+  &[footer-height="1"][open-file-list-pos="bottom"]
+    .open-file-list:not(.editor-pane-tabs) {
+    bottom: 64px !important;
+  }
+
+  &[footer-height="2"][open-file-list-pos="bottom"]
+    .open-file-list:not(.editor-pane-tabs) {
+    bottom: 104px !important;
+  }
+
+  &[footer-height="3"][open-file-list-pos="bottom"]
+    .open-file-list:not(.editor-pane-tabs) {
+    bottom: 144px !important;
+  }
+
+  // when quicktools are hidden the floating toggler would sit behind the
+  // strip — raise it above the bar
+  &:not([footer-height]) #quicktools-toggler {
+    bottom: 32px;
+  }
+}

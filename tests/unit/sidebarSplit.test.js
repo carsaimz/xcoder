@@ -21,6 +21,7 @@ vi.mock("components/sidebar", () => ({
 		toggle: vi.fn(),
 		on: vi.fn(),
 		off: vi.fn(),
+		setRailOnly: vi.fn(),
 	},
 }));
 vi.mock("fileSystem", () => ({ default: vi.fn(() => ({})) }));
@@ -82,8 +83,8 @@ $sidebar.append($apps, $panel, $resize);
 document.body.append($sidebar);
 sidebarApps.init($sidebar);
 
-/** Re-mounts the categorized menu (same path as the sidebar "show" event). */
-function remountMenu() {
+/** Fires the listeners registered on the Sidebar "show" event (same path as the sidebar "show" event). */
+function fireShow() {
 	for (const call of vi.mocked(SidebarModule.on).mock.calls) {
 		const [event, callback] = call;
 		if (event === "show") callback?.();
@@ -95,11 +96,12 @@ beforeEach(() => {
 	floatingWindow.setBootHold(false);
 	floatingWindow.reset();
 	vi.mocked(SidebarModule.hide).mockClear();
+	vi.mocked(SidebarModule.setRailOnly).mockClear();
 	$apps.textContent = "";
 	sidebarApps.remove("toolApp");
 	sidebarApps.remove("nativeApp");
 	sidebarApps.remove("bootNative");
-	remountMenu();
+	fireShow();
 });
 
 /** Registers a native-style (docked) app. */
@@ -157,8 +159,13 @@ describe("sidebar split (native inline / tools floating)", () => {
 			!document.body.querySelector(".sidebar-float.show"),
 			"native app must not open a window",
 		);
-		// a docked panel takes the whole area — the menu goes away
-		assert.ok(!$sidebar.get(".sidebar-menu"), "menu still mounted");
+		// the docked panel owns the panel space — rail-only must be off
+		assert.ok(
+			vi.mocked(SidebarModule.setRailOnly).mock.calls.some(
+				([value]) => value === false,
+			),
+			"rail-only not disabled for a docked app",
+		);
 	});
 
 	test("tapping a tool opens the window and the docked panel yields", () => {
@@ -176,8 +183,13 @@ describe("sidebar split (native inline / tools floating)", () => {
 		);
 		// the native panel gave its place back to the sidebar
 		assert.ok(!$sidebar.get(".native-panel"), "native panel still docked");
-		// float mode keeps the categorized menu visible
-		assert.ok($sidebar.get(".sidebar-menu"), "menu missing in float mode");
+		// the freed space collapses the sidebar to the rail
+		assert.ok(
+			vi.mocked(SidebarModule.setRailOnly).mock.calls.some(
+				([value]) => value === true,
+			),
+			"sidebar not collapsed after the tool took over",
+		);
 	});
 
 	test("tapping a docked app while a window is open drops the window", () => {
@@ -214,18 +226,17 @@ describe("sidebar split (native inline / tools floating)", () => {
 		assert.ok($sidebar.get(".native-panel"), "panel undocked");
 	});
 
-	test("menu affordance differs per mode (window vs panel)", () => {
+	test("rail badges stay on the rail icons", () => {
 		addTool();
-		addNative();
-		const $menu = $sidebar.get(".sidebar-menu");
-		assert.ok($menu, "menu not mounted");
+		const $icon = addNative();
 
-		const $toolRow = $menu.get('.sidebar-menu-item[data-id="toolApp"]');
-		const $nativeRow = $menu.get('.sidebar-menu-item[data-id="nativeApp"]');
-		assert.ok($toolRow?.get(".open_in_new"), "tool row lacks window affordance");
-		assert.ok(
-			$nativeRow?.get(".chevron_right"),
-			"native row lacks panel affordance",
+		assert.ok(sidebarApps.setBadge("nativeApp", 3), "setBadge failed");
+		assert.equal(
+			$icon.get(":scope > .app-badge")?.textContent,
+			"3",
+			"rail badge missing",
 		);
+		sidebarApps.setBadge("nativeApp", null);
+		assert.ok(!$icon.get(":scope > .app-badge"), "badge not cleared");
 	});
 });

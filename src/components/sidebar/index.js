@@ -453,10 +453,35 @@ function create($container, $toggler) {
 		return { clientX, clientY };
 	}
 
+	/**
+	 * Collapses the sidebar to the 52px icon rail (or restores the full
+	 * width). The docked-panel area only exists while a docked app owns
+	 * it — with windowed tools active the rail alone is shown (user
+	 * request: "espaço de apps ou ferramentas só aparecer quando é
+	 * escolhido que abre nele"). Re-syncs the layout margin in tab mode.
+	 * @param {boolean} enabled
+	 */
+	function setRailOnly(enabled) {
+		$el.classList.toggle("rail-only", enabled);
+		if (enabled) {
+			$el.style.maxWidth = "52px";
+			if (mode === "tab" && $el.activated) {
+				root.style.marginLeft = "52px";
+				root.style.width = "calc(100% - 52px)";
+			}
+			return;
+		}
+		$el.style.maxWidth = null;
+		if (mode === "tab" && $el.activated) {
+			setWidth(width);
+		}
+	}
+
 	$el.show = show;
 	$el.hide = hide;
 	$el.toggle = toggle;
 	$el.onshow = () => {};
+	$el.setRailOnly = setRailOnly;
 	$el.getWidth = function () {
 		const width = Math.round(innerWidth * 0.85);
 		return mode === "phone" ? width : MIN_WIDTH;
@@ -480,6 +505,8 @@ function Sidebar({ container, toggler }) {
 Sidebar.hide = () => $sidebar?.hide(true);
 Sidebar.show = () => $sidebar?.show();
 Sidebar.toggle = () => $sidebar?.toggle();
+/** Collapses the sidebar to the icon rail / restores the full panel width. */
+Sidebar.setRailOnly = (enabled) => $sidebar?.setRailOnly?.(enabled);
 
 Sidebar.on = (
 	/**@type {'hide'|'show'} */ event,

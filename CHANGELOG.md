@@ -13,6 +13,53 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.12] - 2026-11-02
+
+### Fixed
+- **Inserir no editor (raiz verdadeira)** — a v1.8.11 curava os sintomas,
+  mas as ferramentas dev e as bibliotecas ainda falhavam sempre: ambas
+  importavam a FUNÇÃO-fábrica assíncrona de «lib/editorManager» e liam
+  «.activeFile» da própria função (sempre «undefined») — por isso o
+  aviso «não há arquivo aberto no editor» aparecia mesmo com arquivos
+  abertos. Agora leem a instância viva «window.editorManager» (como a
+  IA já fazia), com teste de regressão que proíbe o import errado.
+- **Splash de Cordova com o logo oficial** — o cordova-android valida
+  «AndroidWindowSplashScreenAnimatedIcon» com fs.existsSync(): o valor
+  «@mipmap/ic_launcher_fg» (v1.8.11) nunca existe como ficheiro e a
+  compilação caía no robô predefinido do Cordova («o logo saiu de
+  vez»). O novo «res/splash-icon.png» (marca oficial, 960×960 com
+  margem de segurança para a máscara circular) é agora apontado por
+  caminho real e copiado como «ic_cdv_splashscreen.png» no prepare.
+
+### Changed
+- **O espaço do sidebar só existe para apps que abrem nele** — o menu
+  categorizado que ocupava a área dos painéis foi removido: com só
+  ferramentas em janela activas, a sidebar colapsa para a barra de
+  ícones de 52px (modo «rail-only»); escolher um app acoplado
+  (arquivos, plugins, notificações…) devolve o painel completo. Os
+  TÍTULOS das opções ficam agora À FRENTE dos ícones na própria barra
+  (rótulo acima do glifo, por pedido do utilizador).
+- **Janelas flutuantes já não cobrem nada** — a janela desceu para o
+  nível z 106 (sob a sidebar 109, páginas 108, menus de contexto 111 e
+  diálogos 999+); ao abrir a sidebar com uma janela aberta, a janela
+  desliza para o lado da sidebar («avoidSidebar») em vez de ficar por
+  cima das opções.
+- **Mais temas VS** — seis temas novos no estilo do VS Code desktop:
+  VS Dark+ e VS Light+ (barra de estado azul clássica), VS Light
+  Modern, VS Monokai e os dois Solarized; o par claro usa o novo tema
+  de editor «vscodeLight» (tokens Light+ reais). Todos gratuitos.
+- **Barra de estado estilo VS Code** — faixa fina no fundo com dados
+  reais do editor: linha/coluna (toca abre «ir para linha»),
+  indentação (espaços/tamanho de tabulação), codificação (toca abre a
+  paleta) e linguagem (toca abre a paleta de modos), mais erros/avisos
+  do LSP quando existem; esconde-se quando não há arquivo aberto
+  (boas-vindas, terminal) e sobe acima da barra de quicktools.
+
+### Tests
+- 13 novos (ponte do editor 3, temas VS 4, barra de estado 5, e o
+  teste sidebarMenu foi reescrito como sidebarRailOnly): 1086/1086 no
+  total.
+
 ## [1.8.11] - 2026-11-02
 
 ### Fixed
@@ -95,6 +142,30 @@ resumo em inglês.
 ### Tests
 - 32 novos (recuperação de inserção 5, mapeamento SAF do terminal 6,
   wrapping e geradores novos 21): 1062/1062 no total.
+
+## [1.8.12] - 2026-11-02
+
+### Summary
+- The insert "No file is open in the editor" bug is fixed for real: dev
+  tools and libs imported the async editorManager FACTORY and read
+  .activeFile from the function itself (always undefined). They now use
+  the live window.editorManager instance, with a regression test that
+  bans the wrong import.
+- Cordova splash regression fixed: the splash icon preference must be a
+  real file path (cordova checks fs.existsSync), so the official logo
+  (res/splash-icon.png, 960×960 with circular-mask safe margins) ships
+  as the Android 12+ splash icon.
+- The sidebar panel space now exists only for docked apps (files,
+  plugins, notifications…): with windowed tools only, the sidebar
+  collapses to a 52px icon rail; option titles now sit in front of the
+  rail glyphs.
+- Floating windows no longer cover anything: z-order lowered below
+  sidebar/pages/menus/dialogs, and windows slide away from an opening
+  sidebar.
+- Six new VS Code themes (Dark+, Light+, Light Modern, Monokai,
+  Solarized Dark/Light) backed by a new real Light+ editor theme, plus
+  a VS Code-style status bar (Ln/Col, indent, encoding, language, LSP
+  diagnostics). 1086/1086 tests.
 
 ## [1.8.11] - 2026-11-02
 

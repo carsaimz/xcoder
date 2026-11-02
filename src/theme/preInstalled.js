@@ -699,12 +699,184 @@ sakura.scrollbarColor = "rgba(58, 42, 50, 0.12)";
 sakura.preferredEditorTheme = "noctisLilac";
 sakura.preferredTerminalTheme = "light";
 
+// ---- VS Code collection (user request: "mais temas VS") -------------------
+// Real VS Code desktop palettes: Dark+/Light+ (classic blue status bar),
+// the Modern pair (Dark Modern is the Xcoder default above), Monokai and
+// both Solarized flavors as they ship in VS Code.
+const vsDarkPlus = createBuiltInTheme("VS Dark+", "dark", "free");
+vsDarkPlus.darkenedPrimaryColor = "rgb(21, 21, 22)";
+vsDarkPlus.primaryColor = "rgb(37, 37, 38)";
+vsDarkPlus.primaryTextColor = "rgb(204, 204, 204)";
+vsDarkPlus.secondaryColor = "rgb(30, 30, 30)";
+vsDarkPlus.secondaryTextColor = "rgb(204, 204, 204)";
+vsDarkPlus.activeColor = "rgb(0, 122, 204)";
+vsDarkPlus.activeIconColor = "rgb(41, 163, 217)";
+vsDarkPlus.linkTextColor = "rgb(56, 156, 224)";
+vsDarkPlus.borderColor = "rgb(69, 69, 69)";
+vsDarkPlus.popupIconColor = "rgb(204, 204, 204)";
+vsDarkPlus.popupBackgroundColor = "rgb(37, 37, 38)";
+vsDarkPlus.popupTextColor = "rgb(204, 204, 204)";
+vsDarkPlus.popupActiveColor = "rgb(0, 122, 204)";
+vsDarkPlus.buttonBackgroundColor = "rgb(0, 122, 204)";
+vsDarkPlus.buttonTextColor = "rgb(255, 255, 255)";
+vsDarkPlus.buttonActiveColor = "rgb(0, 98, 163)";
+vsDarkPlus.boxShadowColor = "rgba(0, 0, 0, 0.5)";
+vsDarkPlus.activeTextColor = "rgb(255, 255, 255)";
+vsDarkPlus.errorTextColor = "rgb(244, 96, 108)";
+vsDarkPlus.dangerColor = "rgb(190, 50, 50)";
+vsDarkPlus.scrollbarColor = "rgba(121, 121, 121, 0.4)";
+vsDarkPlus.statusBarColor = "rgb(0, 122, 204)";
+vsDarkPlus.statusBarTextColor = "rgb(255, 255, 255)";
+vsDarkPlus.popupBorderRadius = "6px";
+vsDarkPlus.preferredEditorTheme = "vscodeDark";
+vsDarkPlus.preferredTerminalTheme = "dark";
+
+const vsLightPlus = createBuiltInTheme("VS Light+", "light", "free");
+vsLightPlus.darkenedPrimaryColor = "rgb(220, 220, 220)";
+vsLightPlus.primaryColor = "rgb(243, 243, 243)";
+vsLightPlus.primaryTextColor = "rgb(50, 50, 50)";
+vsLightPlus.secondaryColor = "rgb(255, 255, 254)";
+vsLightPlus.secondaryTextColor = "rgb(60, 60, 60)";
+vsLightPlus.activeColor = "rgb(0, 122, 204)";
+vsLightPlus.activeIconColor = "rgb(0, 120, 215)";
+vsLightPlus.linkTextColor = "rgb(0, 102, 177)";
+vsLightPlus.borderColor = "rgb(200, 200, 200)";
+vsLightPlus.popupIconColor = "rgb(50, 50, 50)";
+vsLightPlus.popupBackgroundColor = "rgb(248, 248, 248)";
+vsLightPlus.popupTextColor = "rgb(50, 50, 50)";
+vsLightPlus.popupActiveColor = "rgb(0, 120, 215)";
+vsLightPlus.buttonBackgroundColor = "rgb(0, 120, 215)";
+vsLightPlus.buttonTextColor = "rgb(255, 255, 255)";
+vsLightPlus.buttonActiveColor = "rgb(0, 98, 163)";
+vsLightPlus.boxShadowColor = "rgba(0, 0, 0, 0.16)";
+vsLightPlus.activeTextColor = "rgb(255, 255, 255)";
+vsLightPlus.errorTextColor = "rgb(205, 49, 49)";
+vsLightPlus.dangerColor = "rgb(190, 50, 50)";
+vsLightPlus.scrollbarColor = "rgba(100, 100, 100, 0.4)";
+vsLightPlus.statusBarColor = "rgb(0, 122, 204)";
+vsLightPlus.statusBarTextColor = "rgb(255, 255, 255)";
+vsLightPlus.popupBorderRadius = "6px";
+vsLightPlus.preferredEditorTheme = "vscodeLight";
+vsLightPlus.preferredTerminalTheme = "light";
+
+const vsLightModern = createBuiltInTheme("VS Light Modern", "light", "free");
+vsLightModern.darkenedPrimaryColor = "rgb(232, 232, 232)";
+vsLightModern.primaryColor = "rgb(248, 248, 248)";
+vsLightModern.primaryTextColor = "rgb(59, 59, 59)";
+vsLightModern.secondaryColor = "rgb(255, 255, 255)";
+vsLightModern.secondaryTextColor = "rgb(59, 59, 59)";
+vsLightModern.activeColor = "rgb(0, 95, 184)";
+vsLightModern.activeIconColor = "rgb(0, 95, 184)";
+vsLightModern.linkTextColor = "rgb(0, 95, 184)";
+vsLightModern.borderColor = "rgb(229, 229, 229)";
+vsLightModern.popupIconColor = "rgb(59, 59, 59)";
+vsLightModern.popupBackgroundColor = "rgb(255, 255, 255)";
+vsLightModern.popupTextColor = "rgb(59, 59, 59)";
+vsLightModern.popupActiveColor = "rgb(0, 95, 184)";
+vsLightModern.buttonBackgroundColor = "rgb(0, 95, 184)";
+vsLightModern.buttonTextColor = "rgb(255, 255, 255)";
+vsLightModern.buttonActiveColor = "rgb(0, 76, 148)";
+vsLightModern.boxShadowColor = "rgba(0, 0, 0, 0.14)";
+vsLightModern.activeTextColor = "rgb(255, 255, 255)";
+vsLightModern.errorTextColor = "rgb(226, 67, 67)";
+vsLightModern.dangerColor = "rgb(200, 55, 55)";
+vsLightModern.scrollbarColor = "rgba(100, 100, 100, 0.35)";
+vsLightModern.statusBarColor = "rgb(248, 248, 248)";
+vsLightModern.statusBarTextColor = "rgb(59, 59, 59)";
+vsLightModern.popupBorderRadius = "6px";
+vsLightModern.preferredEditorTheme = "vscodeLight";
+vsLightModern.preferredTerminalTheme = "light";
+
+const vsMonokai = createBuiltInTheme("VS Monokai", "dark", "free");
+vsMonokai.darkenedPrimaryColor = "rgb(21, 22, 19)";
+vsMonokai.primaryColor = "rgb(30, 31, 28)";
+vsMonokai.primaryTextColor = "rgb(220, 222, 214)";
+vsMonokai.secondaryColor = "rgb(39, 40, 34)";
+vsMonokai.secondaryTextColor = "rgb(220, 222, 214)";
+vsMonokai.activeColor = "rgb(166, 226, 46)";
+vsMonokai.activeIconColor = "rgb(230, 97, 139)";
+vsMonokai.linkTextColor = "rgb(230, 97, 139)";
+vsMonokai.borderColor = "rgba(220, 222, 214, 0.16)";
+vsMonokai.popupIconColor = "rgb(220, 222, 214)";
+vsMonokai.popupBackgroundColor = "rgb(34, 35, 30)";
+vsMonokai.popupTextColor = "rgb(220, 222, 214)";
+vsMonokai.popupActiveColor = "rgb(166, 226, 46)";
+vsMonokai.buttonBackgroundColor = "rgb(166, 226, 46)";
+vsMonokai.buttonTextColor = "rgb(30, 31, 28)";
+vsMonokai.buttonActiveColor = "rgb(140, 195, 35)";
+vsMonokai.boxShadowColor = "rgba(0, 0, 0, 0.45)";
+vsMonokai.activeTextColor = "rgb(30, 31, 28)";
+vsMonokai.errorTextColor = "rgb(249, 38, 114)";
+vsMonokai.dangerColor = "rgb(249, 38, 114)";
+vsMonokai.scrollbarColor = "rgba(220, 222, 214, 0.14)";
+vsMonokai.popupBorderRadius = "6px";
+vsMonokai.preferredEditorTheme = "monokai";
+vsMonokai.preferredTerminalTheme = "gruvbox";
+
+const solarizedDark = createBuiltInTheme("Solarized Dark", "dark", "free");
+solarizedDark.darkenedPrimaryColor = "rgb(0, 32, 40)";
+solarizedDark.primaryColor = "rgb(0, 43, 54)";
+solarizedDark.primaryTextColor = "rgb(147, 161, 161)";
+solarizedDark.secondaryColor = "rgb(7, 54, 66)";
+solarizedDark.secondaryTextColor = "rgb(147, 161, 161)";
+solarizedDark.activeColor = "rgb(38, 139, 210)";
+solarizedDark.activeIconColor = "rgb(42, 161, 152)";
+solarizedDark.linkTextColor = "rgb(42, 161, 152)";
+solarizedDark.borderColor = "rgba(88, 110, 117, 0.4)";
+solarizedDark.popupIconColor = "rgb(147, 161, 161)";
+solarizedDark.popupBackgroundColor = "rgb(7, 54, 66)";
+solarizedDark.popupTextColor = "rgb(147, 161, 161)";
+solarizedDark.popupActiveColor = "rgb(38, 139, 210)";
+solarizedDark.buttonBackgroundColor = "rgb(38, 139, 210)";
+solarizedDark.buttonTextColor = "rgb(253, 246, 227)";
+solarizedDark.buttonActiveColor = "rgb(24, 113, 173)";
+solarizedDark.boxShadowColor = "rgba(0, 0, 0, 0.5)";
+solarizedDark.activeTextColor = "rgb(253, 246, 227)";
+solarizedDark.errorTextColor = "rgb(220, 50, 47)";
+solarizedDark.dangerColor = "rgb(203, 75, 22)";
+solarizedDark.scrollbarColor = "rgba(147, 161, 161, 0.25)";
+solarizedDark.popupBorderRadius = "6px";
+solarizedDark.preferredEditorTheme = "solarizedDark";
+solarizedDark.preferredTerminalTheme = "dark";
+
+const solarizedLight = createBuiltInTheme("Solarized Light", "light", "free");
+solarizedLight.darkenedPrimaryColor = "rgb(221, 213, 192)";
+solarizedLight.primaryColor = "rgb(238, 232, 213)";
+solarizedLight.primaryTextColor = "rgb(88, 110, 117)";
+solarizedLight.secondaryColor = "rgb(253, 246, 227)";
+solarizedLight.secondaryTextColor = "rgb(101, 123, 131)";
+solarizedLight.activeColor = "rgb(38, 139, 210)";
+solarizedLight.activeIconColor = "rgb(42, 161, 152)";
+solarizedLight.linkTextColor = "rgb(42, 161, 152)";
+solarizedLight.borderColor = "rgba(88, 110, 117, 0.3)";
+solarizedLight.popupIconColor = "rgb(88, 110, 117)";
+solarizedLight.popupBackgroundColor = "rgb(253, 246, 227)";
+solarizedLight.popupTextColor = "rgb(88, 110, 117)";
+solarizedLight.popupActiveColor = "rgb(38, 139, 210)";
+solarizedLight.buttonBackgroundColor = "rgb(38, 139, 210)";
+solarizedLight.buttonTextColor = "rgb(255, 255, 255)";
+solarizedLight.buttonActiveColor = "rgb(24, 113, 173)";
+solarizedLight.boxShadowColor = "rgba(0, 0, 0, 0.18)";
+solarizedLight.activeTextColor = "rgb(255, 255, 255)";
+solarizedLight.errorTextColor = "rgb(220, 50, 47)";
+solarizedLight.dangerColor = "rgb(203, 75, 22)";
+solarizedLight.scrollbarColor = "rgba(88, 110, 117, 0.3)";
+solarizedLight.popupBorderRadius = "6px";
+solarizedLight.preferredEditorTheme = "solarizedLight";
+solarizedLight.preferredTerminalTheme = "light";
+
 export default [
 	system,
 	createBuiltInTheme("Legacy", "dark", "free"),
 	dark,
 	light,
 	xcoder,
+	vsDarkPlus,
+	vsLightPlus,
+	vsLightModern,
+	vsMonokai,
+	solarizedDark,
+	solarizedLight,
 	glass,
 	glassDark,
 	neon,
