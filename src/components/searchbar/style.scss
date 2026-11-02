@@ -7,6 +7,8 @@
   animation: show-searchbar 300ms ease 1;
   z-index: 200;
   background-color: inherit;
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
 
   input {

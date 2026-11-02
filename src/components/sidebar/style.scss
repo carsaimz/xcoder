@@ -259,9 +259,11 @@ body.no-animation {
         background-color: rgba(255, 255, 255, 0.08);
       }
 
+      // VS Code activity bar: the active view is marked ONLY by the
+      // 2px accent bar on the left and a full-opacity glyph — no
+      // rounded background box (that read as Acode)
       &.active {
         opacity: 1;
-        background-color: rgba(255, 255, 255, 0.12);
 
         &::after {
           transform: translateY(-50%) scaleY(1);

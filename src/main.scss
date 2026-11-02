@@ -179,10 +179,17 @@ a {
       background-color: color-mix(in srgb, var(--secondary-color) 22%, transparent);
     }
 
+    // VS Code Dark Modern: the active tab melts into the editor surface
+    // and carries the blue top accent; inactive tabs stay flat on the
+    // #181818 tab strip
     &.active {
       border-top: solid 2px var(--active-color);
-      background-color: rgba(0, 0, 0, 0.2);
-      background-color: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+      background-color: var(--secondary-color);
+      color: var(--primary-text-color);
+
+      .text {
+        font-weight: 500;
+      }
     }
 
     .file,
@@ -357,6 +364,12 @@ a.icon {
 }
 
 footer {
+
+  // VS Code-ish bottom bar: flat surface with a single hairline on top
+  &[data-shown="true"],
+  &#quick-tools {
+    border-top: 1px solid var(--border-color);
+  }
 
   &.button-container,
   .button-container {

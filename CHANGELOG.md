@@ -13,6 +13,43 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.13] - 2026-11-02
+
+### Changed
+- **Visual ainda mais VS Code** — separadores de arquivos com o estilo
+  Dark Modern verdadeiro (o ativo derrete no editor com o filete azul no
+  topo e peso médio; os inactivos ficam planos na faixa #181818); barra
+  de actividades sem a caixa de fundo arredondada no ícone activo
+  (agora só o filete de 2px e o glifo a opacidade total, como no VS
+  Code); paleta de comandos e listas de sugestões como «quick input»
+  flutuante (cantos 6px nos quatro lados, sombra elevada); menus de
+  contexto com selecção tingida pelo azul; quicktools sem o «salto» dos
+  ícones (feedback por tinte suave); barra de pesquisa plana com fio
+  inferior.
+- **Barra de estado com caminho do arquivo** — o lado esquerdo passa a
+  mostrar o caminho do arquivo activo em estilo breadcrumbs
+  (pasta › arquivo), esmaecido, com os diagnósticos LSP ao lado.
+- **Cabeçalho «EXPLORER» no painel de arquivos** — o painel de arquivos
+  da barra lateral abre com o título da vista em maiúsculas com
+  espaçamento de letras (fixo no topo, com fio inferior), como a vista
+  Explorer do VS Code.
+
+### Fixed
+- **Builds verdes (v1.8.12.1)** — o comentário XML do splash continha
+  «--» (duplo hífen é proibido dentro de comentários XML): o parser
+  expat do cordova rejeitava o config.xml inteiro e TODAS as compilações
+  caíam em «No platforms added to this project». Comentário corrigido e
+  «cordova platform add» agora falha ALTO (sem «|| true»), com
+  preferência pelo cordova-android fixado em node_modules e tentativa
+  nova no registo — nos quatro workflows (release, debug, prerelease,
+  preview).
+
+### Tests
+- 1086/1086 no total (sem alterações de cobertura; alterações visuais
+  cobertas pelas suítes existentes).
+
+<a id="english-1"></a>
+
 ## [1.8.12] - 2026-11-02
 
 ### Fixed
@@ -142,6 +179,22 @@ resumo em inglês.
 ### Tests
 - 32 novos (recuperação de inserção 5, mapeamento SAF do terminal 6,
   wrapping e geradores novos 21): 1062/1062 no total.
+
+## [1.8.13] - 2026-11-02
+
+### Summary
+- Even closer to VS Code: true Dark Modern file tabs (active tab melts
+  into the editor with the blue top accent), activity bar with the bare
+  2px accent indicator (no rounded box), floating quick-input palette
+  and hints (6px corners, lifted shadow), accent-tinted context menu
+  selection, steady quicktools icons, flat search bar.
+- The status bar now shows the active file path breadcrumb-style
+  (folder › file) next to the LSP diagnostics.
+- The files panel opens with an EXPLORER-style uppercase section header.
+- Build pipelines fixed: an XML comment containing "--" made cordova
+  reject config.xml (all builds fell back to "No platforms added");
+  platform add is now loud and retried, preferring the pinned
+  cordova-android from node_modules.
 
 ## [1.8.12] - 2026-11-02
 

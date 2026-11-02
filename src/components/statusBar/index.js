@@ -24,6 +24,7 @@ let $left = null;
 /**@type {HTMLElement|null} */
 let $right = null;
 /**@type {HTMLElement|null} */
+let $path = null;
 let $diagnostics = null;
 /**@type {HTMLElement|null} */
 let $cursor = null;
@@ -65,6 +66,17 @@ function update() {
 	syncVisibility();
 	const file = activeEditorFile();
 	if (!file) return;
+
+	if ($path) {
+		const segments = String(file.uri || file.filename || "")
+			.replace(/^file:\/\//, "")
+			.split("/")
+			.filter(Boolean);
+		$path.textContent =
+			segments.length > 1
+				? segments.join("\u2009\u203a\u2009")
+				: segments[0] || "";
+	}
 
 	const view = manager()?.editor;
 	const state = view?.state;
@@ -184,6 +196,7 @@ function changeEncoding() {
 export default function getStatusBar() {
 	if ($bar) return $bar;
 
+	$path = <span className="statusbar-item statusbar-path" />;
 	$diagnostics = <span className="statusbar-item statusbar-diagnostics" />;
 	$cursor = (
 		<span
@@ -211,7 +224,12 @@ export default function getStatusBar() {
 		/>
 	);
 
-	$left = <div className="statusbar-side left">{$diagnostics}</div>;
+	$left = (
+		<div className="statusbar-side left">
+			{$path}
+			{$diagnostics}
+		</div>
+	);
 	$right = (
 		<div className="statusbar-side right">
 			{$cursor}

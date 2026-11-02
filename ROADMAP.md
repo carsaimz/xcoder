@@ -16,7 +16,20 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.12
+## ✅ Concluído até a v1.8.13
+
+- **v1.8.13 — visual VS Code, segundo passe + builds verdes:**
+  separadores Dark Modern verdadeiros (activo derrete no editor com
+  filete azul, texto em peso médio), barra de actividades sem caixa no
+  ícone activo (só filete 2px + glifo sólido), paleta de comandos e
+  sugestões como quick input flutuante (cantos 6px, sombra elevada),
+  selecção dos menus de contexto tingida pelo azul, quicktools sem
+  salto de ícones, busca plana; barra de estado mostra o caminho do
+  arquivo (pasta › arquivo) ao lado dos diagnósticos; painel de
+  arquivos com cabeçalho «EXPLORER» maiúsculo fixo. Correcção crítica
+  de build: comentário XML com «--» derrubava o parse do config.xml
+  («No platforms added») — comentário reescrito e platform add alto e
+  com nova tentativa nos 4 workflows.
 
 - **v1.8.12 — raiz do «sem arquivo aberto», splash oficial e
   VS Code por dentro:** dev tools e libs liam «.activeFile» da

@@ -24,6 +24,11 @@ function initApp(el) {
 	container = el;
 	container.classList.add("files");
 	container.setAttribute("data-msg", strings["open folder"]);
+	// VS Code Explorer-style section header (rendered via CSS ::before)
+	container.setAttribute(
+		"data-title",
+		(strings["explorer title"] || "Explorer").toUpperCase(),
+	);
 	container.style.overflowX = "auto";
 	container.addEventListener("click", clickHandler);
 	editorManager.on(

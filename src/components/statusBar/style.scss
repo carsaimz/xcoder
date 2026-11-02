@@ -66,6 +66,12 @@
     }
   }
 
+  .statusbar-path {
+    opacity: 0.72;
+    max-width: 46vw;
+    font-size: 10.5px;
+  }
+
   .statusbar-diagnostics {
     display: none;
     align-items: center;
