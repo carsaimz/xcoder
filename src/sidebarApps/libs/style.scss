@@ -3,13 +3,34 @@
 		height: 100%;
 	}
 
+	.libs-list-wrap {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		min-height: 0;
+	}
+
+	.libs-search {
+		margin: 10px 10px 0;
+		width: auto;
+	}
+
 	.libs-list {
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		height: 100%;
+		flex: 1;
+		min-height: 0;
+		height: auto;
 		padding: 10px;
 		overflow-y: auto;
+	}
+
+	.libs-empty {
+		margin: 24px 10px;
+		text-align: center;
+		font-size: 0.85em;
+		opacity: 0.6;
 	}
 
 	.libs-card {

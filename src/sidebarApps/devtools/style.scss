@@ -65,6 +65,12 @@
                 }
         }
 
+        .devtools-tool-search {
+                display: none;
+                width: auto;
+                margin: 8px 0 0;
+        }
+
         .devtools-tool-list {
                 display: none;
                 flex-direction: column;
@@ -79,6 +85,13 @@
 
                 &.open {
                         display: flex;
+                }
+
+                &.no-results::after {
+                        content: "-";
+                        text-align: center;
+                        padding: 10px;
+                        opacity: 0.5;
                 }
         }
 

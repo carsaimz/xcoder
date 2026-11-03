@@ -32,11 +32,11 @@ function create($container, $toggler) {
 
 	const START_THRESHOLD = config.SIDEBAR_SLIDE_START_THRESHOLD_PX; //Point where to start swipe
 	const MIN_WIDTH = 250; //Min width of the side bar
-	const MAX_WIDTH = () => Math.round(innerWidth * 0.88); //Max width of the side bar (≈88% of layout)
+	const MAX_WIDTH = () => Math.round(innerWidth * 0.9); //Max width: 90% of the screen (user request)
 	// Generous default so Git/AI/Files/Plugins panels are usable without
 	// a first manual resize (user-resized width still wins)
 	const DEFAULT_WIDTH = () =>
-		Math.min(Math.max(Math.round(innerWidth * 0.6), 300), 480);
+		Math.min(Math.max(Math.round(innerWidth * 0.62), 320), 560);
 	const resizeBar = Ref();
 
 	$container = $container || app;
@@ -483,7 +483,7 @@ function create($container, $toggler) {
 	$el.onshow = () => {};
 	$el.setRailOnly = setRailOnly;
 	$el.getWidth = function () {
-		const width = Math.round(innerWidth * 0.85);
+		const width = Math.round(innerWidth * 0.92);
 		return mode === "phone" ? width : MIN_WIDTH;
 	};
 

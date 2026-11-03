@@ -2038,9 +2038,9 @@ function renderPanel() {
 
 /**
  * Builds the tool picker: a collapsed header (active tool title +
- * description) that expands into a VERTICAL list where every tool
- * shows its own title and short description — easier to scan than the
- * old horizontal tab strip on narrow screens.
+ * description) that expands into a VERTICAL searchable list where every
+ * tool shows its own title and short description — easier to scan than
+ * the old horizontal tab strip on narrow screens.
  */
 function buildToolPicker() {
 	const $header = (
@@ -2053,13 +2053,26 @@ function buildToolPicker() {
 		</button>
 	);
 
+	// search box — filters the tool list while it is expanded
+	// (user request: "dar para pesquisar ferramentas")
+	const $search = (
+		<input
+			type="text"
+			className="devtools-tool-search"
+			placeholder={t("dev tools search", "Pesquisar ferramentas...")}
+		/>
+	);
+
 	const $list = <div className="devtools-tool-list" role="listbox" />;
 	for (const [id, key, fallback, descKey, descFallback] of TOOL_LIST) {
+		const searchable =
+			`${t(key, fallback)} ${t(descKey, descFallback)}`.toLowerCase();
 		const $row = (
 			<div
 				className={`devtools-tool-item${id === activeTool ? " active" : ""}`}
 				role="option"
 				data-tool={id}
+				data-search={searchable}
 				tabindex="0"
 			>
 				<span className="devtools-tool-item-title">{t(key, fallback)}</span>
@@ -2078,12 +2091,31 @@ function buildToolPicker() {
 		$list.append($row);
 	}
 
+	const applyToolFilter = () => {
+		const query = String($search.value || "")
+			.trim()
+			.toLowerCase();
+		let visible = 0;
+		for (const $row of $list.children) {
+			const match =
+				!query || String($row.dataset?.search || "").includes(query);
+			$row.style.display = match ? "" : "none";
+			if (match) visible++;
+		}
+		$list.classList.toggle("no-results", visible === 0);
+	};
+	$search.oninput = applyToolFilter;
+
 	$header.onclick = () => {
 		const open = $list.classList.toggle("open");
 		$header.setAttribute("aria-expanded", String(open));
 		$header.get(".devtools-tool-chevron").classList.toggle("open", open);
 		if (open) {
+			$search.style.display = "block";
+			applyToolFilter();
 			$list.get(".active")?.scrollIntoView?.({ block: "nearest" });
+		} else {
+			$search.style.display = "none";
 		}
 	};
 	fillToolHeader($header);
@@ -2091,6 +2123,7 @@ function buildToolPicker() {
 	return (
 		<div className="devtools-picker">
 			{$header}
+			{$search}
 			{$list}
 		</div>
 	);

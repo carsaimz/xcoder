@@ -66,6 +66,18 @@
                                 background: color-mix(in srgb, var(--active-color) 22%, transparent);
                                 transform: scale(0.94);
                         }
+
+                        // anchor (pin) button — rotated 45° while the chat is
+                        // docked to the right edge (VS Code "pinned" look)
+                        &.ai-anchor.anchored {
+                                transform: rotate(45deg);
+                                opacity: 1;
+                                color: var(--active-color);
+
+                                &:active {
+                                        transform: rotate(45deg) scale(0.94);
+                                }
+                        }
                 }
         }
 

@@ -216,6 +216,13 @@ export default function editorSettings() {
 			category: categories.guidesIndicators,
 		},
 		{
+			key: "minimap",
+			text: strings["minimap"] || "Minimap",
+			checkbox: values.minimap ?? true,
+			info: strings["settings-info-editor-minimap"],
+			category: categories.guidesIndicators,
+		},
+		{
 			key: "relativeLineNumbers",
 			text: strings["relative line numbers"],
 			checkbox: values.relativeLineNumbers,

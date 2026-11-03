@@ -25,6 +25,8 @@ const t = (key, fallback) => strings[key] || fallback;
 let $panel = null;
 /** @type {string|null} */
 let selectedId = null;
+/** @type {string} live search query of the list view */
+let libQuery = "";
 
 /** Description in the active UI language. */
 function desc(lib) {
@@ -162,6 +164,42 @@ function libCard(lib) {
 	return $card;
 }
 
+/**
+ * Pure filter used by the search box: a lib matches when the query is a
+ * case-insensitive substring of its id, name or description.
+ * @param {LocalLib[]} libs
+ * @param {string} query
+ * @returns {LocalLib[]}
+ */
+function filterLibs(libs, query) {
+	const q = String(query || "")
+		.trim()
+		.toLowerCase();
+	if (!q) return libs;
+	return libs.filter((lib) =>
+		[lib.id, lib.name, desc(lib), lib.license]
+			.filter(Boolean)
+			.some((field) => String(field).toLowerCase().includes(q)),
+	);
+}
+
+/** Repaints only the list under the (stable) search box. */
+function renderList() {
+	const $list = $panel?.get(".libs-list");
+	if (!$list) return;
+	const items = filterLibs(ALL_LIBS, libQuery);
+	$list.textContent = "";
+	if (!items.length) {
+		$list.append(
+			<div className="libs-empty">
+				{t("local libs no results", "Nenhuma biblioteca encontrada")}
+			</div>,
+		);
+		return;
+	}
+	$list.append(...items.map((lib) => libCard(lib)));
+}
+
 /** Detail view with files and actions. */
 function libDetail(lib) {
 	const $view = <div className="libs-detail scroll" />;
@@ -261,11 +299,24 @@ function render() {
 		}
 		selectedId = null;
 	}
+	// searchable list view: the search box stays mounted while typing —
+	// only the list below repaints (no focus loss)
 	$panel.append(
-		<div className="libs-list scroll">
-			{ALL_LIBS.map((lib) => libCard(lib))}
+		<div className="libs-list-wrap">
+			<input
+				type="text"
+				className="libs-search"
+				placeholder={t("local libs search", "Pesquisar bibliotecas...")}
+				value={libQuery}
+				oninput={(e) => {
+					libQuery = e.target.value || "";
+					renderList();
+				}}
+			/>
+			<div className="libs-list scroll" />
 		</div>,
 	);
+	renderList();
 }
 
 /** Retranslates when the language changes mid-session. */

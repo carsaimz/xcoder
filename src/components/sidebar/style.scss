@@ -13,8 +13,8 @@ body.no-animation {
   position: fixed;
   left: 0;
   top: 0;
-  width: 85vw;
-  max-width: 92vw;
+  width: 92vw;
+  max-width: 95vw;
   height: 100vh;
   display: flex;
   background-color: rgb(153, 153, 255);
@@ -652,53 +652,69 @@ body.no-animation {
 }
 
 // ---------------------------------------------------------------------------
-// Icon labels under the activity bar glyphs ("expandir para nomes") plus
-// small-caps category captions on the group separators.
+// Icon labels NEXT TO the activity bar glyphs (row layout — titles never
+// wrap below icons) plus small-caps category captions on the group
+// separators. In rail-only mode the labels hide: the 52px strip is
+// glyphs-only (VS Code activity bar).
 .app-icons-container.with-labels {
   .icon {
-    // title stacked in front of the glyph: label first (order -1),
-    // icon-font ::before / inline svg after it
+    // row: label in front of the glyph (order -1), glyph after it
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    height: 58px;
+    justify-content: flex-start;
+    gap: 7px;
+    width: 100%;
+    height: 40px;
+    padding: 0 6px 0 14px;
     line-height: 1;
 
     .app-badge {
-      top: 1px;
-      right: 2px;
-      bottom: auto;
+      top: auto;
+      right: 4px;
+      bottom: 2px;
     }
 
     .app-label {
       order: -1;
       position: static;
       display: block;
-      max-width: 100%;
-      font-size: 8px;
+      flex: 1;
+      min-width: 0;
+      font-size: 11.5px;
       font-weight: 500;
-      line-height: 10px;
-      letter-spacing: 0.1px;
-      text-align: center;
-      opacity: 0.7;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
+      text-align: left;
+      opacity: 0.75;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      padding: 0 2px;
       pointer-events: none;
       font-family: inherit;
     }
 
     &.xc-svgicon svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       display: block;
+      flex-shrink: 0;
     }
 
     &.active .app-label {
       opacity: 1;
     }
+  }
+}
+
+// rail-only (52px strip): glyphs only — center them again and hide labels
+#sidebar.rail-only .app-icons-container.with-labels .icon {
+  justify-content: center;
+  width: 44px;
+  padding: 0;
+
+  .app-label {
+    display: none;
   }
 }
 

@@ -16,7 +16,22 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.13
+## ✅ Concluído até a v1.8.14
+
+- **v1.8.14 — reestruturação VS Code (estrutura) + minimapa + IA
+  ancorada + economia de tokens:** minimapa na borda direita do editor
+  (barras por linha com cores de tokens da árvore Lezer, cursor de
+  viewport, toque/arrasto rola; por painel; interruptor em
+  Configurações > Editor); chat de IA abre por padrão como painel
+  ancorado à direita («secondary side bar», redimensionável, termina
+  acima da barra de estado; alfinete alterna com janela flutuante);
+  pesquisa nas Bibliotecas e nas Ferramentas web; filtro «Todas / Free
+  / Pago» no seletor de modelos; ordem da barra de actividades igual ao
+  VS Code (Explorador, Pesquisa, Git, IA, Extensões); breadcrumbs por
+  painel entre separadores e código; etiquetas da sidebar AO LADO dos
+  glifos (escondidas no rail); sidebar expande até 90% do ecrã;
+  economia de tokens da IA (janela de 24 mensagens, saídas antigas de
+  ferramentas comprimidas, resultados limitados, contexto enxuto).
 
 - **v1.8.13 — visual VS Code, segundo passe + builds verdes:**
   separadores Dark Modern verdadeiros (activo derrete no editor com

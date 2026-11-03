@@ -139,6 +139,7 @@ class Settings {
 			tabSize: 2,
 			retryRemoteFsAfterFail: true,
 			linenumbers: true,
+			minimap: true,
 			formatOnSave: false,
 			fadeFoldWidgets: false,
 			autoCorrect: true,

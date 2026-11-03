@@ -137,7 +137,7 @@ export default [
         initApp,
         false,
         onSelected,
-        { titleKey: "ai assistant", group: "primary", floating: true },
+        { titleKey: "ai assistant", group: "primary", floating: true, dock: "right" },
 ];
 
 /**
@@ -238,7 +238,8 @@ function initApp(el) {
         updateModeSwitch();
         updateModelButton();
         updateToggles();
-                updateBotPill();
+        updateBotPill();
+        updateAnchorButton();
 
         // re-entering the chat (sidebar reopened with the AI app already
         // active) must land on the latest message — request: scroll auto
@@ -267,6 +268,16 @@ function buildUi() {
                 ></span>
         );
 
+        // Anchor button — toggles the chat between the right-edge panel
+        // (VS Code secondary side bar) and the floating window
+        const $anchorBtn = (
+                <span
+                        className="icon push_pin ai-act ai-anchor"
+                        title={strings["ai anchor"] || "Anchor panel"}
+                        onclick={toggleAnchored}
+                ></span>
+        );
+
         const $header = (
                 <div className="ai-header">
                         {$modelBtn}
@@ -280,6 +291,7 @@ function buildUi() {
                                 title={strings["ai sessions"] || "Chat sessions"}
                                 onclick={openSessions}
                         ></span>
+                        {$anchorBtn}
                         <span
                                 className="icon settings ai-act"
                                 title={strings["ai settings"] || "AI settings"}
@@ -464,6 +476,34 @@ function onSendClick() {
                 setRunning(false);
         } else {
                 send();
+        }
+}
+
+/**
+ * Toggles the chat between the anchored right panel and the floating
+ * window. The preference persists; an open chat re-hosts immediately.
+ * @returns {void}
+ */
+function toggleAnchored() {
+        try {
+                const registry = window.sidebarApps;
+                const anchored = !registry?.isAppAnchored?.("ai");
+                registry?.setAppAnchored?.("ai", anchored);
+                updateAnchorButton();
+        } catch (error) {
+                window.log?.("error", "toggleAnchored failed:", error);
+        }
+}
+
+/** Reflects the anchor state on the pin icon (rotated = anchored). */
+function updateAnchorButton() {
+        try {
+                const anchored = Boolean(window.sidebarApps?.isAppAnchored?.("ai"));
+                container
+                        ?.querySelector(".ai-anchor")
+                        ?.classList.toggle("anchored", anchored);
+        } catch {
+                /* cosmetic only */
         }
 }
 
@@ -2030,6 +2070,7 @@ async function openModelPicker() {
                 items,
                 freeLabel: typeFree,
                 paidLabel: typePaid,
+                allLabel: strings["ai models all"] || "All",
                 actions: [
                         {
                                 value: "__fetch__",
@@ -2041,9 +2082,7 @@ async function openModelPicker() {
                         },
                         {
                                 value: "__local__",
-                                text:
-                                        strings["ai models local"] ||
-                                        "Baixar modelos locais (offline)",
+                                text: strings["ai models local"] || "Baixar modelos locais (offline)",
                         },
                 ],
         });
@@ -2144,6 +2183,7 @@ async function pickModelLive() {
                         items,
                         freeLabel: typeFree,
                         paidLabel: typePaid,
+                        allLabel: strings["ai models all"] || "All",
                 });
                 if (selected) {
                         await setProviderModel(provider.id, selected);

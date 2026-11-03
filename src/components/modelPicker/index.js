@@ -53,6 +53,7 @@ function modelPicker({
 	items = [],
 	freeLabel = "free",
 	paidLabel = "paid",
+	allLabel = "All",
 	actions = [],
 } = {}) {
 	return new Promise((res) => {
@@ -101,6 +102,25 @@ function modelPicker({
 		const $list = (
 			<ul className="scroll no-text-transform mp-list">{rows.map(buildRow)}</ul>
 		);
+		// price filter chips (All / Free / Paid) — persisted per session
+		let typeFilter = localStorage.getItem("modelTypeFilter") || "";
+		const $chips = (
+			<div className="mp-chips">
+				{["", "free", "paid"].map((value) => (
+					<button
+						type="button"
+						className={`mp-chip${value === "free" ? " free" : value === "paid" ? " paid" : ""}`}
+						data-filter={value}
+					>
+						{value === "free"
+							? freeLabel
+							: value === "paid"
+								? paidLabel
+								: allLabel}
+					</button>
+				))}
+			</div>
+		);
 		const $mask = <span className="mask" onclick={cancel}></span>;
 		const $dialog = (
 			<div className="prompt select model-picker">
@@ -112,6 +132,7 @@ function modelPicker({
 						placeholder={placeholder || "Search"}
 						oninput={applyFilter}
 					/>
+					{$chips}
 				</div>
 				{$list}
 				{actions.length ? (
@@ -133,9 +154,16 @@ function modelPicker({
 		);
 
 		function applyFilter() {
-			const visible = filterModelItems(items, $search.value);
+			const visible = filterModelItems(items, $search.value, typeFilter);
 			rows.forEach((row, index) => {
 				if (row.$el) row.$el.style.display = visible.has(index) ? "" : "none";
+			});
+			// chip highlight state
+			$chips.getAll?.(".mp-chip")?.forEach(($chip) => {
+				$chip.classList.toggle(
+					"active",
+					($chip.dataset.filter || "") === typeFilter,
+				);
 			});
 		}
 
@@ -161,6 +189,14 @@ function modelPicker({
 		app.append($dialog, $mask);
 
 		const $search = $dialog.querySelector(".mp-search");
+		// price filter chips (user request: "filtrar free ou paid")
+		$chips.onclick = (e) => {
+			const $chip = e.target?.closest?.(".mp-chip");
+			if (!$chip) return;
+			typeFilter = $chip.dataset.filter || "";
+			localStorage.setItem("modelTypeFilter", typeFilter);
+			applyFilter();
+		};
 		const $first =
 			$list.querySelector(".mp-item.selected") ||
 			$list.querySelector(".mp-item");

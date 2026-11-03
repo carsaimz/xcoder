@@ -1646,5 +1646,13 @@
 	"dev tools tabs": "Tabs",
 	"dev tools tabs desc": "Tabs component (HTML + CSS + JS)",
 	"dev tools labels": "Tabs (comma-separated)",
-	"dev tools style": "Style"
+	"dev tools style": "Style",
+	"minimap": "Minimap",
+	"settings-info-editor-minimap": "Show the code overview (minimap) on the right edge of the editor, like VS Code. Tap or drag it to scroll.",
+	"ai anchor": "Anchor panel to the edge",
+	"right dock undock": "Open as window",
+	"ai models all": "All",
+	"local libs search": "Search libraries...",
+	"local libs no results": "No libraries found",
+	"dev tools search": "Search tools..."
 }

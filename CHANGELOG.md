@@ -13,6 +13,81 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.14] - 2026-11-03
+
+### Added
+- **Minimapa (VS Code)** — visão geral do código na borda direita do
+  editor: uma barra por linha (indentação + comprimento) com as cores
+  dos tokens por cima (strings, comentários, números, palavras-chave e
+  tags, lidos da árvore de sintaxe Lezer), cursor de viewport
+  arrastável, toque/arrasto para rolar até ao ponto. Esconde-se nas
+  páginas (boas-vindas/terminal), cada painel dividido tem o seu, e há
+  um interruptor em Configurações > Editor («Minimapa»).
+- **Painel de IA ancorado** — o chat de IA abre por padrão como painel
+  acoplado à borda direita do ecrã (o «secondary side bar» do VS Code):
+  redimensionável pela borda esquerda, termina acima da barra de estado
+  (que continua a atravessar toda a largura, como no VS Code) e acima do
+  rodapé de quicktools. As janelas flutuantes continuam POR CIMA do
+  painel (nunca ficam escondidas atrás dele) e desviam-se da sidebar. O
+  botão de alfinete no cabeçalho do chat alterna entre painel ancorado e
+  janela flutuante (preferência guardada; toque de novo no ícone da
+  barra de actividades fecha/reabre o painel).
+- **Pesquisa nas Bibliotecas e nas Ferramentas web** — caixa de pesquisa
+  no painel de bibliotecas (por id, nome, descrição e licença, com
+  «nenhuma biblioteca encontrada» quando vazia) e no seletor de
+  ferramentas web (filtra as linhas por título e descrição). A caixa não
+  perde o foco ao escrever.
+- **Filtro Free/Pago nos modelos de IA** — o seletor de modelos ganhou
+  chips «Todas / Free / Pago» (a escolha fica lembrada) que se combinam
+  com a pesquisa; grupos de provedores só aparecem quando têm modelos
+  do tipo escolhido.
+
+### Changed
+- **Reestruturação VS Code (estrutura, não só cores)** — ordem da barra
+  de actividades igual à do VS Code (Explorador, Pesquisa, Git, IA,
+  Extensões; ferramentas depois do separador); breadcrumbs do ficheiro
+  activo entre os separadores e o código («pasta › ficheiro», um por
+  painel, relativo à raiz do projecto); etiquetas da barra lateral
+  passaram a ficar AO LADO dos glifos (linha única, nunca partem para
+  baixo do ícone) e escondem-se no modo rail de 52px; barra lateral
+  expande até 90% do ecrã (o deslize no telemóvel vai a 92%) com
+  predefinição mais larga (62vw, mínimo 320px).
+- **Economia de tokens da IA** — o histórico completo deixa de ser
+  reenviado em cada pedido: janela deslizante de 24 mensagens (turnos
+  antigos colapsam num marcador único, sem «orfãos» de tool calls),
+  saídas de ferramentas de turnos anteriores comprimidas para ~400
+  caracteres, resultados de ferramentas limitados a 8000 caracteres ao
+  entrarem no histórico e contexto do projecto mais enxuto (12 ficheiros
+  abertos / 25 entradas da raiz). Conversas longas custam muito menos em
+  provedores pagos e gratuitos.
+
+## [1.8.14] - 2026-11-03
+
+### Summary
+- New **minimap**: a VS Code code overview on the editor's right edge —
+  per-line bars with Lezer token colors (strings, comments, numbers,
+  keywords, tags), a draggable viewport cursor and tap/drag scrolling.
+  Per split pane, hidden on non-editor pages, toggle in Settings >
+  Editor.
+- New **anchored AI panel**: the chat opens by default docked to the
+  right edge (VS Code "secondary side bar") — resizable, ending above
+  the full-width status bar. Floating windows stay ABOVE it; the pin
+  button in the chat header switches between anchored panel and floating
+  window (persisted).
+- **Search** in the Libraries panel and the web-tools picker; the model
+  picker gained **All / Free / Paid** filter chips (persisted) that
+  combine with the search box.
+- **VS Code structure pass**: activity bar order now matches VS Code
+  (Explorer, Search, Git, AI, Extensions); per-pane **breadcrumbs**
+  between the tabs and the code; sidebar labels sit beside the glyphs
+  (never wrap below) and hide in rail mode; the sidebar expands up to
+  90% of the screen.
+- **AI token economy**: a sliding 24-message window replaces the
+  full-history resend, older tool outputs collapse to ~400-char stubs,
+  new tool results are capped at 8000 chars and the workspace context
+  shrank — long conversations cost far fewer tokens on paid and free
+  providers.
+
 ## [1.8.13] - 2026-11-02
 
 ### Changed

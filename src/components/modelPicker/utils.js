@@ -8,24 +8,30 @@
  * Pure filter used by the picker: rows match the query (case-
  * insensitive); a group header stays visible only while at least one of
  * its rows matches. With an empty query everything is visible.
- * @param {Array<{header?: boolean, text?: string, value?: string}>} items
+ * @param {Array<{header?: boolean, text?: string, value?: string, type?: "free"|"paid"}>} items
  * @param {string} query
+ * @param {""|"free"|"paid"} [typeFilter] price filter ("" = all)
  * @returns {Set<number>} indexes of visible items
  */
-export function filterModelItems(items, query) {
+export function filterModelItems(items, query, typeFilter = "") {
 	const q = String(query || "")
 		.trim()
 		.toLowerCase();
+	const type = String(typeFilter || "").toLowerCase();
 	const visible = new Set();
-	if (!q) {
+	if (!q && !type) {
 		items.forEach((_, index) => visible.add(index));
 		return visible;
 	}
 
 	items.forEach((item, index) => {
 		if (item.header) return;
-		const haystack = String(item.text ?? item.value ?? "").toLowerCase();
-		if (haystack.includes(q)) visible.add(index);
+		if (type && item.type !== type) return;
+		if (q) {
+			const haystack = String(item.text ?? item.value ?? "").toLowerCase();
+			if (!haystack.includes(q)) return;
+		}
+		visible.add(index);
 	});
 
 	items.forEach((item, index) => {

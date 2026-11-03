@@ -1,4 +1,5 @@
 import floatingWindow from "components/sidebar/floatingWindow";
+import rightDock from "components/rightDock";
 import toast from "components/toast";
 import tag from "html-tag-js";
 import logger from "lib/logger";
@@ -92,12 +93,21 @@ function init($el) {
 	if (localStorage.getItem("sidebarIconLabels") !== "0") {
 		$apps.classList.add("with-labels");
 	}
-	// floating window closed by its header button
+	// floating window / right dock closed by their header buttons
 	document.addEventListener("sidebar-float-closed", (e) => {
 		if (currentSection === e.detail?.id) {
 			currentSection = null;
 			localStorage.removeItem(SIDEBAR_APPS_LAST_SECTION);
 		}
+	});
+	// the dock's "open as window" button hands the app back to a
+	// floating window (sidebarApp owns the show logic)
+	document.addEventListener("sidebar-app-undock", (e) => {
+		const app = apps.find((candidate) => candidate.id === e.detail?.id);
+		if (!app || !app.floating) return;
+		rightDock.setPref?.(app.id, false);
+		setActiveApp(app.id);
+		hideSidebar();
 	});
 	// when the sidebar opens while a tool window is visible, slide the
 	// window out of the sidebar's area — options must never sit behind it
@@ -122,11 +132,13 @@ function init($el) {
  */
 async function loadApps() {
 	const loaders = [
+		// VS Code activity bar order: explorer, search, source
+		// control, AI, extensions — then the tool group
 		["files", () => import("./files")],
 		["searchInFiles", () => import("./searchInFiles")],
-		["extensions", () => import("./extensions")],
-		["ai", () => import("./ai")],
 		["git", () => import("./git")],
+		["ai", () => import("./ai")],
+		["extensions", () => import("./extensions")],
 		// sandboxed JS console (Web Worker)
 		["repl", () => import("./repl")],
 		// webdev utilities (shadow/gradient/card/placeholder generators)
@@ -237,6 +249,9 @@ function setActiveApp(id) {
 		const windowId = floatingWindow.activeWindowId();
 		if (windowId && windowId !== id) floatingWindow.reset();
 	}
+	// the right dock hosts one app at a time too
+	const dockId = rightDock.activeWindowId?.();
+	if (dockId && dockId !== id) rightDock.reset();
 
 	currentSection = id;
 	localStorage.setItem(SIDEBAR_APPS_LAST_SECTION, id);
@@ -278,6 +293,11 @@ function pulseApp(id) {
 			floatingWindow.close();
 			return;
 		}
+		// tap again on the anchored right panel = hide it
+		if (app.active && rightDock.isOpenFor(id)) {
+			rightDock.close();
+			return;
+		}
 		// opening a floating tool hands the screen to its window: the
 		// sidebar (rail + panel space) only stays up for docked apps
 		const activatesFloat = usesFloat(app) && !app.active;
@@ -306,6 +326,26 @@ function usesFloat(app) {
 	return Boolean(app?.floating && floatingWindow.floatingEnabled());
 }
 
+/**
+ * Switches a dock-capable app between the anchored right panel and the
+ * floating window (AI chat pin button).
+ * @param {string} id app id
+ * @param {boolean} anchored true = anchor to the right edge
+ * @returns {boolean} false when no app with that id exists
+ */
+function setAppAnchored(id, anchored) {
+	const app = apps.find((candidate) => candidate.id === id);
+	if (!app) return false;
+	app.setAnchored?.(anchored);
+	return true;
+}
+
+/** Whether the app is currently configured to open anchored. */
+function isAppAnchored(id) {
+	const app = apps.find((candidate) => candidate.id === id);
+	return Boolean(app?.dockable && rightDock.prefEnabled?.(id));
+}
+
 /** Hides the sidebar overlay (dynamic import keeps boot order safe). */
 function hideSidebar() {
 	import("components/sidebar")
@@ -323,6 +363,8 @@ export default {
 	ensureActiveApp,
 	setActiveApp,
 	pulseApp,
+	setAppAnchored,
+	isAppAnchored,
 };
 
 // --- long-press tooltip (VS Code shows view labels on hover; on touch we

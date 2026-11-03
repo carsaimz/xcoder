@@ -1,0 +1,52 @@
+// Minimap — VS Code code overview pinned to the right edge of each
+// editor pane. Sits above the CodeMirror scroller; the scroller reserves
+// the matching right padding so text never hides behind the canvas.
+.xc-minimap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 76px;
+  z-index: 6;
+  display: none;
+  border-left: 1px solid var(--border-color);
+  box-sizing: border-box;
+  touch-action: none;
+  cursor: pointer;
+  overflow: hidden;
+
+  &.show {
+    display: block;
+  }
+
+  // live only for editor files — pages (welcome/terminal) hide the strip
+  &.show.empty {
+    display: none;
+  }
+
+  .xc-minimap-canvas {
+    display: block;
+    width: 76px;
+  }
+
+  // viewport slider — hairline box over the visible region
+  .xc-minimap-slider {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 40px;
+    border: 1px solid var(--primary-text-color);
+    border-right: none;
+    border-left: none;
+    background-color: rgba(128, 128, 128, 0.12);
+    pointer-events: none;
+    box-sizing: border-box;
+  }
+}
+
+// reserve the minimap strip so code never slides under it (only while a
+// real editor file is live — pages get the full width back)
+.pane-has-minimap.minimap-live .cm-scroller {
+  padding-right: 76px;
+}

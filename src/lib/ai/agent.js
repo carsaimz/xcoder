@@ -41,6 +41,15 @@ import vshell from "./vshell";
 
 const MAX_STEPS = 25;
 
+// --- token economy ---------------------------------------------------------
+// The full transcript is NEVER resent on every request: older turns
+// collapse into a marker message and tool outputs from previous turns are
+// compacted to short stubs. This cuts prompt tokens dramatically on long
+// conversations (paid + free providers alike).
+const HISTORY_WINDOW = 24; // max non-system messages sent per request
+const OLD_TOOL_CAP = 400; // chars kept from tool outputs of earlier turns
+const TOOL_RESULT_CAP = 8000; // chars kept when a tool result is recorded
+
 /**
  * @typedef {object} ChatEvent
  * @property {"user"|"assistant"|"tool"|"error"|"status"} type
@@ -219,7 +228,7 @@ export class Agent {
 				this.onEvent({ type: "status", payload: { action: "thinking" } });
 				response = await this.requestWithRecovery({
 					config,
-					messages: this.messages,
+					messages: compactForRequest(this.messages),
 				});
 			} catch (error) {
 				const message = `${
@@ -253,7 +262,7 @@ export class Agent {
 					this.messages.push({
 						role: "tool",
 						tool_call_id: call.id,
-						content: result,
+						content: capToolResult(result),
 					});
 					this.onEvent({
 						type: "tool",
@@ -710,7 +719,7 @@ async function workspaceContext() {
 		const open = files.filter((file) => file?.type === "editor" || file?.uri);
 		if (open.length) {
 			const active = manager?.activeFile;
-			const lines = open.slice(0, 20).map((file) => {
+			const lines = open.slice(0, 12).map((file) => {
 				const flags = [];
 				if (active && file === active) flags.push("active");
 				if (file.isUnsaved) flags.push("unsaved");
@@ -718,7 +727,7 @@ async function workspaceContext() {
 				return `- ${file.filename || file.uri || "(untitled)"}${suffix}`;
 			});
 			parts.push(
-				`Open files:\n${lines.join("\n")}${open.length > 20 ? "\n- ..." : ""}`,
+				`Open files:\n${lines.join("\n")}${open.length > 12 ? "\n- ..." : ""}`,
 			);
 		}
 	} catch {
@@ -731,14 +740,14 @@ async function workspaceContext() {
 			const list = await fsOperation(root).lsDir();
 			if (Array.isArray(list) && list.length) {
 				const entries = list
-					.slice(0, 40)
+					.slice(0, 25)
 					.map(
 						(item) =>
 							`${item.isDirectory ? "[dir] " : ""}${Url.basename(item.url)}`,
 					);
 				parts.push(
 					`Workspace root entries:\n${entries.join("\n")}${
-						list.length > 40 ? "\n..." : ""
+						list.length > 25 ? "\n..." : ""
 					}`,
 				);
 			}
@@ -747,6 +756,81 @@ async function workspaceContext() {
 		/* fs not ready — skip */
 	}
 	return parts.join("\n\n");
+}
+
+/**
+ * Caps a tool result BEFORE it enters the transcript (run_command output
+ * can be huge; reads are already capped in tools.js).
+ * @param {string} result
+ * @returns {string}
+ */
+function capToolResult(result) {
+	const text = String(result ?? "");
+	if (text.length <= TOOL_RESULT_CAP) return text;
+	return `${text.slice(0, TOOL_RESULT_CAP)}\n[output truncated to save tokens]`;
+}
+
+/**
+ * Builds the message payload for one request (token economy):
+ *  1. tool outputs recorded in EARLIER turns collapse to short stubs —
+ *     the model already used them; fresh reads are one tool call away;
+ *  2. beyond HISTORY_WINDOW messages, the oldest turns collapse into a
+ *     single marker. Cut points never orphan `tool` messages: the slice
+ *     starts at a user message or a plain assistant message.
+ * The stored transcript (this.messages) is NOT mutated.
+ * @param {Array<object>} messages full transcript (system first)
+ * @returns {Array<object>} payload messages
+ */
+export function compactForRequest(messages) {
+	if (!Array.isArray(messages) || messages.length < 2) return messages;
+
+	// index of the last user message — tool results after it belong to
+	// the CURRENT step and must stay complete
+	let lastUser = -1;
+	for (let i = messages.length - 1; i >= 0; i--) {
+		if (messages[i]?.role === "user") {
+			lastUser = i;
+			break;
+		}
+	}
+
+	const compacted = messages.map((message, index) => {
+		if (
+			message?.role === "tool" &&
+			index < lastUser &&
+			String(message.content ?? "").length > OLD_TOOL_CAP
+		) {
+			return {
+				...message,
+				content: `${String(message.content).slice(0, OLD_TOOL_CAP)}\n[earlier output truncated to save tokens]`,
+			};
+		}
+		return message;
+	});
+
+	if (compacted.length <= HISTORY_WINDOW + 1) return compacted;
+
+	const head = compacted[0]; // system prompt (always sent)
+	const rest = compacted.slice(1);
+	let start = rest.length - HISTORY_WINDOW;
+	while (start < rest.length) {
+		const message = rest[start];
+		if (message?.role === "user") break;
+		if (message?.role === "assistant" && !message.tool_calls) break;
+		start++; // never start on a tool message / tool-calling pair
+	}
+	if (start >= rest.length) start = rest.length - 1;
+
+	const omitted = rest.length - start;
+	if (omitted <= 0) return compacted;
+	return [
+		head,
+		{
+			role: "user",
+			content: `(${omitted} earlier messages of this conversation were hidden to save context; the workspace context above is current)`,
+		},
+		...rest.slice(start),
+	];
 }
 
 /**

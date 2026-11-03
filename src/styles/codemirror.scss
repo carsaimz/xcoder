@@ -158,6 +158,51 @@ body.resizing-editor-pane {
   }
 }
 
+// VS Code breadcrumbs: slim path bar between the tabs and the code
+.editor-crumbs {
+  display: none;
+  flex: 0 0 22px;
+  align-items: center;
+  gap: 2px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+  font-size: 11px;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  user-select: none;
+
+  &.has-path {
+    display: flex;
+  }
+
+  .editor-crumbs-seg {
+    color: color-mix(in srgb, var(--primary-text-color) 62%, transparent);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+
+    &:last-child {
+      color: var(--primary-text-color);
+      font-weight: 500;
+    }
+  }
+
+  .editor-crumbs-sep {
+    color: color-mix(in srgb, var(--primary-text-color) 38%, transparent);
+    flex-shrink: 0;
+  }
+}
+
+// with tabs at the bottom the crumbs sit at the top of the editor content
+.editor-pane-root[data-tabs-position="bottom"] .editor-crumbs {
+  order: -1;
+  border-top: 0;
+}
+
 .editor-global-open-file-list {
   display: none !important;
 }

@@ -36,6 +36,42 @@
     }
   }
 
+  // price filter chips: All / Free / Paid (persisted per session)
+  .mp-chips {
+    display: flex;
+    gap: 6px;
+
+    .mp-chip {
+      flex: 1;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--popup-border-color);
+      background: transparent;
+      color: var(--popup-text-color);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0.7;
+
+      &.active {
+        opacity: 1;
+        background: color-mix(in srgb, var(--popup-active-color) 18%, transparent);
+        border-color: var(--popup-active-color);
+        color: var(--popup-text-color);
+      }
+
+      &.free.active {
+        border-color: #2ea043;
+        background: color-mix(in srgb, #2ea043 16%, transparent);
+      }
+
+      &.paid.active {
+        border-color: #bc8cff;
+        background: color-mix(in srgb, #bc8cff 16%, transparent);
+      }
+    }
+  }
+
   ul.mp-list {
     flex: 1;
     min-height: 120px;

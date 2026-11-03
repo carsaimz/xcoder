@@ -1,3 +1,4 @@
+import rightDock from "components/rightDock";
 import Sidebar from "components/sidebar";
 import floatingWindow from "components/sidebar/floatingWindow";
 import svgIcon from "utils/svgIcons";
@@ -38,6 +39,8 @@ export default class SidebarApp {
 	#iconName = "";
 	/**@type {boolean} float apps open in an independent window; the rest dock in the sidebar */
 	#floating = false;
+	/**@type {boolean} dock apps (float + dock:"right") can anchor to the right edge instead of floating */
+	#dock = false;
 
 	/**
 	 * Creates a new sidebar app.
@@ -46,7 +49,7 @@ export default class SidebarApp {
 	 * @param {string} title
 	 * @param {(el:HTMLElement)=>(void|Function)} init
 	 * @param {(el:HTMLElement)=>void} onselect
-	 * @param {{tabbed?: boolean, launcher?: boolean, titleKey?: string}} [opts]
+	 * @param {{tabbed?: boolean, launcher?: boolean, titleKey?: string, dock?: "right"}} [opts]
 	 */
 	constructor(icon, id, title, init, onselect, opts = {}) {
 		const emptyFunc = () => {};
@@ -61,6 +64,7 @@ export default class SidebarApp {
 		this.#launcher = !!opts.launcher;
 		this.#iconName = icon || "";
 		this.#floating = !!opts.floating;
+		this.#dock = opts.dock === "right" && this.#floating;
 		this.#group =
 			opts.group === "bottom" || opts.group === "tools"
 				? opts.group
@@ -81,6 +85,27 @@ export default class SidebarApp {
 		const $label = this.#icon.querySelector(":scope > .app-label");
 		if ($label) $label.textContent = text;
 	};
+
+	/**
+	 * Opens the panel in the right dock (VS Code secondary side bar).
+	 * The dock hosts the SAME container node the floating window uses.
+	 */
+	#showInDock() {
+		undockDockedPanel($sidebar);
+		Sidebar.setRailOnly?.(true);
+		rightDock.show(this.#id, this.#title, this.#container, () =>
+			this.#onFloatClosed(),
+		);
+	}
+
+	/** Opens the panel in a floating window (classic path). */
+	#showInFloat() {
+		undockDockedPanel($sidebar);
+		Sidebar.setRailOnly?.(true);
+		floatingWindow.show(this.#id, this.#title, this.#container, () =>
+			this.#onFloatClosed(),
+		);
+	}
 
 	/** Window close button - deactivate the app and tell the registry. */
 	#onFloatClosed() {
@@ -211,11 +236,13 @@ export default class SidebarApp {
 				// The panel space itself only exists while a docked app
 				// owns it — with only windowed tools active the sidebar
 				// collapses to the icon rail (user request).
-				undockDockedPanel($sidebar);
-				Sidebar.setRailOnly?.(true);
-				floatingWindow.show(this.#id, this.#title, this.#container, () =>
-					this.#onFloatClosed(),
-				);
+				// Dock-capable apps with the "anchored" preference open
+				// as a right-edge panel (painel de IA ancorado).
+				if (this.#dock && rightDock.prefEnabled(this.#id)) {
+					this.#showInDock();
+				} else {
+					this.#showInFloat();
+				}
 			} else {
 				dockContainer(this.#container, $sidebar);
 				Sidebar.setRailOnly?.(false);
@@ -287,6 +314,31 @@ export default class SidebarApp {
 	/**@type {boolean} float apps open as independent windows (vs docked panels) */
 	get floating() {
 		return this.#floating;
+	}
+
+	/**@type {boolean} dock-capable apps can anchor to the right edge */
+	get dockable() {
+		return this.#dock;
+	}
+
+	/**
+	 * Switches the app between the anchored right panel and the floating
+	 * window (used by the pin button of the AI chat). Only meaningful for
+	 * dock-capable apps; active apps re-open in the chosen host.
+	 * @param {boolean} anchored true = anchor right, false = floating window
+	 * @returns {void}
+	 */
+	setAnchored(anchored) {
+		if (!this.#dock) return;
+		rightDock.setPref(this.#id, anchored);
+		if (!this.#active) return;
+		if (anchored && !rightDock.isOpenFor(this.#id)) {
+			floatingWindow.reset();
+			this.#showInDock();
+		} else if (!anchored && !floatingWindow.isOpenFor(this.#id)) {
+			rightDock.reset();
+			this.#showInFloat();
+		}
 	}
 
 	/**

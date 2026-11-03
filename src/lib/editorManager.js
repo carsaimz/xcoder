@@ -91,7 +91,9 @@ import {
 } from "cm/shiftSelection";
 import tagAutoRename from "cm/tagAutoRename";
 import { getThemeConfig, getThemeExtensions } from "cm/themes";
+import createBreadcrumbs, { updateCrumbs } from "components/breadcrumbs";
 import list from "components/collapsableList";
+import minimap, { attachMinimap } from "components/minimap";
 import quickTools from "components/quickTools";
 import ScrollBar from "components/scrollbar";
 import SideButton, { sideButtonContainer } from "components/sideButton";
@@ -364,6 +366,7 @@ async function EditorManager($header, $body) {
 			touchSelectionController: null,
 			element: <section className="editor-pane"></section>,
 			tabList: <ul className="open-file-list editor-pane-tabs"></ul>,
+			crumbs: createBreadcrumbs(),
 			content: <div className="editor-pane-content"></div>,
 			layoutNode: null,
 		};
@@ -372,10 +375,12 @@ async function EditorManager($header, $body) {
 		pane.tabList.dataset.paneId = pane.id;
 		pane.element.__editorPane = pane;
 		pane.tabList.__editorPane = pane;
+		pane.crumbs.__editorPane = pane;
 		pane.content.__editorPane = pane;
 		pane.editorContainer.__editorPane = pane;
 		pane.content.append(pane.editorContainer);
-		pane.element.append(pane.tabList, pane.content);
+		// VS Code structure: tabs, breadcrumbs, then the code
+		pane.element.append(pane.tabList, pane.crumbs, pane.content);
 		function handlePanePointerDown() {
 			activatePane(pane, { focusEditor: false });
 		}
@@ -1765,6 +1770,12 @@ async function EditorManager($header, $body) {
 	primaryPane.editor = editor;
 	activePane = primaryPane;
 	primaryPane.element.classList.add("active");
+	// VS Code-style code overview (settings > editor > minimap)
+	try {
+		attachMinimap(editor, primaryPane.editorContainer);
+	} catch (error) {
+		console.warn("minimap attach failed", error);
+	}
 
 	await applyKeyBindings(editor);
 
@@ -2486,6 +2497,12 @@ async function EditorManager($header, $body) {
 		pane.editor = paneEditor;
 		paneEditor.__editorPane = pane;
 		applyEditorCompatibility(paneEditor);
+		// split panes get their own minimap instance
+		try {
+			attachMinimap(paneEditor, pane.editorContainer);
+		} catch (error) {
+			console.warn("minimap attach failed", error);
+		}
 		await applyKeyBindings(paneEditor);
 		pane.touchSelectionController = createTouchSelectionMenu(paneEditor, {
 			container: pane.editorContainer,
@@ -3734,6 +3751,11 @@ async function EditorManager($header, $body) {
 		applyOptions(["indentGuides"]);
 	});
 
+	// Toggle the minimap
+	appSettings.on("update:minimap", function (value) {
+		minimap.setEnabled(value !== false);
+	});
+
 	// Keep file.session and cache in sync on every edit
 	function getDocSyncListener() {
 		return EditorView.updateListener.of((update) => {
@@ -3826,6 +3848,46 @@ async function EditorManager($header, $body) {
 		["file-content-changed", "rename-file", "save-file", "update:pin-tab"],
 		markGlobalOpenFileListMirrorDirty,
 	);
+
+	// Breadcrumbs (VS Code structure): the path bar of each pane mirrors
+	// the pane's active file. Repaints are cheap and events are rare.
+	function crumbRoot(uri) {
+		const folders = Array.isArray(addedFolder) ? addedFolder : [];
+		let best = "";
+		for (const folder of folders) {
+			const url = typeof folder === "string" ? folder : folder?.url;
+			if (
+				url &&
+				typeof uri === "string" &&
+				uri.startsWith(url) &&
+				url.length > best.length
+			) {
+				best = url;
+			}
+		}
+		return best || undefined;
+	}
+	function updatePaneCrumbs(pane) {
+		if (!pane?.crumbs) return;
+		try {
+			updateCrumbs(
+				pane.crumbs,
+				pane.activeFile,
+				crumbRoot(pane.activeFile?.uri),
+			);
+		} catch (error) {
+			console.warn("breadcrumbs update failed", error);
+		}
+	}
+	function updateAllCrumbs() {
+		panes.forEach(updatePaneCrumbs);
+	}
+	manager.on(
+		["switch-file", "file-loaded", "rename-file", "remove-file"],
+		updateAllCrumbs,
+	);
+	manager.on(["switch-file"], () => minimap.refreshAll?.());
+	updateAllCrumbs();
 
 	manager.on(["update:read-only"], () => {
 		const file = manager.activeFile;

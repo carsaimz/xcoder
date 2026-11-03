@@ -192,15 +192,20 @@ export function avoidSidebar() {
 	if (!$win || !$win.classList.contains("show")) return;
 	if ($win.classList.contains("maximized")) return;
 	const $sidebarEl = document.getElementById("sidebar");
-	if (!$sidebarEl?.isConnected) return;
-	const edge = $sidebarEl.getBoundingClientRect().right;
+	const $dock = document.getElementById("right-dock");
+	const sidebarOpen = $sidebarEl?.isConnected;
+	const dockOpen = Boolean($dock?.classList.contains("show"));
+	if (!sidebarOpen && !dockOpen) return;
+	const edge = sidebarOpen ? $sidebarEl.getBoundingClientRect().right : 0;
+	const dockLeft = dockOpen
+		? $dock.getBoundingClientRect().left
+		: window.innerWidth;
 	const rect = $win.getBoundingClientRect();
-	if (rect.left >= edge) return;
-	// keep the window fully on screen, to the right of the sidebar
-	const available = Math.max(window.innerWidth - edge - 16, 0);
+	if (rect.left >= edge && rect.right <= dockLeft) return;
+	// keep the window fully between the sidebar and the right dock
+	const available = Math.max(dockLeft - edge - 16, 0);
 	const width = Math.min(rect.width || $win.offsetWidth, available || 240);
-	const left =
-		available > 0 ? edge + 8 : Math.max(window.innerWidth - width - 4, 0);
+	const left = available > 0 ? edge + 8 : Math.max(dockLeft - width - 4, 0);
 	$win.style.width = `${Math.max(width, 240)}px`;
 	$win.style.left = `${Math.max(left, 0)}px`;
 	savePos();
