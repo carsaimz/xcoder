@@ -172,10 +172,14 @@ describe("sidebar expansion (90% da tela)", () => {
                 expect(sidebar).toContain("innerWidth * 0.92");
         });
 
-        it("labels sit IN FRONT of the glyphs (row layout), hidden in rail-only", () => {
+        it("panel title bar shows the option name only after it is pressed", () => {
                 const css = read("src/components/sidebar/style.scss");
-                expect(css).toMatch(/\.app-icons-container\.with-labels\s*\{[^}]*flex-direction:\s*row/s);
-                expect(css).toMatch(/#sidebar\.rail-only \.app-icons-container\.with-labels \.icon\s*\{[^}]*\.app-label\s*\{[^}]*display:\s*none/s);
+                // glyph-only rail: no with-labels, no category captions
+                expect(css).not.toMatch(/with-labels/);
+                expect(css).not.toMatch(/data-label/);
+                // docked-panel shell: title hidden until .with-panel-title
+                expect(css).toMatch(/\.panel-title\s*\{[^}]*display:\s*none/s);
+                expect(css).toMatch(/with-panel-title \.panel-title\s*\{[^}]*display:\s*flex/s);
         });
 
         it("activity bar order matches VS Code (files, search, git, ai, extensions)", () => {

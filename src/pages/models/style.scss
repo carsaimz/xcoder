@@ -14,7 +14,7 @@ wc-page.models-page {
 	.models-intro {
 		margin: 0.5rem 1rem;
 		padding: 0.7rem 0.9rem;
-		border-radius: 8px;
+		border-radius: 3px;
 		background: color-mix(in srgb, var(--active-color) 12%, transparent);
 		color: var(--primary-text-color);
 		font-size: 0.85rem;
@@ -35,7 +35,7 @@ wc-page.models-page {
 		gap: 0.35rem;
 		padding: 0.55rem 0.4rem;
 		border: 1px solid var(--border-color);
-		border-radius: 10px;
+		border-radius: 3px;
 		background: transparent;
 		color: var(--primary-text-color);
 		font-size: 0.82rem;
@@ -72,7 +72,7 @@ wc-page.models-page {
 		gap: 0.45rem;
 		padding: 0.85rem 0.95rem;
 		border: 1px solid var(--border-color);
-		border-radius: 12px;
+		border-radius: 3px;
 		background: var(--primary-color);
 	}
 

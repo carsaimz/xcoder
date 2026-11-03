@@ -80,6 +80,19 @@ function remove(id) {
 }
 
 /**
+ * Cached promise of the Sidebar module — one dynamic import shared by
+ * every call site (panel title, hide-on-toggle, show hooks). Repeated
+ * `import()` calls fired from event handlers settle unpredictably late
+ * in some environments; awaiting the cached promise is a microtask.
+ * @returns {Promise<{default: object}>}
+ */
+let $sidebarModulePromise = null;
+function sidebarModule() {
+	$sidebarModulePromise ??= import("components/sidebar");
+	return $sidebarModulePromise;
+}
+
+/**
  * Initialize sidebar apps
  * @param {HTMLElement} $el
  */
@@ -89,16 +102,16 @@ function init($el) {
 	$apps.addEventListener("click", onclick);
 	SidebarApp.init($el, $apps);
 	attachLongPressTooltips($apps);
-	// icon names under the glyphs (categorized views)
-	if (localStorage.getItem("sidebarIconLabels") !== "0") {
-		$apps.classList.add("with-labels");
-	}
 	// floating window / right dock closed by their header buttons
 	document.addEventListener("sidebar-float-closed", (e) => {
 		if (currentSection === e.detail?.id) {
 			currentSection = null;
 			localStorage.removeItem(SIDEBAR_APPS_LAST_SECTION);
 		}
+		// closing the window frees the title bar again
+		sidebarModule()
+			.then(({ default: SidebarModule }) => SidebarModule.setPanelTitle?.(""))
+			.catch(() => {});
 	});
 	// the dock's "open as window" button hands the app back to a
 	// floating window (sidebarApp owns the show logic)
@@ -109,9 +122,23 @@ function init($el) {
 		setActiveApp(app.id);
 		hideSidebar();
 	});
+	// keep the panel title bar in sync with retranslated titles: the
+	// per-app langchange listeners run first, so re-push on a following
+	// task ("rebuild after the per-app langchange listeners refreshed")
+	document.addEventListener("langchange", () => {
+		setTimeout(() => {
+			const app = apps.find((candidate) => candidate.id === currentSection);
+			if (!app) return;
+			sidebarModule()
+				.then(({ default: SidebarModule }) =>
+					SidebarModule.setPanelTitle?.(usesFloat(app) ? "" : app.title),
+				)
+				.catch(() => {});
+		}, 0);
+	});
 	// when the sidebar opens while a tool window is visible, slide the
 	// window out of the sidebar's area — options must never sit behind it
-	import("components/sidebar")
+	sidebarModule()
 		.then(({ default: SidebarModule }) =>
 			SidebarModule.on?.("show", floatingWindow.avoidSidebar),
 		)
@@ -259,6 +286,14 @@ function setActiveApp(id) {
 	for (const currentApp of apps) {
 		currentApp.active = currentApp.id === id;
 	}
+	// the option name only appears once it is pressed: docked panels show
+	// it in the sidebar title bar (VS Code view title); windowed tools
+	// title their own window instead
+	sidebarModule()
+		.then(({ default: SidebarModule }) =>
+			SidebarModule.setPanelTitle?.(floatMode ? "" : app.title),
+		)
+		.catch(() => {});
 }
 
 /**
@@ -348,7 +383,7 @@ function isAppAnchored(id) {
 
 /** Hides the sidebar overlay (dynamic import keeps boot order safe). */
 function hideSidebar() {
-	import("components/sidebar")
+	sidebarModule()
 		.then(({ default: SidebarModule }) => SidebarModule.hide?.())
 		.catch(() => {});
 }

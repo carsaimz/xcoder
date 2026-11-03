@@ -82,8 +82,6 @@ export default class SidebarApp {
 		if (!text) return;
 		this.#title = text;
 		this.#icon.title = text;
-		const $label = this.#icon.querySelector(":scope > .app-label");
-		if ($label) $label.textContent = text;
 	};
 
 	/**
@@ -155,15 +153,10 @@ export default class SidebarApp {
 		const existing = $apps.get(`:scope > .apps-group.${group}`);
 		if (existing) return existing;
 
-		// category caption (small-caps label above the group)
-		const captions = {
-			primary: strings["sidebar group primary"] || "Views",
-			tools: strings["sidebar group tools"] || "Tools",
-			bottom: strings["sidebar group bottom"] || "Account",
-		};
-		const $group = (
-			<div className={`apps-group ${group}`} data-label={captions[group]} />
-		);
+		// grouping is layout-only (top views / pinned bottom items) —
+		// no visible categories: the name shows in the long-press tooltip
+		// and in the panel title bar once the app is pressed
+		const $group = <div className={`apps-group ${group}`} />;
 		const $bottom = $apps.get(":scope > .apps-group.bottom");
 
 		if (group === "primary") {
@@ -398,10 +391,9 @@ export default class SidebarApp {
  * @returns {HTMLElement}
  */
 function Icon({ icon, id, title }) {
-	// name shown in front of the glyph (user request: "títulos na frente
-	// de ícones") — visible when .app-icons-container has the
-	// .with-labels class; DOM order is label first, glyph after
-	const $label = <small className="app-label">{title}</small>;
+	// rail icons are glyph-only: the name appears when the option is
+	// pressed (panel title bar) or on long-press (tooltip), never beside
+	// the glyph
 	// SVG icon pack (Lucide): icons registered as "svg:<name>" render as inline
 	// vectors — tier 1 of the hybrid icon convention (docs/ICONS.md).
 	if (icon?.startsWith("svg:")) {
@@ -414,7 +406,6 @@ function Icon({ icon, id, title }) {
 					title={title}
 					className="icon xc-svgicon"
 				>
-					{$label}
 					{$svg}
 				</span>
 			);
@@ -428,9 +419,7 @@ function Icon({ icon, id, title }) {
 			data-id={id}
 			title={title}
 			className={className}
-		>
-			{$label}
-		</span>
+		/>
 	);
 }
 
@@ -446,10 +435,10 @@ function undockDockedPanel($sidebarEl) {
 	if (
 		docked &&
 		docked.isConnected &&
-		docked.parentNode === $sidebarEl &&
+		$sidebarEl.contains(docked) &&
 		docked.dataset?.app
 	) {
-		$sidebarEl.replaceChild(<div className="container"></div>, docked);
+		docked.replaceWith(<div className="container"></div>);
 	}
 }
 
@@ -478,7 +467,7 @@ function dockContainer($container, $sidebarEl) {
 		if (existingContainer) {
 			existingContainer.remove();
 		}
-		$sidebarEl.appendChild($container);
+		($sidebarEl.get(".panel") || $sidebarEl).appendChild($container);
 	}
 }
 

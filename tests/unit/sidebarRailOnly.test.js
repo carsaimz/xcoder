@@ -21,6 +21,7 @@ vi.mock("components/sidebar", () => ({
                 on: vi.fn(),
                 off: vi.fn(),
                 setRailOnly: vi.fn(),
+                setPanelTitle: vi.fn(),
         },
 }));
 vi.mock("fileSystem", () => ({ default: vi.fn(() => ({})) }));
@@ -180,19 +181,23 @@ describe("sidebar rail-only mode", () => {
                 assert.equal($container.childElementCount, 0, "container not empty");
         });
 
-        test("rail shows the title in front of the glyph", async () => {
+        test("rail is glyphs-only; the name goes to the panel title bar", async () => {
                 const $icon = addNative();
                 // titles retranslate through the app's langchange listener
                 document.dispatchEvent(new Event("langchange"));
                 await new Promise((resolve) => setTimeout(resolve, 5));
-                const label = $icon.get(":scope > .app-label");
-                assert.ok(label, "icon label missing");
-                assert.equal(label.textContent, "Arquivos", "label not translated");
-                // label is the FIRST child — the title precedes the glyph
                 assert.equal(
-                        $icon.firstChild,
-                        label,
-                        "label must come before the glyph",
+                        $icon.get(":scope > .app-label"),
+                        null,
+                        "app-label must not render next to the glyph",
+                );
+                // activating the docked app pushes its name to the title bar
+                const calls = SidebarModule.setPanelTitle?.mock?.calls ?? [];
+                const last = calls.at(-1)?.[0];
+                assert.equal(
+                        last,
+                        "Arquivos",
+                        "panel title bar must show the translated app name",
                 );
         });
 

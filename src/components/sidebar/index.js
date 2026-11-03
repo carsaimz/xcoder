@@ -53,7 +53,10 @@ function create($container, $toggler) {
 			<div className="apps">
 				<div className="app-icons-container"></div>
 			</div>
-			<div className="container"></div>
+			<div className="panel">
+				<div className="panel-title" hidden></div>
+				<div className="container"></div>
+			</div>
 			<div
 				className="resize-bar w-resize"
 				onmousedown={onresize}
@@ -477,11 +480,26 @@ function create($container, $toggler) {
 		}
 	}
 
+	/**
+	 * Shows the active docked app's name in the panel title bar
+	 * (VS Code view title). Empty string hides the bar again.
+	 * @param {string} title
+	 */
+	function setPanelTitle(title) {
+		const $title = $el.get(".panel-title");
+		if (!$title) return;
+		const text = String(title || "");
+		$title.textContent = text;
+		$title.hidden = !text;
+		$el.classList.toggle("with-panel-title", !!text);
+	}
+
 	$el.show = show;
 	$el.hide = hide;
 	$el.toggle = toggle;
 	$el.onshow = () => {};
 	$el.setRailOnly = setRailOnly;
+	$el.setPanelTitle = setPanelTitle;
 	$el.getWidth = function () {
 		const width = Math.round(innerWidth * 0.92);
 		return mode === "phone" ? width : MIN_WIDTH;
@@ -507,6 +525,8 @@ Sidebar.show = () => $sidebar?.show();
 Sidebar.toggle = () => $sidebar?.toggle();
 /** Collapses the sidebar to the icon rail / restores the full panel width. */
 Sidebar.setRailOnly = (enabled) => $sidebar?.setRailOnly?.(enabled);
+/** Shows the active docked app's name in the panel title bar. */
+Sidebar.setPanelTitle = (title) => $sidebar?.setPanelTitle?.(title);
 
 Sidebar.on = (
 	/**@type {'hide'|'show'} */ event,

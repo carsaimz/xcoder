@@ -87,10 +87,22 @@
 
   >.list-item {
     display: flex;
-    min-height: 60px;
+    // VS Code list density: 48px rows instead of mobile 60px
+    min-height: 48px;
     text-decoration: none;
     margin: auto;
     box-sizing: border-box;
+    border-radius: 3px;
+    transition: background-color 80ms ease;
+
+    &:hover {
+      background-color: color-mix(in srgb, currentColor 6%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 1px solid var(--active-color);
+      outline-offset: -1px;
+    }
 
     &.disabled {
       pointer-events: none;
@@ -168,16 +180,13 @@
     }
 
     .icon {
-      height: 60px;
-      width: 60px;
+      height: 40px;
+      width: 40px;
+      font-size: 1.25em;
 
       &.no-icon {
         width: 20px;
       }
-    }
-
-    .icon {
-      font-size: 1.4em;
     }
 
     * {
@@ -238,8 +247,12 @@ ul {
       }
 
       &.tile:active {
-        transition: all 300ms ease;
-        background-color: rgba($color: #000000, $alpha: 0.2);
+        transition: all 120ms ease;
+        background-color: color-mix(in srgb, currentColor 8%, transparent);
+      }
+
+      &:hover {
+        background-color: color-mix(in srgb, currentColor 5%, transparent);
       }
 
       &:last-child {
@@ -277,6 +290,6 @@ ul {
 .list-item,
 .tile {
   &:focus {
-    background-color: rgba($color: #000000, $alpha: 0.2);
+    background-color: color-mix(in srgb, currentColor 7%, transparent);
   }
 }

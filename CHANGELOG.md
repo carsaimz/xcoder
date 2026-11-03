@@ -13,6 +13,29 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.15] - 2026-11-03
+
+### Changed
+- **Barra de actividades só com glifos** — os ícones da sidebar deixaram
+  de ter legendas (nada de nomes debaixo/ao lado dos ícones) e as
+  categorias («Vistas»/«Ferramentas»/«Conta») saíram da barra. O nome
+  aparece só quando a opção é pressionada, na barra de título do painel
+  (o «view title» do VS Code), e ao manter o dedo no ícone.
+- **Design de todas as páginas** — o cabeçalho de cada página (sobre,
+  definições, perfil, plugins, ficheiros…) troca a barra colorida de
+  app móvel pelo estilo VS Code: barra da cor do fundo, título
+  alinhado à esquerda junto à seta de voltar, 35px e filete inferior.
+  As listas ficaram mais densas (linhas de 48px com hover e foco) e o
+  conteúdo ganha uma coluna de leitura centrada em ecrãs largos.
+  Cartões arredondados (12px+) ficaram widgets de 3px nas páginas
+  Sobre, Perfil, Modelos, Apoio, Temas, Novidades, Markdown,
+  Quicktools e Processos.
+
+### Removed
+- **Skills «Codex» e «Claude Code»** — cascas vazias (prompts que só
+  imitavam os CLIs, sem agente por trás). Removidas a pedido; para
+  agentes completos, instale o opencode (ou similar) pelo terminal.
+
 ## [1.8.14] - 2026-11-03
 
 ### Added
@@ -60,6 +83,23 @@ resumo em inglês.
   entrarem no histórico e contexto do projecto mais enxuto (12 ficheiros
   abertos / 25 entradas da raiz). Conversas longas custam muito menos em
   provedores pagos e gratuitos.
+
+## [1.8.15] - 2026-11-03
+
+### Summary
+- **Glyph-only activity bar**: rail icons lost their captions and the
+  category groups went away — the app name now appears only when the
+  option is pressed, in the panel title bar (VS Code "view title"),
+  plus the long-press tooltip.
+- **Every page redesigned** with the VS Code design language: flat
+  page-background header with a left-aligned title next to the back
+  chevron (35px, hairline), denser 48px list rows with hover/focus
+  states and a centered reading column on wide screens. Rounded cards
+  became squared 3px widgets across About, Profile, Models, Support,
+  Themes, Changelog, Markdown, QuickTools and Processes.
+- **Removed** the "Codex" and "Claude Code" AI skills — empty shells
+  (prompt playbooks, not real agents). Install opencode or similar via
+  the terminal for full agents.
 
 ## [1.8.14] - 2026-11-03
 

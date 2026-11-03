@@ -30,7 +30,7 @@
       gap: 6px;
       margin-top: 8px;
       padding: 4px 14px;
-      border-radius: 999px;
+      border-radius: 3px;
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.02em;
@@ -77,10 +77,10 @@
     max-width: 400px;
     min-height: fit-content;
     height: auto;
-    background: color-mix(in srgb,
-        var(--popup-background-color) 20%,
-        transparent);
-    border-radius: 12px;
+    // VS Code widget: flat, hairline outline, no card tint
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
     overflow: visible;
     margin-bottom: 16px;
     display: flex;
@@ -100,9 +100,7 @@
       }
 
       &:hover {
-        background: color-mix(in srgb,
-            var(--popup-background-color) 40%,
-            transparent);
+        background: color-mix(in srgb, currentColor 6%, transparent);
       }
 
       .info-item-icon {
@@ -138,19 +136,16 @@
       display: inline-flex;
       align-items: center;
       padding: 12px;
-      background: color-mix(in srgb,
-          var(--popup-background-color) 20%,
-          transparent);
-      border-radius: 12px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
       color: var(--secondary-text-color);
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
 
       &:hover {
-        background: color-mix(in srgb,
-            var(--popup-background-color) 40%,
-            transparent);
-        transform: translateY(-1px);
+        background: color-mix(in srgb, currentColor 6%, transparent);
+        border-color: var(--active-color);
       }
 
       .social-icon {

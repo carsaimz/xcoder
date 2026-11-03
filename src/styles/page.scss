@@ -167,6 +167,20 @@ body {
   }
 }
 
+// VS Code reading column: on wide screens page content becomes a
+// centered 48rem column with breathing room (VS Code settings editor).
+// Pages that manage their own shell (main/detail settings) are excluded.
+wc-page:not(#root):not(.main-settings-page):not(.detail-settings-page) {
+  > main:not(:empty),
+  > .main:not(:empty) {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 0.5rem 1rem 6rem;
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+
 wc-page {
   position: fixed !important;
   top: 0;

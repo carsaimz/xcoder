@@ -13,7 +13,7 @@
         align-items: center;
         gap: 0.9rem;
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: 3px;
         background: var(--secondary-color);
         border: 1px solid rgba(255, 255, 255, 0.06);
 
@@ -59,7 +59,7 @@
         flex-direction: column;
         gap: 0.6rem;
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: 3px;
         background: var(--secondary-color);
         border: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -80,7 +80,7 @@
         gap: 0.5rem;
         min-height: 44px;
         padding: 0 14px;
-        border-radius: 8px;
+        border-radius: 3px;
         border: 1px solid rgba(255, 255, 255, 0.12);
         background: rgba(255, 255, 255, 0.04);
         color: var(--primary-text-color);
@@ -114,7 +114,7 @@
         flex-direction: column;
         gap: 0.45rem;
         padding: 0.75rem;
-        border-radius: 8px;
+        border-radius: 3px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         background: rgba(0, 0, 0, 0.15);
 }
@@ -174,7 +174,7 @@
 .support-method-qr {
         align-self: center;
         width: 148px;
-        border-radius: 8px;
+        border-radius: 3px;
         border: 1px solid rgba(255, 255, 255, 0.12);
         background: #fff;
         padding: 4px;

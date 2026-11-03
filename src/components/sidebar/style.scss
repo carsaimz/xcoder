@@ -25,7 +25,7 @@ body.no-animation {
   box-sizing: border-box;
 
   // the docked-panel space only exists while a docked app owns it
-  > .container:empty {
+  .panel > .container:empty {
     display: none;
   }
 
@@ -319,13 +319,47 @@ body.no-animation {
     }
   }
 
+  .panel {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    // VS Code view title — the option's name appears only after it is
+    // pressed; the activity bar itself stays glyphs-only
+    .panel-title {
+      display: none;
+      flex-shrink: 0;
+      min-height: 35px;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+
+  &.with-panel-title .panel-title {
+    display: flex;
+  }
+
   .container {
     overflow: hidden;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
 
     &.files {
       overflow-x: auto;
@@ -652,94 +686,6 @@ body.no-animation {
 }
 
 // ---------------------------------------------------------------------------
-// Icon labels NEXT TO the activity bar glyphs (row layout — titles never
-// wrap below icons) plus small-caps category captions on the group
-// separators. In rail-only mode the labels hide: the 52px strip is
-// glyphs-only (VS Code activity bar).
-.app-icons-container.with-labels {
-  .icon {
-    // row: label in front of the glyph (order -1), glyph after it
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 7px;
-    width: 100%;
-    height: 40px;
-    padding: 0 6px 0 14px;
-    line-height: 1;
-
-    .app-badge {
-      top: auto;
-      right: 4px;
-      bottom: 2px;
-    }
-
-    .app-label {
-      order: -1;
-      position: static;
-      display: block;
-      flex: 1;
-      min-width: 0;
-      font-size: 11.5px;
-      font-weight: 500;
-      line-height: 1.2;
-      letter-spacing: 0.2px;
-      text-align: left;
-      opacity: 0.75;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      pointer-events: none;
-      font-family: inherit;
-    }
-
-    &.xc-svgicon svg {
-      width: 18px;
-      height: 18px;
-      display: block;
-      flex-shrink: 0;
-    }
-
-    &.active .app-label {
-      opacity: 1;
-    }
-  }
-}
-
-// rail-only (52px strip): glyphs only — center them again and hide labels
-#sidebar.rail-only .app-icons-container.with-labels .icon {
-  justify-content: center;
-  width: 44px;
-  padding: 0;
-
-  .app-label {
-    display: none;
-  }
-}
-
-// category captions: "Vistas" / "Ferramentas" / "Conta"
-.app-icons-container .apps-group[data-label]:not(:empty) {
-  &::after {
-    content: attr(data-label);
-    display: block;
-    width: 100%;
-    text-align: center;
-    font-size: 7px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    opacity: 0.45;
-    padding-top: 2px;
-    pointer-events: none;
-  }
-
-  &.tools::before,
-  &.bottom::before {
-    margin-bottom: 4px;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Floating sidebar windows — panels open as independent windows above the
 // editor instead of living inside the narrow sidebar overlay.

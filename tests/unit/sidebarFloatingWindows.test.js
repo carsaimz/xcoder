@@ -2,7 +2,7 @@
 /**
  * Floating sidebar windows — panels open as independent windows above
  * the editor ("após sidebar abrissem como janelas independentes de
- * sidebar"), with tap-again-to-close, category captions and icon labels.
+ * sidebar"), with tap-again-to-close and a glyphs-only activity bar.
  */
 import assert from "node:assert/strict";
 import { beforeEach, describe, test, vi } from "vitest";
@@ -221,21 +221,24 @@ describe("floating sidebar windows", () => {
 		});
 	});
 
-	test("icon labels are rendered and captions categorize the groups", async () => {
+	test("rail icons are glyph-only: no labels, no categories", async () => {
 		const $icon = await installLibs();
-		const $label = $icon.querySelector(":scope > .app-label");
-		assert.ok($label, "app-label missing from the icon");
-		assert.equal($label.textContent, "Bibliotecas");
-
+		assert.ok($icon, "icon missing");
+		assert.equal(
+			$icon.querySelector(":scope > .app-label"),
+			null,
+			"app-label must not render next to the glyph",
+		);
 		assert.ok(
-			$apps.classList.contains("with-labels"),
-			"with-labels class not applied",
+			!$apps.classList.contains("with-labels"),
+			"with-labels class must not be applied",
 		);
 		const $group = $icon.closest(".apps-group");
 		assert.ok($group, "icon outside a group");
-		assert.ok(
-			$group.dataset.label?.length > 0,
-			"group has no category caption",
+		assert.equal(
+			$group.dataset.label,
+			undefined,
+			"groups must not carry category captions",
 		);
 	});
 });

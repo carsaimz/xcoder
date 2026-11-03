@@ -23,6 +23,38 @@ header {
   }
 }
 
+// Every page (about, settings, profile, plugins, file browser…) gets the
+// VS Code command-center treatment: the bar melts into the page
+// background, the title sits left next to the back chevron — no more
+// colored mobile app bar.
+wc-page:not(#root)>header.tile {
+  height: 35px;
+  background-color: rgb(255, 255, 255);
+  background-color: var(--secondary-color);
+  color: rgb(37, 37, 37);
+  color: var(--primary-text-color);
+  box-shadow: none;
+  border-bottom: 1px solid var(--border-color);
+
+  >.text {
+    margin: auto 0;
+    padding-left: 2px;
+    text-align: left;
+    font-size: 0.9em;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .icon {
+    font-size: 1.35em !important;
+    opacity: 0.85;
+
+    &:active {
+      transform: none;
+    }
+  }
+}
+
 .tile {
   display: flex;
   flex-wrap: nowrap;

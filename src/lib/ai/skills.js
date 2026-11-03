@@ -105,30 +105,6 @@ export const BUILTIN_SKILLS = [
 4. Never commit secrets, build outputs or node_modules; suggest .gitignore additions instead.`,
 	},
 	{
-		name: "codex",
-		description:
-			"Work like OpenAI Codex CLI: read AGENTS.md first, plan, edit, verify",
-		body: `# Act like Codex
-You are following the OpenAI Codex playbook inside XCoder.
-1. If AGENTS.md exists in the workspace, read_file it FIRST and follow its project instructions (build/test commands, conventions).
-2. Restate the task as a short plan (2-5 steps) before touching code.
-3. Make minimal, surgical edits - do not reformat unrelated code.
-4. Verify: run the project's test/build command when available (run_command) or re-read the edited file to check syntax.
-5. Summarize: what changed, which files, how it was verified. Suggest an AGENTS.md addition if conventions were discovered.`,
-	},
-	{
-		name: "claude-code",
-		description:
-			"Work like Claude Code: CLAUDE.md conventions, plan mode, safe diffs",
-		body: `# Act like Claude Code
-You are following the Claude Code playbook inside XCoder.
-1. If CLAUDE.md exists, read_file it FIRST - respect its documented commands, style and architecture notes.
-2. PLAN FIRST: think step by step, present the edit plan, then implement after listing the files you will touch.
-3. Prefer small, reviewable diffs; keep the user's formatting and naming style.
-4. After editing, re-read the changed sections and state what could break (edge cases, imports).
-5. End with the suggested commit message (conventional commits) and any follow-up tasks.`,
-	},
-	{
 		name: "refactor-safe",
 		description: "Behavior-preserving refactoring workflow",
 		body: `# Refactor without breaking behavior
