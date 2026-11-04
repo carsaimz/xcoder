@@ -10,6 +10,7 @@ import config from "./config";
 import EditorFile from "./editorFile";
 import openFolder from "./openFolder";
 import appSettings from "./settings";
+import fileTimeline from "./fileTimeline";
 
 let saveTimeout;
 
@@ -137,6 +138,12 @@ async function saveFile(file, isSaveAs = false) {
 			savedDoc,
 			savedVersion,
 		});
+
+		// VS Code Timeline parity: local snapshot after every save
+		// (restore/delete available in the file menu). Never throws.
+		if (appSettings.value.fileTimeline && file.uri) {
+			fileTimeline.recordSnapshot(file.uri, data, file.filename);
+		}
 
 		if (file.location) {
 			recents.addFolder(file.location);

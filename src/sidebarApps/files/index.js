@@ -13,8 +13,175 @@ export default [
 	initApp, // init function
 	false, // prepend
 	onSelected, // onSelected function
-	{ titleKey: "files", group: "primary" },
+	{
+		titleKey: "files",
+		group: "primary",
+		titleActions: getTitleActions,
+	},
 ];
+
+/**
+ * View title actions for the Explorer title bar (VS Code parity):
+ * new file, new folder, refresh and collapse-all. Dependencies load on
+ * first tap — the module itself must stay import-light because it sits
+ * in the boot graph of the sidebar (and of every fileIcons consumer).
+ * @returns {{icon: string, title?: string, onclick: Function}[]}
+ */
+function getTitleActions() {
+	return [
+		{
+			icon: "file-plus",
+			title: strings["new file"],
+			onclick: () => createEntry("file"),
+		},
+		{
+			icon: "folder-plus",
+			title: strings["new folder"],
+			onclick: () => createEntry("folder"),
+		},
+		{
+			icon: "refresh-cw",
+			title: strings["refresh"],
+			onclick: refreshFolders,
+		},
+		{
+			icon: "chevrons-down",
+			title: strings["collapse all"] || "Collapse All",
+			onclick: collapseAll,
+		},
+	];
+}
+
+/**
+ * Shared dependencies of the title actions, resolved once on first use.
+ * @returns {Promise<object>} { addedFolder, fsOperation, prompt, select, toast, config, helpers, Url }
+ */
+let depsPromise = null;
+function loadDeps() {
+	depsPromise ??= Promise.all([
+		import("lib/openFolder"),
+		import("fileSystem"),
+		import("dialogs/prompt"),
+		import("dialogs/select"),
+		import("components/toast"),
+		import("lib/config"),
+		import("utils/helpers"),
+		import("utils/Url"),
+	]).then(
+		([
+			{ addedFolder },
+			{ default: fsOperation },
+			{ default: prompt },
+			{ default: select },
+			{ default: toast },
+			{ default: config },
+			{ default: helpers },
+			{ default: Url },
+		]) => ({
+			addedFolder,
+			fsOperation,
+			prompt,
+			select,
+			toast,
+			config,
+			helpers,
+			Url,
+		}),
+	);
+	return depsPromise;
+}
+
+/**
+ * Creates a file or folder at the root of the target folder.
+ * @param {"file"|"folder"} kind
+ * @returns {Promise<void>}
+ */
+async function createEntry(kind) {
+	const { addedFolder, fsOperation, prompt, toast, config, helpers, Url } =
+		await loadDeps();
+
+	if (!addedFolder.length) {
+		toast(strings["open folder"]);
+		return;
+	}
+
+	let name = await prompt(
+		kind === "file" ? strings["enter file name"] : strings["folder name"],
+		"",
+		"filename",
+		{
+			match: config.FILE_NAME_REGEX,
+			required: true,
+		},
+	);
+
+	name = helpers.fixFilename(name);
+	if (!name) return;
+
+	const folder = await resolveTargetFolder({ addedFolder, select, toast });
+	if (!folder) return;
+
+	const entryUrl = Url.join(folder.url, name);
+	if (await fsOperation(entryUrl).exists()) {
+		toast(`${name}: ${strings["already exists"]}`);
+		return;
+	}
+
+	try {
+		if (kind === "file") {
+			await fsOperation(folder.url).createFile(name);
+		} else {
+			await fsOperation(folder.url).createDirectory(name);
+		}
+		folder.reload();
+	} catch (error) {
+		helpers.error(error);
+	}
+}
+
+/**
+ * Picks the folder root a title action applies to: the only open folder
+ * when there is exactly one, otherwise a selection dialog.
+ * @param {{addedFolder: object[], select: Function, toast: Function}} deps
+ * @returns {Promise<object|null>} folder object or null when cancelled
+ */
+async function resolveTargetFolder({ addedFolder, select, toast }) {
+	const folders = addedFolder.filter((folder) => folder.url);
+	if (!folders.length) {
+		toast(strings["open folder"]);
+		return null;
+	}
+	if (folders.length === 1) return folders[0];
+
+	const options = folders.map((folder) => [
+		folder.url,
+		folder.title || folder.url,
+	]);
+	const url = await select(strings["select folder"], options);
+	if (!url) return null;
+	return folders.find((folder) => folder.url === url) || null;
+}
+
+/** Reloads every open folder (Explorer refresh button). */
+async function refreshFolders() {
+	const { addedFolder, toast } = await loadDeps();
+	if (!addedFolder.length) {
+		toast(strings["open folder"]);
+		return;
+	}
+	addedFolder.forEach((folder) => folder.reload?.());
+}
+
+/** Collapses every folder list in the Explorer (VS Code collapse-all). */
+function collapseAll() {
+	const lists = container.getAll(":scope > div");
+	lists.forEach((list) => {
+		if (typeof list.collapse === "function" && !list.collapsed) {
+			list.collapse();
+		}
+	});
+	if (lists.length) fixHeight(lists[0]);
+}
 
 /**
  * Initialize files app

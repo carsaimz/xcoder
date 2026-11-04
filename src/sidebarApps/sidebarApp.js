@@ -41,6 +41,8 @@ export default class SidebarApp {
 	#floating = false;
 	/**@type {boolean} dock apps (float + dock:"right") can anchor to the right edge instead of floating */
 	#dock = false;
+	/**@type {{tabbed?: boolean, launcher?: boolean, titleKey?: string, dock?: "right", titleActions?: (Array|Function)}} raw registration opts */
+	#opts = {};
 
 	/**
 	 * Creates a new sidebar app.
@@ -49,7 +51,7 @@ export default class SidebarApp {
 	 * @param {string} title
 	 * @param {(el:HTMLElement)=>(void|Function)} init
 	 * @param {(el:HTMLElement)=>void} onselect
-	 * @param {{tabbed?: boolean, launcher?: boolean, titleKey?: string, dock?: "right"}} [opts]
+	 * @param {{tabbed?: boolean, launcher?: boolean, titleKey?: string, dock?: "right", titleActions?: (Array|Function)}} [opts]
 	 */
 	constructor(icon, id, title, init, onselect, opts = {}) {
 		const emptyFunc = () => {};
@@ -65,6 +67,7 @@ export default class SidebarApp {
 		this.#iconName = icon || "";
 		this.#floating = !!opts.floating;
 		this.#dock = opts.dock === "right" && this.#floating;
+		this.#opts = opts;
 		this.#group =
 			opts.group === "bottom" || opts.group === "tools"
 				? opts.group
@@ -366,6 +369,29 @@ export default class SidebarApp {
 	/**@type {(el:HTMLElement)=>void} */
 	get onselect() {
 		return this.#onselect;
+	}
+
+	/**
+	 * View title actions (VS Code Explorer-style icon buttons in the
+	 * sidebar's panel title bar). The registration opts accept either
+	 * a static array or a zero-arg factory — a factory keeps labels
+	 * fresh on every panel activation (language change safe). A
+	 * throwing factory degrades to no actions instead of killing
+	 * activation.
+	 * @returns {{icon: string, title?: string, onclick: Function}[]}
+	 */
+	get titleActions() {
+		const source = this.#opts?.titleActions;
+		if (typeof source === "function") {
+			try {
+				const actions = source();
+				return Array.isArray(actions) ? actions : [];
+			} catch (error) {
+				window.log?.("warn", `titleActions for "${this.#id}" failed: ${error}`);
+				return [];
+			}
+		}
+		return Array.isArray(source) ? source : [];
 	}
 
 	remove() {

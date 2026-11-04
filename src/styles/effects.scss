@@ -62,9 +62,30 @@ wc-page:not(.no-animation) {
 		display: none;
 	}
 
+	// Global kill switch: decorative animations and transitions stop when
+	// the OS asks for reduced motion (WCAG 2.3.3 / roadmap Lote A). The
+	// instant-state rules keep functional animations out of the way while
+	// layout itself is untouched.
 	wc-page:not(.no-animation),
 	#palette,
-	#sidebar .container {
+	#sidebar .container,
+	.sidebar-float,
+	#quick-tools,
+	.apps-tooltip {
 		animation: none;
+		transition: none;
+	}
+
+	#root,
+	app,
+	main,
+	#sidebar,
+	#palette,
+	#hints,
+	dialog {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
 	}
 }

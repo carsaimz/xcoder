@@ -306,6 +306,25 @@ const ICONS = {
 		["path", { d: "M12 10v6" }],
 		["path", { d: "M9 13h6" }],
 	],
+	"folder-plus": [
+		["path", { d: "M12 10v6" }],
+		["path", { d: "M9 13h6" }],
+		[
+			"path",
+			{
+				d: "M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z",
+			},
+		],
+	],
+	"chevrons-down": [
+		["path", { d: "m7 6 5 5 5-5" }],
+		["path", { d: "m7 13 5 5 5-5" }],
+	],
+	history: [
+		["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" }],
+		["path", { d: "M3 3v5h5" }],
+		["path", { d: "M12 7v5l4 2" }],
+	],
 	lightbulb: [
 		[
 			"path",

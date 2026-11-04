@@ -223,6 +223,13 @@ export default function editorSettings() {
 			category: categories.guidesIndicators,
 		},
 		{
+			key: "fileTimeline",
+			text: strings["timeline"] || "Timeline",
+			checkbox: values.fileTimeline ?? true,
+			info: strings["settings-info-editor-file-timeline"],
+			category: categories.guidesIndicators,
+		},
+		{
 			key: "relativeLineNumbers",
 			text: strings["relative line numbers"],
 			checkbox: values.relativeLineNumbers,

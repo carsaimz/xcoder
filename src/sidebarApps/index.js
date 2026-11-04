@@ -110,7 +110,9 @@ function init($el) {
 		}
 		// closing the window frees the title bar again
 		sidebarModule()
-			.then(({ default: SidebarModule }) => SidebarModule.setPanelTitle?.(""))
+			.then(({ default: SidebarModule }) =>
+				SidebarModule.setPanelTitle?.("", []),
+			)
 			.catch(() => {});
 	});
 	// the dock's "open as window" button hands the app back to a
@@ -131,7 +133,10 @@ function init($el) {
 			if (!app) return;
 			sidebarModule()
 				.then(({ default: SidebarModule }) =>
-					SidebarModule.setPanelTitle?.(usesFloat(app) ? "" : app.title),
+					SidebarModule.setPanelTitle?.(
+						usesFloat(app) ? "" : app.title,
+						usesFloat(app) ? [] : app.titleActions,
+					),
 				)
 				.catch(() => {});
 		}, 0);
@@ -291,7 +296,10 @@ function setActiveApp(id) {
 	// title their own window instead
 	sidebarModule()
 		.then(({ default: SidebarModule }) =>
-			SidebarModule.setPanelTitle?.(floatMode ? "" : app.title),
+			SidebarModule.setPanelTitle?.(
+				floatMode ? "" : app.title,
+				floatMode ? [] : app.titleActions,
+			),
 		)
 		.catch(() => {});
 }

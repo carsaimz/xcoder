@@ -42,3 +42,12 @@
     color: var(--popup-text-color);
   }
 }
+
+// Quick Open fuzzy highlight — the matched characters of a filename glow
+// in the accent color, VS Code quick-input style
+mark.xc-fuzzy-hit {
+  background: transparent;
+  color: var(--active-color, #0078d4);
+  font-weight: 700;
+  padding: 0;
+}

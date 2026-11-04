@@ -140,6 +140,9 @@ class Settings {
 			retryRemoteFsAfterFail: true,
 			linenumbers: true,
 			minimap: true,
+			// VS Code Timeline parity: local snapshots on every save
+			// (roadmap Lote D item), restorable from the file menu
+			fileTimeline: true,
 			formatOnSave: false,
 			fadeFoldWidgets: false,
 			autoCorrect: true,

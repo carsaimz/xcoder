@@ -16,7 +16,19 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.14
+## ✅ Concluído até a v1.8.16
+
+- **v1.8.16 — aprofundamento VS Code: acções de título, linha do
+  tempo local e Quick Open difuso:** a barra de título do painel da
+  sidebar aloja botões-ícone (paridade com o Explorer) e o Explorador
+  ganha Novo ficheiro / Nova pasta / Actualizar / Colapsar tudo;
+  cada gravação guarda uma captura local do ficheiro (máx. 20 / 2 MB,
+  gravações idênticas desduplicadas) listada em «Menu do ficheiro ›
+  Linha do tempo» com restauro que mantém o cursor e interruptor em
+  Definições › Editor; «Ir para ficheiro» (Ctrl-P) pontua como o VS
+  Code (bónus de início/fronteira/consecutivos/nome, realce dos
+  caracteres correspondentes; abas abertas › recentes › índice); o SO
+  pode pedir movimento reduzido e o app obedece (WCAG 2.3.3).
 
 - **v1.8.14 — reestruturação VS Code (estrutura) + minimapa + IA
   ancorada + economia de tokens:** minimapa na borda direita do editor
@@ -405,9 +417,8 @@ referência.
 - [ ] **TalkBack nos menus principais** ✨ — Rótulos de conteúdo nos
   ícones, alvos de toque ≥48dp e navegação de foco coerente no sidebar, abas
   e dialogs.
-- [ ] **Respeitar prefers-reduced-motion** ✨ — Desativar animações
-  decorativas (pulso, transições de página) quando o SO pede movimento
-  reduzido.
+- [x] **Respeitar prefers-reduced-motion** ✨ — **v1.8.16:** animações
+  decorativas desligam-se quando o SO pede movimento reduzido.
 
 ## Lote B — Busca & Build
 
@@ -416,9 +427,9 @@ referência.
   forma eficiente).
 - [ ] **Globs na busca/substituição** ✨ — Incluir/excluir por padrão
   (`src/**`, `*.min.js`) e histórico de buscas persistente entre sessões.
-- [ ] **«Ir para ficheiro» fuzzy** 🖥️ inspirado no VS Code — Abertura
-  rápida por nome com ranking (abertos recentes primeiro), acessível da
-  barra superior.
+- [x] **«Ir para ficheiro» fuzzy** 🖥️ inspirado no VS Code —
+  **v1.8.16:** pontuação difusa com realce dos caracteres; abertas
+  primeiro, depois recentes, depois o índice.
 - [ ] **Build recipes por projeto** ✨ — `scripts.json` com build/test/run
   executados no console com ambiente do projeto e botão de parar.
 - [ ] **Pré-visualização inline das ocorrências** 🖥️ inspirado no Spck —
@@ -446,9 +457,9 @@ referência.
   entre execuções.
 - [ ] **Painel de inspeção Eruda melhorado** ✨ — DOM/CSS em tempo real no
   preview web com editáveis inline (o módulo devTools já embarca Eruda).
-- [ ] **Timeline local por ficheiro** 🖥️ inspirado no VS Code Timeline —
-  Snapshots automáticos ao guardar (janela de tempo configurável) com diff e
-  restauração.
+- [x] **Timeline local por ficheiro** 🖥️ inspirado no VS Code Timeline —
+  **v1.8.16:** capturas ao guardar (20 / 2 MB, dedupe), página com
+  restauro e limpeza, interruptor nas definições.
 - [ ] **Export/restore do estado do app** ✨ — Zip com settings, plugins,
   modelos instalados e sessões — para migrar de aparelho.
 - [ ] **Visualizador de Logcat** ✨ — Ver logcat filtrado (por tag/app)
@@ -732,7 +743,7 @@ referência.
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.8.9
+## ✅ Done through v1.8.16
 
 - **v1.8.9 — hybrid sidebar (native docked + tool windows), embedded-site
   downloads, 24 dev tools and 69 libraries:** files/plugins/
@@ -1029,8 +1040,8 @@ Rejected/reverted upstream: #2864, #2526, #2930/#2931 (reverted in
   Markdown).
 - [ ] **TalkBack on the main surfaces** ✨ — Content labels on icons, ≥48dp
   touch targets and coherent focus order across sidebar, tabs and dialogs.
-- [ ] **Honor prefers-reduced-motion** ✨ — Disable decorative animations
-  (pulses, page transitions) when the OS requests reduced motion.
+- [x] **Honor prefers-reduced-motion** ✨ — **v1.8.16:** decorative
+  animations switch off when the OS requests reduced motion.
 
 ## Batch B — Search & Build
 
@@ -1039,8 +1050,9 @@ Rejected/reverted upstream: #2864, #2526, #2930/#2931 (reverted in
   efficiently).
 - [ ] **Glob search/replace** ✨ — Include/exclude patterns (`src/**`,
   `*.min.js`) and a search history persisted across sessions.
-- [ ] **Fuzzy «Go to file»** 🖥️ inspired by VS Code — Quick open by name
-  with ranking (recently opened first), reachable from the top bar.
+- [x] **Fuzzy «Go to file»** 🖥️ inspired by VS Code — **v1.8.16:**
+  fuzzy scoring with matched-character highlight; open tabs first, then
+  recents, then the native index.
 - [ ] **Per-project build recipes** ✨ — `scripts.json` with build/test/run
   executed in the console with project env and a stop button.
 - [ ] **Inline match preview** 🖥️ inspired by Spck — Each result shows the
@@ -1065,8 +1077,9 @@ Rejected/reverted upstream: #2864, #2526, #2930/#2931 (reverted in
   objects with an expandable tree and pin watched expressions across runs.
 - [ ] **Improved Eruda inspector** ✨ — Real-time DOM/CSS in the web
   preview with inline editing (the devTools module already ships Eruda).
-- [ ] **Per-file local timeline** 🖥️ inspired by VS Code Timeline —
-  Automatic snapshots on save (configurable window) with diff and restore.
+- [x] **Per-file local timeline** 🖥️ inspired by VS Code Timeline —
+  **v1.8.16:** snapshots on save (20 / 2 MB, de-duplicated), restore and
+  clear page, settings toggle.
 - [ ] **Full app state export/restore** ✨ — Zip with settings, plugins,
   installed models and sessions — for device migration.
 - [ ] **Logcat viewer** ✨ — Filtered logcat (by tag/app) while running

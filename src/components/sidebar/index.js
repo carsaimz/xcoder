@@ -2,6 +2,7 @@ import "./style.scss";
 import Ref from "html-tag-js/ref";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
+import svgIcon from "utils/svgIcons";
 
 /**
  * @typedef {object} SideBar
@@ -9,6 +10,13 @@ import config from "lib/config";
  * @property {function():void} hide
  * @property {function():void} toggle
  * @property {function():void} onshow
+ */
+
+/**
+ * @typedef {object} PanelTitleAction
+ * @property {string} icon svg pack name or icon-font class
+ * @property {string} [title] accessible label / tooltip
+ * @property {function():void} onclick invoked when the action is tapped
  */
 
 /**@type {HTMLElement} */
@@ -54,7 +62,10 @@ function create($container, $toggler) {
 				<div className="app-icons-container"></div>
 			</div>
 			<div className="panel">
-				<div className="panel-title" hidden></div>
+				<div className="panel-title" hidden>
+					<span className="panel-title-text"></span>
+					<span className="panel-title-actions"></span>
+				</div>
 				<div className="container"></div>
 			</div>
 			<div
@@ -483,15 +494,47 @@ function create($container, $toggler) {
 	/**
 	 * Shows the active docked app's name in the panel title bar
 	 * (VS Code view title). Empty string hides the bar again.
+	 * Optional view title actions (VS Code style icon buttons on the
+	 * right edge of the bar) can be passed as the second argument:
+	 * `[{ icon: "file-plus", title: "New file", onclick() {} }]` —
+	 * `icon` is an "svg:" pack name (without prefix) or an icon-font
+	 * class.
 	 * @param {string} title
+	 * @param {PanelTitleAction[]} [actions]
 	 */
-	function setPanelTitle(title) {
+	function setPanelTitle(title, actions) {
 		const $title = $el.get(".panel-title");
 		if (!$title) return;
 		const text = String(title || "");
-		$title.textContent = text;
+		const $text = $title.get(".panel-title-text");
+		const $actions = $title.get(".panel-title-actions");
+		if ($text) $text.textContent = text;
 		$title.hidden = !text;
 		$el.classList.toggle("with-panel-title", !!text);
+
+		if (!$actions) return;
+		$actions.textContent = "";
+		(Array.isArray(actions) ? actions : []).forEach((action) => {
+			if (!action?.icon || typeof action.onclick !== "function") return;
+			const icon = String(action.icon).startsWith("svg:")
+				? String(action.icon).slice(4)
+				: action.icon;
+			const $glyph = svgIcon(icon);
+			const $btn = $glyph ? (
+				<span className="panel-title-action xc-svgicon">{$glyph}</span>
+			) : (
+				<span className={`panel-title-action icon ${icon}`} />
+			);
+			$btn.title = action.title || "";
+			$btn.setAttribute("role", "button");
+			$btn.setAttribute("aria-label", action.title || "");
+			$btn.onclick = (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				action.onclick(e);
+			};
+			$actions.append($btn);
+		});
 	}
 
 	$el.show = show;

@@ -4,6 +4,7 @@ import files from "lib/fileList";
 import openFile from "lib/openFile";
 import { addedFolder } from "lib/openFolder";
 import recents from "lib/recents";
+import { highlightMatches, rankCandidates } from "utils/fuzzyMatch";
 import helpers from "utils/helpers";
 
 /**
@@ -12,7 +13,6 @@ import helpers from "utils/helpers";
 
 /**@type {HintModification} */
 let hintsModification;
-
 export default async function findFile() {
 	palette(
 		generateHints,
@@ -29,32 +29,44 @@ export default async function findFile() {
 	files.on("remove-file", onRemoveFile);
 
 	/**
-	 * Generates hint for inputhints
+	 * Generates fuzzy-ranked hints for the current query. Open files come
+	 * first, then recently used, then the folder listing and the native
+	 * file index (VS Code Quick Open behaviour).
 	 * @param {HintModification} hints Hint modification object
+	 * @param {string} [query]
 	 */
 	async function generateHints(hints, query = "") {
 		hintsModification = hints;
-		const list = [];
 		const seen = new Set();
+		const candidates = [];
 
-		editorManager.files.forEach((file) => {
-			const { uri, name } = file;
-			if (!matchesQuery(query, name, uri)) return;
+		// already-open tabs: priority 1 (also the natural recents order)
+		editorManager.files.forEach((file, index) => {
+			if (file.uri) seen.add(file.uri);
 			let { location = "" } = file;
-
 			if (location) {
 				location = helpers.getVirtualPath(location);
 			}
-
-			if (uri) seen.add(uri);
-			list.push(hintItem(name, location, uri));
+			candidates.push({
+				name: file.name,
+				path: location || file.uri || "",
+				url: file.uri || file.id,
+				priority: 1 + index * 0.001,
+			});
 		});
 
+		// on-disk files of open folders: priority 3 (recents get 2)
+		const recentSet = new Set(recents.files);
 		files().forEach((file) => {
 			if (seen.has(file.url)) return;
-			if (!matchesQuery(query, file.name, file.path)) return;
 			seen.add(file.url);
-			list.push(hintItem(file));
+			const visiblePath = helpers.getVirtualPath(file.path || "");
+			candidates.push({
+				name: file.name,
+				path: visiblePath || file.url,
+				url: file.url,
+				priority: recentSet.has(file.url) ? 2 : 3,
+			});
 		});
 
 		const nativeRoots = addedFolder
@@ -71,13 +83,22 @@ export default async function findFile() {
 				entries.forEach((file) => {
 					if (seen.has(file.url)) return;
 					seen.add(file.url);
-					list.push(hintItem(file));
+					candidates.push({
+						name: file.name,
+						path: file.path || file.url,
+						url: file.url,
+						priority: 4,
+					});
 				});
 			} catch (error) {
 				console.warn("Unable to query native file index:", error);
 			}
 		}
-		return list;
+
+		const ranking = rankCandidates(candidates, query, 50);
+		return ranking.map(({ item, indices }) =>
+			hintItem(item.name, item.path, item.url, indices),
+		);
 	}
 
 	function onselect(value) {
@@ -86,24 +107,16 @@ export default async function findFile() {
 	}
 }
 
-function matchesQuery(query, ...values) {
-	if (!query) return true;
-	const normalized = query.toLowerCase();
-	return values.some((value) =>
-		String(value || "")
-			.toLowerCase()
-			.includes(normalized),
-	);
-}
-
 /**
- * Generates hint item for inputhints
+ * Generates hint item for inputhints. The filename renders with the
+ * matched characters highlighted (VS Code quick-open look).
  * @param {string|{name: string, path: string, url: string}} name Hint text
  * @param {string} path Hint subtext
  * @param {string} url Hint value
+ * @param {number[]} [indices] matched character positions inside name
  * @returns {{text: string, value: string}}
  */
-function hintItem(name, path, url) {
+function hintItem(name, path, url, indices = []) {
 	if (typeof name === "object") {
 		({ name, path, url } = name);
 	}
@@ -112,9 +125,11 @@ function hintItem(name, path, url) {
 	if (subText.length > 50) {
 		subText = `...${subText.slice(-50)}`;
 	}
+	const nameHtml = highlightMatches(name, indices);
+	const recentBadge = recent ? `data-str='${strings["recently used"]}'` : "";
 	return {
 		text: `<div style="display: flex; flex-direction: column;">
-        <strong ${recent ? `data-str='${strings["recently used"]}'` : ""} style="font-size: 1rem;">${name}</strong>
+        <strong ${recentBadge} style="font-size: 1rem;">${nameHtml}</strong>
         <span style="font-size: 0.8rem; opacity: 0.8;">${subText}</span>
       <div>`,
 		value: url,

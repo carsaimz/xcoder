@@ -13,6 +13,41 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.16] - 2026-11-04
+
+### Added
+- **Acções de título de vista (VS Code)** — a barra de título do painel
+  da sidebar passou a alojar botões-ícone à direita (paridade com o
+  Explorer do VS Code). O Explorador ganhou quatro: «Novo ficheiro»,
+  «Nova pasta», «Actualizado» (recarrega todas as pastas abertas) e
+  «Colapsar tudo». As apps registram as suas acções via `titleActions`
+  (array ou fábrica — à prova de mudança de idioma; fábrica que lança
+  degrada para sem acções em vez de matar a activação).
+- **Linha do tempo local do ficheiro (VS Code Timeline)** — cada
+  gravação guarda uma captura do ficheiro em
+  `<dados>/timeline/<hash>/<timestamp>.txt` (máx. 20 capturas / 2 MB por
+  ficheiro, gravações idênticas consecutivas são desduplicadas, ficheiros
+  acima de 512 KB são ignorados e falhas de armazenamento nunca quebram
+  a gravação). «Menu do ficheiro › Linha do tempo» abre a página com
+  horas relativas, tamanho e botão Restaurar — restaura no disco e
+  recarrega a aba aberta mantendo o cursor; «Limpar linha do tempo»
+  remove tudo. Interruptor «Linha do tempo» em Definições › Editor
+  (ligado por defeito).
+
+### Changed
+- **«Ir para ficheiro» difuso (Quick Open)** — a pesquisa de ficheiros
+  (Ctrl-P) trocou a busca por sub-cadeia por pontuação difusa com os
+  bónus do VS Code: início da cadeia, fronteiras de palavra, sequências
+  consecutivas e correspondência no nome (vs. pasta). Empates ficam por
+  prioridade: abas abertas, depois usados recentemente, depois o índice
+  nativo; os caracteres correspondentes ficam realçados no resultado.
+
+### Accessibility
+- **prefers-reduced-motion respeitado globalmente** — as animações
+  decorativas (ondulação, transições de páginas, janela flutuante,
+  quicktools, tooltips) desligam-se quando o SO pede movimento reduzido
+  (WCAG 2.3.3), com interruptor global de duração para o resto.
+
 ## [1.8.15] - 2026-11-03
 
 ### Changed
@@ -83,6 +118,24 @@ resumo em inglês.
   entrarem no histórico e contexto do projecto mais enxuto (12 ficheiros
   abertos / 25 entradas da raiz). Conversas longas custam muito menos em
   provedores pagos e gratuitos.
+
+## [1.8.16] - 2026-11-04
+
+### Summary
+- **View title actions**: the sidebar panel title bar now hosts icon
+  buttons on its right edge (VS Code Explorer parity). The Explorer gets
+  New File, New Folder, Refresh and Collapse All; apps register actions
+  via `titleActions` (static array or throwing-safe factory).
+- **Local file timeline (VS Code Timeline)**: every save stores a
+  snapshot (max 20 / 2 MB per file, identical saves de-duplicated);
+  File menu > Timeline lists them with relative times and a Restore
+  button that writes to disk and reloads the open tab keeping the
+  cursor. Settings > Editor > Timeline toggles it (on by default).
+- **Fuzzy Quick Open**: Ctrl-P file search now scores matches like VS
+  Code (start-of-string, word boundaries, consecutive runs, basename
+  beats folder) and highlights the matched characters. Ties rank open
+  tabs first, then recents, then the native index.
+- **prefers-reduced-motion** is honoured globally (WCAG 2.3.3).
 
 ## [1.8.15] - 2026-11-03
 

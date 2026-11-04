@@ -297,6 +297,12 @@ export default {
 	"file-info"(url) {
 		showFileInfo(url);
 	},
+	async "file-timeline"() {
+		const { default: timeline } = await import(
+			/* webpackChunkName: "timeline" */ "pages/timeline"
+		);
+		timeline();
+	},
 	async goto() {
 		const lastLine = editorManager.editor?.state?.doc?.lines;
 		const message = lastLine
