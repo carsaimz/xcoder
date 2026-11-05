@@ -177,9 +177,17 @@ describe("account page (sidebar profile icon)", () => {
                                 "profile body is rendered",
                         );
                         // sign-in section shows because supabaseConfigured() is true and no user
+                        // (site-only login: handoff button, no credentials inside the app)
                         assert.ok(
-                                document.querySelector('input[type="email"]'),
-                                "e-mail field rendered for signed-out user",
+                                [...document.querySelectorAll(".profile-page button")].some(
+                                        ($b) => ($b.textContent || "").includes("Entrar pelo site"),
+                                ),
+                                "site handoff button rendered for signed-out user",
+                        );
+                        assert.equal(
+                                document.querySelector('.profile-page input[type="email"]'),
+                                null,
+                                "no email field inside the app",
                         );
                         // animate() never settles under happy-dom — detach synchronously
                         document

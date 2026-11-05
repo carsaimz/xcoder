@@ -2,14 +2,10 @@
 /**
  * Regression tests for the two "dead account" reports:
  *
- *  1. Profile (account) page: "Entrar"/"Criar conta" did nothing and the
- *     page stayed on "Convidado" forever. Root cause: WCPage's `body`
- *     setter REPLACES the internal `.main` container with the assigned
- *     element, and the getter (`get(".main") || get("main")`) then returns
- *     NULL because the profile body div doesn't carry the `main` class
- *     (the About page does: `<main class="main scroll">`). Every
- *     `$page.body.querySelector(...)` inside onSignIn/onSignUp threw a
- *     silent TypeError — an async click handler rejects invisibly.
+ *  1. Profile (account) page: sign-in is SITE-ONLY (the app never asks
+ *     for credentials) — the session is seeded the same way the
+ *     xcoder://auth/oauth handoff delivers it, and the page must reflect
+ *     it and support sign-out.
  *
  *  2. GitHub settings: a PAT typed into the "Personal access token" row
  *     (and the Remote URL / Branch rows) was never persisted —
@@ -341,125 +337,69 @@ describe("account page (profile) — sign-in must actually work", () => {
         );
 
         test(
-                "shows the honest OAuth hint when no federated provider is active",
+                "site-only sign-in: the app NEVER asks for credentials, only the site handoff",
                 { timeout: 20000 },
                 async () => {
                         renderProfile();
                         await vi.waitFor(
                                 () => {
-                                        const text =
-                                                document.querySelector(".profile-page")
-                                                        ?.textContent || "";
-                                        assert.match(text, /Google\/GitHub/);
-                                },
-                                { timeout: 5000 },
-                        );
-                        cleanupPages();
-                },
-        );
-
-        test(
-                "Entrar sends the password grant, stores the session and re-renders",
-                { timeout: 20000 },
-                async () => {
-                        renderProfile();
-                        const $body = document.querySelector(".profile-page");
-                        $body.querySelector('input[type="email"]').value =
-                                "teste@exemplo.com";
-                        $body.querySelector('input[type="password"]').value =
-                                "senha-123";
-                        const $btn = [...$body.querySelectorAll("button")].find(($b) =>
-                                ($b.textContent || "").includes("Entrar"),
-                        );
-                        assert.ok($btn, "Entrar button exists");
-                        $btn.click();
-
-                        await vi.waitFor(
-                                () => {
+                                        const $page = document.querySelector(".profile-page");
                                         assert.ok(
-                                                state.fetchCalls.some((c) =>
-                                                        c.url.includes("/auth/v1/token"),
+                                                [...$page.querySelectorAll("button")].find(($b) =>
+                                                        ($b.textContent || "").includes("Entrar pelo site"),
                                                 ),
-                                                "password grant request sent",
+                                                "site handoff button rendered",
                                         );
                                 },
                                 { timeout: 5000 },
                         );
-
-                        const grant = state.fetchCalls.find((c) =>
-                                c.url.includes("/auth/v1/token"),
-                        );
-                        const payload = JSON.parse(grant.opts.body);
-                        assert.equal(payload.email, "teste@exemplo.com");
-                        assert.equal(payload.password, "senha-123");
-
-                        const stored = JSON.parse(
-                                localStorage.getItem("xcoder.supabase.session") || "null",
+                        const $page = document.querySelector(".profile-page");
+                        assert.equal(
+                                $page.querySelector('input[type="password"]'),
+                                null,
+                                "no password field inside the app",
                         );
                         assert.equal(
-                                stored?.access_token,
-                                "at-123",
-                                "session persisted to localStorage",
+                                $page.querySelector('input[type="email"]'),
+                                null,
+                                "no email field inside the app",
                         );
-                        assert.equal(stored?.user?.email, "teste@exemplo.com");
-
-                        await vi.waitFor(
-                                () => {
-                                        const text = document.body.textContent || "";
-                                        assert.match(
-                                                text,
-                                                /teste@exemplo\.com/,
-                                                "account visible after re-render",
-                                        );
-                                },
-                                { timeout: 5000 },
-                        );
-                        assert.doesNotMatch(
-                                document.body.textContent || "",
-                                /Convidado/,
-                                "guest label gone after sign-in",
+                        assert.ok(
+                                [...$page.querySelectorAll("button")].find(($b) =>
+                                        ($b.textContent || "").includes("colar link"),
+                                ),
+                                "paste-link fallback still offered",
                         );
                         cleanupPages();
                 },
         );
         test(
-                "Terminar sessão clears the session and re-renders to guest",
+                "a seeded session (site handoff) renders the account and Terminar sessão clears it",
                 { timeout: 20000 },
                 async () => {
-                        // 1. sign in (same path as the previous test)
                         renderProfile();
-                        let $body = document.querySelector(".profile-page");
-                        $body.querySelector('input[type="email"]').value =
-                                "teste@exemplo.com";
-                        $body.querySelector('input[type="password"]').value =
-                                "senha-123";
-                        const $in = [...$body.querySelectorAll("button")].find(($b) =>
-                                ($b.textContent || "").includes("Entrar"),
-                        );
-                        $in.click();
-                        await vi.waitFor(
-                                () => {
-                                        const stored = JSON.parse(
-                                                localStorage.getItem(
-                                                        "xcoder.supabase.session",
-                                                ) || "null",
-                                        );
-                                        assert.equal(stored?.access_token, "at-123");
-                                },
-                                { timeout: 5000 },
+                        // the session arrives exactly like the xcoder://auth/oauth
+                        // intent delivers it from the site
+                        const supabase = await import("lib/supabase");
+                        assert.ok(
+                                supabase.applyOAuthTokens(
+                                        "xcoder://auth/oauth#access_token=at-123&refresh_token=rt-123",
+                                ),
+                                "tokens applied",
                         );
                         await vi.waitFor(
                                 () => {
                                         assert.match(
                                                 document.body.textContent || "",
                                                 /teste@exemplo\.com/,
+                                                "account visible after the handoff profile fetch",
                                         );
                                 },
                                 { timeout: 5000 },
                         );
 
-                        // 2. sign out — the confirm dialog (mocked) resolves true
-                        $body = document.querySelector(".profile-page");
+                        // sign out — the confirm dialog (mocked) resolves true
+                        const $body = document.querySelector(".profile-page");
                         const $out = [...$body.querySelectorAll("button")].find(($b) =>
                                 ($b.textContent || "").includes("Terminar sessão"),
                         );

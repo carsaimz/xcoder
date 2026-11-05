@@ -2,12 +2,15 @@
  * GitHub sign-in orchestration for the UI (settings page + git
  * sidebar app).
  *
- * Policy: NO user-owned OAuth clients. Sign-in is either the official
- * built-in client (Device Flow, client id baked into
- * config.GH_OAUTH_CLIENT_ID) or the user's own personal access token
- * (PAT). Legacy installs that saved a client id keep working via the
- * settings.ghOAuthClientId fallback, but users are never asked to
- * create their own apps.
+ * Policy (SITE-ONLY login — user request: "Login deve ser apenas pelo
+ * site, o mesmo vale para GitHub"): sign-in always goes through the
+ * browser. The GitHub App web flow opens the official site, which
+ * exchanges the code server-side and hands the session back to the app
+ * (xcoder://github/session). When the site deployment is not configured
+ * yet, the Device Flow keeps working (github.com in the browser, only a
+ * short code typed there — never credentials inside the app). The in-app
+ * PAT prompt is no longer part of the sign-in chooser; a PAT can still
+ * be set in Settings > GitHub for advanced/self-hosted setups.
  */
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
@@ -59,44 +62,25 @@ export function resolveGhClientId() {
 }
 
 /**
- * Chooses the sign-in method, easiest first: the GitHub App web flow
- * (one tap in the browser) when available, then the Device Flow (needs
- * only a client id), then the manual PAT. The PAT option is ALWAYS
- * offered — it needs no client id and works offline-ish; hiding it
- * here left users with no way to paste a token from the sidebar
- * (v1.7.9 bug: "connect with GitHub via PAT" was impossible and the
- * session problem seemed unsolvable).
+ * Resolves the sign-in method — SITE FIRST. When the site deployment has
+ * the GitHub App credentials the web flow is used directly (no chooser:
+ * one tap opens the site, sign in there, session comes back to the
+ * app). Otherwise the Device Flow is the fallback (still browser-based).
  * @returns {Promise<"web"|"device"|"pat"|null>}
  */
 export async function chooseGhSignInMethod() {
-	const options = [];
-	// only offer the browser route when the site deployment really has
+	// only take the browser route when the site deployment really has
 	// the GitHub App credentials — otherwise it dead-ends on the site's
 	// "não configurada" error page and the account stays empty
 	if (ghWebFlowEnabled() && (await siteGhWebConfigured())) {
-		options.push([
-			"web",
-			strings["github web sign in"] || "Connect with GitHub (browser)",
-			"svg:external-link",
-		]);
+		return "web";
 	}
 	if (resolveGhClientId()) {
-		options.push([
-			"device",
-			strings["github device sign in"] || "Sign in with a code (device flow)",
-			"svg:qr-code",
-		]);
+		return "device";
 	}
-	options.push([
-		"pat",
-		strings["github pat sign in"] || "Personal access token (PAT)",
-		"svg:key",
-	]);
-	const choice = await select(
-		strings["sign in with github"] || "Sign in with GitHub",
-		options,
-	);
-	return choice || null;
+	// last resort (no site config, no client id): the manual PAT prompt,
+	// so the entry point never feels dead
+	return "pat";
 }
 
 /**
@@ -211,14 +195,15 @@ export async function signInWithDeviceFlow() {
 }
 
 /**
- * Full sign-in flow: method chooser, then PAT or Device Flow.
+ * Full sign-in flow: site web flow first, Device Flow fallback,
+ * manual PAT only as the last resort.
  * @returns {Promise<boolean>} whether a session was saved
  */
 export async function signInGitHubFlow() {
 	const method = await chooseGhSignInMethod();
 	if (method === "web") return signInWithGitHubApp();
-	if (method === "pat") return signInWithPat();
 	if (method === "device") return signInWithDeviceFlow();
+	if (method === "pat") return signInWithPat();
 	return false;
 }
 

@@ -91,18 +91,18 @@ describe("fetchGhUser normalises before sending", () => {
         });
 });
 
-describe("sign-in chooser offers PAT (sidebar session bug)", () => {
+describe("sign-in policy (site-only login)", () => {
         const read = (p) => readFileSync(join(process.cwd(), p), "utf8");
 
-        it("chooseGhSignInMethod always pushes the pat option", () => {
+        it("chooseGhSignInMethod keeps pat only as the last-resort method id", () => {
                 const source = read("src/lib/ghSignIn.js");
                 const chooseFn = source.slice(
                         source.indexOf("export async function chooseGhSignInMethod"),
                         source.indexOf("export async function saveGhSession"),
                 );
                 expect(chooseFn).toContain('"pat"');
-                // unconditional push (not behind ghWebFlowEnabled/resolveGhClientId)
-                expect(chooseFn).toMatch(/\n\s*options\.push\(\[\s*"pat"/);
+                // no in-app chooser list anymore — the method is resolved directly
+                expect(chooseFn).not.toMatch(/options\.push/);
         });
 
         it("signInGitHubFlow still routes pat to signInWithPat", () => {

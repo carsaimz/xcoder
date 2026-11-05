@@ -551,6 +551,10 @@
                         overflow: hidden;
                 }
 
+                .ai-tool-detail {
+                        margin-top: 3px;
+                }
+
                 .ai-tool-result {
                         background: color-mix(in srgb, var(--primary-color) 82%, black);
                         border: 1px solid var(--border-color);

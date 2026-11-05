@@ -128,14 +128,15 @@ describe("account page — site session handoff (fim do 'Convidado')", () => {
                 );
         });
 
-        test("profile page wires the handoff button, authchange and inline errors", () => {
+        test("profile page wires the handoff button and authchange (site-only login)", () => {
                 const src = read("src/pages/profile/profile.js");
                 assert.match(src, /async function onSiteHandoff/);
                 assert.match(src, /appHandoffUrl\(\)/);
                 assert.match(src, /addEventListener\("authchange"/);
                 assert.match(src, /removeEventListener\("authchange"/);
-                assert.match(src, /data-form-error/);
-                assert.match(src, /function showFormError/);
+                // site-only sign-in: no credentials are ever asked inside the app
+                assert.doesNotMatch(src, /type="password"/);
+                assert.doesNotMatch(src, /signInWithPassword/);
                 // the mount stays synchronous (first paint + tests)
                 assert.match(src, /ensureFreshSession\(\)\s*\n\s*\.then/);
         });

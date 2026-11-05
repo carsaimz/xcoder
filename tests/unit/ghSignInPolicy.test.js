@@ -45,16 +45,21 @@ describe("shared sign-in flow", () => {
                 expect(legacyPos).toBeGreaterThan(builtinPos);
         });
 
-        it("offers the web flow first, device flow with a client id, PAT last", () => {
+        it("site-first: web flow directly, device fallback, no chooser and no PAT option", () => {
                 const chooseFn = ghSignIn.slice(
                         ghSignIn.indexOf("export async function chooseGhSignInMethod"),
                         ghSignIn.indexOf("export async function saveGhSession"),
                 );
-                const webPos = chooseFn.indexOf("ghWebFlowEnabled()");
-                const devicePos = chooseFn.indexOf("resolveGhClientId()");
-                expect(chooseFn.indexOf('"web"')).toBeGreaterThan(-1);
+                const webPos = chooseFn.indexOf('return "web"');
+                const devicePos = chooseFn.indexOf('return "device"');
+                const patPos = chooseFn.indexOf('return "pat"');
                 expect(webPos).toBeGreaterThan(-1);
                 expect(devicePos).toBeGreaterThan(webPos);
+                expect(patPos).toBeGreaterThan(devicePos);
+                // the chooser must not render an in-app method list anymore
+                expect(chooseFn).not.toMatch(/\bselect\(/);
+                // login happens in the browser/site, never inside the app UI
+                expect(ghSignIn).toMatch(/site/i);
         });
 
         it("the client SECRET never reaches the app source", () => {

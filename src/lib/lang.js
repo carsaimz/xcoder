@@ -270,7 +270,19 @@ export default {
 					: "en-us";
 		const lang = langMap[resolved];
 		const strings = await lang.strings();
-		window.strings = strings.default;
+		// Partial locales used to expose `undefined` for the 600+
+		// keys added after their last translation, so every lookup
+		// fell through to hardcoded (mostly Portuguese) fallbacks —
+		// a Spanish user read Portuguese mid-UI. Merging en-us UNDER
+		// the selected locale guarantees every key resolves: fully
+		// translated locales are untouched, partial ones degrade to
+		// English instead of a random second language.
+		if (resolved !== "en-us") {
+			const en = await langMap["en-us"].strings();
+			window.strings = { ...en.default, ...strings.default };
+		} else {
+			window.strings = strings.default;
+		}
 		currentLang = resolved;
 		document.documentElement.lang = getIntlLocale(resolved);
 		document.documentElement.dir = getLocaleDirection(resolved);

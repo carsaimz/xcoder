@@ -13,6 +13,52 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.18] - 2026-11-05
+
+### Changed
+- **Login apenas pelo site** — a página de conta deixou de pedir
+  e-mail/palavra-passe (e os botões OAuth do app saíram): o login da
+  conta XCoder acontece SOMENTE no site oficial. O botão «Entrar pelo
+  site» abre o navegador, o utilizador entra lá (e-mail, Google ou
+  GitHub) e a sessão volta sozinha via deep link `xcoder://auth/oauth`;
+  quem preferir continua podendo colar o link de retorno à mão. Nenhuma
+  credencial é digitada dentro do app.
+- **GitHub: site primeiro** — o seletor de métodos saiu; com o site
+  configurado, «Entrar com GitHub» abre directamente o fluxo web do
+  GitHub App (o site troca o código no servidor e devolve a sessão via
+  `xcoder://github/session`). Sem configuração no site, cai para o
+  Device Flow (também no navegador); o PAT manual deixou de ser opção
+  do seletor e continua disponível como campo avançado em Definições ›
+  GitHub.
+- **Ferramentas da IA em linha compacta** — cada tool call aparece como
+  um «chip» amigável («Criou src/app.js», «Executou npm test», «Pesquisou
+  na web: "..."») com ícone por tipo de acção, em vez do nome cru da
+  ferramenta; os argumentos (JSON) e a saída completa ficam escondidos
+  e só aparecem ao tocar na linha — o transcript deixou de despejar o
+  conteúdo inteiro dos ficheiros criados.
+
+### Added
+- **Rótulos traduzidos para as ferramentas da IA** — 25 novas chaves de
+  tradução (pt-br, en-us) descrevem cada ferramenta em linguagem natural.
+
+### Fixed
+- **Meio-traduzido acabou** — `lib/lang` agora funde `en-us` DEBAIXO do
+  idioma escolhido: idiomas parciais (647 chaves novas desde a última
+  tradução) mostram inglês em vez de cair em fallbacks codificados
+  (maioria em português) no meio de outra língua.
+- **Español completo** — as 647 chaves que faltavam em `es-sv.json`
+  foram traduzidas (1.059 → 1.706; cobertura total vs en-us), com
+  placeholders, tags HTML e nomes técnicos preservados.
+- **pt-br normalizado** — 10 textos com formas de português europeu
+  («ficheiro», «utilizador», «se precisares») convertidas para pt-BR
+  («arquivo», «usuário», «se precisar»).
+
+### Docs
+- README (pt + en) actualizado ao estado actual: terminal Alpine real
+  no agente, chat com tools compactas, login apenas pelo site,
+  estrutura `lib/ai/` com as novas tools; «Sem conta» trocado por
+  «conta opcional via site».
+
 ## [1.8.17] - 2026-11-05
 
 ### Added
@@ -145,6 +191,28 @@ resumo em inglês.
   entrarem no histórico e contexto do projecto mais enxuto (12 ficheiros
   abertos / 25 entradas da raiz). Conversas longas custam muito menos em
   provedores pagos e gratuitos.
+
+## [1.8.18] - 2026-11-05
+
+### Summary
+- **Site-only sign-in**: the account page no longer asks for e-mail or
+  password and the in-app OAuth buttons are gone — XCoder sign-in
+  happens ONLY on the official site. A «Sign in on the site» button
+  opens the browser and the session returns automatically via the
+  `xcoder://auth/oauth` deep link; a paste-link fallback remains.
+- **GitHub: site first**: the method chooser is gone — with the site
+  configured, sign-in goes straight to the GitHub App web flow (code
+  exchanged server-side, session returned via `xcoder://github/session`);
+  the Device Flow remains as a browser-based fallback and the manual PAT
+  stays as an advanced Settings field.
+- **Compact AI tool rows**: every tool call renders as a friendly chip
+  («Created src/app.js», «Ran npm test») with a per-action icon; raw
+  arguments and full output stay hidden until tapped — no more dumped
+  file contents in the transcript.
+- **Translation fixes**: partial locales now fall back to English
+  (en-us merged underneath) instead of hardcoded Portuguese;
+  Spanish (es-sv) is complete (647 keys translated, full coverage);
+  pt-BR normalized (10 pt-PT forms fixed); 25 new AI tool label keys.
 
 ## [1.8.17] - 2026-11-05
 

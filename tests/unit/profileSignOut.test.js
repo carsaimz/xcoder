@@ -212,15 +212,15 @@ describe("profile — real confirm dialog + real actionStack", () => {
                 "Terminar sessão (real confirm) clears the session",
                 { timeout: 20000 },
                 async () => {
-                        // sign in first
+                        // the session arrives exactly like the site handoff delivers it
+                        const supabase = await import("lib/supabase");
+                        assert.ok(
+                                supabase.applyOAuthTokens(
+                                        "xcoder://auth/oauth#access_token=at-123&refresh_token=rt-123",
+                                ),
+                                "tokens applied",
+                        );
                         renderProfile();
-                        let $body = document.querySelector(".profile-page");
-                        $body.querySelector('input[type="email"]').value =
-                                "teste@exemplo.com";
-                        $body.querySelector('input[type="password"]').value = "senha";
-                        [...$body.querySelectorAll("button")].find(($b) =>
-                                ($b.textContent || "").includes("Entrar"),
-                        ).click();
                         await vi.waitFor(
                                 () => {
                                         assert.equal(
@@ -244,7 +244,7 @@ describe("profile — real confirm dialog + real actionStack", () => {
                         );
 
                         // tap Terminar sessão — REAL confirm dialog opens
-                        $body = document.querySelector(".profile-page");
+                        const $body = document.querySelector(".profile-page");
                         const $out = [...$body.querySelectorAll("button")].find(($b) =>
                                 ($b.textContent || "").includes("Terminar sessão"),
                         );

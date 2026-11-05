@@ -7,7 +7,7 @@
 
 **Editor de código rápido e offline-first para Android** • **Fast, offline-first code editor for Android**
 
-🤖 Agente de IA / AI agent • 🐧 Terminal Linux • 🧠 LSP • 🚫 Sem anúncios / No ads • 🔒 Sem conta / No account
+🤖 Agente de IA / AI agent • 🐧 Terminal Linux • 🧠 LSP • 🔑 Conta opcional via site / Optional site account • 🚫 Sem anúncios / No ads
 
 [🇧🇷 Português (Brasil)](#português-brasil) | [🇺🇸 English](#english)
 
@@ -46,16 +46,26 @@ O XCoder é um editor de código mobile-first para Android focado em privacidade
 e uso offline. Ele entrega uma experiência completa de edição — realce de
 sintaxe para mais de 100 linguagens, integrações LSP, gerenciamento de arquivos
 compatível com Git, um terminal Alpine Linux (proot) e um servidor local de
-pré-visualização — **sem** exigir conta, exibir anúncios ou enviar telemetria.
+pré-visualização — **sem** exibir anúncios ou enviar telemetria. A conta é
+opcional e o login acontece **apenas no site oficial** (o app nunca pede
+credenciais).
 
 ## ✨ Destaques
 
 - 🤖 **Assistente de IA com agentes e subagentes** — traga sua própria chave
-  **ou use o provedor Integrado sem chave**. O agente pode ler e analisar seu
-  projeto, criar/editar/excluir arquivos, executar JavaScript em um sandbox
-  isolado, usar um shell virtual (com VCS de snapshots local) e criar
-  subagentes somente leitura para tarefas de pesquisa. Você aprova cada ação
-  sensível.
+  **ou use o provedor Integrado sem chave**. O agente lê e analisa seu
+  projeto, cria/edita/apaga arquivos, executa JavaScript em um sandbox
+  isolado, pesquisa na web, usa ferramentas GitHub, carrega skills
+  (playbooks) e cria subagentes somente leitura para tarefas de pesquisa —
+  e **comanda o terminal Alpine Linux real**: abre/fecha o terminal, executa
+  qualquer comando, espera a saída, vê o código de saída e decide o próximo
+  passo sozinho (estilo Claude Code). Você aprova cada ação sensível, com
+  três níveis de autonomia (*perguntar*, *seguro* e *automático*).
+- 🖥️ **Chat com ferramentas visíveis e leves** — cada ferramenta aparece como
+  uma linha compacta e amigável (“Criou `src/app.js`”, “Executou
+  `npm test`”), sem despejar conteúdo de arquivo no transcript; toque na
+  linha para ver os argumentos e a saída completa. A resposta chega
+  renderizada ao vivo (streaming) com raciocínio expansível.
 - 🔌 **Gerenciador de provedores de IA** — presets em três grupos:
   - *Integrado (sem chave, grátis)*: Pollinations (texto + **geração de
     imagens** com `/image`) e DuckDuckGo AI (experimental)
@@ -80,6 +90,10 @@ pré-visualização — **sem** exigir conta, exibir anúncios ou enviar telemet
   navegador do app e console.
 - ☁️ **Sincronização em nuvem opcional**: backend no GitHub ou Firebase para
   backup de configurações e conversas de IA.
+- 🔑 **Login apenas pelo site** — a conta do XCoder (e a do GitHub) entra
+  pelo site oficial: o app abre o navegador, você entra lá e a sessão volta
+  automaticamente via deep link (`xcoder://`). Nenhuma credencial é digitada
+  dentro do app.
 - 🛰️ **Site embutido**: aba lateral "Website" abre a documentação, o
   marketplace e a página de patrocínios dentro do próprio app.
 - 🔄 **Verificador de atualizações**: consulta opcional aos GitHub Releases
@@ -143,13 +157,14 @@ npm test
 1. Abra uma pasta de projeto.
 2. Toque na aba **IA** na barra lateral.
 3. Comece a conversar — o provedor **Integrado** (Pollinations) funciona
-   **sem chave e sem conta**. Para mais poder, abra *Configurações →
+   **sem chave e sem cadastro**. Para mais poder, abra *Configurações →
    Assistente de IA* e escolha um provedor (ex.: **Groq** — grátis) com a sua
    chave de API.
 4. Pergunte qualquer coisa: "explique este projeto", "adicione um toggle de
-   dark mode", "encontre todos os usos de X e refatore". Use `/image` para
-   gerar imagens e pressione uma mensagem para copiar, regenerar, detalhar
-   ou resumir a resposta.
+   dark mode", "encontre todos os usos de X e refatore", "rode os testes no
+   terminal e corrija o que falhar". Use `/image` para gerar imagens e
+   pressione uma mensagem para copiar, regenerar, detalhar ou resumir a
+   resposta.
 
 O agente pergunta antes de modificar qualquer coisa, a menos que você aumente
 o nível de autonomia dele.
@@ -169,7 +184,7 @@ chaves) e abra um pull request.
 
 ```
 src/                 código-fonte do app (editor, fs, terminal, LSP, IA)
-  lib/ai/            agente de IA, tools, cliente de provedores, shell virtual
+  lib/ai/            agente de IA, tools (arquivos, terminal real, web, GitHub), cliente de provedores, shell virtual
   cm/                integração CodeMirror 6
   lang/              traduções da interface (30 locales)
   plugins/           plugins Cordova vendored (terminal, server, sftp, ...)
@@ -247,16 +262,25 @@ XCoder é desenvolvido e mantido por **Carsai Mozambique**
 XCoder is a mobile-first code editor for Android focused on privacy and offline
 usage. It ships a complete editing experience — syntax highlighting for 100+
 languages, LSP integrations, Git-friendly file management, an Alpine Linux
-terminal (proot) and a local live preview server — **without** requiring an
-account, showing ads or sending telemetry.
+terminal (proot) and a local live preview server — **without** showing ads or
+sending telemetry. The account is optional and sign-in happens **only on the
+official site** (the app never asks for credentials itself).
 
 ## ✨ Highlights
 
 - 🤖 **AI assistant with agents & subagents** — bring your own key. The agent
-  can read and analyze your project, create/edit/delete files, run JavaScript
-  in an isolated sandbox, use a virtual shell (with a local snapshot VCS) and
-  spawn read-only subagents for research tasks. You approve every sensitive
-  action.
+  reads and analyzes your project, creates/edits/deletes files, runs
+  JavaScript in an isolated sandbox, searches the web, uses GitHub tools,
+  loads skills (playbooks) and spawns read-only subagents for research —
+  and **drives the real Alpine Linux terminal**: it opens/closes the
+  terminal, runs any command, waits for the output, sees the exit code and
+  decides the next step on its own (Claude Code style). You approve every
+  sensitive action, with three autonomy levels (*ask*, *safe* and *auto*).
+- 🖥️ **Chat with visible, lightweight tools** — every tool shows up as a
+  compact friendly row ("Created `src/app.js`", "Ran `npm test`") without
+  dumping file contents into the transcript; tap the row to reveal the raw
+  arguments and full output. Answers arrive rendered live (streaming) with
+  an expandable thought process.
 - 🔌 **AI provider manager** — presets in three groups:
   - *Built-in (keyless, free)*: Pollinations (text + **image generation**
     via `/image`) and DuckDuckGo AI (experimental)
@@ -280,12 +304,16 @@ account, showing ads or sending telemetry.
   console.
 - ☁️ **Optional cloud sync**: GitHub backend or Firebase for settings & AI
   chat backups.
+- 🔑 **Site-only sign-in** — the XCoder account (and GitHub) signs in through
+  the official site: the app opens the browser, you sign in there and the
+  session returns automatically via deep link (`xcoder://`). No credentials
+  are ever typed inside the app.
 - 🔄 **Update checker**: optional checks against GitHub Releases (asked on
   first run, can also be triggered from *About → Check for updates*).
 - 🔌 **Plugins**: install community plugins from URLs or local files, with a
   development template.
-- 🔒 **100% offline core**: no account, no ads, no in-app purchases, no
-  tracking.
+- 🔒 **Offline-first core**: no ads, no in-app purchases, no tracking — the
+  (optional) account lives on the site, not in your editor.
 - 🌍 **30 UI languages** — defaults to your device language (Portuguese as
   fallback).
 
@@ -338,11 +366,12 @@ npm test
 1. Open a project folder.
 2. Tap the **AI** tab in the sidebar.
 3. Start chatting — the **Built-in** provider (Pollinations) works with
-   **no key and no account**. For more power open *Settings → AI assistant*
+   **no key and no sign-up**. For more power open *Settings → AI assistant*
    and pick a provider (e.g. **Groq** — free) with your API key.
 4. Ask anything: "explain this project", "add a dark mode toggle", "find all
-   uses of X and refactor". Use `/image` to generate images, and long-press
-   a message to copy, regenerate, expand or summarize it.
+   uses of X and refactor", "run the tests in the terminal and fix whatever
+   fails". Use `/image` to generate images, and long-press a message to
+   copy, regenerate, expand or summarize it.
 
 The agent asks before modifying anything unless you raise its autonomy level.
 
@@ -360,7 +389,7 @@ a pull request.
 
 ```
 src/                 application source (editor, fs, terminal, LSP, AI)
-  lib/ai/            AI agent, tools, provider client, virtual shell
+  lib/ai/            AI agent, tools (files, real terminal, web, GitHub), provider client, virtual shell
   cm/                CodeMirror 6 integration
   lang/              UI translations (30 locales)
   plugins/           vendored Cordova plugins (terminal, server, sftp, ...)
