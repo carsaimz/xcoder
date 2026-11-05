@@ -133,6 +133,13 @@ Cada release publica:
 | `XCoder-x.y.z.AppImage` | Linux (AppImage) |
 | `xcoder_x.y.z_amd64.deb` | Debian / Ubuntu (.deb) |
 
+No desktop o app tem **menu nativo** (Arquivo/Editar/Visualizar/Terminal/Ajuda)
+com salvamento, abas, desfazer/refazer, paleta de comandos, zoom persistente,
+novo terminal, verificação de actualizações e dialog Sobre — tudo ligado aos
+mesmos comandos do registro interno (atalhos remapeados pelo utilizador
+continuam a funcionar). O site detecta o sistema do visitante e abre a aba de
+downloads certa (Android/Windows/Linux).
+
 Compilar localmente:
 
 ```bash
