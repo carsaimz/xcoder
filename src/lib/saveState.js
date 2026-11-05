@@ -88,8 +88,14 @@ export default () => {
 	});
 
 	if (settings.rememberFolders) {
+		const seenFolderKeys = new Set();
 		addedFolder.forEach((folder) => {
 			const { url, saveState, title, listState, listFiles } = folder;
+			// Old sessions could hold the same project twice under
+			// slightly different URLs — keep only the first copy.
+			const key = String(url || "").replace(/\/+$/, "");
+			if (seenFolderKeys.has(key)) return;
+			seenFolderKeys.add(key);
 			folders.push({
 				url,
 				opts: {

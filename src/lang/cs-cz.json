@@ -1055,5 +1055,7 @@
   "saving replaced files": "Saving replaced files...",
   "replaced files saved": "Saved {count} file(s)",
   "replace failed": "Failed to save {count} file(s)",
-  "no changes found": "No changes found"
+  "no changes found": "No changes found",
+  "explorer empty title": "No folder opened",
+  "explorer empty desc": "Open a project folder to start working."
 }

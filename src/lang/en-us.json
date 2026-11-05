@@ -1660,5 +1660,7 @@
 	"ai models all": "All",
 	"local libs search": "Search libraries...",
 	"local libs no results": "No libraries found",
-	"dev tools search": "Search tools..."
+	"dev tools search": "Search tools...",
+	"explorer empty title": "No folder opened",
+	"explorer empty desc": "Open a project folder to start working."
 }

@@ -210,8 +210,10 @@ function initApp(el) {
 			if (fileList) fixHeight(fileList);
 		},
 	);
-	editorManager.on("add-folder", fixHeight);
+	editorManager.on("add-folder", onFolderChanged);
+	editorManager.on("remove-folder", onFolderChanged);
 	Sidebar.on("show", onSelected);
+	renderEmptyState();
 }
 
 /**
@@ -222,10 +224,84 @@ function onSelected(el) {
 	// Phone sidebars and inactive sidebar apps are detached, so document-wide
 	// icon updates cannot reach them until this view is shown again.
 	fileIcons.refreshRenderedIcons(container);
+	renderEmptyState();
 	const $scrollableLists = container.getAll(":scope .scroll[data-scroll-top]");
 	$scrollableLists.forEach(($el) => {
 		$el.scrollTop = $el.dataset.scrollTop;
 	});
+}
+
+/**
+ * Folder set changed (project opened or closed) — refresh the empty state
+ * and, when the very last project closes with nothing left to work on,
+ * bring the Welcome tab back so "Abrir pasta" is reachable again.
+ * @returns {void}
+ */
+function onFolderChanged() {
+	renderEmptyState();
+	maybeReopenWelcome();
+}
+
+/**
+ * True when no project root is rendered in the Explorer.
+ * @returns {boolean}
+ */
+function hasOpenFolders() {
+	return !!container.querySelector(':scope > .list > .tile[data-type="root"]');
+}
+
+/**
+ * Renders (or removes) the VS Code-style "no folder opened" empty state
+ * with a working Open Folder button — after closing all projects the
+ * Explorer used to go blank with no way to open a new project.
+ * @returns {void}
+ */
+function renderEmptyState() {
+	if (container.querySelector(':scope > .list > .tile[data-type="root"]')) {
+		container
+			.querySelectorAll(":scope > .explorer-empty")
+			.forEach((el) => el.remove());
+		return;
+	}
+
+	if (container.querySelector(":scope > .explorer-empty")) return;
+
+	// <p> on purpose: fixHeight() treats every direct <div> child as a
+	// collapsable list and would crash on it.
+	const $empty = (
+		<p className="explorer-empty">
+			<span className="icon folder_open" />
+			<span className="explorer-empty-title">
+				{strings["explorer empty title"] || "No folder opened"}
+			</span>
+			<span className="explorer-empty-desc">
+				{strings["explorer empty desc"] ||
+					"Open a project folder to start working."}
+			</span>
+			<button className="explorer-empty-btn" type="button">
+				{strings["open folder"] || "Open Folder"}
+			</button>
+		</p>
+	);
+	$empty.onclick = () => xcoder.exec("open-folder");
+	container.append($empty);
+}
+
+/**
+ * Reopens the Welcome tab after the last project is closed and no editor
+ * files remain, restoring the "Open folder" entry point (user report).
+ * @returns {void}
+ */
+function maybeReopenWelcome() {
+	if (hasOpenFolders()) return;
+	if (editorManager.files.length) return;
+	if (editorManager.getFile("welcome-tab", "id")) return;
+
+	import("pages/welcome")
+		.then(({ default: openWelcomeTab }) => openWelcomeTab())
+		.catch((error) => {
+			window.log?.("error", error);
+		});
 }
 
 /**

@@ -13,6 +13,33 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.17] - 2026-11-05
+
+### Added
+- **IA com terminal real** — o agente ganhou a ferramenta «terminal»:
+  abre e fecha o Terminal (Alpine Linux) do app, executa QUALQUER
+  comando (apk, git, node, python, npm, curl, builds…), espera o
+  comando terminar, captura a saída e o código de saída e decide o
+  passo seguinte sozinho. Detecção de fim por marcador único no PTY
+  (com eco ignorado), saída ANSI limpa e truncada (8k caracteres,
+  cabeça+cauda), Ctrl+C disponível («signal») para comandos presos,
+  tempo por comando ajustável (90s padrão, até 300s) e execuções
+  serializadas (um comando de cada vez). Comandos interactivos em
+  ecrã inteiro (vim/htop) ficam documentados como a evitar.
+
+### Fixed
+- **«Abrir pasta» desaparecia ao fechar todos os projectos** — o
+  Explorador agora mostra um estado vazio à la VS Code («Nenhuma pasta
+  aberta» + botão «Abrir pasta» funcional) em vez de ficar em branco;
+  ao fechar o último projecto sem ficheiros abertos, a aba Boas-vindas
+  volta sozinha com o botão grande. Era impossível abrir um novo
+  projecto sem reiniciar o app.
+- **Projectos duplicados** — abrir a mesma pasta por caminhos com
+  forma diferente (com/sem barra final, SAF vs doc id) criava dois
+  cartões do mesmo projecto; a verificação de duplicados compara
+  agora URLs normalizados (o mesmo critério do openFolder.find), e o
+  saveState também elimina duplicados de sessões antigas ao gravar.
+
 ## [1.8.16] - 2026-11-04
 
 ### Added
@@ -118,6 +145,31 @@ resumo em inglês.
   entrarem no histórico e contexto do projecto mais enxuto (12 ficheiros
   abertos / 25 entradas da raiz). Conversas longas custam muito menos em
   provedores pagos e gratuitos.
+
+## [1.8.17] - 2026-11-05
+
+### Added
+- **AI with a real terminal** — the agent gained a «terminal» tool:
+  it opens and closes the app's Terminal (Alpine Linux), runs ANY
+  command (apk, git, node, python, npm, curl, builds...), waits for
+  completion, captures output + exit code and decides the next step on
+  its own. Completion is detected with a unique PTY marker (echo-safe),
+  output is ANSI-cleaned and clamped (8k chars, head+tail), Ctrl+C is
+  available via the «signal» action, per-command timeout is tunable
+  (90s default, up to 300s) and runs are serialized (one at a time).
+
+### Fixed
+- **«Open Folder» vanished after closing all projects** — the Explorer
+  now shows a VS Code-style empty state («No folder opened» + a working
+  Open Folder button) instead of going blank; when the last project
+  closes with no editor files open, the Welcome tab comes back on its
+  own with the big button. Opening a new project used to require an
+  app restart.
+- **Duplicate projects** — opening the same folder through differently
+  shaped paths (trailing slash, SAF vs doc id) created two tiles for
+  one project; the duplicate check now compares normalized URLs (same
+  criterion as openFolder.find) and saveState also dedupes legacy
+  sessions while persisting.
 
 ## [1.8.16] - 2026-11-04
 

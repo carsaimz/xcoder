@@ -128,7 +128,10 @@ const XCODER_PLUGIN_MANIFEST_FILE = "plugin.json";
  * @param {Map<string, boolean>} [opts.listState]
  */
 function openFolder(_path, opts = {}) {
-	if (addedFolder.find((folder) => folder.url === _path)) {
+	// Same project opened twice through different URL shapes (trailing
+	// slash, SAF tree vs doc id) used to create duplicate tiles in the
+	// Explorer — compare normalized keys instead of raw strings.
+	if (addedFolder.find((folder) => areSameOpenFolderUrl(folder.url, _path))) {
 		return;
 	}
 

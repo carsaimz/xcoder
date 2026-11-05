@@ -16,7 +16,19 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.16
+## ✅ Concluído até a v1.8.17
+
+- **v1.8.17 — IA com terminal real + Explorador que nunca fica sem
+  saída:** o agente abre/fecha o Terminal (Alpine) e corre comandos
+  reais (apk/git/node/python/npm/curl/builds), esperando o fim e lendo
+  a saída + código de saída antes de decidir o passo seguinte (marcador
+  PTY, saída limpa e limitada, Ctrl+C, timeout ajustável, execuções
+  serializadas); o Explorador mostra estado vazio com botão «Abrir
+  pasta» quando não há projectos e a Boas-vindas regressa ao fechar o
+  último; projectos duplicados (barra final/SAF) eliminados pela
+  comparação de URLs normalizados.
+
+- **v1.8.16 — aprofundamento VS Code: acções de título, linha do
 
 - **v1.8.16 — aprofundamento VS Code: acções de título, linha do
   tempo local e Quick Open difuso:** a barra de título do painel da
@@ -743,7 +755,20 @@ referência.
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.8.16
+## ✅ Done through v1.8.17
+
+- **v1.8.17 — AI with a real terminal + an Explorer with no dead end:**
+  the agent opens/closes the (Alpine) Terminal and runs real commands
+  (apk/git/node/python/npm/curl/builds), waiting for completion and
+  reading output + exit code before deciding the next step (PTY marker,
+  cleaned & clamped output, Ctrl+C, tunable timeout, serialized runs);
+  the Explorer shows an empty state with an Open Folder button when no
+  projects remain and Welcome returns after the last one closes;
+  duplicate projects (trailing slash/SAF) eliminated via normalized
+  URL comparison.
+
+- **v1.8.16 — VS Code deepening: view title actions, local file
+  timeline and fuzzy Quick Open:**
 
 - **v1.8.9 — hybrid sidebar (native docked + tool windows), embedded-site
   downloads, 24 dev tools and 69 libraries:** files/plugins/

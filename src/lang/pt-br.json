@@ -1777,5 +1777,7 @@
 	"ai models all": "Todas",
 	"local libs search": "Pesquisar bibliotecas...",
 	"local libs no results": "Nenhuma biblioteca encontrada",
-	"dev tools search": "Pesquisar ferramentas..."
+	"dev tools search": "Pesquisar ferramentas...",
+	"explorer empty title": "Nenhuma pasta aberta",
+	"explorer empty desc": "Abra uma pasta de projeto para começar a trabalhar."
 }

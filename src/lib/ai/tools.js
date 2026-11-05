@@ -209,6 +209,34 @@ export const TOOLS = [
 		},
 	},
 	{
+		name: "terminal",
+		description:
+			"Drive the REAL Alpine Linux terminal (app Terminal tab). Actions: 'run' (execute any sh command — apk, node, python, git, npm, curl... — wait for it to finish and get its output + exit code), 'open' (show the terminal), 'close' (close it), 'signal' (send Ctrl+C to a running command), 'list' (list open terminals). Prefer this over run_command when a full Linux environment, package manager or long build is needed. Avoid interactive full-screen apps (vim/htop) — they block until timeout.",
+		danger: "exec",
+		parameters: {
+			type: "object",
+			properties: {
+				action: {
+					type: "string",
+					enum: ["run", "open", "close", "signal", "list"],
+					description: "default 'run'",
+				},
+				command: {
+					type: "string",
+					description: "sh command line (action 'run')",
+				},
+				timeout_ms: {
+					type: "number",
+					description: "max wait for action 'run' (default 90000, max 300000)",
+				},
+			},
+		},
+		async run(args) {
+			const terminalTool = (await import("./terminalTool")).default;
+			return terminalTool(args);
+		},
+	},
+	{
 		name: "run_js",
 		description:
 			"Execute JavaScript in an isolated Web Worker sandbox (no DOM). console.log output and the last expression value are returned.",
