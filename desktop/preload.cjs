@@ -27,12 +27,23 @@ const channels = new Map(); // callId -> { success, fail }
 let callSeq = 0;
 
 ipcRenderer.on("xcoder:exec:event", (_event, message) => {
-        const { callId, result, done, error } = message || {};
+        const { callId, result, done, error, fileErrorCode } = message || {};
         const channel = channels.get(callId);
         if (!channel) return;
         if (error !== undefined && error !== null && done) {
                 channels.delete(callId);
-                channel.fail && channel.fail(error);
+                if (!channel.fail) return;
+                if (typeof fileErrorCode === "number") {
+                        // File service errors travel as the NUMERIC cordova
+                        // FileError code — exactly what Android passes to
+                        // fail() — so plugin code can do `new FileError(code)`
+                        // and the app's `err.code === 1` checks keep working.
+                        channel.fail(fileErrorCode);
+                } else if (typeof error === "string") {
+                        channel.fail(new Error(error));
+                } else {
+                        channel.fail(error);
+                }
                 return;
         }
         if (done) {
@@ -340,6 +351,34 @@ function boot() {
         );
         if (deviceModule) window.device = deviceModule;
 
+        // --- BuildInfo (cordova-plugin-buildinfo equivalent) -------------
+        // main.js reads BuildInfo.version/versionCode during boot; without
+        // this shim the desktop app would die with "BuildInfo is not defined"
+        // right after the encoding fix. versionCode derives monotonically
+        // from semver (major*1e6 + minor*1e3 + patch).
+        if (!window.BuildInfo) {
+                let pkg = {};
+                try {
+                        pkg = JSON.parse(
+                                fs.readFileSync(path.join(__dirname, "package.json"), "utf8"),
+                        );
+                } catch {
+                        /* fall back to empty metadata */
+                }
+                const [major = 0, minor = 0, patch = 0] = String(
+                        pkg.version || "0.0.0",
+                )
+                        .split(".")
+                        .map((part) => Number.parseInt(part, 10) || 0);
+                window.BuildInfo = {
+                        version: pkg.version || "0.0.0",
+                        versionCode: major * 1e6 + minor * 1e3 + patch,
+                        packageName: "com.carsaimz.xcoder",
+                        buildType: "release",
+                        debug: false,
+                };
+        }
+
         // --- clipboard ---------------------------------------------------
         window.plugins = window.plugins || {};
         window.plugins.clipboard = {
@@ -352,13 +391,29 @@ function boot() {
         };
 
         // --- small stubs the app expects ---------------------------------
-        if (!window.statusbar) {
-                window.statusbar = {
+        // NOTE: `window.statusbar` already exists in every browser as the
+        // built-in BarProp (`window.statusbar.visible`) — an `if (!window.statusbar)`
+        // guard never fires. Attach the missing methods to the existing object
+        // (or replace it) instead.
+        {
+                const stub = {
                         setBackgroundColor() {},
                         setTextColor() {},
                         setStyleLight() {},
                         setStyleDark() {},
                 };
+                const barprop =
+                        window.statusbar && typeof window.statusbar === "object"
+                                ? window.statusbar
+                                : {};
+                for (const [name, fn] of Object.entries(stub)) {
+                        if (typeof barprop[name] !== "function") barprop[name] = fn;
+                }
+                try {
+                        window.statusbar = barprop;
+                } catch {
+                        /* keep the browser BarProp as-is */
+                }
         }
 
         navigator.app = navigator.app || {};

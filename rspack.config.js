@@ -158,7 +158,9 @@ module.exports = (env, options) => {
       filename: '[name].js',
       chunkFilename: '[name].chunk.js',
       assetModuleFilename: '[name][ext]',
-      publicPath: devOrigin ? ''.concat(devOrigin, '/build/') : '/build/',
+      publicPath: devOrigin
+        ? ''.concat(devOrigin, '/build/')
+        : './build/',
       clean: !isDev,
     },
     // TypeScript's Node-only plugin loader uses a dynamic require. It is never

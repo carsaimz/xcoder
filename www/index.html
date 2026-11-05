@@ -125,9 +125,18 @@
 
       if (!hasES6) {
         setStartupMessage(
-          "XCoder requires a modern browser. Please update Android System WebView or Chrome."
+          isDesktop()
+            ? "XCoder requires a modern runtime. Please reinstall XCoder."
+            : "XCoder requires a modern browser. Please update Android System WebView or Chrome."
         );
       }
+
+      // Safety net: every module reads localized text through the global
+      // `strings`, which is only populated later by lib/lang. Provide an
+      // empty object up front so a missing translation can never crash the
+      // boot with "ReferenceError: strings is not defined" (real keys are
+      // merged/overwritten by lang.set).
+      window.strings = window.strings || {};
 
       window.__XCODER_WEBVIEW_MAJOR__ = getWebViewMajor();
       window.__XCODER_MIN_WEBVIEW_MAJOR__ = MIN_WEBVIEW_MAJOR;
@@ -139,6 +148,25 @@
         setStartupMessage(
           "Your Android System WebView is old. Update Android System WebView or Chrome if XCoder stays on this screen."
         );
+      }
+
+      function isAndroidLike() {
+        return /android/i.test(navigator.userAgent || "");
+      }
+
+      function isDesktop() {
+        return /electron/i.test(navigator.userAgent || "");
+      }
+
+      function updateHint() {
+        if (isDesktop()) {
+          return "Please reinstall XCoder or report the issue at " +
+            "github.com/carsaimz/xcoder/issues.";
+        }
+        if (isAndroidLike()) {
+          return "Update Android System WebView or Chrome and restart.";
+        }
+        return "Please use a recent version of Chrome, Edge or Firefox.";
       }
 
       function isStorageError(reason) {
@@ -159,8 +187,7 @@
           isStorageError(event && event.error)
             ? "XCoder failed to start: storage is unavailable. Try restarting your device, or clearing the app data. " +
                 message
-            : "XCoder failed to start. Update Android System WebView or Chrome. " +
-                message
+            : "XCoder failed to start. " + updateHint() + " " + message
         );
       }
 
@@ -173,8 +200,7 @@
           isStorageError(reason)
             ? "XCoder failed to start: storage is unavailable. Try restarting your device, or clearing the app data. " +
                 message
-            : "XCoder failed to start. Update Android System WebView or Chrome. " +
-                message
+            : "XCoder failed to start. " + updateHint() + " " + message
         );
       }
 

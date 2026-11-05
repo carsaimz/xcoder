@@ -211,7 +211,7 @@ async function entryFor(realPath, fsName = null) {
                 fullPath: "/" + rel,
                 nativeURL: realUrl(realPath, stat.isDirectory()),
                 filesystem: fsName,
-		filesystemName: fsName,
+                filesystemName: fsName,
                 size: stat.size,
                 lastModified: stat.mtimeMs,
         };
@@ -226,6 +226,33 @@ function errorCodeOf(error) {
         return FERR.INVALID_MODIFICATION;
 }
 
+/**
+ * Serialize an exec failure for the renderer. Only genuine filesystem errors
+ * carry a numeric `fileErrorCode` (rebuilds cordova's FileError contract);
+ * every other service error keeps its plain message.
+ * @param {Error|string} error
+ * @returns {{ done: boolean, error: string, fileErrorCode?: number }}
+ */
+function execErrorPayload(error) {
+        const message =
+                typeof error === "string" ? error : error?.message || String(error);
+        let fileErrorCode;
+        if (error && typeof error === "object") {
+                if (typeof error.fileErrorCode === "number") {
+                        fileErrorCode = error.fileErrorCode;
+                } else if (error.code === "ENOENT") {
+                        fileErrorCode = FERR.NOT_FOUND;
+                } else if (error.code === "EACCES") {
+                        fileErrorCode = FERR.NOT_READABLE;
+                } else if (error.code === "EEXIST") {
+                        fileErrorCode = FERR.PATH_EXISTS;
+                } else if (error.code === "EPERM") {
+                        fileErrorCode = FERR.NO_MODIFICATION;
+                }
+        }
+        return { done: true, error: message, fileErrorCode };
+}
+
 /* ------------------------------------------------------------------ */
 /* Encoding helpers                                                    */
 /* ------------------------------------------------------------------ */
@@ -236,9 +263,16 @@ const ENCODINGS = {
         ASCII: "ascii",
         "ISO-8859-1": "latin1",
         LATIN1: "latin1",
+        "WINDOWS-1252": "latin1",
+        "CP1252": "latin1",
+        "ISO-8859-15": "latin1",
         "UTF-16": "utf16le",
         "UTF-16LE": "utf16le",
+        "UCS-2": "utf16le",
+        UCS2: "utf16le",
+        BINARY: "latin1",
         BASE64: "base64",
+        HEX: "hex",
 };
 
 function nodeEnc(name) {
@@ -298,7 +332,15 @@ async function fileService(action, args) {
 
                 case "resolveLocalFileSystemURI": {
                         const realPath = toRealPath(args[0]);
-                        await fsp.stat(realPath);
+                        try {
+                                await fsp.stat(realPath);
+                        } catch (error) {
+                                // Match Android: a missing/unreadable entry must fail
+                                // with the NUMERIC FileError code (NOT_FOUND_ERR = 1),
+                                // never a raw Node error — the app's exists() checks
+                                // `err.code === 1` to resolve false.
+                                throw ferr(errorCodeOf(error));
+                        }
                         return entryFor(realPath, fsNameFor(realPath));
                 }
 
@@ -1173,9 +1215,69 @@ async function systemService(action, args, emit, ctx) {
                 }
                 case "compare-texts":
                         return String(args[0]) === String(args[1]) ? 0 : 1;
+                case "get-available-encodings": {
+                        // Same shape as the Android plugin: { [name]: { label, aliases, name } }
+                        const map = {};
+                        for (const encoding of DESKTOP_ENCODING_LIST) {
+                                map[encoding.name] = encoding;
+                        }
+                        return map;
+                }
+                case "decode": {
+                        // args: [buffer (ArrayBuffer|TypedArray), charset] -> text
+                        return decodeWithCharset(Buffer.from(toArrayBuffer(args[0])), args[1]);
+                }
+                case "encode": {
+                        // args: [text, charset] -> ArrayBuffer
+                        return encodeWithCharset(String(args[0] ?? ""), args[1]);
+                }
                 default:
                         throw new Error(`System service: unsupported action "${action}"`);
         }
+}
+
+/* ------------------------------------------------------------------ */
+/* Charset support (desktop)                                           */
+/* ------------------------------------------------------------------ */
+
+// Charsets the desktop runtime can round-trip. Node ships full-ICU inside
+// Electron, so TextDecoder covers every decode entry; encoding is limited to
+// the sets Buffer understands (plus latin1 approximations for the western
+// single-byte sets). Mirrors the Android "get-available-encodings" answer.
+const DESKTOP_ENCODING_LIST = [
+        { label: "Unicode (UTF-8)", aliases: ["utf8", "unicode", "cp65001"], name: "UTF-8" },
+        { label: "ISO-8859-1 (Latin-1)", aliases: ["latin1", "iso88591", "l1", "cp819"], name: "ISO-8859-1" },
+        { label: "Windows-1252 (Western)", aliases: ["cp1252", "win1252", "ansi", "windows1252"], name: "windows-1252" },
+        { label: "Unicode (UTF-16 Little Endian)", aliases: ["utf16le", "ucs2", "ucs-2", "utf-16le"], name: "UTF-16LE" },
+        { label: "Unicode (UTF-16 Big Endian)", aliases: ["utf16be", "utf-16be"], name: "UTF-16BE" },
+        { label: "ASCII", aliases: ["ascii", "us", "us-ascii"], name: "US-ASCII" },
+];
+
+function decodeWithCharset(buffer, charset) {
+        const name = String(charset || "UTF-8");
+        if (name.toUpperCase() === "UTF-16BE") {
+                // Node has no native utf16be; swap pairs and decode LE.
+                const swapped = Buffer.from(buffer);
+                swapped.swap16();
+                return swapped.toString("utf16le");
+        }
+        try {
+                return new TextDecoder(name, { fatal: false }).decode(buffer);
+        } catch {
+                return buffer.toString(nodeEnc(name));
+        }
+}
+
+function encodeWithCharset(text, charset) {
+        const name = String(charset || "UTF-8").toUpperCase();
+        let buffer;
+        if (name === "UTF-16BE") {
+                buffer = Buffer.from(text, "utf16le");
+                buffer.swap16();
+        } else {
+                buffer = Buffer.from(text, nodeEnc(name));
+        }
+        return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 }
 
 function isDarkTheme(scheme) {
@@ -1563,6 +1665,8 @@ module.exports = {
         dispatch,
         emitIntent,
         setPaths,
+        errorCodeOf,
+        execErrorPayload,
         paths: (app) => ({
                 userData: app.getPath("userData"),
                 files: path.join(app.getPath("userData"), "files"),

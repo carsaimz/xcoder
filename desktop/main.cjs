@@ -455,6 +455,20 @@ if (!gotLock) {
                 // Register xcoder:// so the website can hand OAuth/logins back to us.
                 app.setAsDefaultProtocolClient(SCHEME);
 
+                // Android creates the app storage dirs natively before any web
+                // code runs; desktop must do the same or every early stat/exists
+                // on dataDirectory/cacheDirectory fails.
+                for (const dir of [
+                        services.paths(app).files,
+                        services.paths(app).cache,
+                ]) {
+                        try {
+                                fs.mkdirSync(dir, { recursive: true });
+                        } catch (error) {
+                                console.error("[xcoder-desktop] failed to create", dir, error);
+                        }
+                }
+
                 buildMenu();
 
                 nativeTheme.on("updated", () => {
@@ -511,12 +525,7 @@ function registerIpc() {
                         .then((result) => {
                                 if (result !== services.NO_FINAL) emit({ done: true, result });
                         })
-                        .catch((error) =>
-                                emit({
-                                        done: true,
-                                        error: typeof error === "string" ? error : error.message,
-                                }),
-                        );
+                        .catch((error) => emit(services.execErrorPayload(error)));
         });
 
         ipcMain.on("xcoder:exit", () => {

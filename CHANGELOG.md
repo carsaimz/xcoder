@@ -33,6 +33,45 @@ resumo em inglês.
 ### Changed
 - `package-lock.json` ressincronizado com a versão actual (estava em 1.8.9).
 
+## [1.8.21] - 2026-11-06
+
+### Fixed
+- **O app PC (Windows/Linux) arrancava sempre no ecrã de splash com
+  "Update Android WebView or Chrome. Uncaught ReferenceError: strings is not
+  defined"** — a primeira chamada nativa do arranque
+  (`System.get-available-encodings`) não existia no runtime desktop e o
+  callback de erro referenciava o global `strings`, que só é criado mais
+  tarde pelo `lang.set()`. Correção em várias camadas:
+  - `initEncodings()` já não depende de `strings` nem rejeita: usa
+    `console.warn` e um mapa de charsets predefinido (UTF-8, ISO-8859-1,
+    windows-1252, UTF-16LE/BE, ASCII), mantendo o boot vivo e o seletor de
+    codificação funcional mesmo sem resposta nativa.
+  - O serviço `System` do desktop implementa `get-available-encodings`,
+    `decode` (TextDecoder full-ICU) e `encode` — a conversão de charsets de
+    ficheiros passa a funcionar no PC.
+  - Shim `BuildInfo` no preload (versão, versionCode monotónico a partir do
+    semver, packageName) — o boot seguinte morreria em "BuildInfo is not
+    defined".
+  - Erros de ficheiro voltam a seguir o contrato do Android: o IPC envia o
+    código numérico do FileError (1 = NOT_FOUND, …) e o preload reconstrói
+    esse número — `exists()` deixa de rejeitar para caminhos inexistentes
+    (causava "storage is unavailable" no arranque).
+  - Os diretórios de dados (`files/`, `cache/`) são criados no arranque do
+    desktop, como o Android faz nativamente.
+  - `publicPath` do bundle passa a relativo (`./build/`): sobre `file://` os
+    chunks dinâmicos (incluindo os JSON de idioma) falhavam com
+    ChunkLoadError e o app ficava sem traduções.
+  - Stub `statusbar` instalado correctamente (o BarProp nativo do browser
+    tornava o guarda `if (!window.statusbar)` inoperante).
+  - `HandleIntent` tolera intent `null` (arranque sem deep link no desktop).
+- **Mensagem do splash consciente da plataforma** — no PC o erro de arranque
+  sugere reinstalar/reportar em vez de "Update Android WebView"; rede de
+  segurança `window.strings = {}` criada antes de qualquer módulo.
+
+### Added
+- Testes unitários para o fallback de `initEncodings` (4 novos; 1185 no
+  total).
+
 ## [1.8.19] - 2026-11-06
 
 ### Added
@@ -253,6 +292,43 @@ resumo em inglês.
 ### Changed
 - `package-lock.json` re-synced with the current version (was stuck at
   1.8.9).
+
+## [1.8.21] - 2026-11-06
+
+### Fixed — PC builds failed to boot ("strings is not defined")
+- The Windows/Linux app always died on the splash screen with
+  "Update Android WebView or Chrome. Uncaught ReferenceError: strings is not
+  defined". Root cause chain, fixed layer by layer:
+  - The first native boot call (`System.get-available-encodings`) did not
+    exist in the desktop runtime and its error callback referenced the
+    `strings` global, only populated later by `lang.set()`. `initEncodings()`
+    now never touches `strings`, never rejects, and seeds a default charset
+    map (UTF-8, ISO-8859-1, windows-1252, UTF-16LE/BE, ASCII).
+  - The desktop `System` service implements `get-available-encodings`,
+    `decode` (full-ICU TextDecoder) and `encode` — file charset conversion
+    now works on PC.
+  - `BuildInfo` shim in the preload (version, monotonic versionCode from
+    semver, packageName) — boot would have crashed next with "BuildInfo is
+    not defined".
+  - File errors follow the Android contract again: IPC carries the numeric
+    FileError code (1 = NOT_FOUND, …) and the preload rebuilds it —
+    `exists()` no longer rejects for missing paths (caused the follow-up
+    "storage is unavailable" splash).
+  - Data directories (`files/`, `cache/`) are created at desktop startup,
+    like Android does natively.
+  - Bundle `publicPath` is now relative (`./build/`): over `file://` dynamic
+    chunks (including language JSONs) failed with ChunkLoadError, leaving
+    the app without translations.
+  - `statusbar` stub installed correctly (the browser's built-in BarProp
+    made the `if (!window.statusbar)` guard a no-op).
+  - `HandleIntent` tolerates a `null` intent (desktop launch without deep
+    link).
+- Platform-aware splash error message — on PC it suggests reinstalling /
+  reporting the issue instead of "Update Android WebView"; a
+  `window.strings = {}` safety net is created before any module loads.
+
+### Added
+- Unit tests for the `initEncodings` fallback (4 new; 1185 total).
 
 ## [1.8.19] - 2026-11-06
 

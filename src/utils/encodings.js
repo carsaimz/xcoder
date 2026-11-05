@@ -1,4 +1,3 @@
-import alert from "dialogs/alert";
 import settings from "lib/settings";
 
 let encodings = {};
@@ -201,8 +200,47 @@ export function encode(text, charset) {
 	return execEncode(text, charset);
 }
 
+// Fallback charset map used until (or instead of) the native
+// "get-available-encodings" answer arrives. Mirrors the Android plugin's
+// shape: { [canonicalName]: { label, aliases, name } }. Keeps boot alive and
+// the encoding picker usable on platforms where the native list is
+// unavailable (e.g. desktop builds before the runtime answers).
+const DEFAULT_ENCODINGS = {
+	"UTF-8": {
+		label: "Unicode (UTF-8)",
+		aliases: ["utf8", "unicode"],
+		name: "UTF-8",
+	},
+	"ISO-8859-1": {
+		label: "ISO-8859-1 (Latin-1)",
+		aliases: ["latin1", "iso88591", "l1"],
+		name: "ISO-8859-1",
+	},
+	"windows-1252": {
+		label: "Windows-1252 (Western)",
+		aliases: ["cp1252", "win1252", "ansi"],
+		name: "windows-1252",
+	},
+	"UTF-16LE": {
+		label: "Unicode (UTF-16 Little Endian)",
+		aliases: ["utf16le", "ucs2", "ucs-2"],
+		name: "UTF-16LE",
+	},
+	"UTF-16BE": {
+		label: "Unicode (UTF-16 Big Endian)",
+		aliases: ["utf16be"],
+		name: "UTF-16BE",
+	},
+	"US-ASCII": { label: "ASCII", aliases: ["ascii", "us"], name: "US-ASCII" },
+};
+
 export async function initEncodings() {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve) => {
+		// Boot-critical and runs before lang.set() — never touch the
+		// `strings` global here (a ReferenceError on the failure path would
+		// kill the whole app on the splash screen), and never reject: the
+		// DEFAULT_ENCODINGS map keeps the editor fully usable with the
+		// common charsets even when the native list is unavailable.
 		cordova.exec(
 			(map) => {
 				Object.keys(map).forEach((key) => {
@@ -212,8 +250,14 @@ export async function initEncodings() {
 				resolve();
 			},
 			(error) => {
-				alert(strings.error, error.message || error);
-				reject(error);
+				console.warn(
+					"initEncodings: native encoding list unavailable, using defaults:",
+					error?.message || error,
+				);
+				for (const [key, value] of Object.entries(DEFAULT_ENCODINGS)) {
+					if (!encodings[key]) encodings[key] = value;
+				}
+				resolve();
 			},
 			"System",
 			"get-available-encodings",

@@ -14,7 +14,11 @@ const pendingIntents = [];
  *
  * @param {Intent} intent
  */
-export default async function HandleIntent(intent = {}) {
+export default async function HandleIntent(intent) {
+	// Desktop's get-cordova-intent resolves to null when no deep link was
+	// passed at launch — a default parameter wouldn't catch null, so coerce
+	// explicitly (a null intent must be a no-op, never a TypeError).
+	intent = intent || {};
 	const type = intent.action?.split(".").slice(-1)[0];
 
 	if (["SEND", "VIEW", "EDIT"].includes(type)) {

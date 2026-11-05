@@ -150,14 +150,36 @@ quickTools.$input.addEventListener("keydown", (e) => {
 	setQuicktoolsUsed();
 });
 
-appSettings.on("update:quicktoolsItems:after", () => {
+// Defer the subscription: this module participates in a circular import
+// (openFile → editorFile → quickTools → … → settings) and can evaluate
+// BEFORE lib/settings finishes initializing, which used to crash with
+// "Cannot read properties of undefined (reading 'on')". Live bindings
+// resolve the real settings object by the time the timeout runs.
+function subscribeQuicktoolsItemsUpdate() {
+	if (appSettings?.on) {
+		appSettings.on("update:quicktoolsItems:after", onQuicktoolsItemsUpdate);
+	} else {
+		setTimeout(
+			() =>
+				appSettings?.on?.(
+					"update:quicktoolsItems:after",
+					onQuicktoolsItemsUpdate,
+				),
+			0,
+		);
+	}
+}
+
+function onQuicktoolsItemsUpdate() {
 	setTimeout(() => {
 		if (actionStack.has("search-bar")) return;
 		const { $footer, $row1, $row2 } = quickTools;
 		const height = getFooterHeight();
 		$footer.content = [$row1, $row2].slice(0, height);
 	}, 100);
-});
+}
+
+subscribeQuicktoolsItemsUpdate();
 
 let historyNavigationInitialized = false;
 // Initialize history navigation
