@@ -13,6 +13,28 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.19] - 2026-11-06
+
+### Added
+- **Versão para PC (Windows + Linux)** — o novo workflow `Desktop` publica em
+  cada release o instalador NSIS + o .exe portátil (Windows) e AppImage + .deb
+  (Linux). A mesma interface web corre num shell Electron com uma camada de
+  compatibilidade Cordova própria: `cordova-plugin-file` → Node fs (com as
+  classes originais do plugin — Entry/FileWriter/FileReader), plugin `sdcard`
+  → Node fs + diálogos nativos, plugin `system` → Electron (shell, área de
+  transferência, tema), `Executor`/terminal → shell real do sistema com
+  streaming por linhas, pré-visualização → servidor http local e deep links
+  `xcoder://` registados no SO, para o login via site voltar ao app
+  exactamente como no Android.
+- **Testes de shim locais** — o runtime de compatibilidade (mini cordova +
+  exec por IPC + registry de plugins) tem teste de fumaça que valida o ciclo
+  completo: carregamento dos plugins, `deviceready`, leitura/escrita via
+  `Entry`/`FileWriter`, `sdcard`, `system`, streaming do `Executor` e clipboard.
+
+### Notas
+- No desktop o terminal usa a shell do sistema (bash/PowerShell) em vez do
+  Alpine/proot; o restante — editor, IA, plugins, temas — é igual ao Android.
+
 ## [1.8.18] - 2026-11-05
 
 ### Changed
@@ -191,6 +213,28 @@ resumo em inglês.
   entrarem no histórico e contexto do projecto mais enxuto (12 ficheiros
   abertos / 25 entradas da raiz). Conversas longas custam muito menos em
   provedores pagos e gratuitos.
+
+## [1.8.19] - 2026-11-06
+
+### Added
+- **Desktop version (Windows + Linux)** — the new `Desktop` workflow attaches
+  to every release: NSIS setup + portable .exe (Windows) and AppImage + .deb
+  (Linux). The same web UI runs in an Electron shell backed by its own Cordova
+  compatibility layer: `cordova-plugin-file` → Node fs (with the plugin's
+  original Entry/FileWriter/FileReader classes), the `sdcard` plugin → Node fs
+  + native dialogs, the `system` plugin → Electron (shell, clipboard, theme),
+  `Executor`/terminal → the real system shell with line streaming, live
+  preview → a local http server, and OS-registered `xcoder://` deep links so
+  site-based login returns to the app exactly like on Android.
+- **Local shim tests** — the compatibility runtime (mini cordova + IPC exec +
+  plugin registry) has a smoke test covering the full loop: plugin loading,
+  `deviceready`, Entry/FileWriter reads and writes, `sdcard`, `system`,
+  `Executor` streaming and clipboard.
+
+### Notes
+- On desktop the terminal uses the system shell (bash/PowerShell) instead of
+  Android's Alpine/proot; everything else — editor, AI, plugins, themes — is
+  identical.
 
 ## [1.8.18] - 2026-11-05
 

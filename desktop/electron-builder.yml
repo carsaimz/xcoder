@@ -1,0 +1,64 @@
+# electron-builder configuration for XCoder desktop
+appId: com.carsaimz.xcoder
+productName: XCoder
+asar: false
+compression: maximum
+
+directories:
+  output: release
+  buildResources: build
+
+# The renderer (web build) is copied into app/www by the CI workflow.
+files:
+  - main.cjs
+  - preload.cjs
+  - services.cjs
+  - vendor/**/*
+  - app/**/*
+  - package.json
+
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  shortcutName: XCoder
+
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
+
+linux:
+  icon: build/icons
+  category: Development
+  desktop:
+    Name: XCoder
+    Comment: Fast, offline-first code editor and web IDE
+    StartupWMClass: XCoder
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+
+appImage:
+  artifactName: ${productName}-${version}.${ext}
+
+deb:
+  artifactName: ${productName}-${version}.${ext}
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libsecret-1-0

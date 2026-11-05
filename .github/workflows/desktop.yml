@@ -1,0 +1,208 @@
+# Desktop (Windows + Linux) builds of XCoder.
+#
+# Produces:
+#   Windows: NSIS setup .exe + portable .exe
+#   Linux:   AppImage + .deb
+#
+# Triggers:
+#   - every published GitHub release (artifacts are attached automatically)
+#   - manual dispatch (artifacts only, or attached when `attach_release` is on)
+name: Desktop
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to stamp (e.g. 1.8.18). Defaults to package.json."
+        required: false
+        type: string
+      attach_release:
+        description: "Attach artifacts to the matching vX.Y.Z release/tag"
+        required: false
+        type: boolean
+        default: false
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+jobs:
+  web:
+    name: Build web assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production web bundle
+        run: |
+          node utils/config.js p
+          npx rspack --mode production
+
+      - name: Verify bundle
+        run: |
+          test -f www/index.html
+          test -f www/build/boot.js
+          test -f www/build/main.js
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xcoder-www
+          path: www/
+          retention-days: 7
+
+  resolve-version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+      publish: ${{ steps.v.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: v
+        shell: bash
+        run: |
+          RAW="${{ inputs.version || github.event.release.tag_name || '' }}"
+          if [ -n "$RAW" ]; then
+            VERSION="${RAW#v}"
+            TAG="v${VERSION}"
+          else
+            VERSION=$(node -p "require('./package.json').version")
+            TAG="v${VERSION}"
+          fi
+          if [ "${{ github.event_name }}" = "release" ] || [ "${{ inputs.attach_release }}" = "true" ]; then
+            PUBLISH="true"
+          else
+            PUBLISH="false"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
+
+  windows:
+    name: Windows (setup + portable)
+    needs: [web, resolve-version]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: xcoder-www
+          path: desktop/app/www
+
+      - name: Stamp version
+        shell: bash
+        run: |
+          node -e "
+            const fs = require('fs');
+            const p = JSON.parse(fs.readFileSync('desktop/package.json', 'utf8'));
+            p.version = '${{ needs.resolve-version.outputs.version }}';
+            fs.writeFileSync('desktop/package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm install
+
+      - name: Vendor Cordova plugin JS
+        working-directory: desktop
+        run: node copy-vendor.cjs
+
+      - name: Build Windows installers
+        working-directory: desktop
+        run: npx electron-builder --win nsis portable --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xcoder-desktop-windows
+          path: |
+            desktop/release/*.exe
+          retention-days: 14
+          if-no-files-found: error
+
+  linux:
+    name: Linux (AppImage + deb)
+    needs: [web, resolve-version]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: xcoder-www
+          path: desktop/app/www
+
+      - name: Stamp version
+        run: |
+          node -e "
+            const fs = require('fs');
+            const p = JSON.parse(fs.readFileSync('desktop/package.json', 'utf8'));
+            p.version = '${{ needs.resolve-version.outputs.version }}';
+            fs.writeFileSync('desktop/package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm install
+
+      - name: Vendor Cordova plugin JS
+        working-directory: desktop
+        run: node copy-vendor.cjs
+
+      - name: Build Linux packages
+        working-directory: desktop
+        run: npx electron-builder --linux AppImage deb --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xcoder-desktop-linux
+          path: |
+            desktop/release/*.AppImage
+            desktop/release/*.deb
+          retention-days: 14
+          if-no-files-found: error
+
+  publish:
+    name: Attach to release
+    if: needs.resolve-version.outputs.publish == 'true'
+    needs: [resolve-version, windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: artifacts
+
+      - name: Publish desktop artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.resolve-version.outputs.tag }}
+          files: |
+            artifacts/xcoder-desktop-windows/*.exe
+            artifacts/xcoder-desktop-linux/*.AppImage
+            artifacts/xcoder-desktop-linux/*.deb
+          fail_on_unmatched_files: true

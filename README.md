@@ -118,6 +118,33 @@ abra o
 [workflow Debug APK](https://github.com/carsaimz/xcoder/actions/workflows/debug.yml),
 escolha a execução mais recente e baixe o artefato.
 
+### 💻 Windows e Linux (PC)
+
+O XCoder também corre no computador: a mesma interface web empacotada num
+shell Electron, com uma camada de compatibilidade Cordova própria (ficheiros
+locais via Node, pré-visualização por servidor http local, terminal na shell
+real do sistema e deep links `xcoder://` para o login via site voltar ao app).
+Cada release publica:
+
+| Ficheiro | Descrição |
+| --- | --- |
+| `XCoder-x.y.z-setup.exe` | Instalador Windows (NSIS) |
+| `XCoder-x.y.z-portable.exe` | Windows portátil — não precisa de instalação |
+| `XCoder-x.y.z.AppImage` | Linux (AppImage) |
+| `xcoder_x.y.z_amd64.deb` | Debian / Ubuntu (.deb) |
+
+Compilar localmente:
+
+```bash
+npm ci && node utils/config.js p && npx rspack --mode production
+cd desktop && npm install && node copy-vendor.cjs
+npx electron-builder --win nsis portable    # Windows
+npx electron-builder --linux AppImage deb   # Linux
+```
+
+> Nota: no desktop o terminal usa a shell do sistema (bash/PowerShell) em vez
+> do Alpine/proot do Android; o resto — editor, IA, plugins, temas — é igual.
+
 ## 📸 Capturas de tela
 
 > Renderizações ilustrativas da interface (tema Dark+). Capturas reais de
@@ -327,6 +354,36 @@ Nightly-style debug builds (`v1.x.x-debug`) are produced automatically on
 every push — open the
 [Debug APK workflow](https://github.com/carsaimz/xcoder/actions/workflows/debug.yml),
 pick the latest run and download the artifact.
+
+## 📸 Screenshots
+
+### 💻 Windows & Linux (desktop)
+
+XCoder also runs on the desktop: the same web UI wrapped in an Electron shell,
+with its own Cordova compatibility layer (local files over Node, live preview
+via a local http server, terminal on the real system shell and OS-level
+`xcoder://` deep links so site-based login comes back into the app). Every
+release ships:
+
+| File | Description |
+| --- | --- |
+| `XCoder-x.y.z-setup.exe` | Windows installer (NSIS) |
+| `XCoder-x.y.z-portable.exe` | Portable Windows build — no install needed |
+| `XCoder-x.y.z.AppImage` | Linux (AppImage) |
+| `xcoder_x.y.z_amd64.deb` | Debian / Ubuntu (.deb) |
+
+Build locally:
+
+```bash
+npm ci && node utils/config.js p && npx rspack --mode production
+cd desktop && npm install && node copy-vendor.cjs
+npx electron-builder --win nsis portable    # Windows
+npx electron-builder --linux AppImage deb   # Linux
+```
+
+> Note: on desktop the terminal runs the system shell (bash/PowerShell)
+> instead of Android's Alpine/proot; everything else — editor, AI, plugins,
+> themes — is identical.
 
 ## 📸 Screenshots
 

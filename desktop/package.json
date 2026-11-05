@@ -1,0 +1,23 @@
+{
+        "name": "xcoder-desktop",
+        "productName": "XCoder",
+        "version": "1.8.19",
+        "description": "XCoder desktop — the XCoder web IDE packaged for Windows and Linux with Electron",
+        "main": "main.cjs",
+        "private": true,
+        "author": "Carsai Mozambique",
+        "license": "MIT",
+        "scripts": {
+                "vendor": "node copy-vendor.cjs",
+                "dist": "electron-builder",
+                "dist:win": "electron-builder --win nsis portable",
+                "dist:linux": "electron-builder --linux AppImage deb"
+        },
+        "devDependencies": {
+                "cordova-plugin-device": "^2.1.0",
+                "cordova-plugin-file": "^8.1.3",
+                "electron": "^33.4.11",
+                "electron-builder": "^25.1.8",
+                "ws": "^8.18.3"
+        }
+}
