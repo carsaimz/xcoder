@@ -13,6 +13,26 @@ Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
 históricas estão em pt-br; a partir da v1.6.2 cada release traz também um
 resumo em inglês.
 
+## [1.8.20] - 2026-11-06
+
+### Added
+- **Menu nativo no desktop (Windows/Linux)** — barra de menus Arquivo,
+  Editar, Visualizar, Terminal e Ajuda: novo arquivo, abrir arquivo/pasta,
+  salvar/salvar tudo, fechar abas, desfazer/refazer, área de transferência,
+  localizar arquivo, paleta de comandos, ampliar/reduzir zoom (persistente),
+  alternar barra lateral, tela cheia, novo terminal, console, documentação,
+  releases, reportar bug, **verificar atualizações** (compara a versão com a
+  última release do GitHub) e dialog **Sobre**. Etiquetas em pt-BR ou inglês
+  conforme o idioma do sistema.
+- **Ponte menu → comandos do app** — o menu envia os mesmos comandos do
+  registro interno (`lib/commands` e comandos do CodeMirror) via
+  `lib/desktopMenu.js`; os aceleradores já usados pelo app são exibidos mas
+  NÃO registados no SO (`registerAccelerator: false`), preservando atalhos
+  remapeados pelo utilizador.
+
+### Changed
+- `package-lock.json` ressincronizado com a versão actual (estava em 1.8.9).
+
 ## [1.8.19] - 2026-11-06
 
 ### Added
@@ -213,6 +233,26 @@ resumo em inglês.
   entrarem no histórico e contexto do projecto mais enxuto (12 ficheiros
   abertos / 25 entradas da raiz). Conversas longas custam muito menos em
   provedores pagos e gratuitos.
+
+## [1.8.20] - 2026-11-06
+
+### Added
+- **Native desktop menu (Windows/Linux)** — File, Edit, View, Terminal and
+  Help menu bar: new file, open file/folder, save/save all, close tabs,
+  undo/redo, clipboard, find file, command palette, zoom in/out/reset
+  (persisted), toggle sidebar, full screen, new terminal, console,
+  documentation, releases, bug reporting, **check for updates** (compares
+  the installed version with the latest GitHub release) and an **About**
+  dialog. Labels follow the OS locale (pt-BR or English).
+- **Menu → app command bridge** — the menu dispatches the very same commands
+  the app UI uses (`lib/commands` and CodeMirror commands) through
+  `lib/desktopMenu.js`; accelerators already bound by the app are displayed
+  but NOT registered with the OS (`registerAccelerator: false`), keeping
+  user-remapped key bindings working.
+
+### Changed
+- `package-lock.json` re-synced with the current version (was stuck at
+  1.8.9).
 
 ## [1.8.19] - 2026-11-06
 

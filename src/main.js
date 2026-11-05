@@ -41,6 +41,7 @@ import applySettings from "lib/applySettings";
 import checkFiles from "lib/checkFiles";
 import { canSaveFile } from "lib/commands";
 import config from "lib/config";
+import initDesktopMenu from "lib/desktopMenu";
 import EditorFile from "lib/editorFile";
 import EditorManager from "lib/editorManager";
 import fileIcons from "lib/fileIcons";
@@ -220,6 +221,7 @@ async function onDeviceReady() {
 		return true;
 	})();
 	window.xcoder = xcoder;
+	initDesktopMenu();
 	ensureAceCompatApi();
 
 	if (Number.isInteger(window.ANDROID_SDK_INT) && window.ANDROID_SDK_INT < 33) {

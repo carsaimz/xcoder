@@ -16,7 +16,27 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.17
+## ✅ Concluído até a v1.8.20
+
+- **v1.8.20 — menu nativo no desktop:** barra de menus Arquivo/Editar/
+  Visualizar/Terminal/Ajuda (zoom persistente, verificar atualizações,
+  Sobre) com a ponte `lib/desktopMenu.js` para os mesmos comandos do app,
+  preservando atalhos remapeados.
+- **v1.8.19 — versão para PC:** Windows (setup NSIS + portátil) e Linux
+  (AppImage + .deb) publicados em cada release; shell Electron com camada
+  de compatibilidade Cordova (fs, sdcard, system, terminal real, deep
+  links).
+- **v1.8.18 — login só pelo site:** login/GitHub saem do app e voltam via
+  deep link; chips compactos das ferramentas da IA; revisão de i18n.
+- **v1.8.17 — IA com terminal real + Explorador que nunca fica sem
+  saída:** o agente abre/fecha o Terminal (Alpine) e corre comandos
+  reais (apk/git/node/python/npm/curl/builds), esperando o fim e lendo
+  a saída + código de saída antes de decidir o passo seguinte (marcador
+  PTY, saída limpa e limitada, Ctrl+C, timeout ajustável, execuções
+  serializadas); o Explorador mostra estado vazio com botão «Abrir
+  pasta» quando não há projectos e a Boas-vindas regressa ao fechar o
+  último; projectos duplicados (barra final/SAF) eliminados pela
+  comparação de URLs normalizados.
 
 - **v1.8.17 — IA com terminal real + Explorador que nunca fica sem
   saída:** o agente abre/fecha o Terminal (Alpine) e corre comandos
