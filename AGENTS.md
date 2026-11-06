@@ -7,7 +7,7 @@ XCoder (`com.carsaimz.xcoder`, fork do Acode, MIT) — editor offline-first para
 ## Comandos (ordem do CI)
 
 ```bash
-npm ci --legacy-peer-deps   # CI canónico; CONTRIBUTING usa pnpm — qualquer gestor serve
+npm ci --legacy-peer-deps   # CI canónico; CONTRIBUTING documenta o npm como gestor canónico
 npm run setup               # deps + cordova platform add android + plugins de src/plugins
 npm run check               # Biome check --write (lint+format) — rodar antes de commit
 npm run typecheck           # tsc --noEmit
@@ -17,13 +17,14 @@ npm run lang:check          # cobre traduções + node wiki/checkWikiBilingual.m
 ```
 
 - Teste único: `npx vitest run tests/unit/<ficheiro>.test.js` ou `npx vitest run -t "nome"`.
+- `npm run typecheck:checkjs` — ratchet progressivo de `checkJs` sobre JS puro (hoje 5 folhas em `src/lib/ai/`: actionPrompt, modelId, pkg, providerLogos, slashCommands). Para adicionar um ficheiro: `node scripts/checkjs_add_file.mjs <ficheiro>` mede os erros do closure inteiro — arruma o JSDoc antes de adicioná-lo a `tsconfig.checkjs.json`; ficheiros de fanout largo (markdown.js, agent.js) puxam ~11k erros da árvore toda.
 - `npm run dev` — `utils/scripts/dev.js`: servidor HTTPS (cert auto-assinado, fallback HTTP sem `openssl`) + `rspack --watch` + `cordova run android` + watcher de `src/plugins/` + reload via WebSocket.
 - Web bundle sem Android: `npx rspack --mode development` (sempre com `node utils/config.js p|d` antes — ver "efeitos laterais").
 - APK debug: `npm run build` / `npm run build d` → `platforms/android/app/build/outputs/apk/debug/app-debug.apk`. Release: `npm run build p` (APK) / `npm run build p bundle` (AAB). `utils/scripts/build.sh` = `config.js` + `rspack` + `cordova build`.
 - Desktop: `node utils/config.js p && npx rspack --mode production`, depois `cd desktop && npm install && node copy-vendor.cjs && npx electron-builder --win nsis portable` (ou `--linux AppImage deb`).
 - Traduções: `npm run lang add|remove|search|update` (`utils/lang.js`), base `src/lang/en-us.json`.
 
-CI (`.github/workflows/ci.yml`): `ci --legacy-peer-deps -> biome check (|| true) -> typecheck -> test -> check-plugin-refs -> lang:check -> wiki bilingual -> typos -> build prod`. O Biome no CI não bloqueia (`|| true`) — não fies nisso, roda `npm run check` local.
+CI (`.github/workflows/ci.yml`): `ci --legacy-peer-deps -> biome check -> typecheck -> test -> check-plugin-refs -> lang:check -> wiki bilingual -> typos -> build prod`. O Biome no CI é **blocking** (o `|| true` foi removido) — drift de formatação quebra o CI: roda `npm run check` antes de commitar.
 
 ## Arquitetura (só o que não é óbvio)
 
@@ -33,11 +34,11 @@ CI (`.github/workflows/ci.yml`): `ci --legacy-peer-deps -> biome check (|| true)
 - **JSX-like:** JSX de `html-tag-js` dentro de `.js/.ts` (ex: `<span .../>`) processado por `utils/custom-loaders/html-tag-jsx-loader.js` antes do SWC. Não é React — sem JSX runtime, sem TSX real; `tsx: false` no SWC.
 - **Cordova nativo (vendored):** `src/plugins/*` (terminal, proot, server, sftp/ftp, sdcard, websocket...) instalados por `utils/setup.js` via `cordova plugin add ./src/plugins/<dir>` (`file:` no `package.json`). `config.xml` tem hooks `before_prepare/after_prepare` (`hooks/restore-cordova-resources.js`, `modify-java-files.js`, `post-process.js`) que fazem patch em `platforms/android` gerado — não edites `platforms/` à mão.
 - **AI:** `src/lib/ai/agent.js|client.js|providers.js|tools.js|terminalTool.js|vshell.js|...`. Janela 24 mensagens, outputs clampados — não reenvies histórico completo em nenhum novo loop.
-- **Desktop (`desktop/`):** `desktop/package.json` (`xcoder-desktop`, Electron, `private`, sem scripts de teste — `main.cjs|preload.cjs|services.cjs` = shim Cordova: `file/sdcard/system/Executor` → Node/Electron). Terminal usa a shell real (bash/PowerShell), não Alpine/proot. Versão própria (1.8.19) à deriva da raiz.
+- **Desktop (`desktop/`):** `desktop/package.json` (`xcoder-desktop`, Electron, `private`, sem scripts de teste — `main.cjs|preload.cjs|services.cjs` = shim Cordova: `file/sdcard/system/Executor` → Node/Electron). Terminal usa a shell real (bash/PowerShell), não Alpine/proot. `utils/config.js` sincroniza a versão com a raiz (não edites à mão).
 
 ## Armadilhas
 
-- **Não assuma fontes:** `webpack.config.js` e `.prettierrc`/`prettier` existem mas o canónico é **Rspack + Biome** (2.5.11, `indentStyle: "tab"`). Biome só cobre `src/**/*.js`, `utils/**/*.js`, `src/lang/**/*.json` — exclui `src/plugins/**`, `www/`, `platforms/`, `hooks/`, `fastlane/`.
+- **Não assuma fontes:** `.prettierrc`/`prettier` existem mas o canónico é **Rspack + Biome** (2.5.11, `indentStyle: "tab"`); `webpack.config.js` foi removido (rspack é a única fonte). Biome só cobre `src/**/*.js`, `utils/**/*.js`, `src/lang/**/*.json` — exclui `src/plugins/**`, `www/`, `platforms/`, `hooks/`, `fastlane/`. One-offs de versões passadas vivem em `scripts/archive/` — não os corra nem estenda.
 - **`utils/config.js` tem efeitos laterais em ficheiros versionados:** escreve `.babelrc` (`compact` = só em `p`), `res/android/values/ic_launcher_background.xml`, copia `src/res/libs` → `www/res/libs`, sincroniza `version` em `config.xml` com `package.json`. É por isso que o `build.sh` corre-o primeiro; não o saltes.
 - **`package.json` é a fonte da versão, não o `config.xml`.**
 - **`tsconfig` tem `checkJs: false` + `allowJs: true`** — o `typecheck` só valida TS de verdade (workers LSP); não ligues `checkJs` sem atualizar JSDoc no codebase inteiro.
@@ -47,4 +48,6 @@ CI (`.github/workflows/ci.yml`): `ci --legacy-peer-deps -> biome check (|| true)
 - **Segurança/privacidade:** sem telemetria; login só no site via deep link `xcoder://` (auth/GitHub), nunca credenciais no app. `google-services.json` está no repo — não adiciones segredos novos sem pensar.
 - **Comentários `<!-- -- -->` em XML:** `--` dentro de comentário XML quebra o parser expat do Cordova (`No platforms added`) — escrever por extenso.
 - **`package-lock.json` vs `desktop/package-lock.json`:** são subprojetos separados; `npm audit`/bump no root não cobre o desktop.
+- **Binários grandes no repo:** assets do proot (`.so`/Alpine por arquitectura — ~20 MB no total), fontes em `src/res/fonts/`, `utils/code-editor-icon.icomoon.json` (946 KB). Não os delete; se o tamanho do repo incomodar (clone fresco lento), considerar Git LFS — exige migração de histórico, não fazer às pressas.
+- **Churn fantasma de line endings:** `core.autocrlf=true` no Windows + Biome gravando LF: depois de `npm run check` muitos ficheiros mudam só o EOL — no commit vira no-op (o git normaliza para LF). Commitar só o diff real.
 
