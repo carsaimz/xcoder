@@ -63,6 +63,13 @@ export default defineConfig({
                 // inside the WebView (launched from the app commands) and depends on
                 // cordova/editorManager globals, so it must never be collected here.
                 include: ["tests/**/*.test.{js,ts}"],
+                // Deterministic web-storage globals across Node versions (see
+                // tests/setup.js for the evidence and the shim).
+                setupFiles: ["tests/setup.js"],
+                // The suite is heavy (CodeMirror, LSP workers, AI prompts);
+                // 5s trips on constrained machines without any actual bug.
+                testTimeout: 15000,
+                hookTimeout: 15000,
                 exclude: [
                         ...configDefaults.exclude,
                         "src/test/**",

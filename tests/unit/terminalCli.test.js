@@ -19,6 +19,23 @@ import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { existsSync } from "node:fs";
+
+/** git-bash ships with Git for Windows; msys64 is the other usual home. */
+function findBash() {
+	if (process.platform !== "win32") return "bash";
+	return (
+		[
+			process.env.XCODER_TEST_BASH,
+			"C:\\Program Files\\Git\\bin\\bash.exe",
+			"C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+			"C:\\msys64\\usr\\bin\\bash.exe",
+		].filter(Boolean).find(existsSync) ?? null
+	);
+}
+
+const BASH = findBash();
+const itCli = BASH === null ? it.skip : it;
 const INIT_SCRIPT = join(
         process.cwd(),
         "src/plugins/terminal/scripts/init-alpine.sh",
@@ -55,7 +72,7 @@ afterEach(() => {
 });
 
 function run(script, args, fileArgs = []) {
-        return spawnSync("bash", [join(binDir, script), ...args], {
+        return spawnSync(BASH, [join(binDir, script), ...args], {
                 cwd: workdir,
                 encoding: "utf8",
                 input: "",
@@ -63,8 +80,22 @@ function run(script, args, fileArgs = []) {
         });
 }
 
+/**
+ * msys bash reports POSIX views of the tempdir on Windows ("/tmp/...")
+ * while the test variables hold Windows paths. The CLI is the source of
+ * truth for what it emits (realpath of the arg), so resolve expectations
+ * through the same bash that runs the script.
+ */
+function bashAbsPath(arg) {
+	const res = spawnSync(BASH, ["-c", `realpath -m ${JSON.stringify(arg)}`], {
+		cwd: workdir,
+		encoding: "utf8",
+		input: "",
+	});
+	return (res.stdout || "").trim();
+}
 describe("terminal CLI scripts (init-alpine.sh heredocs)", () => {
-        it("ships an update-propagation version marker", () => {
+        itCli("ships an update-propagation version marker", () => {
                 // Older installs already extracted CLI v1 — the guard must
                 // rewrite the scripts whenever the marker version differs.
                 expect(initSource).toMatch(/\.xcoder-cli-version/);
@@ -72,71 +103,71 @@ describe("terminal CLI scripts (init-alpine.sh heredocs)", () => {
                 expect(initSource).toMatch(/CLI_VERSION="2"/);
         });
 
-        it("acode open <file> emits the OSC 7777 open sequence", () => {
+        itCli("acode open <file> emits the OSC 7777 open sequence", () => {
                 const file = join(workdir, "main.c");
                 writeFileSync(file, "int main() {}\n");
                 const res = run("acode", ["open", "main.c"]);
                 expect(res.status).toBe(0);
                 // OSC: ESC ] 7777 ; open ; file ; <abs path> BEL
                 expect(res.stdout).toContain(
-                        `\x1b]7777;open;file;${file}\x07`,
+                        `\x1b]7777;open;file;${bashAbsPath("main.c")}\x07`,
                 );
         });
 
-        it("xcoder open <folder> reports type=folder", () => {
+        itCli("xcoder open <folder> reports type=folder", () => {
                 const dir = join(workdir, "src");
                 mkdirSync(dir);
                 const res = run("xcoder", ["open", "src"]);
                 expect(res.status).toBe(0);
-                expect(res.stdout).toContain(`\x1b]7777;open;folder;${dir}\x07`);
+                expect(res.stdout).toContain(`\x1b]7777;open;folder;${bashAbsPath("src")}\x07`);
         });
 
-        it("acode <file> keeps the positional form working", () => {
+        itCli("acode <file> keeps the positional form working", () => {
                 const file = join(workdir, "notes.txt");
                 writeFileSync(file, "hello");
                 const res = run("acode", ["notes.txt"]);
                 expect(res.status).toBe(0);
-                expect(res.stdout).toContain(`\x1b]7777;open;file;${file}\x07`);
+                expect(res.stdout).toContain(`\x1b]7777;open;file;${bashAbsPath("notes.txt")}\x07`);
         });
 
-        it("multiple paths open in one invocation", () => {
+        itCli("multiple paths open in one invocation", () => {
                 const a = join(workdir, "a.js");
                 const b = join(workdir, "b.js");
                 writeFileSync(a, "");
                 writeFileSync(b, "");
                 const res = run("acode", ["open", "a.js", "b.js"]);
                 expect(res.status).toBe(0);
-                expect(res.stdout).toContain(`\x1b]7777;open;file;${a}\x07`);
-                expect(res.stdout).toContain(`\x1b]7777;open;file;${b}\x07`);
+                expect(res.stdout).toContain(`\x1b]7777;open;file;${bashAbsPath("a.js")}\x07`);
+                expect(res.stdout).toContain(`\x1b]7777;open;file;${bashAbsPath("b.js")}\x07`);
         });
 
-        it("open without a path fails with usage", () => {
+        itCli("open without a path fails with usage", () => {
                 const res = run("acode", ["open"]);
                 expect(res.status).toBe(1);
                 expect(res.stderr).toMatch(/requires a file or folder/);
         });
 
-        it("missing paths fail with a clear error", () => {
+        itCli("missing paths fail with a clear error", () => {
                 const res = run("acode", ["open", "definitely-missing-xyz.js"]);
                 expect(res.status).toBe(1);
                 expect(res.stderr).toMatch(/does not exist/);
         });
 
-        it("--version prints the CLI version", () => {
+        itCli("--version prints the CLI version", () => {
                 const res = run("acode", ["--version"]);
                 expect(res.status).toBe(0);
                 expect(res.stdout).toMatch(/xcoder CLI 2/);
         });
 
-        it("--help documents the acode-compatible form", () => {
+        itCli("--help documents the acode-compatible form", () => {
                 const res = run("acode", ["--help"]);
                 expect(res.status).toBe(0);
                 expect(res.stdout).toMatch(/acode open/);
         });
 
-        it("no arguments opens the current folder", () => {
+        itCli("no arguments opens the current folder", () => {
                 const res = run("acode", []);
                 expect(res.status).toBe(0);
-                expect(res.stdout).toContain(`\x1b]7777;open;folder;${workdir}\x07`);
+                expect(res.stdout).toContain(`\x1b]7777;open;folder;${bashAbsPath(".")}\x07`);
         });
 });
