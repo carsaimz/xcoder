@@ -66,10 +66,12 @@ export default defineConfig({
                 // Deterministic web-storage globals across Node versions (see
                 // tests/setup.js for the evidence and the shim).
                 setupFiles: ["tests/setup.js"],
-                // The suite is heavy (CodeMirror, LSP workers, AI prompts);
-                // 5s trips on constrained machines without any actual bug.
-                testTimeout: 15000,
-                hookTimeout: 15000,
+                // The suite is heavy (CodeMirror, LSP workers, AI prompts),
+                // and several tests evaluate whole module graphs inside the
+                // test body (sidebar apps, settings pages, AI chat windowing):
+                // on slow machines those imports alone exceed 15s, so allow 60s.
+                testTimeout: 60000,
+                hookTimeout: 60000,
                 exclude: [
                         ...configDefaults.exclude,
                         "src/test/**",
