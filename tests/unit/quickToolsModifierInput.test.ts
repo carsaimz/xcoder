@@ -144,7 +144,12 @@ describe("quick-tools modifier input", () => {
 		expect(textNode).not.toBeNull();
 
 		if (textNode) textNode.nodeValue = '"@c/commands"';
-		await new Promise((resolve) => setTimeout(resolve, 20));
+		// CodeMirror reconciles DOM changes through its observer in rAF
+		// batches; under load the delivery can land past a fixed sleep, so
+		// poll for the input context instead of waiting a constant 20ms.
+		for (let waited = 0; waited < 1000 && !receivedInput; waited += 10) {
+			await new Promise((resolve) => setTimeout(resolve, 10));
+		}
 
 		expect(receivedInput).toEqual({ from, to, text: "c" });
 		expect(view.state).toBe(startState);
