@@ -631,8 +631,10 @@ export const CATALOG_LIBS = [
 		version: "7.8.1",
 		license: "Apache-2.0",
 		site: "https://rxjs.dev",
-		descPt: "ReactiveX: observables para fluxos assíncronos (eventos, timers, pedidos) com operadores combináveis.",
-		descEn: "ReactiveX: observables for async streams (events, timers, requests) with composable operators.",
+		descPt:
+			"ReactiveX: observables para fluxos assíncronos (eventos, timers, pedidos) com operadores combináveis.",
+		descEn:
+			"ReactiveX: observables for async streams (events, timers, requests) with composable operators.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/rxjs@7.8.1/dist/bundles",
 		files: [{ path: "rxjs.umd.min.js", size: 88037 }],
 	},
@@ -642,8 +644,10 @@ export const CATALOG_LIBS = [
 		version: "9.0.21",
 		license: "MIT",
 		site: "https://immerjs.github.io/immer",
-		descPt: "Estados imutáveis com conforto mutável: escreve mutations e recebe o next-state congelado.",
-		descEn: "Immutable state with mutable comfort: write mutations, get the frozen next-state.",
+		descPt:
+			"Estados imutáveis com conforto mutável: escreve mutations e recebe o next-state congelado.",
+		descEn:
+			"Immutable state with mutable comfort: write mutations, get the frozen next-state.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/immer@9.0.21/dist",
 		files: [{ path: "immer.umd.production.min.js", size: 16200 }],
 	},
@@ -653,8 +657,10 @@ export const CATALOG_LIBS = [
 		version: "2.30.1",
 		license: "MIT",
 		site: "https://momentjs.com",
-		descPt: "Datas clássicas: parse, validar, formatar e durações. Bundle grande — prefira dayjs em projetos novos.",
-		descEn: "Classic dates: parse, validate, format and durations. Large bundle — prefer dayjs in new projects.",
+		descPt:
+			"Datas clássicas: parse, validar, formatar e durações. Bundle grande — prefira dayjs em projetos novos.",
+		descEn:
+			"Classic dates: parse, validate, format and durations. Large bundle — prefer dayjs in new projects.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/moment@2.30.1/min",
 		files: [{ path: "moment.min.js", size: 58890 }],
 	},
@@ -664,8 +670,10 @@ export const CATALOG_LIBS = [
 		version: "4.7.8",
 		license: "MIT",
 		site: "https://handlebarsjs.com",
-		descPt: "Templates {{mustache}} compilados no browser — lógica mínima, helpers e partials.",
-		descEn: "{{mustache}} templates compiled in the browser — minimal logic, helpers and partials.",
+		descPt:
+			"Templates {{mustache}} compilados no browser — lógica mínima, helpers e partials.",
+		descEn:
+			"{{mustache}} templates compiled in the browser — minimal logic, helpers and partials.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/handlebars@4.7.8/dist",
 		files: [{ path: "handlebars.min.js", size: 88426 }],
 	},
@@ -675,8 +683,10 @@ export const CATALOG_LIBS = [
 		version: "3.24.1",
 		license: "MIT",
 		site: "https://zod.dev",
-		descPt: "Validação de schemas com total typesafety — parse de APIs, formulários e configs (build UMD).",
-		descEn: "Fully type-safe schema validation — parse APIs, forms and configs (UMD build).",
+		descPt:
+			"Validação de schemas com total typesafety — parse de APIs, formulários e configs (build UMD).",
+		descEn:
+			"Fully type-safe schema validation — parse APIs, forms and configs (UMD build).",
 		cdnBase: "https://cdn.jsdelivr.net/npm/zod@3.24.1/lib",
 		files: [{ path: "index.umd.js", size: 176626 }],
 	},
@@ -686,8 +696,10 @@ export const CATALOG_LIBS = [
 		version: "2.0.3",
 		license: "BSD-3-Clause",
 		site: "https://quilljs.com",
-		descPt: "Editor WYSIWYG rico com toolbar, temas e formato delta (inclui o CSS do tema Snow).",
-		descEn: "Rich WYSIWYG editor with toolbar, themes and delta format (includes the Snow theme CSS).",
+		descPt:
+			"Editor WYSIWYG rico com toolbar, temas e formato delta (inclui o CSS do tema Snow).",
+		descEn:
+			"Rich WYSIWYG editor with toolbar, themes and delta format (includes the Snow theme CSS).",
 		cdnBase: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist",
 		files: [
 			{ path: "quill.js", size: 209274 },
@@ -700,8 +712,10 @@ export const CATALOG_LIBS = [
 		version: "1.6.2",
 		license: "MIT",
 		site: "https://github.com/fengyuanchen/cropperjs",
-		descPt: "Recorte, rotação e zoom de imagens com gestos touch (inclui o CSS).",
-		descEn: "Image crop, rotate and zoom with touch gestures (includes the CSS).",
+		descPt:
+			"Recorte, rotação e zoom de imagens com gestos touch (inclui o CSS).",
+		descEn:
+			"Image crop, rotate and zoom with touch gestures (includes the CSS).",
 		cdnBase: "https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist",
 		files: [
 			{ path: "cropper.min.js", size: 37369 },
@@ -714,8 +728,10 @@ export const CATALOG_LIBS = [
 		version: "1.12.0",
 		license: "MIT",
 		site: "https://apvarun.github.io/toastify-js",
-		descPt: "Notificações toast leves e estilizáveis, sem dependências (inclui o CSS).",
-		descEn: "Lightweight, styleable toast notifications with no dependencies (includes the CSS).",
+		descPt:
+			"Notificações toast leves e estilizáveis, sem dependências (inclui o CSS).",
+		descEn:
+			"Lightweight, styleable toast notifications with no dependencies (includes the CSS).",
 		cdnBase: "https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src",
 		files: [
 			{ path: "toastify.js", size: 15130 },
@@ -728,8 +744,10 @@ export const CATALOG_LIBS = [
 		version: "11.15.10",
 		license: "MIT",
 		site: "https://sweetalert2.github.io",
-		descPt: "Modais e alertas bonitos, acessíveis e customizáveis — bundle all com CSS embutido.",
-		descEn: "Beautiful, accessible and customizable modals and alerts — all bundle with embedded CSS.",
+		descPt:
+			"Modais e alertas bonitos, acessíveis e customizáveis — bundle all com CSS embutido.",
+		descEn:
+			"Beautiful, accessible and customizable modals and alerts — all bundle with embedded CSS.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist",
 		files: [{ path: "sweetalert2.all.min.js", size: 72231 }],
 	},
@@ -739,8 +757,10 @@ export const CATALOG_LIBS = [
 		version: "1.6.13",
 		license: "MIT",
 		site: "https://floating-ui.com",
-		descPt: "Posicionamento de tooltips, popovers e dropdowns (@floating-ui/dom, build UMD).",
-		descEn: "Positioning for tooltips, popovers and dropdowns (@floating-ui/dom, UMD build).",
+		descPt:
+			"Posicionamento de tooltips, popovers e dropdowns (@floating-ui/dom, build UMD).",
+		descEn:
+			"Positioning for tooltips, popovers and dropdowns (@floating-ui/dom, UMD build).",
 		cdnBase: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.13/dist",
 		files: [{ path: "floating-ui.dom.umd.min.js", size: 9913 }],
 	},

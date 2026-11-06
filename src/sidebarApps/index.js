@@ -1,5 +1,5 @@
-import floatingWindow from "components/sidebar/floatingWindow";
 import rightDock from "components/rightDock";
+import floatingWindow from "components/sidebar/floatingWindow";
 import toast from "components/toast";
 import tag from "html-tag-js";
 import logger from "lib/logger";
