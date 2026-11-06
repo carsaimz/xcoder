@@ -1,2 +1,7 @@
 *.sh text eol=lf
 config.xml text eol=lf
+
+# Vendored third-party libraries must be byte-exact: EOL conversion
+# corrupts them (e.g. alpinejs cdn.min.js grew by 5 bytes on a CRLF
+# checkout and broke the size assertions in tests/unit/localLibs.test.js).
+src/res/libs/** -text
