@@ -77,9 +77,7 @@ try {
 
 	// Keep desktop/package.json version in sync with the root version.
 	try {
-		const desktopJson = JSON.parse(
-			fs.readFileSync(desktopPackagePath, "utf8"),
-		);
+		const desktopJson = JSON.parse(fs.readFileSync(desktopPackagePath, "utf8"));
 		if (desktopJson.version !== packageJson.version) {
 			desktopJson.version = packageJson.version;
 			fs.writeFileSync(

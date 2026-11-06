@@ -43,9 +43,7 @@
 		}
 	},
 	"javascript": {
-		"globals": [
-			"Global1"
-		]
+		"globals": ["Global1"]
 	},
 	"files": {
 		"includes": [
@@ -63,9 +61,7 @@
 	},
 	"overrides": [
 		{
-			"includes": [
-				"src/main.js"
-			],
+			"includes": ["src/main.js"],
 			"linter": {
 				"rules": {
 					"style": {
