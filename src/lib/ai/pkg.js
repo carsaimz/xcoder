@@ -143,7 +143,7 @@ export function filterJq(data, query) {
 /**
  * pkg command handler.
  * @param {string[]} args
- * @param {object} io {exec(commandLine) for nested commands}
+ * @param {{exec: (commandLine: string) => Promise<string>}} io exec(commandLine) for nested commands
  * @returns {Promise<{output: string, error?: boolean}>}
  */
 export async function cmdPkg(args, { exec }) {
@@ -228,7 +228,7 @@ export async function cmdPkg(args, { exec }) {
 /**
  * jq command handler (available when the jq package is installed).
  * @param {string[]} args
- * @param {object} io {readText(url), resolvePath(path)}
+ * @param {{readText: (url: string) => Promise<string | null>, resolvePath: (path: string) => string}} io readText(url), resolvePath(path)
  * @returns {Promise<{output: string, error?: boolean}>}
  */
 export async function cmdJq(args, { readText, resolvePath }) {
