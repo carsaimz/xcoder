@@ -8,9 +8,9 @@ import helpers from "utils/helpers";
 import Url from "utils/Url";
 import config from "./config";
 import EditorFile from "./editorFile";
+import fileTimeline from "./fileTimeline";
 import openFolder from "./openFolder";
 import appSettings from "./settings";
-import fileTimeline from "./fileTimeline";
 
 let saveTimeout;
 

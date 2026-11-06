@@ -161,8 +161,10 @@ export const LOCAL_LIBS = [
 		version: "18.3.1",
 		license: "MIT",
 		site: "https://react.dev",
-		descPt: "Biblioteca UI declarativa da Meta (build UMD offline). Combine com react-dom para SPAs e componentes reutilizáveis.",
-		descEn: "Meta's declarative UI library (offline UMD build). Pair with react-dom for SPAs and reusable components.",
+		descPt:
+			"Biblioteca UI declarativa da Meta (build UMD offline). Combine com react-dom para SPAs e componentes reutilizáveis.",
+		descEn:
+			"Meta's declarative UI library (offline UMD build). Pair with react-dom for SPAs and reusable components.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/react@18.3.1/umd",
 		files: [{ path: "react.production.min.js", size: 10751 }],
 	},
@@ -172,8 +174,10 @@ export const LOCAL_LIBS = [
 		version: "18.3.1",
 		license: "MIT",
 		site: "https://react.dev",
-		descPt: "Renderizador do React para o DOM — par obrigatório do núcleo react (build UMD offline).",
-		descEn: "React's DOM renderer — required companion of the react core (offline UMD build).",
+		descPt:
+			"Renderizador do React para o DOM — par obrigatório do núcleo react (build UMD offline).",
+		descEn:
+			"React's DOM renderer — required companion of the react core (offline UMD build).",
 		cdnBase: "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd",
 		files: [{ path: "react-dom.production.min.js", size: 131835 }],
 	},
@@ -183,8 +187,10 @@ export const LOCAL_LIBS = [
 		version: "3.5.13",
 		license: "MIT",
 		site: "https://vuejs.org",
-		descPt: "Framework progressivo com reatividade fina e templates no HTML — build global completa, funciona offline no app.",
-		descEn: "Progressive framework with fine-grained reactivity and HTML templates — full global build, works offline in the app.",
+		descPt:
+			"Framework progressivo com reatividade fina e templates no HTML — build global completa, funciona offline no app.",
+		descEn:
+			"Progressive framework with fine-grained reactivity and HTML templates — full global build, works offline in the app.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/vue@3.5.13/dist",
 		files: [{ path: "vue.global.prod.js", size: 157924 }],
 	},
@@ -194,8 +200,10 @@ export const LOCAL_LIBS = [
 		version: "1.7.9",
 		license: "MIT",
 		site: "https://axios-http.com",
-		descPt: "Cliente HTTP baseado em promises com interceptores e cancelamento — funciona em browser e node.",
-		descEn: "Promise-based HTTP client with interceptors and cancellation — works in browser and node.",
+		descPt:
+			"Cliente HTTP baseado em promises com interceptores e cancelamento — funciona em browser e node.",
+		descEn:
+			"Promise-based HTTP client with interceptors and cancellation — works in browser and node.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/axios@1.7.9/dist",
 		files: [{ path: "axios.min.js", size: 54050 }],
 	},
@@ -205,8 +213,10 @@ export const LOCAL_LIBS = [
 		version: "1.11.13",
 		license: "MIT",
 		site: "https://day.js.org",
-		descPt: "Datas modernas em ~2 KB, API imutável e plugins — alternativa leve ao moment.",
-		descEn: "Modern ~2 KB dates with an immutable API and plugins — the lightweight moment alternative.",
+		descPt:
+			"Datas modernas em ~2 KB, API imutável e plugins — alternativa leve ao moment.",
+		descEn:
+			"Modern ~2 KB dates with an immutable API and plugins — the lightweight moment alternative.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/dayjs@1.11.13",
 		files: [{ path: "dayjs.min.js", size: 7160 }],
 	},
@@ -216,8 +226,10 @@ export const LOCAL_LIBS = [
 		version: "4.17.21",
 		license: "MIT",
 		site: "https://lodash.com",
-		descPt: "Utilitários essenciais (debounce, deep clone, agrupamento, ordenação) num único ficheiro.",
-		descEn: "Essential utilities (debounce, deep clone, grouping, ordering) in a single file.",
+		descPt:
+			"Utilitários essenciais (debounce, deep clone, agrupamento, ordenação) num único ficheiro.",
+		descEn:
+			"Essential utilities (debounce, deep clone, grouping, ordering) in a single file.",
 		cdnBase: "https://cdn.jsdelivr.net/npm/lodash@4.17.21",
 		files: [{ path: "lodash.min.js", size: 73015 }],
 	},

@@ -51,7 +51,7 @@ export function installSiteDownloadBridge() {
 	window.addEventListener("message", handleSiteMessage);
 	toast(
 		globalThis.strings?.["site bridge ready"] ||
-		"Downloads do site chegam ao app",
+			"Downloads do site chegam ao app",
 	);
 	return () => {
 		window.removeEventListener("message", handleSiteMessage);
