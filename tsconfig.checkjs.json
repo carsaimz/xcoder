@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "checkJs": true,
+    // Progressive checkJs ratchet: strict catch variables would force a
+    // `error.message` cast at every try/catch in plain-JS code — too much
+    // churn for the JSDoc migration, so keep them `any` here for now.
+    "useUnknownInCatchVariables": false
+  },
+  // Only leaf modules with a small import closure belong on this list: with
+  // checkJs the whole import graph of every included file gets type-checked
+  // (e.g. including markdown.js drags in ~11k errors from the rest of src/).
+  // Use `node scripts/checkjs_add_file.mjs <file>` to measure a new file
+  // before adding it here.
+  "include": [
+    "src/lib/ai/actionPrompt.js",
+    "src/lib/ai/modelId.js",
+    "src/lib/ai/pkg.js",
+    "src/lib/ai/providerLogos.js",
+    "src/lib/ai/slashCommands.js"
+  ],
+  "exclude": ["node_modules"]
+}

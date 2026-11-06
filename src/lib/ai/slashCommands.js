@@ -18,7 +18,7 @@ const MAX_INLINE_SELECTION = 8000;
 
 /**
  * @typedef {object} SlashContext
- * @property {boolean} hasFile is a file open in the editor
+ * @property {boolean} [hasFile] is a file open in the editor
  * @property {string} [fileName] name/path of the active file
  * @property {string} [selection] current editor selection (may be empty)
  */
