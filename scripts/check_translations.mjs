@@ -13,11 +13,12 @@
  *   node scripts/check_translations.mjs --verbose  # list every key
  *   node scripts/check_translations.mjs --lang pt-br
  */
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const LANG_DIR = path.join(
-	path.resolve(new URL("..", import.meta.url).pathname),
+	path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
 	"src",
 	"lang",
 );

@@ -29,10 +29,10 @@ começar o desenvolvimento.
 4. Aguarde a construção do contêiner (~5–10 min na primeira vez; as seguintes são instantâneas)
 5. Quando estiver pronto, construa o APK:
    ```bash
-   pnpm run build paid dev apk
+   npm run build
    ```
 
-   > Use qualquer gerenciador de pacotes (pnpm, bun, npm, yarn etc.)
+   > Gestor canónico: **npm** (CI usa `npm ci --legacy-peer-deps`).
 
 ### Opção 2: Docker CLI (para qualquer editor)
 
@@ -58,8 +58,8 @@ docker run -it --rm \
   bash
 
 # Dentro do contêiner, rode o setup e o build
-pnpm run setup
-pnpm run build paid dev apk # ou pnpm run build p d
+npm run setup
+npm run build # ou npm run build p d
 ```
 
 **Mantendo o contêiner vivo para uso repetido:**
@@ -72,8 +72,8 @@ docker run -d --name xcoder-dev \
   sleep infinity
 
 # Execute comandos no contêiner ativo
-docker exec -it xcoder-dev bash -c "pnpm run setup"
-docker exec -it xcoder-dev pnpm run build paid dev apk
+docker exec -it xcoder-dev bash -c "npm run setup"
+docker exec -it xcoder-dev npm run build
 
 # Pare e remova ao terminar
 docker stop xcoder-dev && docker rm xcoder-dev
@@ -90,9 +90,9 @@ Se preferir não usar Docker:
 | Requisito | Versão |
 |------------|---------|
 | **Node.js** | 18+ (22 recomendado) |
-| **pnpm** ou **bun** | Mais recente |
+| **npm** | Mais recente (canónico — CI usa `npm ci`) |
 | **Java JDK** | 17+ (21 recomendado) |
-| **Android SDK** | API 35 |
+| **Android SDK** | API 36 |
 | **Gradle** | 8.x |
 
 ### Variáveis de ambiente
@@ -119,8 +119,8 @@ Mais variáveis na [documentação do Cordova](https://cordova.apache.org/docs/e
 git clone https://github.com/carsaimz/xcoder.git
 cd XCoder
 
-pnpm run setup          # dependências + setup do Cordova
-pnpm run build paid dev apk   # ou pnpm run build p d
+npm run setup          # dependências + setup do Cordova
+npm run build   # ou npm run build p d
 ```
 
 O APK ficará em: `platforms/android/app/build/outputs/apk/debug/app-debug.apk`
@@ -133,7 +133,7 @@ O APK ficará em: `platforms/android/app/build/outputs/apk/debug/app-debug.apk`
 2. **Faça as mudanças** — commits focados e atômicos
 3. **Cheque a qualidade do código:**
    ```bash
-   pnpm run check
+   npm run check
    ```
 4. **Teste** num dispositivo ou emulador quando possível
 
@@ -147,7 +147,7 @@ O APK ficará em: `platforms/android/app/build/outputs/apk/debug/app-debug.apk`
 ### Estilo de código
 
 Usamos [Biome](https://biomejs.dev/) para lint e formatação:
-- Rode `pnpm run check` antes de commitar
+- Rode `npm run check` antes de commitar
 - Instale a extensão Biome no VS Code para formatar automaticamente
 
 ### Mensagens de commit
@@ -166,10 +166,10 @@ refactor: simplifica a lógica de carregamento de ficheiros
 2. Registre-o em `src/lib/lang.js`
 3. Use os utilitários:
    ```bash
-   pnpm run lang add       # Adicionar string
-   pnpm run lang remove    # Remover string
-   pnpm run lang search    # Buscar strings
-   pnpm run lang update    # Atualizar traduções
+   npm run lang add       # Adicionar string
+   npm run lang remove    # Remover string
+   npm run lang search    # Buscar strings
+   npm run lang update    # Atualizar traduções
    ```
 
 ## ℹ️ Adicionando novos ícones (à fonte existente)
@@ -240,10 +240,10 @@ Thank you for your interest in contributing to XCoder! This guide will help you 
 
 5. Once ready, build the APK:
    ```bash
-   pnpm run build paid dev apk
+   npm run build
    ```
 
-   > Use any package manager (pnpm, bun, npm, yarn, etc.)
+   > Canonical package manager: **npm** (CI uses `npm ci --legacy-peer-deps`).
 
 ### Option 2: Docker CLI (For Any Editor)
 
@@ -268,8 +268,8 @@ docker run -it --rm \
   bash
 
 # Inside the container, run setup and build
-pnpm run setup
-pnpm run build paid dev apk # or pnpm run build p d
+npm run setup
+npm run build # or npm run build p d
 ```
 
 **Keep container running for repeated use:**
@@ -282,8 +282,8 @@ docker run -d --name xcoder-dev \
   sleep infinity
 
 # Execute commands in the running container
-docker exec -it xcoder-dev bash -c "pnpm run setup"
-docker exec -it xcoder-dev pnpm run build paid dev apk
+docker exec -it xcoder-dev bash -c "npm run setup"
+docker exec -it xcoder-dev npm run build
 
 # Stop and remove when done
 docker stop xcoder-dev && docker rm xcoder-dev
@@ -298,9 +298,9 @@ If you prefer not to use Docker at all:
 | Requirement | Version |
 |------------|---------|
 | **Node.js** | 18+ (22 recommended) |
-| **pnpm** or **bun** | Latest |
+| **npm** | Latest (canonical — CI uses `npm ci`) |
 | **Java JDK** | 17+ (21 recommended) |
-| **Android SDK** | API 35 |
+| **Android SDK** | API 36 |
 | **Gradle** | 8.x |
 
 ### Environment Setup
@@ -327,8 +327,8 @@ Some more environment variables, check [cordova docs](https://cordova.apache.org
 git clone https://github.com/carsaimz/xcoder.git
 cd XCoder
 
-pnpm run setup
-pnpm run build paid dev apk # or pnpm run build p d
+npm run setup
+npm run build # or npm run build p d
 ```
 
 The APK will be at: `platforms/android/app/build/outputs/apk/debug/app-debug.apk`
@@ -341,7 +341,7 @@ The APK will be at: `platforms/android/app/build/outputs/apk/debug/app-debug.apk
 2. **Make changes** — keep commits focused and atomic
 3. **Check code quality:**
    ```bash
-   pnpm run check
+   npm run check
    ```
 4. **Test** on a device or emulator if possible
 
@@ -355,7 +355,7 @@ The APK will be at: `platforms/android/app/build/outputs/apk/debug/app-debug.apk
 ### Code Style
 
 We use [Biome](https://biomejs.dev/) for linting and formatting:
-- Run `pnpm run check` before committing
+- Run `npm run check` before committing
 - Install the Biome VS Code extension for auto-formatting
 
 ### Commit Messages
@@ -374,10 +374,10 @@ refactor: simplify file loading logic
 2. Add it to `src/lib/lang.js`
 3. Use the translation utilities:
    ```bash
-   pnpm run lang add       # Add new string
-   pnpm run lang remove    # Remove string
-   pnpm run lang search    # Search strings
-   pnpm run lang update    # Update translations
+   npm run lang add       # Add new string
+   npm run lang remove    # Remove string
+   npm run lang search    # Search strings
+   npm run lang update    # Update translations
    ```
 
 ## ℹ️ Adding New Icons (to the existing font family)

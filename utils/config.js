@@ -62,6 +62,7 @@ try {
 // Keep config.xml version in sync with package.json
 const configPath = path.join(rootDir, "config.xml");
 const packagePath = path.join(rootDir, "package.json");
+const desktopPackagePath = path.join(rootDir, "desktop", "package.json");
 try {
 	const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8"));
 	let config = fs.readFileSync(configPath, "utf8");
@@ -72,6 +73,23 @@ try {
 			`$1${packageJson.version}$3`,
 		);
 		fs.writeFileSync(configPath, config, "utf8");
+	}
+
+	// Keep desktop/package.json version in sync with the root version.
+	try {
+		const desktopJson = JSON.parse(
+			fs.readFileSync(desktopPackagePath, "utf8"),
+		);
+		if (desktopJson.version !== packageJson.version) {
+			desktopJson.version = packageJson.version;
+			fs.writeFileSync(
+				desktopPackagePath,
+				`${JSON.stringify(desktopJson, undefined, "\t")}\n`,
+				"utf8",
+			);
+		}
+	} catch (error) {
+		console.warn(`Unable to sync desktop version: ${error.message}`);
 	}
 } catch (error) {
 	console.warn(`Unable to sync version: ${error.message}`);
