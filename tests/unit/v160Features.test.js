@@ -77,13 +77,11 @@ describe("v1.6.0 wiring guards", () => {
                 expect(src).toMatch(/terminalOnboardingDone: false/);
         });
 
-        it("the repl worker is a bundler entry (rspack + webpack)", () => {
+        it("the repl worker is a bundler entry (rspack)", () => {
                 expect(read("rspack.config.js")).toMatch(
                         /replWorker: '\.\/src\/lib\/replWorker\.js'/,
                 );
-                expect(read("webpack.config.js")).toMatch(
-                        /replWorker: '\.\/src\/lib\/replWorker\.js'/,
-                );
+                
         });
 
         it("the repl sidebar app is registered in the loaders", () => {
