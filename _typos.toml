@@ -57,6 +57,7 @@ extend-exclude = [
     "wiki",
     "README.md",
     "ROADMAP.md",
+    "AGENTS.md",
     "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md",
     "CHANGELOG.md",
