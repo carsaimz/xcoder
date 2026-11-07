@@ -1,5 +1,57 @@
+const fs = require('fs');
 const path = require('path');
 const { rspack } = require('@rspack/core');
+
+/**
+ * Rewrites `url(./build/<asset>)` occurrences inside every emitted CSS file
+ * to plain `url(<asset>)`.
+ *
+ * Why: output.publicPath ('./build/' since v1.8.21) is the base for JS chunk
+ * loading (resolved against index.html) — but css-loader v7 no longer has a
+ * publicPath option and bakes the SAME './build/' prefix into CSS url()
+ * assets. Extracted CSS already lives INSIDE build/, and the browser resolves
+ * url() against the CSS FILE, so `url(./build/icons.ttf)` became
+ * build/build/icons.ttf (404) and every icon-font glyph went blank app-wide
+ * (welcome page, editor header/quickTools, floating windows, file tree) on
+ * every platform. Sibling-relative `url(icons.ttf)` is correct everywhere:
+ * Android asset server, desktop file://, dev server — assets and CSS are
+ * emitted into the same directory (assetModuleFilename '[name][ext]').
+ *
+ * Runs on every emit (build, watch, all CI workflows — they all use this
+ * config); idempotent by construction.
+ */
+function FixCssAssetUrls() {
+  return {
+    name: 'FixCssAssetUrls',
+    apply(compiler) {
+      compiler.hooks.afterEmit.tap('FixCssAssetUrls', (compilation) => {
+        try {
+          const dir = compiler.outputPath;
+          if (!fs.existsSync(dir)) return;
+          for (const name of fs.readdirSync(dir)) {
+            if (!name.endsWith('.css')) continue;
+            const file = path.join(dir, name);
+            let css = fs.readFileSync(file, 'utf8');
+            const fixed = css.replace(
+              /url\((['"]?)\.\/build\//g,
+              'url($1',
+            );
+            if (fixed !== css) {
+              fs.writeFileSync(file, fixed);
+              compilation.warnings.push(
+                new Error(`FixCssAssetUrls: rewrote asset urls in ${name}`),
+              );
+            }
+          }
+        } catch (err) {
+          compilation.warnings.push(
+            new Error(`FixCssAssetUrls failed: ${err && err.message}`),
+          );
+        }
+      });
+    },
+  };
+}
 
 module.exports = (env, options) => {
   const { mode = 'development' } = options;
@@ -112,6 +164,8 @@ module.exports = (env, options) => {
     // Regular CSS files do not need Sass processing. Passing icon CSS through
     // Sass converts escaped private-use code points into literal characters in
     // production, which Cordova's asset WebView renders as missing glyphs.
+    // CSS url() asset paths are fixed up post-emit by FixCssAssetUrls (see
+    // above) — css-loader v7 has no publicPath option anymore.
     {
       test: /(?<!\.m)\.css$/,
       type: 'javascript/auto',
@@ -201,6 +255,7 @@ module.exports = (env, options) => {
       new rspack.CssExtractRspackPlugin({
         filename: '[name].css',
       }),
+      FixCssAssetUrls(),
     ],
   };
 

@@ -7,6 +7,29 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.24] - 2026-11-08
+
+### Fixed
+- **Ícones desaparecendo em todo o app (welcome, header do editor,
+  janelas flutuantes, árvore de ficheiros)** — desde a v1.8.21 o
+  `output.publicPath` relativo (`./build/`, necessário para o desktop
+  em `file://`) passou a ser embutido TAMBÉM nos `url()` do CSS, embora
+  o CSS extraído já viva dentro de `build/`; o browser resolvia
+  `build/build/icons.ttf` (404) e a fonte de ícones nunca carregava —
+  todos os glifos ficavam em branco (o css-loader v7 removeu a opção
+  `publicPath`, que permitia separar os dois). Um plugin do rspack
+  (`FixCssAssetUrls`) reescreve os `url()` dos assets para
+  sibling-relative no pós-emit; válido para Android, desktop e dev
+  server, e cobre também as fontes KaTeX e imagens (logo/about).
+
+English summary: since v1.8.21 the relative `output.publicPath` was also
+baked into CSS `url()` assets while the extracted CSS already lives inside
+`build/` — browsers resolved `build/build/icons.ttf` (404) and the icon
+font never loaded, blanking every icon-font glyph app-wide (welcome,
+editor header, floating windows, file tree; KaTeX fonts and images too).
+A tiny rspack post-emit plugin (`FixCssAssetUrls`) rewrites CSS asset
+urls to sibling-relative on every platform and every CI workflow.
+
 ## [1.8.23] - 2026-11-07
 
 ### Added
