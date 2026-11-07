@@ -185,6 +185,7 @@ module.exports = (env, options) => {
       extensions: ['.ts', '.tsx', '.js', '.mjs', '.json'],
       fallback: {
         path: require.resolve('path-browserify'),
+        buffer: require.resolve('buffer/'),
         crypto: false,
       },
       modules: ['node_modules', 'src'],

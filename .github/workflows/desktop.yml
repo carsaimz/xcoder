@@ -129,7 +129,34 @@ jobs:
         working-directory: desktop
         run: node copy-vendor.cjs
 
-      - name: Build Windows installers
+      # Windows code signing — only when the repo has the secrets set
+      # (WINDOWS_CSC_LINK = base64 PFX, WINDOWS_CSC_KEY_PASSWORD).
+      # Without them the artifacts build unsigned (see docs/CODE_SIGNING.md).
+      - name: Decode signing certificate
+        if: ${{ secrets.WINDOWS_CSC_LINK != '' }}
+        working-directory: desktop
+        shell: bash
+        env:
+          WINDOWS_CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+        run: echo "$WINDOWS_CSC_LINK" | base64 -d > cert.pfx
+
+      - name: Build Windows installers (signed)
+        if: ${{ secrets.WINDOWS_CSC_LINK != '' }}
+        working-directory: desktop
+        env:
+          CSC_LINK: cert.pfx
+          CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder --win nsis portable --publish never
+
+      - name: Remove decoded certificate
+        if: ${{ always() }}
+        working-directory: desktop
+        shell: bash
+        run: rm -f cert.pfx
+
+      - name: Build Windows installers (unsigned)
+        if: ${{ secrets.WINDOWS_CSC_LINK == '' }}
         working-directory: desktop
         run: npx electron-builder --win nsis portable --publish never
 

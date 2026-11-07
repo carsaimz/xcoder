@@ -1,7 +1,7 @@
 {
 	"name": "com.carsaimz.xcoder",
 	"displayName": "XCoder",
-	"version": "1.8.22",
+	"version": "1.8.23",
 	"description": "XCoder is a fast, offline-first code editor and web IDE for Android",
 	"scripts": {
 		"lang": "node ./utils/lang.js",
@@ -170,6 +170,7 @@
 		"@xterm/xterm": "^6.0.0",
 		"acorn": "^8.18.0",
 		"autosize": "^6.0.1",
+		"buffer": "^6.0.3",
 		"codemirror": "^6.0.2",
 		"cordova": "13.0.0",
 		"core-js": "^3.50.0",
@@ -178,6 +179,7 @@
 		"escape-string-regexp": "^5.0.0",
 		"filesize": "^11.0.22",
 		"html-tag-js": "^2.4.16",
+		"isomorphic-git": "^1.44.11",
 		"jszip": "^3.10.1",
 		"katex": "^0.18.4",
 		"markdown-it": "^15.0.1",

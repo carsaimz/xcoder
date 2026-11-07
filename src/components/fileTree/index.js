@@ -2,6 +2,7 @@ import "./style.scss";
 import tile from "components/tile";
 import VirtualList from "components/virtualList";
 import tag from "html-tag-js";
+import { isSelected as fileSelected } from "lib/fileSelection";
 import helpers from "utils/helpers";
 import Path from "utils/Path";
 
@@ -170,6 +171,7 @@ export default class FileTree {
 		$title.dataset.url = url;
 		$title.dataset.name = name;
 		$title.dataset.type = "dir";
+		if (fileSelected(url)) $title.classList.add("selected");
 
 		const $content = tag("ul", { className: "scroll folder-content" });
 		$wrapper.append($title, $content);
@@ -223,6 +225,15 @@ export default class FileTree {
 
 		$title.addEventListener("click", (e) => {
 			e.stopPropagation();
+			// Ctrl/⌘-click selects rows instead of toggling the folder
+			if (e.ctrlKey || e.metaKey || e.shiftKey) {
+				this.options.onRowSelect?.(
+					$title.dataset.url,
+					this.entryUrls(),
+					e.shiftKey ? "range" : "toggle",
+				);
+				return;
+			}
 			toggle();
 		});
 
@@ -302,10 +313,25 @@ export default class FileTree {
 		$tile.dataset.url = url;
 		$tile.dataset.name = name;
 		$tile.dataset.type = "file";
+		if (fileSelected(url)) $tile.classList.add("selected");
 
 		$tile.addEventListener("click", (e) => {
 			e.stopPropagation();
-			this.options.onFileClick?.($tile.dataset.url, $tile.dataset.name);
+			// VS Code selection modifiers: ctrl/⌘ toggles, shift ranges
+			if (e.ctrlKey || e.metaKey || e.shiftKey) {
+				this.options.onRowSelect?.(
+					$tile.dataset.url,
+					this.entryUrls(),
+					e.shiftKey ? "range" : "toggle",
+				);
+				return;
+			}
+			this.options.onFileClick?.(
+				$tile.dataset.url,
+				$tile.dataset.name,
+				$tile,
+				e,
+			);
 		});
 
 		$tile.addEventListener("contextmenu", (e) => {
@@ -319,6 +345,14 @@ export default class FileTree {
 		});
 
 		return $tile;
+	}
+
+	/**
+	 * Ordered urls of the current entries (range selection context).
+	 * @returns {string[]}
+	 */
+	entryUrls() {
+		return this.entries.map((entry) => entry.url);
 	}
 
 	/**

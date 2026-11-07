@@ -185,6 +185,8 @@ export async function exec(commandLine) {
 			}
 			case "vcs":
 				return await cmdVcs(args);
+			case "git":
+				return await cmdGit(args);
 			case "open":
 				return await cmdOpen(args);
 			// --- Termux-like packages (local catalog, see lib/ai/pkg.js)
@@ -212,6 +214,8 @@ export async function exec(commandLine) {
 						"  pkg list | pkg search <term> | pkg install <name> | pkg uninstall <name>",
 						"  installable: jq, http, nano, gh, python3  (e.g. 'pkg install jq')",
 						"  vcs init | vcs commit <msg> | vcs log | vcs restore <id> | vcs diff",
+						"  git init | git status | git add -A | git commit -m <msg>",
+						"  git log | git branch | git checkout <b> | git push | git pull | git clone <url>",
 					].join("\n"),
 				};
 			default:
@@ -471,6 +475,17 @@ const MAX_FILE_SIZE = 200 * 1024;
 /**
  * @param {string[]} args
  */
+/**
+ * Real git over the engine (isomorphic-git) — same commands the
+ * Source Control sidebar runs, so both surfaces stay in sync.
+ * @param {string[]} args
+ * @returns {Promise<{output: string, error?: boolean}>}
+ */
+async function cmdGit(args) {
+	const { gitCli } = await import("lib/git/cli");
+	return gitCli(args);
+}
+
 async function cmdVcs(args) {
 	const sub = args[0] || "help";
 	const vcsUrl = Url.join(getCwd(), VCS_DIR);

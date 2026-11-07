@@ -73,3 +73,9 @@
         width: max-content;
     }
 }
+// multi-selection highlight (VS Code Explorer)
+.tile.selected {
+	background: color-mix(in srgb, var(--active-color) 18%, transparent);
+	outline: 1px solid color-mix(in srgb, var(--active-color) 35%, transparent);
+	border-radius: 6px;
+}

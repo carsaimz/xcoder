@@ -61,7 +61,12 @@ it("uses recycled file identity for open and context actions", () => {
 	tree.createFileElement("b.ts", "file:///b.ts", row);
 	row.click();
 	row.dispatchEvent(new Event("contextmenu"));
-	expect(onFileClick).toHaveBeenCalledWith("file:///b.ts", "b.ts");
+	expect(onFileClick).toHaveBeenCalledWith(
+		"file:///b.ts",
+		"b.ts",
+		expect.anything(),
+		expect.anything(),
+	);
 	expect(onContextMenu).toHaveBeenCalledWith(
 		"file",
 		"file:///b.ts",

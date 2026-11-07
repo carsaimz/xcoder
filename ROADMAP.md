@@ -16,8 +16,18 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Concluído até a v1.8.20
+## ✅ Concluído até a v1.8.23
 
+- **v1.8.23 — git real + multiselecção + assinatura Windows:** o painel
+  Source Control agora corre git de verdade (isomorphic-git) na pasta
+  do projecto — init, stage/unstage/discard, commit, histórico com
+  checkout, branches (criar/trocar/eliminar), push/pull/fetch/clone e
+  ahead/behind; credential manager estilo VS Code (token da sessão
+  automático, PAT de reserva); `git` completo no terminal da IA com
+  sincronização bidirecional (painel ⇄ terminal); multiselecção no
+  Explorador (Ctrl/Shift, toque + acções em massa, colar em lote);
+  assinatura de código Windows condicionada a segredos com guia em
+  `docs/CODE_SIGNING.md`.
 - **v1.8.20 — menu nativo no desktop:** barra de menus Arquivo/Editar/
   Visualizar/Terminal/Ajuda (zoom persistente, verificar atualizações,
   Sobre) com a ponte `lib/desktopMenu.js` para os mesmos comandos do app,
@@ -775,8 +785,17 @@ referência.
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Done through v1.8.17
+## ✅ Done through v1.8.23
 
+- **v1.8.23 — real git + multi-select + Windows signing:** the Source
+  Control panel now runs real git (isomorphic-git) inside the project
+  folder — init, stage/unstage/discard, commit, history with checkout,
+  branches (create/switch/delete), push/pull/fetch/clone and
+  ahead/behind; VS Code-style credential manager (session token used
+  automatically, PAT fallback); full `git` in the AI terminal with
+  two-way sync (panel ⇄ terminal); Explorer multi-select (Ctrl/Shift,
+  touch selection + bulk actions, multi-item paste); Windows code
+  signing gated on secrets with the guide in `docs/CODE_SIGNING.md`.
 - **v1.8.17 — AI with a real terminal + an Explorer with no dead end:**
   the agent opens/closes the (Alpine) Terminal and runs real commands
   (apk/git/node/python/npm/curl/builds), waiting for completion and

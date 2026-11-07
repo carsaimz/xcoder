@@ -513,3 +513,138 @@
                 }
         }
 }
+
+	// --- Source Control (real git) -------------------------------------
+
+	.git-scm-view {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.git-branch-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		padding: 6px 8px;
+		border: 1px solid var(--border-color);
+		border-radius: 10px;
+		background: color-mix(in srgb, var(--primary-color) 55%, transparent);
+	}
+
+	.git-branch-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 12px;
+		font-weight: 700;
+		padding: 4px 10px;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--active-color) 14%, transparent);
+		color: var(--active-color);
+		cursor: pointer;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 60%;
+
+		.git-branch-ic {
+			font-size: 14px;
+		}
+
+		&:active {
+			opacity: 0.75;
+		}
+	}
+
+	.git-branch-sync {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+
+		.icon {
+			font-size: 17px;
+			cursor: pointer;
+			opacity: 0.8;
+
+			&:hover {
+				opacity: 1;
+			}
+
+			&:active {
+				opacity: 0.6;
+			}
+		}
+	}
+
+	.git-sync-counts {
+		font-size: 11px;
+		font-weight: 700;
+		opacity: 0.85;
+		white-space: nowrap;
+	}
+
+	.git-section {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.git-section-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		.git-section-title {
+			font-size: 11px;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: 0.6px;
+			opacity: 0.65;
+		}
+
+		.icon {
+			font-size: 16px;
+			cursor: pointer;
+			opacity: 0.75;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+
+	.git-file-act {
+		font-size: 15px;
+		opacity: 0.55;
+		flex-shrink: 0;
+		padding: 2px;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+
+	.git-file .icon.add {
+		color: color-mix(in srgb, #3fb950 75%, var(--secondary-text-color));
+	}
+
+	.git-file .icon.remove,
+	.git-file .icon.undo {
+		color: color-mix(in srgb, #f85149 70%, var(--secondary-text-color));
+	}
+
+	.git-init-btn {
+		width: 100%;
+	}
+
+	.git-clone-btn {
+		width: 100%;
+	}
+
+	.git-snapshot-status {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}

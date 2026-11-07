@@ -84,6 +84,15 @@ credenciais).
   — diagnósticos, autocompletar, hover, ir para definição, renomear, formatar.
 - 🐧 **Terminal**: shell Alpine Linux real via proot com executores em segundo
   plano e um gerenciador de pacotes estilo Termux.
+- 🌿 **Git real + Source Control**: repositório git de verdade dentro da
+  pasta do projecto (isomorphic-git) — init, stage/unstage/discard,
+  commit, histórico, branches, push/pull/fetch/clone e ahead/behind, no
+  painel Source Control **e** no terminal (`git …`), sincronizados entre
+  si; credenciais usam a sessão GitHub automaticamente (credential
+  manager estilo VS Code, PAT de reserva).
+- ✳️ **Multiselecção no Explorador**: Ctrl/⌘-clique e Shift-clique no
+  desktop, modo «Selecionar» no toque — acções em massa (abrir, copiar,
+  cortar, eliminar) e colar múltiplos itens.
 - 📂 **Arquivos**: armazenamento local, cartão SD, backends SFTP e FTP,
   workspaces multi-raiz, busca e substituição poderosas entre arquivos.
 - 🌐 **Pré-visualização ao vivo**: servidor HTTP integrado + preview no

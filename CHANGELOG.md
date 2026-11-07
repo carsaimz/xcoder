@@ -7,6 +7,56 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.23] - 2026-11-07
+
+### Added
+- **Git real no painel Source Control (isomorphic-git)** — o painel Git
+  deixa de ser "snapshots + comandos preparados": agora há git de verdade
+  dentro da pasta do projecto (`.git` real) — init, status com secções
+  **Preparadas / Mudanças / Sem rastreio** (estilo VS Code), stage/unstage
+  por ficheiro ou tudo, discard com confirmação, commit, histórico
+  (checkout + copiar hash), branches (criar/trocar/eliminar), push, pull,
+  fetch, clone e ahead/behind por branch.
+- **Credential manager estilo VS Code** — o token da sessão (site/device
+  flow/PAT) é usado automaticamente em push/pull/clone (`lib/git/
+  credentials.js`); em 401 o app pede um PAT uma vez e pode guardá-lo.
+  Tokens finos/App usam `x-access-token` como utilizador.
+- **`git` no terminal (vshell) e integração bidirecional** — o terminal
+  da IA (e o `vshell`) ganhou `git init|status|add|commit|log|branch|
+  checkout|push|pull|fetch|remote|clone` sobre o mesmo motor; toda
+  mutação (de qualquer superfície) refresca o painel via
+  `lib/git/events.js` e acções do painel ecoam o comando no terminal
+  aberto (`[xcoder] git …`).
+- **Multiselecção no Explorador (estilo VS Code)** — Ctrl/⌘-clica
+  alterna, Shift-clica selecciona intervalo; no toque, «Selecionar» no
+  menu de contexto entra no modo de selecção (toque alterna, segure
+  abre o menu de acções). Acções em massa: abrir (até 10 ficheiros),
+  copiar, cortar e eliminar com uma confirmação; «Selecionar tudo» e
+  «Sair da selecção». A área de transferência de pastas passou a
+  suportar múltiplos itens (colar em lote).
+- **Assinatura de código Windows (setup)** — o workflow Desktop assina
+  o setup NSIS e o exe portátil quando os segredos
+  `WINDOWS_CSC_LINK` (PFX em base64) e `WINDOWS_CSC_KEY_PASSWORD`
+  existem; sem segredos compila não-assinado sem falhar. Guia completo
+  em `docs/CODE_SIGNING.md` (certificado, segredos, verificação
+  signtool, EV/Azure Trusted Signing).
+
+### Fixed
+- Detecção de estado do git com a matriz real do isomorphic-git
+  (`[head, workdir, stage]`) — untracked/modificado/preparado/eliminado
+  classificados por tabela de verdade testada contra a biblioteca.
+- `desktop/package.json` sincronizado com a versão do app no build
+  (`utils/config.js`).
+
+### Changed
+- Painel Git reorganizado: cartão de conta, cartão de repositório
+  (picker partilhado), cartão Source Control (branch + pull/push +
+  ficheiros) e Histórico; os snapshots locais continuam como recurso
+  secundário em projectos sem git.
+- `isomorphic-git` entra como dependência e é empacotado num chunk
+  lazy (só carrega quando o painel Git abre); fallback `buffer` no
+  rspack para o build web.
+
 ## [1.8.22] - 2026-11-07
 
 ### Added

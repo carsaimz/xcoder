@@ -32,3 +32,4 @@ desktop/node_modules/
 desktop/vendor/
 desktop/app/
 desktop/release/
+desktop/cert.pfx

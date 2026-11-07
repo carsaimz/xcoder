@@ -5,16 +5,15 @@ import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import vshell from "lib/ai/vshell";
-import { planCommit, publishToGitHub, splitRepo } from "lib/ghPublish";
 import { pickAndApplyGhRepo } from "lib/ghRepos";
 import { refreshGhProfile, signInGitHubFlow } from "lib/ghSignIn";
+import * as git from "lib/git";
+import { echoGitCommand } from "lib/git/terminalEcho";
 import {
-	collectWorkspace,
-	commit,
-	getStatus,
-	preparedCommands,
 	readVcsDb,
-	restore,
+	commit as snapshotCommit,
+	restore as snapshotRestore,
+	getStatus as snapshotStatus,
 } from "lib/gitPanel";
 import lang, { getIntlLocale } from "lib/lang";
 import settings from "lib/settings";
@@ -30,15 +29,35 @@ const COMMIT_PREFIXES = [
 	"ci",
 ];
 
+const LETTER_CLASS = {
+	added: "git-added",
+	"staged-modified": "git-modified",
+	"staged-deleted": "git-deleted",
+	modified: "git-modified",
+	deleted: "git-deleted",
+	untracked: "git-added",
+};
+const LETTER_TEXT = {
+	added: "A",
+	"staged-modified": "M",
+	"staged-deleted": "D",
+	modified: "M",
+	deleted: "D",
+	untracked: "U",
+};
+
 /** @type {HTMLElement} */
 let container = null;
 /** @type {HTMLElement} */
-let $statusBody = null;
+let $scmBody = null;
 /** @type {HTMLElement} */
-let $commitsBody = null;
+let $historyBody = null;
 /** @type {HTMLInputElement} */
 let $message = null;
 let refreshTimer = 0;
+let removeGitListener = null;
+/** @type {{ahead: number, behind: number, at: number}} */
+let syncState = { ahead: 0, behind: 0, at: 0 };
 
 /**
  * Git sidebar app.
@@ -98,9 +117,17 @@ function initApp(el) {
 	// the repository card mirrors the active repo (set here or in chat)
 	settings.on("update:ghRepo", onAccountChanged);
 
+	// VS Code behaviour: git mutations from ANY surface (terminal `git`,
+	// AI agent, sidebar buttons) refresh this view
+	removeGitListener = git.onGitChange(() => {
+		if (container?._$accountBody?.isConnected) refresh();
+	});
+
 	return () => {
 		container = null;
 		clearInterval(refreshTimer);
+		removeGitListener?.();
+		removeGitListener = null;
 		settings.off("update:ghUserLogin", onAccountChanged);
 		settings.off("update:ghToken", onAccountChanged);
 		settings.off("update:ghRepo", onAccountChanged);
@@ -111,18 +138,9 @@ function initApp(el) {
 function onAccountChanged() {
 	if (!container?._$accountBody?.isConnected) return;
 	renderAccount();
-	renderGh();
 }
 
 function buildUi() {
-	const $refresh = (
-		<span
-			className="icon refresh"
-			title={strings.refresh || "Refresh"}
-			onclick={refresh}
-		></span>
-	);
-
 	const $account = (
 		<div className="git-card git-account">
 			<div className="git-card-header">
@@ -151,26 +169,6 @@ function buildUi() {
 		</div>
 	);
 
-	const $remoteEdit = (
-		<span
-			className="icon public"
-			title={strings["git remote url"] || "Remote URL"}
-			onclick={editRemote}
-		></span>
-	);
-
-	const $status = (
-		<div className="git-card">
-			<div className="git-card-header">
-				<span className="git-card-title">
-					{strings["git status"] || "Status"}
-				</span>
-				{$refresh}
-			</div>
-			<div className="git-status" ref={setStatusBody}></div>
-		</div>
-	);
-
 	$message = (
 		<input
 			type="text"
@@ -179,20 +177,22 @@ function buildUi() {
 		/>
 	);
 
-	const $composer = (
-		<div className="git-card">
+	const $scm = (
+		<div className="git-card git-scm">
 			<div className="git-card-header">
 				<span className="git-card-title">
-					{strings["git commit"] || "Commit"}
+					{strings["git scm"] || "Source Control"}
 				</span>
+				<span
+					className="icon refresh"
+					title={strings.refresh || "Refresh"}
+					onclick={refresh}
+				></span>
 			</div>
 			<div className="git-composer">
 				{$message}
 				<button className="git-commit-btn" onclick={onCommit}>
 					{strings["git commit"] || "Commit"}
-				</button>
-				<button className="git-publish-btn" onclick={onPublish}>
-					{strings["git publish"] || "Publicar no GitHub"}
 				</button>
 			</div>
 			<div className="git-prefixes">
@@ -208,29 +208,18 @@ function buildUi() {
 					</span>
 				))}
 			</div>
+			<div className="git-scm-body" ref={setScmBody}></div>
 		</div>
 	);
 
-	const $commits = (
+	const $history = (
 		<div className="git-card">
 			<div className="git-card-header">
 				<span className="git-card-title">
-					{strings["git commits"] || "Snapshots"}
+					{strings["git commits"] || "History"}
 				</span>
 			</div>
-			<div className="git-commits" ref={setCommitsBody}></div>
-		</div>
-	);
-
-	const $gh = (
-		<div className="git-card">
-			<div className="git-card-header">
-				<span className="git-card-title">
-					{strings["git github"] || "GitHub — prepared commands"}
-				</span>
-				{$remoteEdit}
-			</div>
-			<div className="git-gh" ref={setGhBody}></div>
+			<div className="git-commits" ref={setHistoryBody}></div>
 		</div>
 	);
 
@@ -238,25 +227,18 @@ function buildUi() {
 		<div className="git-panel">
 			{$account}
 			{$repo}
-			{$status}
-			{$composer}
-			{$commits}
-			{$gh}
+			{$scm}
+			{$history}
 		</div>
 	);
 }
 
-function setStatusBody(el) {
-	$statusBody = el;
+function setScmBody(el) {
+	$scmBody = el;
 }
 
-function setCommitsBody(el) {
-	$commitsBody = el;
-}
-
-function setGhBody(el) {
-	container._$ghBody = el;
-	renderGh();
+function setHistoryBody(el) {
+	$historyBody = el;
 }
 
 function setAccountBody(el) {
@@ -323,30 +305,26 @@ async function chooseRepo() {
 	const changed = await pickAndApplyGhRepo();
 	if (changed) {
 		renderRepo();
-		renderGh();
 	}
 }
 
 async function refresh() {
-	if (!container || !$statusBody?.isConnected) return;
+	if (!container || !$scmBody?.isConnected) return;
 
-	// Account card and GitHub commands must render regardless of the
+	// Account card and repository card must render regardless of the
 	// local repo state — a broken/absent git workspace used to
 	// early-return and leave the connected account invisible.
 	renderAccount();
 	renderRepo();
-	renderGh();
 
-	let status;
-	try {
-		status = await getStatus();
-	} catch (error) {
-		renderError($statusBody, error);
-		return;
+	const hasRealRepo = await git.hasRepo().catch(() => false);
+	if (hasRealRepo) {
+		await renderScm();
+		await renderGitHistory();
+	} else {
+		renderSnapshotScm();
+		await renderSnapshotHistory();
 	}
-
-	renderStatus(status);
-	renderCommits();
 }
 
 /**
@@ -410,17 +388,15 @@ function renderAccount() {
 async function retryProfile() {
 	await refreshGhProfile();
 	renderAccount();
-	renderGh();
 }
 
 /**
- * GitHub sign-in: delegates to the shared flow — personal access token
- * (PAT) or the official device flow. No user-owned OAuth clients.
+ * GitHub sign-in: delegates to the shared flow — site web flow, device
+ * flow or PAT fallback (see lib/ghSignIn.js policy).
  */
 async function signInGitHub() {
 	await signInGitHubFlow();
 	renderAccount();
-	renderGh();
 }
 
 /**
@@ -434,38 +410,596 @@ async function signOutGitHub() {
 	await settings.update();
 	toast(strings.logout || "Logout");
 	renderAccount();
-	renderGh();
 }
 
-/**
- * @param {HTMLElement} el
- * @param {Error} error
- */
-function renderError(el, error) {
-	sidebarApps.setBadge?.("git", null);
-	el.content = (
-		<div className="git-empty">{`git: ${error.message || error}`}</div>
-	);
-}
+// ---------------------------------------------------------------------------
+// Source Control (real git)
+// ---------------------------------------------------------------------------
 
-function renderStatus(status) {
-	const { changes } = status;
-
-	// VS Code-style badge: number of pending changes on the rail icon
-	sidebarApps.setBadge?.("git", countChanges(changes) || null);
-
-	if (!status.hasRepo && !countChanges(status.changes)) {
-		$statusBody.content = (
-			<div className="git-empty">
-				{strings["git no repo"] ||
-					"No snapshots yet — create your first commit to start tracking changes."}
-			</div>
+/** Renders the Source Control body from real git status. */
+async function renderScm() {
+	const $body = $scmBody;
+	let status;
+	try {
+		status = await git.status();
+	} catch (error) {
+		sidebarApps.setBadge?.("git", null);
+		$body.content = (
+			<div className="git-empty">{`git: ${error.message || error}`}</div>
 		);
 		return;
 	}
 
-	if (!countChanges(changes)) {
-		$statusBody.content = (
+	const badge = status.total || null;
+	sidebarApps.setBadge?.("git", badge);
+
+	// header: branch chip + sync actions
+	const remote = await git.remoteUrl().catch(() => "");
+	const { ahead, behind } = await syncCounts(remote);
+
+	$body.content = (
+		<div className="git-scm-view">
+			{renderBranchBar(status.branch, remote, ahead, behind)}
+			{status.staged.length ? renderStagedSection(status) : null}
+			{status.changed.length ? renderChangesSection(status) : null}
+			{status.untracked.length ? renderUntrackedSection(status) : null}
+			{!status.total ? (
+				<div className="git-empty">
+					{strings["git no changes"] ||
+						"No changes — everything matches the last commit."}
+				</div>
+			) : null}
+		</div>
+	);
+}
+
+/**
+ * Cached ahead/behind (60s TTL — a fetch per refresh would be too much).
+ * @param {string} remote
+ */
+async function syncCounts(remote) {
+	if (!remote) return { ahead: 0, behind: 0 };
+	const now = Date.now();
+	if (now - syncState.at < 60000) return syncState;
+	try {
+		await git.fetch();
+		syncState = { ...(await git.aheadBehind()), at: now };
+	} catch {
+		syncState = { ahead: 0, behind: 0, at: now };
+	}
+	return syncState;
+}
+
+/**
+ * Branch chip + pull/push row (VS Code title bar actions).
+ * @param {string} branch
+ * @param {string} remote
+ * @param {number} ahead
+ * @param {number} behind
+ */
+function renderBranchBar(branch, remote, ahead, behind) {
+	const syncLabel = [ahead ? `↑${ahead}` : "", behind ? `↓${behind}` : ""]
+		.filter(Boolean)
+		.join(" ");
+
+	return (
+		<div className="git-branch-bar">
+			<span className="git-branch-chip" onclick={chooseBranch}>
+				<span className="icon git-branch-ic"></span>
+				{branch || strings["git detached"] || "detached"}
+			</span>
+			<span className="git-branch-sync">
+				{syncLabel ? (
+					<span className="git-sync-counts">{syncLabel}</span>
+				) : null}
+				<span
+					className={`icon ${remote ? "download" : "public"}`}
+					title={strings["git pull"] || "Pull"}
+					onclick={onPull}
+				></span>
+				<span
+					className="icon upload"
+					title={strings["git push"] || "Push"}
+					onclick={onPush}
+				></span>
+			</span>
+		</div>
+	);
+}
+
+/** Branch picker dialog: switch, create, delete. */
+async function chooseBranch() {
+	try {
+		const list = await git.branches();
+		const options = list.all.map((branch) => [
+			branch.name,
+			`${branch.current ? "✓ " : ""}${branch.name}`,
+			"svg:git-branch",
+		]);
+		options.push([
+			"__create__",
+			`➕ ${strings["git branch create"] || "Create branch…"}`,
+			"add",
+		]);
+		if (list.all.length > 1) {
+			options.push([
+				"__delete__",
+				`🗑 ${strings["git branch delete"] || "Delete branch…"}`,
+				"delete",
+			]);
+		}
+		const choice = await select(strings["git branches"] || "Branches", options);
+		if (!choice || choice === list.current) return;
+		if (choice === "__create__") {
+			const name = await prompt(
+				strings["git branch create"] || "Create branch",
+				"",
+				"text",
+			);
+			if (!name) return;
+			await runGit(`git checkout -b ${name}`, () =>
+				git.createBranch(null, name.trim()),
+			);
+			return;
+		}
+		if (choice === "__delete__") {
+			const name = await select(
+				strings["git branch delete"] || "Delete branch",
+				list.all
+					.filter((branch) => !branch.current)
+					.map((branch) => [branch.name, branch.name, "svg:git-branch"]),
+			);
+			if (!name) return;
+			const { default: confirm } = await import("dialogs/confirm");
+			const ok = await confirm(
+				strings["git branch delete"] || "Delete branch",
+				`${name}?`,
+			);
+			if (!ok) return;
+			await runGit(`git branch -D ${name}`, () => git.deleteBranch(null, name));
+			return;
+		}
+		await runGit(`git checkout ${choice}`, () => git.checkout(null, choice));
+	} catch (error) {
+		toast(`branch: ${error.message || error}`);
+	}
+}
+
+/**
+ * Shared action runner: loader + terminal echo + refresh + error toast.
+ * @param {string} command display command for the terminal echo
+ * @param {() => Promise<any>} fn engine call
+ */
+async function runGit(command, fn) {
+	const hide = await loader.show();
+	try {
+		const result = await fn();
+		echoGitCommand(command);
+		return result;
+	} catch (error) {
+		toast(`git: ${error.message || error}`, 4500);
+		return null;
+	} finally {
+		hide();
+		syncState = { ahead: 0, behind: 0, at: 0 };
+		refresh();
+	}
+}
+
+/** Stage-all action. */
+async function onStageAll() {
+	await runGit("git add -A", () => git.stage(null, "*"));
+}
+
+/** Unstage-all action. */
+async function onUnstageAll() {
+	await runGit("git restore --staged .", () => git.unstage(null, "*"));
+}
+
+/**
+ * Stages one file.
+ * @param {string} path
+ */
+async function onStage(path) {
+	await runGit(`git add ${path}`, () => git.stage(null, [path]));
+}
+
+/**
+ * Unstages one file.
+ * @param {string} path
+ */
+async function onUnstage(path) {
+	await runGit(`git restore --staged ${path}`, () => git.unstage(null, [path]));
+}
+
+/**
+ * Discards one file (confirm first — destructive).
+ * @param {string} path
+ */
+async function onDiscard(path) {
+	const { default: confirm } = await import("dialogs/confirm");
+	const ok = await confirm(
+		strings["git discard"] || "Discard changes",
+		`${strings["git discard confirm"] || "Discard all changes in"} ${path}?`,
+	);
+	if (!ok) return;
+	await runGit(`git checkout -- ${path}`, () => git.discard(null, [path]));
+}
+
+/**
+ * Commit: message box → staged commit (offers stage-all when nothing is
+ * staged yet, like VS Code's auto-stage hint).
+ */
+async function onCommit() {
+	const message = ($message?.value || "").trim();
+	if (!message) {
+		toast(strings["git commit msg"] || "Commit message");
+		return;
+	}
+	const hasRepo = await git.hasRepo().catch(() => false);
+	if (!hasRepo) {
+		await snapshotCommitFlow(message);
+		return;
+	}
+	const hide = await loader.show();
+	try {
+		let status = await git.status();
+		if (!status.staged.length && status.total) {
+			// nothing staged — stage everything first (VS Code behaviour)
+			await git.stage(null, "*");
+			status = await git.status();
+		}
+		if (!status.staged.length) {
+			toast(strings["git no changes"] || "No changes to commit");
+			return;
+		}
+		const oid = await git.commit(null, message);
+		echoGitCommand(`git commit -m "${message.replace(/"/g, "'")}"`);
+		toast(
+			`${strings["git committed"] || "Committed"} ${oid.slice(0, 7)}`,
+			3000,
+		);
+		$message.value = "";
+	} catch (error) {
+		toast(`commit: ${error.message || error}`, 4500);
+	} finally {
+		hide();
+		syncState = { ahead: 0, behind: 0, at: 0 };
+		refresh();
+	}
+}
+
+/**
+ * Push: configures the remote from the selected GitHub repo when
+ * needed, then pushes with the session credentials.
+ */
+async function onPush() {
+	const hasRepo = await git.hasRepo().catch(() => false);
+	if (!hasRepo) {
+		toast(strings["git no repo"] || "Initialize a repository first");
+		return;
+	}
+	let hide = await loader.show();
+	try {
+		let remote = await git.remoteUrl();
+		if (!remote) {
+			const values = settings.value;
+			if (!values.ghRepo) {
+				hide();
+				const picked = await pickAndApplyGhRepo();
+				if (!picked) return;
+				hide = await loader.show();
+			}
+			const url =
+				settings.value.gitRemoteUrl ||
+				`https://github.com/${settings.value.ghRepo}.git`;
+			await git.addRemote(null, "origin", url);
+			remote = url;
+			echoGitCommand(`git remote add origin ${url}`);
+		}
+		const branch = await git.currentBranch();
+		await git.push(null, {});
+		echoGitCommand(`git push -u origin ${branch || "main"}`);
+		toast(`${strings["git pushed"] || "Pushed"} → ${remote}`, 4000);
+	} catch (error) {
+		toast(`push: ${error.message || error}`, 5000);
+	} finally {
+		hide();
+		syncState = { ahead: 0, behind: 0, at: 0 };
+		refresh();
+	}
+}
+
+/** Pull with fast-forward/merge handled by the engine. */
+async function onPull() {
+	const hasRepo = await git.hasRepo().catch(() => false);
+	if (!hasRepo) {
+		toast(strings["git no repo"] || "Initialize a repository first");
+		return;
+	}
+	await runGit("git pull", () => git.pull(null, {}));
+	toast(strings["git pulled"] || "Pull ok", 3000);
+}
+
+/** Initializes a repository in the opened project. */
+async function onInit() {
+	await runGit("git init", () => git.init(null));
+	toast(strings["git inited"] || "Repository initialized", 3000);
+}
+
+/**
+ * Clone from URL into a subfolder of the current workspace.
+ */
+async function onClone() {
+	const url = await prompt(
+		strings["git clone url"] || "Repository URL (https://github.com/user/repo)",
+		settings.value.gitRemoteUrl || "",
+		"text",
+	);
+	if (!url) return;
+	const hide = await loader.create(strings["git clone"] || "Clone", url, {
+		timeout: 0,
+	});
+	try {
+		const dir = await git.clone({ url: url.trim() });
+		echoGitCommand(`git clone ${url.trim()}`);
+		toast(`${strings["git cloned"] || "Cloned"} → ${Url.basename(dir)}`, 4000);
+	} catch (error) {
+		toast(`clone: ${error.message || error}`, 5000);
+	} finally {
+		hide.destroy();
+		refresh();
+	}
+}
+
+/**
+ * Commit history from real git (with checkout + copy actions).
+ */
+async function renderGitHistory() {
+	if (!$historyBody?.isConnected) return;
+	let history;
+	try {
+		history = await git.log(null, { depth: 30 });
+	} catch {
+		history = [];
+	}
+	if (!history.length) {
+		$historyBody.content = (
+			<div className="git-empty">
+				{strings["git no commits"] || "No commits yet."}
+			</div>
+		);
+		return;
+	}
+	$historyBody.content = (
+		<div className="git-commit-list">
+			{history.map((item) => (
+				<div className="git-commit" onclick={() => commitActions(item)}>
+					<span className="git-commit-id">{item.short}</span>
+					<span className="git-commit-msg">{item.message}</span>
+					<span className="git-commit-time">
+						{item.author ? `${item.author} · ` : ""}
+						{relativeTime(item.timestamp)}
+					</span>
+				</div>
+			))}
+		</div>
+	);
+}
+
+/**
+ * Actions for a history entry.
+ * @param {{oid: string, short: string, message: string}} item
+ */
+async function commitActions(item) {
+	const choice = await select(item.message, [
+		{
+			value: "copy",
+			text: strings.copy || "Copy hash",
+			icon: "copy",
+		},
+		{
+			value: "checkout",
+			text: strings["git checkout"] || "Checkout",
+			icon: "historyrestore",
+		},
+	]);
+	if (choice === "copy") {
+		await copy(item.oid);
+		toast(strings["git copied"] || "Copied");
+	} else if (choice === "checkout") {
+		const { default: confirm } = await import("dialogs/confirm");
+		const ok = await confirm(
+			strings["git checkout"] || "Checkout",
+			`${item.short} — ${item.message}`,
+		);
+		if (!ok) return;
+		await runGit(`git checkout ${item.short}`, () =>
+			git.checkout(null, item.oid),
+		);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Sections
+// ---------------------------------------------------------------------------
+
+/**
+ * @param {object} status engine status
+ */
+function renderStagedSection(status) {
+	return (
+		<div className="git-section">
+			<div className="git-section-header">
+				<span className="git-section-title">
+					{strings["git staged"] || "Staged Changes"}
+				</span>
+				<span
+					className="icon remove"
+					title={strings["git unstage all"] || "Unstage all"}
+					onclick={onUnstageAll}
+				></span>
+			</div>
+			<div className="git-file-list">
+				{status.staged.map((row) => (
+					<div className="git-file" data-path={row.path}>
+						<span className={`git-letter ${LETTER_CLASS[row.status] || ""}`}>
+							{LETTER_TEXT[row.status] || "M"}
+						</span>
+						<span
+							className="git-file-name"
+							onclick={() =>
+								row.status !== "staged-deleted" && openChangedFile(row.path)
+							}
+						>
+							{row.path}
+						</span>
+						<span
+							className="icon remove git-file-act"
+							title={strings["git unstage"] || "Unstage"}
+							onclick={() => onUnstage(row.path)}
+						></span>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * @param {object} status engine status
+ */
+function renderChangesSection(status) {
+	return (
+		<div className="git-section">
+			<div className="git-section-header">
+				<span className="git-section-title">
+					{strings["git changes"] || "Changes"}
+				</span>
+				<span
+					className="icon add"
+					title={strings["git stage all"] || "Stage all"}
+					onclick={onStageAll}
+				></span>
+			</div>
+			<div className="git-file-list">
+				{status.changed.map((row) => (
+					<div className="git-file" data-path={row.path}>
+						<span className={`git-letter ${LETTER_CLASS[row.status] || ""}`}>
+							{LETTER_TEXT[row.status] || "M"}
+						</span>
+						<span
+							className="git-file-name"
+							onclick={() =>
+								row.status !== "deleted" && openChangedFile(row.path)
+							}
+						>
+							{row.path}
+						</span>
+						<span
+							className="icon undo git-file-act"
+							title={strings["git discard"] || "Discard"}
+							onclick={() => onDiscard(row.path)}
+						></span>
+						<span
+							className="icon add git-file-act"
+							title={strings["git stage"] || "Stage"}
+							onclick={() => onStage(row.path)}
+						></span>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * @param {object} status engine status
+ */
+function renderUntrackedSection(status) {
+	return (
+		<div className="git-section">
+			<div className="git-section-header">
+				<span className="git-section-title">
+					{strings["git untracked"] || "Untracked"}
+				</span>
+				<span
+					className="icon add"
+					title={strings["git stage all"] || "Stage all"}
+					onclick={onStageAll}
+				></span>
+			</div>
+			<div className="git-file-list">
+				{status.untracked.map((row) => (
+					<div className="git-file" data-path={row.path}>
+						<span className="git-letter git-added">U</span>
+						<span
+							className="git-file-name"
+							onclick={() => openChangedFile(row.path)}
+						>
+							{row.path}
+						</span>
+						<span
+							className="icon add git-file-act"
+							title={strings["git stage"] || "Stage"}
+							onclick={() => onStage(row.path)}
+						></span>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+// ---------------------------------------------------------------------------
+// Snapshot fallback (no real git repo yet)
+// ---------------------------------------------------------------------------
+
+/**
+ * Snapshot mode body: initialize real git OR keep using local snapshots.
+ */
+function renderSnapshotScm() {
+	sidebarApps.setBadge?.("git", null);
+	$scmBody.content = (
+		<div className="git-scm-view">
+			<button className="git-commit-btn git-init-btn" onclick={onInit}>
+				{strings["git init repo"] || "Initialize repository"}
+			</button>
+			<button className="git-ghost-btn git-clone-btn" onclick={onClone}>
+				{strings["git clone"] || "Clone repository…"}
+			</button>
+			<span className="git-account-hint">
+				{strings["git snapshots hint"] ||
+					"Sem repositório git — os snapshots locais continuam disponíveis abaixo."}
+			</span>
+			<div className="git-snapshot-status" ref={setSnapBody}></div>
+		</div>
+	);
+	updateSnapshotStatus();
+}
+
+function setSnapBody(el) {
+	container._$snapBody = el;
+}
+
+/** Fills the snapshot status rows (old VCS kept for non-git projects). */
+async function updateSnapshotStatus() {
+	const $body = container?._$snapBody;
+	if (!$body?.isConnected) return;
+	let status;
+	try {
+		status = await snapshotStatus();
+	} catch (error) {
+		$body.content = (
+			<div className="git-empty">{`git: ${error.message || error}`}</div>
+		);
+		return;
+	}
+	const { changes } = status;
+	const count = countChanges(changes);
+
+	if (!count) {
+		$body.content = (
 			<div className="git-empty">
 				{strings["git no changes"] ||
 					"No changes — everything matches the last snapshot."}
@@ -475,31 +1009,30 @@ function renderStatus(status) {
 	}
 
 	const rows = [
-		...changes.modified.map(rowFactory("M", "git-modified")),
-		...changes.added.map(rowFactory("A", "git-added")),
-		...changes.deleted.map(rowFactory("D", "git-deleted")),
-	];
-
-	$statusBody.content = <div className="git-file-list">{rows}</div>;
-
-	function rowFactory(letter, cls) {
-		/**
-		 * @param {string} path
-		 */
-		return (path) => (
-			<div className="git-file" data-path={path}>
-				<span className={`git-letter ${cls}`}>{letter}</span>
+		...changes.modified.map((path) => (
+			<div className="git-file">
+				<span className="git-letter git-modified">M</span>
 				<span className="git-file-name" onclick={() => openChangedFile(path)}>
 					{path}
 				</span>
-				<span
-					className="icon copy git-file-copy"
-					title={strings.copy || "Copy path"}
-					onclick={() => copyPath(path)}
-				></span>
 			</div>
-		);
-	}
+		)),
+		...changes.added.map((path) => (
+			<div className="git-file">
+				<span className="git-letter git-added">A</span>
+				<span className="git-file-name" onclick={() => openChangedFile(path)}>
+					{path}
+				</span>
+			</div>
+		)),
+		...changes.deleted.map((path) => (
+			<div className="git-file">
+				<span className="git-letter git-deleted">D</span>
+				<span className="git-file-name">{path}</span>
+			</div>
+		)),
+	];
+	$body.content = <div className="git-file-list">{rows}</div>;
 }
 
 /** @param {{modified: string[], added: string[], deleted: string[]}} changes */
@@ -507,6 +1040,87 @@ function countChanges(changes) {
 	return (
 		changes.modified.length + changes.added.length + changes.deleted.length
 	);
+}
+
+/** Snapshot history list. */
+async function renderSnapshotHistory() {
+	if (!$historyBody?.isConnected) return;
+	const { commits } = await readVcsDb();
+	if (!commits.length) {
+		$historyBody.content = (
+			<div className="git-empty">
+				{strings["git no commits"] || "No snapshots yet."}
+			</div>
+		);
+		return;
+	}
+	$historyBody.content = (
+		<div className="git-commit-list">
+			{commits
+				.slice()
+				.reverse()
+				.map((item) => (
+					<div className="git-commit" onclick={() => snapshotActions(item)}>
+						<span className="git-commit-id">{item.id}</span>
+						<span className="git-commit-msg">{item.message}</span>
+						<span className="git-commit-time">
+							{shortDate(item.at)} · {relativeTime(item.at)}
+						</span>
+					</div>
+				))}
+		</div>
+	);
+}
+
+/**
+ * @param {{id: string, message: string, at: number}} item
+ */
+async function snapshotActions(item) {
+	const choice = await select(item.message, [
+		{
+			value: "restore",
+			text: strings["git restore"] || "Restore files",
+			icon: "historyrestore",
+		},
+		{ value: "copy", text: strings.copy || "Copy id", icon: "copy" },
+	]);
+	if (choice === "restore") {
+		const { default: confirm } = await import("dialogs/confirm");
+		const ok = await confirm(
+			strings["git restore"] || "Restore files",
+			(
+				strings["git confirm restore"] ||
+				"Restore all files from snapshot {id}? Current files with the same name will be overwritten."
+			).replace("{id}", item.id),
+		);
+		if (!ok) return;
+		try {
+			const result = await snapshotRestore(item.id);
+			toast(result?.output || strings["git restored"] || "Files restored");
+			refresh();
+		} catch (error) {
+			toast(`restore: ${error.message || error}`);
+		}
+	} else if (choice === "copy") {
+		await copy(item.id);
+		toast(strings["git copied"] || "Copied");
+	}
+}
+
+/** Snapshot commit (used when no git repo exists yet). */
+async function snapshotCommitFlow(message) {
+	try {
+		const result = await snapshotCommit(message);
+		if (result?.error) {
+			toast(result.output);
+			return;
+		}
+		if ($message) $message.value = "";
+		toast(result?.output || strings["git committed"] || "Snapshot created");
+		refresh();
+	} catch (error) {
+		toast(`commit: ${error.message || error}`);
+	}
 }
 
 /**
@@ -523,196 +1137,6 @@ async function openChangedFile(relativePath) {
 }
 
 /**
- * Copies a changed file path to the clipboard.
- * @param {string} relativePath
- */
-async function copyPath(relativePath) {
-	await copy(relativePath);
-	toast(strings["git copied"] || "Copied");
-}
-
-async function onCommit() {
-	const message = ($message?.value || "").trim();
-	if (!message) {
-		toast(strings["git commit msg"] || "Commit message");
-		return;
-	}
-	try {
-		const result = await commit(message);
-		if (result?.error) {
-			toast(result.output);
-			return;
-		}
-		$message.value = "";
-		toast(result?.output || strings["git committed"] || "Snapshot created");
-		refresh();
-	} catch (error) {
-		toast(`commit: ${error.message || error}`);
-	}
-}
-
-/**
- * Publishes the workspace text files to the configured GitHub
- * repository as ONE real commit using the connected account (PAT).
- * collectWorkspace() already filters text files and sizes.
- */
-async function onPublish() {
-	const values = settings.value;
-	if (!values.ghToken) {
-		toast(strings["github sign in desc"] || "Sign in to GitHub first");
-		return;
-	}
-	if (!values.ghRepo) {
-		toast(strings["git repo card"] || "Choose a repository first");
-		return;
-	}
-	const parsed = splitRepo(values.ghRepo);
-	if (!parsed) {
-		toast(
-			`${values.ghRepo}: ${strings["git repo card"] || "invalid owner/name"}`,
-		);
-		return;
-	}
-	const message = ($message?.value || "").trim() || "update from XCoder";
-	const $publishLoader = loader.create(
-		strings["git publish"] || "Publicar no GitHub",
-		values.ghRepo,
-		{ timeout: 0 },
-	);
-	try {
-		const workspace = await collectWorkspace();
-		const files = Object.entries(workspace).map(([path, content]) => ({
-			path,
-			content,
-		}));
-		const plan = planCommit(files);
-		if (plan.ups + plan.dels === 0) {
-			toast(strings["git publish empty"] || "No text files to publish");
-			return;
-		}
-		const result = await publishToGitHub({
-			token: values.ghToken,
-			ghRepo: values.ghRepo,
-			branch: values.ghBranch || undefined,
-			message,
-			files,
-		});
-		toast(
-			`${strings["git publish done"] || "Published"}: ${parsed.owner}/${parsed.repo} (${result.branch})`,
-			4500,
-		);
-		if ($message) $message.value = "";
-	} catch (error) {
-		toast(`publish: ${error.message || error}`);
-	} finally {
-		$publishLoader.destroy();
-	}
-}
-
-async function renderCommits() {
-	if (!$commitsBody?.isConnected) return;
-	const { commits } = await readVcsDb();
-
-	if (!commits.length) {
-		$commitsBody.content = (
-			<div className="git-empty">
-				{strings["git no commits"] || "No snapshots yet."}
-			</div>
-		);
-		return;
-	}
-
-	$commitsBody.content = (
-		<div className="git-commit-list">
-			{commits
-				.slice()
-				.reverse()
-				.map((item) => (
-					<div className="git-commit" onclick={() => commitActions(item)}>
-						<span className="git-commit-id">{item.id}</span>
-						<span className="git-commit-msg">{item.message}</span>
-						<span className="git-commit-time">
-							{shortDate(item.at)} · {relativeTime(item.at)}
-						</span>
-					</div>
-				))}
-		</div>
-	);
-}
-
-/**
- * @param {{id: string, message: string, at: number}} item
- */
-async function commitActions(item) {
-	const choice = await select(item.message, [
-		{
-			value: "restore",
-			text: strings["git restore"] || "Restore files",
-			icon: "historyrestore",
-		},
-		{ value: "copy", text: strings.copy || "Copy id", icon: "copy" },
-	]);
-	if (choice === "restore") {
-		const ok = await confirmDialog(
-			strings["git restore"] || "Restore files",
-			(
-				strings["git confirm restore"] ||
-				"Restore all files from snapshot {id}? Current files with the same name will be overwritten."
-			).replace("{id}", item.id),
-		);
-		if (!ok) return;
-		try {
-			const result = await restore(item.id);
-			toast(result?.output || strings["git restored"] || "Files restored");
-			refresh();
-		} catch (error) {
-			toast(`restore: ${error.message || error}`);
-		}
-	} else if (choice === "copy") {
-		await copy(item.id);
-		toast(strings["git copied"] || "Copied");
-	}
-}
-
-function renderGh() {
-	const $body = container?._$ghBody;
-	if (!$body?.isConnected) return;
-	const remote = settings.value.gitRemoteUrl || "";
-	const commands = preparedCommands(remote, "update");
-
-	$body.content = (
-		<div className="git-gh-list">
-			{commands.map((entry) => (
-				<div className="git-gh-cmd" onclick={() => copyCommand(entry.command)}>
-					<span className="git-gh-label">{entry.label}</span>
-					<code className="git-gh-text">{entry.command}</code>
-				</div>
-			))}
-		</div>
-	);
-}
-
-async function editRemote() {
-	const value = await prompt(
-		strings["git remote url"] || "Remote URL",
-		settings.value.gitRemoteUrl || "",
-		"text",
-	);
-	if (value === null) return;
-	settings.value.gitRemoteUrl = String(value || "").trim();
-	settings.update();
-	renderGh();
-}
-
-/**
- * @param {string} command
- */
-async function copyCommand(command) {
-	await copy(command);
-	toast(strings["git copied"] || "Command copied");
-}
-
-/**
  * @param {string} text
  */
 async function copy(text) {
@@ -725,17 +1149,6 @@ async function copy(text) {
 	} catch (error) {
 		toast(`clipboard: ${error.message || error}`);
 	}
-}
-
-/**
- * Small confirm wrapper (kept local to avoid importing dialogs twice).
- * @param {string} title
- * @param {string} message
- * @returns {Promise<boolean>}
- */
-async function confirmDialog(title, message) {
-	const { default: confirm } = await import("dialogs/confirm");
-	return confirm(title, message);
 }
 
 /**

@@ -24,6 +24,17 @@ win:
       arch: [x64]
     - target: portable
       arch: [x64]
+  # Code signing is FULLY secret-driven (see docs/CODE_SIGNING.md):
+  # when CSC_LINK + CSC_KEY_PASSWORD are present in the environment the
+  # NSIS installer and the portable exe are signed with signtool
+  # (SHA-256). Without them the build stays unsigned — CI never breaks.
+  signingHashAlgorithms:
+    - sha256
+  signAndEditExecutable: true
+
+# Keep unsigned local/CI builds working: electron-builder would
+# otherwise hard-fail when forceCodeSigning is on and no cert exists.
+forceCodeSigning: false
 
 nsis:
   oneClick: false
