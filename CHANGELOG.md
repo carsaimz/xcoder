@@ -7,6 +7,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.22] - 2026-11-07
+
+### Added
+- Biome blocking no CI, boot smoke, ratchet checkJs em lib/ai
+
+### Fixed
+- Check-plugin-refs usa imports com protocolo node:
+- Setup órfão, sync desktop e docs npm
+
+### Changed
+- Biome --write normaliza biome.json e utils/config.js (escopo utils/)
+- Normalize src/ formatting via biome check --write
+
+### Maintenance
+- Scripts/archive, remove webpack.config.js legado, docs
+
+
 ## 🇧🇷 Português
 
 Todas as mudanças notáveis do **XCoder** ficam neste ficheiro. As entradas
