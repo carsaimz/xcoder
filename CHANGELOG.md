@@ -7,6 +7,39 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.25] - 2026-11-08
+
+### Fixed
+- **PC: «storage is unavailable / File encoding error» no arranque** —
+  toda a leitura de ficheiros no desktop falhava em dupla falha: o XHR
+  para `file://` era bloqueado (faltavam as flags
+  `allowFileAccessFromFileUrls`/`allowUniversalAccessFromFileUrls`) e o
+  fallback do FileReader crashava («parameter 1 is not of type 'Blob'»,
+  o File do plugin vendido não é um Blob real). O `internalFs.readFile`
+  agora usa o `nativeURL` (`file://`) no desktop e converte qualquer
+  falha do FileReader no código numérico 4 («File not readable»); o
+  check da pasta de plugins no arranque já não derruba o boot; a splash
+  mostra a 1ª linha do stack quando algo falha (diagnóstico).
+- **Android: painel Git sem conta nem repositório** — a causa era de
+  fluxo: o login do site (Supabase) guardava a sessão da CONTA mas
+  descartava o `provider_token` do GitHub; o painel Git precisa de um
+  token GITHUB (fluxo GitHub App separado). Agora «Entrar com GitHub»
+  no site devolve o token do GitHub no mesmo fragmento e o app faz a
+  ponte automaticamente: token guardado, perfil @login carregado, painel
+  Source Control com conta e repositórios de imediato (estilo VS Code:
+  um login, git a funcionar). Quem já tem sessão mas sem GitHub usa o
+  botão «Entrar» do cartão do painel Git (fluxo web/dispositivo).
+
+English summary: desktop file reads failed twice (file:// XHR blocked by
+missing webPreferences flags + FileReader fallback crashing on the
+vendored non-Blob File) — readFile now prefers the file:// nativeURL on
+desktop and maps failures to numeric codes; the boot no longer dies on a
+plugin-dir hiccup and the splash prints the failing stack line. The git
+panel was empty because the site login (Supabase) dropped the GitHub
+provider_token — the site now forwards it and the app auto-bridges it
+into the git session (one login → Source Control live). Existing
+sessions connect via the panel's sign-in button.
+
 ## [1.8.24] - 2026-11-08
 
 ### Fixed

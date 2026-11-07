@@ -183,6 +183,9 @@
       function handleStartupError(event) {
         if (!isStartupLoading()) return;
         var message = event && event.message ? event.message : "Startup error";
+        if (event && event.error && event.error.stack) {
+          message += " [" + String(event.error.stack).split("\n")[0] + "]";
+        }
         setStartupMessage(
           isStorageError(event && event.error)
             ? "XCoder failed to start: storage is unavailable. Try restarting your device, or clearing the app data. " +
@@ -196,6 +199,11 @@
         var reason = event && event.reason;
         var message =
           reason && reason.message ? reason.message : "Startup promise failed";
+        if (reason && reason.stack) {
+          message += " [" + String(reason.stack).split("\n")[0] + "]";
+        } else if (reason && typeof reason !== "string") {
+          try { message += " [" + JSON.stringify(reason) + "]"; } catch (e) {}
+        }
         setStartupMessage(
           isStorageError(reason)
             ? "XCoder failed to start: storage is unavailable. Try restarting your device, or clearing the app data. " +

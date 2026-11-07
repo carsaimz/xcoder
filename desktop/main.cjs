@@ -358,6 +358,15 @@ function createWindow() {
                         nodeIntegration: false,
                         sandbox: false, // preload uses Node to load the plugin JS
                         spellcheck: false,
+                        // internalFs.readFile reads files via XHR on the file://
+                        // nativeURL (the cdvfile:// toInternalURL has no fetch
+                        // handler here and the FileReader fallback dies because
+                        // the vendored plugin File is not a Blob). Without these
+                        // flags every file read on desktop 403s — the app booted
+                        // but storage-dependent boot steps failed with
+                        // "File encoding error" (v1.8.24 PC report).
+                        allowFileAccessFromFileUrls: true,
+                        allowUniversalAccessFromFileUrls: true,
                 },
         });
 
