@@ -99,6 +99,11 @@ jobs:
     name: Windows (setup + portable)
     needs: [web, resolve-version]
     runs-on: windows-latest
+    env:
+      # step-level `if:` cannot read the secrets context — mirror it into
+      # env once at job level (empty string when the secret is unset)
+      WINDOWS_CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+      WINDOWS_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v7
 
@@ -133,30 +138,28 @@ jobs:
       # (WINDOWS_CSC_LINK = base64 PFX, WINDOWS_CSC_KEY_PASSWORD).
       # Without them the artifacts build unsigned (see docs/CODE_SIGNING.md).
       - name: Decode signing certificate
-        if: ${{ secrets.WINDOWS_CSC_LINK != '' }}
+        if: env.WINDOWS_CSC_LINK != ''
         working-directory: desktop
         shell: bash
-        env:
-          WINDOWS_CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
         run: echo "$WINDOWS_CSC_LINK" | base64 -d > cert.pfx
 
       - name: Build Windows installers (signed)
-        if: ${{ secrets.WINDOWS_CSC_LINK != '' }}
+        if: env.WINDOWS_CSC_LINK != ''
         working-directory: desktop
         env:
           CSC_LINK: cert.pfx
-          CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+          CSC_KEY_PASSWORD: ${{ env.WINDOWS_CSC_KEY_PASSWORD }}
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
         run: npx electron-builder --win nsis portable --publish never
 
       - name: Remove decoded certificate
-        if: ${{ always() }}
+        if: always()
         working-directory: desktop
         shell: bash
         run: rm -f cert.pfx
 
       - name: Build Windows installers (unsigned)
-        if: ${{ secrets.WINDOWS_CSC_LINK == '' }}
+        if: env.WINDOWS_CSC_LINK == ''
         working-directory: desktop
         run: npx electron-builder --win nsis portable --publish never
 
