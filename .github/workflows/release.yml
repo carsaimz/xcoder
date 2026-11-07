@@ -86,8 +86,16 @@ jobs:
             git add package.json config.xml CHANGELOG.md
             # tolerant re-run: files may already carry the target version
             git diff --cached --quiet || git commit -m "chore(release): v${VERSION}"
-            git tag -a "v${VERSION}" -m "XCoder v${VERSION}" || true
-            git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
+            # the branch may have moved since dispatch (parallel fixes) —
+            # rebase so the push never races, then only create the tag when
+            # the remote does not have it yet (Auto release may have made it)
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+              git push origin "HEAD:${GITHUB_REF_NAME}"
+            else
+              git tag -a "v${VERSION}" -m "XCoder v${VERSION}"
+              git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
+            fi
           else
             # tag push: the new tag must compare greater than previous tags
             if [ -n "$PREV" ]; then
