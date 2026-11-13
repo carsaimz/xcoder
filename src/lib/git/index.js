@@ -428,6 +428,18 @@ export async function addRemote(root, name, url) {
 }
 
 /**
+ * Removes a remote (VS Code "Remove Remote").
+ * @param {string} [root]
+ * @param {string} name
+ */
+export async function removeRemote(root, name) {
+	root = await gitRoot(root);
+	await git.deleteRemote(await opts(root, { remote: name }));
+	emitGitChange(root, "remote-remove", { name });
+	return true;
+}
+
+/**
  * Fetches refs from a remote and reports the remote head of a branch.
  * @param {string} [root]
  * @param {{remote?: string, branch?: string, creds?: object}} [args]

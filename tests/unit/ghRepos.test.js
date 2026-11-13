@@ -274,15 +274,15 @@ describe("wiring — page removed, sidebar owns the picker", () => {
                 );
         });
 
-        test("Git sidebar renders the repository card wired to the picker", async () => {
+        test("Git sidebar owns the publish flow wired to the picker", async () => {
                 const fs = await import("node:fs");
                 const path = await import("node:path");
                 const read = (rel) =>
                         fs.readFileSync(path.join(process.cwd(), rel), "utf8");
                 const gitApp = read("src/sidebarApps/git/index.js");
                 assert.match(gitApp, /pickAndApplyGhRepo/, "uses the shared picker");
-                assert.match(gitApp, /git-repo-body/, "has the repository card body");
-                assert.match(gitApp, /git-repo-name/, "renders the active repo name");
+                assert.match(gitApp, /onPublish/, "has the publish flow");
+                assert.match(gitApp, /git-remote-setup/, "renders the remote setup card");
                 const ghSettingsSrc = read("src/settings/ghSettings.js");
                 assert.doesNotMatch(
                         ghSettingsSrc,

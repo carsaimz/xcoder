@@ -162,7 +162,7 @@ describe("account page — site session handoff (fim do 'Convidado')", () => {
 // ----------------------------------------------------------------- 3. PAT
 
 describe("GitHub PAT persistence (repos que não apareciam)", () => {
-        test("ghSettings persists ghToken/gitRemoteUrl/ghBranch itself", () => {
+        test("ghSettings persists the ghToken itself (remote/branch live in the git panel)", () => {
                 const src = read("src/settings/ghSettings.js");
                 assert.ok(
                         !src.includes("already persisted the prompt value"),
@@ -170,7 +170,6 @@ describe("GitHub PAT persistence (repos que não apareciam)", () => {
                 );
                 assert.match(src, /settings\.value\.ghToken = token/);
                 assert.match(src, /await settings\.update\(\)/);
-                assert.match(src, /settings\.value\[key\] = trimmed/);
                 // profile is fetched right after a manual token save —
                 // since v1.8.0 through the shared refreshGhProfile flow
                 // (normalises the token, friendly 401 hint)

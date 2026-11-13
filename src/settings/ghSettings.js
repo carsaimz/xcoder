@@ -7,9 +7,12 @@ import settings from "lib/settings";
 import "./gh-settings.scss";
 
 /**
- * XCoder GitHub settings — account (PAT or the official device-flow
- * sign in) plus the remote URL/branch rows. Repository LISTING moved to
- * the Git sidebar app (and the AI chat) — that is where repos are used.
+ * XCoder GitHub settings — account only (sign-in / PAT / logout).
+ *
+ * Repository, remote and branch configuration moved INTO the Git
+ * sidebar (user request: "ao invés de configurar nas definições, vamos
+ * configurar na própria sidebar git — estilo VS Code"). The settings
+ * page only keeps the account-level session used by git AND the AI chat.
  */
 
 /**
@@ -149,26 +152,14 @@ export default function ghSettings() {
 					"Alternative to signing in: paste a PAT (classic or fine-grained) with repo, workflow and gist scopes.",
 			},
 			{
-				key: "gitRemoteUrl",
-				text: strings["git remote url"] || "Remote URL",
-				value: values.gitRemoteUrl || "",
-				prompt: strings["git remote url"] || "Remote URL",
-				promptType: "text",
-				promptOptions: { required: false },
+				key: "git-open-panel",
+				text:
+					strings["git settings hint"] ||
+					"Repositório, remote e branch ficam no painel Git",
 				info:
-					strings["settings-info-gh-remote"] ||
-					"Repository URL used by the Git panel commands (https://github.com/user/repo.git).",
-			},
-			{
-				key: "ghBranch",
-				text: strings["git branch"] || "Branch",
-				value: values.ghBranch || "main",
-				prompt: strings["git branch"] || "Branch",
-				promptType: "text",
-				promptOptions: { required: false },
-				info:
-					strings["settings-info-gh-branch"] ||
-					"Default branch used by push and clone commands.",
+					strings["settings-info-git-panel"] ||
+					"Abra o app Git na barra lateral para escolher o repositório, configurar o remote e publicar — tudo em um só lugar, como no VS Code.",
+				chevron: true,
 			},
 		];
 	}
@@ -232,16 +223,15 @@ export default function ghSettings() {
 				break;
 			}
 
+			case "git-open-panel": {
+				const { openGitPanel } = await import("sidebarApps/git");
+				await openGitPanel();
+				break;
+			}
+
 			case "gitRemoteUrl":
 			case "ghBranch":
-				// persisted here too — the kit does not persist prompts
-				if (typeof value === "string") {
-					const trimmed = value.trim();
-					if (trimmed !== settings.value[key]) {
-						settings.value[key] = trimmed;
-						await settings.update();
-					}
-				}
+				// legacy keys — kept for stored settings compatibility only
 				break;
 
 			default:
@@ -270,8 +260,6 @@ export default function ghSettings() {
 					: strings["not signed in"] || "Not signed in",
 		);
 		setRow($list, "ghToken", values.ghToken ? "••••••••" : "");
-		setRow($list, "gitRemoteUrl", values.gitRemoteUrl || "");
-		setRow($list, "ghBranch", values.ghBranch || "main");
 
 		const $signin = $list.get('[data-key="gh-signin"]');
 		const $signout = $list.get('[data-key="gh-signout"]');

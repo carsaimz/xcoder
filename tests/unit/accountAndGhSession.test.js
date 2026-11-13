@@ -490,21 +490,40 @@ describe("GitHub settings — prompt rows must persist", () => {
         );
 
         test(
-                "Remote URL row persists its value",
+                "Remote URL row moved to the Git sidebar (config in the panel)",
                 { timeout: 20000 },
                 async () => {
-                        state.promptResult = "https://github.com/octocat/other.git";
                         const page = ghSettings();
                         const $list = page.getListElement();
-                        $list.get('[data-key="gitRemoteUrl"]').click();
-                        await vi.waitFor(
-                                () => {
-                                        assert.equal(
-                                                state.settingsValue.gitRemoteUrl,
-                                                "https://github.com/octocat/other.git",
-                                        );
-                                },
-                                { timeout: 5000 },
+                        assert.equal(
+                                $list.get('[data-key="gitRemoteUrl"]'),
+                                null,
+                                "remote URL row removed from settings",
+                        );
+                        assert.equal(
+                                $list.get('[data-key="ghBranch"]'),
+                                null,
+                                "branch row removed from settings",
+                        );
+                        assert.ok(
+                                $list.get('[data-key="git-open-panel"]'),
+                                "pointer row to the Git sidebar present",
+                        );
+                        const fs = await import("node:fs");
+                        const path = await import("node:path");
+                        const gitApp = fs.readFileSync(
+                                path.join(process.cwd(), "src/sidebarApps/git/index.js"),
+                                "utf8",
+                        );
+                        assert.match(
+                                gitApp,
+                                /onAddRemote/,
+                                "remote URL entry lives in the git sidebar",
+                        );
+                        assert.match(
+                                gitApp,
+                                /gitRemoteUrl/,
+                                "git sidebar persists the remote url setting",
                         );
                         cleanupPages();
                 },

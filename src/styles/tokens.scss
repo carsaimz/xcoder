@@ -1,0 +1,68 @@
+/**
+ * Design tokens — the app-wide shape & depth system (v1.8.25 redesign).
+ *
+ * Themes own the COLORS (--primary-color, --secondary-color, --popup-*).
+ * This layer derives every structural decision from those colors, so any
+ * theme (light or dark) is skinned automatically:
+ *
+ *   - radius scale (--radius-*)   unified corner rounding
+ *   - surfaces   (--surface-*)    layered backgrounds via color-mix
+ *   - hairlines  (--hairline-*)   1px separators softer than --border-color
+ *   - shadows    (--shadow-1..3)  quiet, layered elevation
+ *   - focus ring (--focus-ring)   accessible focus affordance
+ *   - motion     (--ease-*, --dur-*)
+ *
+ * Components must prefer these tokens over raw theme variables so the
+ * design language stays coherent.
+ */
+
+:root {
+  /* --- radius scale ----------------------------------------------------- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 999px;
+
+  /* --- surfaces (layered on top of theme colors) ------------------------- */
+  /* level 1: raised card / panel content over the chrome surface */
+  --surface-1: color-mix(in srgb, var(--secondary-color) 82%, transparent);
+  /* level 2: inset field / input well */
+  --surface-2: color-mix(in srgb, var(--primary-color) 72%, transparent);
+  /* level 3: hover wash over any surface */
+  --surface-hover: color-mix(in srgb, var(--active-color) 8%, transparent);
+  /* level 4: pressed wash */
+  --surface-active: color-mix(in srgb, var(--active-color) 16%, transparent);
+
+  /* --- hairlines --------------------------------------------------------- */
+  --hairline: color-mix(in srgb, var(--border-color) 70%, transparent);
+  --hairline-strong: var(--border-color);
+
+  /* --- elevation ---------------------------------------------------------- */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 6px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 4px 14px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.08);
+  --shadow-3: 0 16px 40px rgba(0, 0, 0, 0.24), 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  /* --- focus -------------------------------------------------------------- */
+  --focus-ring: 0 0 0 2px
+    color-mix(in srgb, var(--active-color) 35%, transparent);
+
+  /* --- motion -------------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+
+  /* --- typography ----------------------------------------------------------- */
+  --font-ui: var(--app-font-family, "Segoe UI", "Roboto", system-ui, sans-serif);
+  --font-mono: var(--editor-font, "Fira Code", "Roboto Mono", monospace);
+  --fs-xs: 10px;
+  --fs-sm: 11px;
+  --fs-md: 12px;
+  --fs-base: 13px;
+  --fs-lg: 14px;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+}

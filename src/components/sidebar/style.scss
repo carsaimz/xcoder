@@ -615,8 +615,8 @@ body.no-animation {
   width: 200px;
   background-color: var(--popup-background-color);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: var(--shadow-2, 0 4px 12px rgba(0, 0, 0, 0.2));
   display: none;
   z-index: 1000;
   overflow: hidden;
@@ -744,9 +744,9 @@ body.no-animation {
   background-color: var(--primary-color);
   color: var(--primary-text-color);
   // VS Code-like window shell: subtle radius, hairline border
-  border-radius: 6px;
+  border-radius: var(--radius-md, 10px);
   border: 1px solid var(--border-color);
-  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-3, 0 14px 44px rgba(0, 0, 0, 0.5));
   overflow: hidden;
   touch-action: none;
 

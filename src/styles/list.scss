@@ -92,7 +92,7 @@
     text-decoration: none;
     margin: auto;
     box-sizing: border-box;
-    border-radius: 3px;
+    border-radius: var(--radius-xs, 6px);
     transition: background-color 80ms ease;
 
     &:hover {

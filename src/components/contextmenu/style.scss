@@ -19,14 +19,14 @@ body.no-animation {
   background-color: rgb(255, 255, 255);
   background-color: var(--popup-background-color);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
-  box-shadow: 0 4px 16px var(--box-shadow-color);
-  border-radius: 6px;
+  box-shadow: var(--shadow-2, 0 4px 16px var(--box-shadow-color));
+  border-radius: var(--radius-sm, 8px);
 
   transform-origin: top center;
   animation: menu-grow 100ms ease 1;
 
   list-style: none;
-  padding: 4px 0;
+  padding: 6px;
   border: solid 1px transparent;
   border: solid 1px var(--popup-border-color);
 
@@ -45,14 +45,15 @@ body.no-animation {
     border: none;
     border-bottom: solid 1px rgba(122, 122, 122, 0.227);
     border-bottom: solid 1px var(--border-color);
-    margin: 4px 0;
+    margin: 6px 4px;
   }
 
   li {
     display: flex;
-    height: 44px;
+    height: 40px;
     align-items: center;
-    padding: 0 12px;
+    padding: 0 10px;
+    border-radius: var(--radius-xs, 6px);
     user-select: none;
 
     &.notice::after {
