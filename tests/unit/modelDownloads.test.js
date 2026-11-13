@@ -12,6 +12,13 @@ vi.mock("fileSystem", () => ({
         default: vi.fn((url) => ({
                 exists: async () => files.has(url),
                 writeFile: async (data) => {
+                        // strict like real internalFs: getFile({create:false})
+                        // rejects with NOT_FOUND_ERR when the file is missing
+                        if (!files.has(url)) {
+                                throw Object.assign(new Error("Path not found"), {
+                                        code: 1,
+                                });
+                        }
                         const bytes =
                                 typeof data === "string"
                                         ? new TextEncoder().encode(data).length

@@ -20,7 +20,7 @@ body.no-animation {
   background-color: var(--popup-background-color);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
   box-shadow: var(--shadow-2, 0 4px 16px var(--box-shadow-color));
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-md, 10px);
 
   transform-origin: top center;
   animation: menu-grow 100ms ease 1;

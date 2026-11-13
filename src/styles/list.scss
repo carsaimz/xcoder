@@ -87,16 +87,24 @@
 
   >.list-item {
     display: flex;
-    // VS Code list density: 48px rows instead of mobile 60px
+    // v1.8.28: list rows become soft rounded cards (surface tint + no
+    // hairlines) — the visible face of the token system on every
+    // settings/about/profile page
     min-height: 48px;
     text-decoration: none;
-    margin: auto;
+    margin: 3px 8px;
+    padding: 0 4px;
     box-sizing: border-box;
-    border-radius: var(--radius-xs, 6px);
+    border-radius: var(--radius-sm, 8px);
+    background-color: var(--surface-1, transparent);
     transition: background-color 80ms ease;
 
     &:hover {
-      background-color: color-mix(in srgb, currentColor 6%, transparent);
+      background-color: var(--surface-hover, color-mix(in srgb, currentColor 6%, transparent));
+    }
+
+    &:active {
+      background-color: var(--surface-active, color-mix(in srgb, currentColor 10%, transparent));
     }
 
     &:focus-visible {
@@ -115,15 +123,16 @@
       }
     }
 
-    &:not(:last-of-type) {
-      border-bottom: solid 1px rgba(122, 122, 122, 0.227);
-      border-bottom: solid 1px var(--border-color);
-    }
-
     &:first-child {
+      margin-top: 6px;
+
       .container .value {
         text-transform: none;
       }
+    }
+
+    &:last-of-type {
+      margin-bottom: 6px;
     }
 
     .container {

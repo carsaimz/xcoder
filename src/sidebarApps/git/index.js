@@ -4,6 +4,7 @@ import toast from "components/toast";
 import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
+import Ref from "html-tag-js/ref";
 import vshell from "lib/ai/vshell";
 import { pickAndApplyGhRepo } from "lib/ghRepos";
 import {
@@ -58,6 +59,14 @@ let container = null;
 let $accountBody = null;
 /** @type {HTMLElement} */
 let $mainBody = null;
+/*
+ * Body refs — the html-tag-js JSX runtime only binds `ref` attributes
+ * holding a Ref instance (it checks `instanceOfRef` and assigns `.el`).
+ * Function refs are SILENTLY DROPPED, which left this panel blank in
+ * v1.8.26 (every body stayed null, so refresh() early-returned).
+ */
+const accountBodyRef = Ref();
+const mainBodyRef = Ref();
 /** @type {HTMLInputElement} */
 let $message = null;
 /** @type {HTMLElement} */
@@ -114,6 +123,10 @@ function initApp(el) {
 	container = el;
 	el.classList.add("git-app");
 	el.content = buildUi();
+	// Ref instances got their element during tag creation (see note above)
+	$accountBody = accountBodyRef.el;
+	$mainBody = mainBodyRef.el;
+	renderAccount();
 	refresh();
 
 	// refresh when files change (debounced)
@@ -157,8 +170,8 @@ function onAccountChanged() {
 }
 
 function buildUi() {
-	const $account = <div className="git-account" ref={setAccountBody}></div>;
-	const $main = <div className="git-main" ref={setMainBody}></div>;
+	const $account = <div className="git-account" ref={accountBodyRef}></div>;
+	const $main = <div className="git-main" ref={mainBodyRef}></div>;
 
 	return (
 		<div className="git-panel">
@@ -166,15 +179,6 @@ function buildUi() {
 			{$main}
 		</div>
 	);
-}
-
-function setAccountBody(el) {
-	$accountBody = el;
-	renderAccount();
-}
-
-function setMainBody(el) {
-	$mainBody = el;
 }
 
 // ---------------------------------------------------------------------------
@@ -341,6 +345,10 @@ async function refresh() {
  * re-filled in place afterwards.
  */
 function renderShell(mode) {
+	const scmBodyRef = Ref();
+	const historyBodyRef = Ref();
+	const snapBodyRef = Ref();
+
 	if (mode === "scm") {
 		$message = (
 			<input
@@ -419,7 +427,7 @@ function renderShell(mode) {
 					</div>
 				</div>
 
-				<div className="git-scm" ref={setScmBody}></div>
+				<div className="git-scm" ref={scmBodyRef}></div>
 
 				<div className="git-section git-history" data-section="history">
 					<div
@@ -431,7 +439,7 @@ function renderShell(mode) {
 							{strings["git history title"] || "Histórico"}
 						</span>
 					</div>
-					<div className="git-section-body" ref={setHistoryBody}></div>
+					<div className="git-section-body" ref={historyBodyRef}></div>
 				</div>
 			</div>
 		);
@@ -468,23 +476,16 @@ function renderShell(mode) {
 							{strings["git commits"] || "Snapshots locais"}
 						</span>
 					</div>
-					<div className="git-section-body" ref={setSnapBody}></div>
+					<div className="git-section-body" ref={snapBodyRef}></div>
 				</div>
 			</div>
 		);
 	}
-}
-
-function setScmBody(el) {
-	container._$scmBody = el;
-}
-
-function setHistoryBody(el) {
-	container._$historyBody = el;
-}
-
-function setSnapBody(el) {
-	container._$snapBody = el;
+	// Ref instances are bound synchronously during tag creation —
+	// publish them for renderScm / renderGitHistory / renderSnapshotStatus
+	container._$scmBody = scmBodyRef.el;
+	container._$historyBody = historyBodyRef.el;
+	container._$snapBody = snapBodyRef.el;
 }
 
 /** Collapses/expands a section and re-renders its chevron. */

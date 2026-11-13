@@ -1,9 +1,9 @@
 import "./style.scss";
-import fsOperation from "fileSystem";
 import Page from "components/page";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
+import select from "dialogs/select";
 import actionStack from "lib/actionStack";
 import { formatBytes, modelsByKind } from "lib/ai/localModels";
 import {
@@ -36,9 +36,33 @@ const KINDS = [
 	},
 ];
 
+/** Language filter chips (model.lang values). */
+const LANGS = [
+	{ id: "all", label: strings["local models lang all"] || "Todos" },
+	{ id: "pt", label: "PT" },
+	{ id: "multi", label: strings["local models lang multi"] || "Multi" },
+	{ id: "en", label: "EN" },
+];
+
+/** Sort modes — catalog order is lightest-first (the historical default). */
+const SORTS = [
+	{
+		id: "default",
+		label: strings["local models sort default"] || "Mais leve primeiro",
+	},
+	{
+		id: "size-desc",
+		label: strings["local models sort size desc"] || "Tamanho: maior primeiro",
+	},
+	{
+		id: "name-asc",
+		label: strings["local models sort name"] || "Nome (A–Z)",
+	},
+];
+
 /**
- * Local models screen — browse, download, use and delete on-device AI
- * models (LLM assistants, speech-to-text and text-to-speech).
+ * Local models screen — browse, filter, sort, download, use and delete
+ * on-device AI models (LLM assistants, speech-to-text and text-to-speech).
  */
 export default function modelsPage() {
 	const $page = Page(strings["local models title"] || "Modelos locais");
@@ -55,20 +79,27 @@ export default function modelsPage() {
 	};
 
 	let kind = "llm";
+	let query = "";
+	let lang = "all";
+	let sort = "default";
+
 	const $tabs = <div className="models-tabs"></div>;
+	const $filters = <div className="models-filters"></div>;
 	const $storage = <div className="models-storage"></div>;
 	const $list = <div className="main list models-list"></div>;
 
 	renderTabs();
+	renderFilters();
 	renderStorage();
 
 	$page.body = (
 		<div className="models-body">
 			<p className="models-intro">
 				{strings["local models intro"] ||
-					"Baixe modelos para conversar, transcrever voz e gerar fala sem internet — dos leves (~56MB) aos completos (~1,2GB)."}
+					"Baixe modelos para conversar, transcrever voz e gerar fala sem internet — dos leves (~56MB) aos completos (~1,4GB)."}
 			</p>
 			{$tabs}
+			{$filters}
 			{$storage}
 			{$list}
 		</div>
@@ -98,30 +129,126 @@ export default function modelsPage() {
 		}
 	}
 
-	async function renderStorage() {
-		try {
-			const { bytes, count } = await localStorageUsage();
-			$storage.textContent =
-				count > 0
-					? `${strings["local models used"] || "Usado"}: ${formatBytes(bytes)} · ${count} ${
-							strings["local models count"] || "modelo(s)"
-						}`
-					: strings["local models storage empty"] || "Nenhum modelo instalado";
-		} catch {
-			$storage.textContent = "";
+	function renderFilters() {
+		$filters.content = "";
+
+		const $search = (
+			<input
+				type="text"
+				className="models-search"
+				placeholder={strings["local models search"] || "Procurar modelo…"}
+				spellcheck="false"
+				oninput={(event) => {
+					query = event.target.value || "";
+					renderList();
+				}}
+			/>
+		);
+
+		const $chips = (
+			<div className="models-lang">
+				{LANGS.map((entry) => (
+					<button
+						className={`models-lang-chip${lang === entry.id ? " active" : ""}`}
+						onclick={() => {
+							if (lang === entry.id) return;
+							lang = entry.id;
+							renderFilters();
+							renderList();
+						}}
+					>
+						{entry.label}
+					</button>
+				))}
+			</div>
+		);
+
+		const sortLabel =
+			SORTS.find((entry) => entry.id === sort)?.label || SORTS[0].label;
+		const $sort = (
+			<button
+				className="models-sort"
+				onclick={async () => {
+					const choice = await select(
+						strings["local models sort title"] || "Ordenar por",
+						SORTS.map((entry) => ({
+							value: entry.id,
+							text: entry.label,
+						})),
+					);
+					if (!choice || choice === sort) return;
+					sort = choice;
+					renderFilters();
+					renderList();
+				}}
+			>
+				<span className="icon swap_vert"></span>
+				<span className="models-sort-label">{sortLabel}</span>
+			</button>
+		);
+
+		$filters.append($search, $chips, $sort);
+	}
+
+	function renderStorage() {
+		localStorageUsage()
+			.then(({ bytes, count }) => {
+				$storage.textContent =
+					count > 0
+						? `${strings["local models used"] || "Usado"}: ${formatBytes(bytes)} · ${count} ${
+								strings["local models count"] || "modelo(s)"
+							}`
+						: strings["local models storage empty"] ||
+							"Nenhum modelo instalado";
+			})
+			.catch(() => {
+				$storage.textContent = "";
+			});
+	}
+
+	/** Applies search + language filter + sort to the catalog of `kind`. */
+	function visibleModels() {
+		let list = modelsByKind(kind);
+		if (lang !== "all") {
+			list = list.filter((model) => (model.lang || "multi") === lang);
 		}
+		const needle = query.trim().toLowerCase();
+		if (needle) {
+			list = list.filter((model) =>
+				`${model.name} ${model.descPt} ${model.descEn}`
+					.toLowerCase()
+					.includes(needle),
+			);
+		}
+		if (sort === "size-desc") {
+			list = [...list].sort((a, b) => b.sizeBytes - a.sizeBytes);
+		} else if (sort === "name-asc") {
+			list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+		} else if (sort === "size-asc") {
+			list = [...list].sort((a, b) => a.sizeBytes - b.sizeBytes);
+		}
+		return list;
 	}
 
 	async function renderList() {
 		$list.content = "";
-		const cards = modelsByKind(kind).map((model) =>
-			ModelCard(model, () => {
-				renderList();
-				renderStorage();
-			}),
-		);
-		for (const $card of cards) {
-			$list.append($card);
+		const models = visibleModels();
+		if (!models.length) {
+			$list.append(
+				<div className="models-empty">
+					{strings["local models empty"] ||
+						"Nenhum modelo corresponde aos filtros."}
+				</div>,
+			);
+			return;
+		}
+		for (const model of models) {
+			$list.append(
+				ModelCard(model, () => {
+					renderList();
+					renderStorage();
+				}),
+			);
 		}
 	}
 }
@@ -132,11 +259,13 @@ export default function modelsPage() {
 function ModelCard(model, onChange) {
 	const size = formatBytes(model.sizeBytes);
 	const langLabel =
-		model.lang === "pt" ? "PT" : model.lang === "en" ? "EN" : "PT/EN+";
+		model.lang === "pt"
+			? "PT"
+			: model.lang === "en"
+				? "EN"
+				: strings["local models lang badge"] || "PT/EN+";
 	const desc =
-		window.strings?.__lang === "en"
-			? model.descEn
-			: model.descPt || model.descEn;
+		window.strings?.__lang === "en" ? model.descEn : model.descPt || model.descEn;
 
 	const $title = <div className="models-card-title">{model.name}</div>;
 	const $meta = (

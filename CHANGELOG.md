@@ -7,6 +7,67 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.28] - 2026-11-13
+
+### Fixed
+- **«PATH NOT FOUND» ao baixar modelos** — a causa era a escrita em
+  ficheiros que ainda não existem: o `internalFs.writeFile` resolve a
+  entrada com `getFile({create: false})`, então gravar um ficheiro novo
+  falha com NOT_FOUND_ERR. Toda primeira instalação batia nisso (o
+  transporte fetch no 1.º ficheiro e, no Android nativo, a escrita do
+  `_manifest.json` DEPOIS de baixar todos os ~200MB). Agora um helper
+  `writeModelFile` escreve via `createFile` quando o ficheiro não existe
+  e via `writeFile` quando existe — e os testes mockam o comportamento
+  real (writeFile falha em ficheiro ausente) para nunca regredir.
+- **Painel Git em branco (v1.8.26)** — o painel ligava os corpos com
+  `ref={função}`, mas o runtime JSX só instancia refs de objeto
+  (`instanceOfRef`): as funções eram descartadas em silêncio,
+  `$accountBody`/`$mainBody` ficavam `null` para sempre e
+  `renderAccount()`/`refresh()` saíam cedo — ecrã vazio. Agora o painel
+  usa instâncias de `Ref()` em todos os cinco corpos, e um teste que
+  monta o painel REAL (happy-dom + JSX) garante que a conta e a vista
+  principal renderizam (a conta, o welcome sem repo e o re-mount).
+
+### Added
+- **Catálogo local expandido (10 LLMs)** — quatro novos modelos, todos
+  com tamanhos verificados blob a blob na HF:
+  - **LFM2.5 350M** (onnx-community, q4f16, ~258MB, multilingue com
+    português) — irmão maior do 230M;
+  - **Qwen3 0.6B** (q4f16, ~579MB, multilingue) — raciocínio passo a
+    passo e código;
+  - **SmolLM2 1.7B** (q4f16, ~1,1GB, inglês) — o SmolLM2 mais capaz;
+  - **Qwen2.5 Coder 1.5B** (q4f16, ~1,36GB, multilingue) — o mais forte
+    para programar offline.
+- **Ecrã de Modelos locais com busca, filtros e ordenação** — campo de
+  busca por nome/descrição, chips de idioma (Todos/PT/Multi/EN) e ordenar
+  por (mais leve primeiro / maior primeiro / nome A–Z), com estado vazio
+  quando nenhum modelo corresponde.
+
+### Changed
+- **Redesign visível (temas intactos)** — a camada de tokens agora
+  aparece de fato:
+  - linhas de lista (Definições, Sobre, Perfil…) viram cartões
+    arredondados com superfície `--surface-1`, sem hairlines e com hover/
+    press mais claro;
+  - o ícone ativo da barra lateral ganha pílula arredondada com a cor de
+    destaque (além da barra de acento VS Code);
+  - menu de contexto com raio 10px e toast com raio 14px;
+  - o ecrã de Modelos locais inteiro segue os tokens (tabs segmentadas,
+    cartões com sombra `--shadow-1`, chips e inputs preenchidos).
+
+English summary: fixes the «PATH NOT FOUND» download failure (writes to
+not-yet-existing files — fetch transport's first file and the Android
+manifest write after ~200MB downloaded — now go through a
+createFile-or-writeFile helper, with the test mock mirroring real cordova
+NOT_FOUND semantics) and the blank Git panel (function refs were silently
+dropped by the JSX runtime; all five bodies now bind through Ref()
+instances, with a real-DOM render test). Adds four verified local models
+(LFM2.5-350M, Qwen3-0.6B, SmolLM2-1.7B, Qwen2.5-Coder-1.5B — 10 LLMs
+total), search/language filters and size/name sorting on the Models
+screen, and makes the token redesign visible: list rows become rounded
+surface cards, the active sidebar icon gets an accent pill, menus/toast
+softer radii.
+
 ## [1.8.27] - 2026-11-13
 
 ### Added

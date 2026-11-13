@@ -105,6 +105,31 @@ export const LOCAL_MODELS = [
 		],
 	},
 	{
+		id: "lfm2.5-350m",
+		kind: "llm",
+		name: "LFM2.5 350M (Liquid AI)",
+		repo: "onnx-community/LFM2.5-350M-ONNX",
+		dtype: "q4f16",
+		task: "text-generation",
+		lang: "multi",
+		descPt:
+			"~258MB: irmão maior do 230M, multilingue (português incluído), com respostas mais completas mantendo a velocidade no aparelho.",
+		descEn:
+			"~258MB: bigger sibling of the 230M, multilingual (Portuguese included), more complete answers while staying fast on-device.",
+		sizeBytes: 258_454_337,
+		// onnx-community export: no special_tokens_map.json, standalone
+		// chat_template.jinja (mirrors the official Liquid repo layout)
+		files: [
+			"config.json",
+			"generation_config.json",
+			"tokenizer.json",
+			"tokenizer_config.json",
+			"chat_template.jinja",
+			"onnx/model_q4f16.onnx",
+			"onnx/model_q4f16.onnx_data",
+		],
+	},
+	{
 		id: "smollm2-360m",
 		kind: "llm",
 		name: "SmolLM2 360M Instruct",
@@ -150,6 +175,43 @@ export const LOCAL_MODELS = [
 		files: [...LLM_META, "onnx/model_q4f16.onnx"],
 	},
 	{
+		id: "qwen3-0.6b",
+		kind: "llm",
+		name: "Qwen3 0.6B",
+		repo: "onnx-community/Qwen3-0.6B-ONNX",
+		dtype: "q4f16",
+		task: "text-generation",
+		lang: "multi",
+		descPt:
+			"~579MB da Qwen 3: raciocínio passo a passo e boas instruções de código, multilingue.",
+		descEn:
+			"~579MB from Qwen 3: step-by-step reasoning and solid code instructions, multilingual.",
+		sizeBytes: 578_923_726,
+		// this repo ships added_tokens.json and a standalone chat template
+		files: [
+			...LLM_META,
+			"added_tokens.json",
+			"chat_template.jinja",
+			"onnx/model_q4f16.onnx",
+			"onnx/model_q4f16.onnx_data",
+		],
+	},
+	{
+		id: "smollm2-1.7b",
+		kind: "llm",
+		name: "SmolLM2 1.7B Instruct",
+		repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+		dtype: "q4f16",
+		task: "text-generation",
+		lang: "en",
+		descPt:
+			"~1,1GB: o SmolLM2 mais capaz — conversa e explica código com fluência (inglês).",
+		descEn:
+			"~1.1GB: the most capable SmolLM2 — fluent conversation and code explanations (English).",
+		sizeBytes: 1_110_840_353,
+		files: [...LLM_META, "onnx/model_q4f16.onnx"],
+	},
+	{
 		id: "qwen2.5-1.5b",
 		kind: "llm",
 		name: "Qwen2.5 1.5B Instruct",
@@ -178,6 +240,27 @@ export const LOCAL_MODELS = [
 			"~1.25GB from Meta: natural Portuguese answers. The most complete offline model here.",
 		sizeBytes: 1_246_843_797,
 		files: [...LLM_META, "onnx/model_q4f16.onnx"],
+	},
+	{
+		id: "qwen2.5-coder-1.5b",
+		kind: "llm",
+		name: "Qwen2.5 Coder 1.5B",
+		repo: "onnx-community/Qwen2.5-Coder-1.5B-Instruct",
+		dtype: "q4f16",
+		task: "text-generation",
+		lang: "multi",
+		descPt:
+			"~1,36GB focado em código: escreve e refatora funções completas — o mais forte do catálogo para programar offline.",
+		descEn:
+			"~1.36GB code-focused: writes and refactors complete functions — the strongest offline coding model in the catalog.",
+		sizeBytes: 1_355_669_223,
+		// ships added_tokens.json alongside LLM_META
+		files: [
+			...LLM_META,
+			"added_tokens.json",
+			"onnx/model_q4f16.onnx",
+			"onnx/model_q4f16.onnx_data",
+		],
 	},
 
 	// ------------------------------------------------------------- STT

@@ -71,7 +71,8 @@ const FETCH_HTTP = {
 				}
 				onProgress?.(loaded, total);
 			}
-			await fsOperation(destUrl).writeFile(
+			await writeModelFile(
+				destUrl,
 				new Blob(parts, { type: "application/octet-stream" }),
 			);
 			onProgress?.(loaded, loaded);
@@ -81,7 +82,7 @@ const FETCH_HTTP = {
 		if (blob.size > FETCH_MAX_BYTES) {
 			throw new Error("too big for browser download — use the app");
 		}
-		await fsOperation(destUrl).writeFile(blob);
+		await writeModelFile(destUrl, blob);
 		onProgress?.(blob.size, blob.size);
 	},
 };
@@ -122,6 +123,27 @@ function httpPort() {
 /** Root url of the models storage. */
 function modelsRoot() {
 	return Url.join(globalThis.DATA_STORAGE || "", MODELS_ROOT_DIR);
+}
+
+/**
+ * Writes a model file whether or not it already exists.
+ *
+ * Why this exists: internalFs.writeFile resolves the entry with
+ * `getFile(name, { create: false })`, so writing a MISSING file fails
+ * with cordova's NOT_FOUND_ERR ("Path not found"). Every first install
+ * hit exactly that — the FETCH transport's first chunk and the final
+ * `_manifest.json` write both target files that don't exist yet — which
+ * is the «PATH NOT FOUND» users saw when downloading models.
+ */
+async function writeModelFile(fileUrl, data) {
+	const fs = fsOperation(fileUrl);
+	if (await fs.exists()) {
+		return fs.writeFile(data);
+	}
+	return fsOperation(Url.dirname(fileUrl)).createFile(
+		Url.basename(fileUrl),
+		data,
+	);
 }
 
 /**
@@ -363,9 +385,7 @@ export async function downloadModel(model, { onEvent } = {}) {
 			totalBytes: doneBytes,
 			completedAt: Date.now(),
 		};
-		await fsOperation(manifestUrl(model.id)).writeFile(
-			JSON.stringify(manifest),
-		);
+		await writeModelFile(manifestUrl(model.id), JSON.stringify(manifest));
 		emit({ status: "done", loaded: doneBytes, total: doneBytes });
 		return { ok: true };
 	} catch (error) {
