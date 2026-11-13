@@ -7,6 +7,56 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.26] - 2026-11-13
+
+### Added
+- **Painel Git configurável no próprio painel (estilo VS Code)** —
+  fim da configuração espalhada entre definições e painel:
+  - Conta GitHub no topo do painel: entrar (site / device flow / PAT),
+    avatar com menu (atualizar perfil, colar PAT, sair) e **auto-cura**:
+    quem tem token guardado mas perfil em branco vê o painel buscar o
+    perfil sozinho ao abrir (o estado «sessão ativa nas definições mas
+    sem conta no git» desaparece).
+  - Sem repositório: welcome view com «Inicializar repositório» e
+    «Clonar repositório» (igual ao VS Code).
+  - Com repositório sem remote: cartão «Publicar no GitHub» — escolhe o
+    repositório da conta (ou cola uma URL), liga o `origin` e faz push
+    da branch num só fluxo.
+  - Menu ... com tudo: publicar/alterar remote, branches (trocar, criar,
+    apagar), pull, push, fetch, clonar e remover remote.
+  - Secções Staged/Changes/Untracked colapsáveis com ações por ficheiro
+    (preparar, despreparar, descartar, abrir), letras A/M/D/U e
+    ahead/behind no cabeçalho da branch.
+  - Snapshots locais continuam como fallback para projetos sem git.
+
+### Changed
+- **Redesign dos componentes e do CSS base (temas intactos)** — novo
+  sistema de tokens (`styles/tokens.scss`): escala de raios, superfícies
+  `color-mix`, hairlines, sombras em camadas, focus ring e motion, todos
+  derivados das variáveis de tema (qualquer tema continua a vestir tudo).
+  Inputs passam a ser preenchidos com borda e focus ring; diálogos e
+  menus têm linhas alinhadas à esquerda, hover arredondado e sem
+  caixa-alta; toast, janelas flutuantes, botões e listas seguem os tokens.
+- **Definições GitHub enxutas** — apenas a conta (entrar/PAT/sair);
+  repositório, remote e branch passam a ser configurados no painel Git
+  (nova linha abre o painel diretamente).
+
+### Fixed
+- Remote removível (`git remote remove origin`) e push com guarda:
+  «faça um commit antes de publicar a branch» em vez de falha críptica.
+
+English summary: the Git panel is now self-contained (VS Code style) —
+account sign-in/refresh/PAT/logout at the top with automatic profile
+heal for stored tokens, a welcome view (Initialize/Clone repository) when
+there is no repo, a Publish-to-GitHub card that wires `origin` and pushes
+in one flow, a ... menu with every git command, and collapsible
+Staged/Changes/Untracked sections with per-file actions. GitHub settings
+shrink to account-only; repository/remote/branch live in the panel. Base
+CSS got a design-token layer (radii, surfaces, hairlines, layered
+shadows, focus ring, motion) derived from theme variables — themes stay
+untouched while dialogs, menus, inputs, buttons, toast and floating
+windows adopt the new language.
+
 ## [1.8.25] - 2026-11-08
 
 ### Fixed
