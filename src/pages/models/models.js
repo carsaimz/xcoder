@@ -265,7 +265,9 @@ function ModelCard(model, onChange) {
 				? "EN"
 				: strings["local models lang badge"] || "PT/EN+";
 	const desc =
-		window.strings?.__lang === "en" ? model.descEn : model.descPt || model.descEn;
+		window.strings?.__lang === "en"
+			? model.descEn
+			: model.descPt || model.descEn;
 
 	const $title = <div className="models-card-title">{model.name}</div>;
 	const $meta = (
