@@ -240,23 +240,32 @@ async function onDeviceReady() {
 		system.clearCache();
 	}
 
-	if (!(await fsOperation(PLUGIN_DIR).exists())) {
-		try {
-			await fsOperation(DATA_STORAGE).createDirectory("plugins");
-		} catch (error) {
-			logger.log(
-				"error",
-				`Failed to create plugins directory, falling back to internal storage: ${error.message || error}`,
-			);
-			window.DATA_STORAGE = dataDirectory;
-			window.CACHE_STORAGE = cacheDirectory;
-			window.PLUGIN_DIR = Url.join(window.DATA_STORAGE, "plugins");
-			window.KEYBINDING_FILE = Url.join(
-				window.DATA_STORAGE,
-				".key-bindings.json",
-			);
-			await fsOperation(window.DATA_STORAGE).createDirectory("plugins");
+	try {
+		if (!(await fsOperation(PLUGIN_DIR).exists())) {
+			try {
+				await fsOperation(DATA_STORAGE).createDirectory("plugins");
+			} catch (error) {
+				logger.log(
+					"error",
+					`Failed to create plugins directory, falling back to internal storage: ${error.message || error}`,
+				);
+				window.DATA_STORAGE = dataDirectory;
+				window.CACHE_STORAGE = cacheDirectory;
+				window.PLUGIN_DIR = Url.join(window.DATA_STORAGE, "plugins");
+				window.KEYBINDING_FILE = Url.join(
+					window.DATA_STORAGE,
+					".key-bindings.json",
+				);
+				await fsOperation(window.DATA_STORAGE).createDirectory("plugins");
+			}
 		}
+	} catch (error) {
+		// never let a storage hiccup kill the boot — plugins are optional
+		// at startup and loadPlugins() tolerates a missing directory
+		logger.log(
+			"warn",
+			`Plugin directory check failed (boot continues): ${error.message || error}`,
+		);
 	}
 
 	localStorage.versionCode = versionCode;

@@ -97,23 +97,53 @@ const internalFs = {
 				filename,
 				(fileEntry) => {
 					(async () => {
-						const url = fileEntry.toInternalURL();
+						// Desktop (Electron): XHR the file:// nativeURL directly —
+						// the webPreferences flags allowFileAccess/allowUniversal
+						// AccessFromFileUrls make it fetchable, while the old
+						// chain was doubly broken there: cdvfile:// (toInternalURL)
+						// has no fetch handler and the FileReader fallback crashed
+						// with "parameter 1 is not of type 'Blob'" (the vendored
+						// plugin File object is not a real Blob), which surfaced as
+						// boot/storage failures ("File encoding error").
+						// Android keeps the previous order: the WebView serves
+						// cdvfile:// through the plugin bridge and the FileReader
+						// fallback works with real Blob File objects.
+						const nativeUrl = fileEntry.nativeURL || "";
+						const candidates =
+							window.xcoderDesktop && /^file:/i.test(nativeUrl)
+								? [nativeUrl, fileEntry.toInternalURL()]
+								: [fileEntry.toInternalURL()];
+						for (const url of candidates) {
+							try {
+								const data = await ajax({
+									url,
+									responseType: "arraybuffer",
+								});
+								resolve({ data });
+								return;
+							} catch (error) {
+								/* try the next source */
+							}
+						}
 						try {
-							const data = await ajax({
-								url: url,
-								responseType: "arraybuffer",
-							});
-
-							resolve({ data });
-						} catch (error) {
 							fileEntry.file((file) => {
-								const fileReader = new FileReader();
-								fileReader.onerror = reject;
-								fileReader.readAsArrayBuffer(file);
-								fileReader.onloadend = () => {
-									resolve({ data: fileReader.result });
-								};
+								try {
+									const fileReader = new FileReader();
+									fileReader.onerror = () => reject({ code: 4 });
+									fileReader.onloadend = () =>
+										resolve({
+											data: fileReader.result,
+										});
+									fileReader.readAsArrayBuffer(file);
+								} catch (error) {
+									// synchronous native throw (non-Blob
+									// File) — report the numeric code the
+									// rest of the app understands
+									reject({ code: 4 });
+								}
 							}, reject);
+						} catch (error) {
+							reject({ code: 4 });
 						}
 					})();
 				},

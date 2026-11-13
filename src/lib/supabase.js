@@ -293,6 +293,18 @@ export function applyOAuthTokens(rawUrl) {
 	session = {
 		access_token: accessToken,
 		refresh_token: params.get("refresh_token") || "",
+		// GitHub-provider logins carry the user's GitHub OAuth token in the
+		// fragment — the app bridges it into the git credential session so
+		// "entrar com GitHub" no site liga o Source Control de uma vez
+		// (estilo VS Code: um login, git a funcionar).
+		provider_token:
+			normalizeToken(params.get("provider_token")) ||
+			session?.provider_token ||
+			"",
+		provider_refresh_token:
+			normalizeToken(params.get("provider_refresh_token")) ||
+			session?.provider_refresh_token ||
+			"",
 		user: session?.user || null,
 		expires_at: Date.now() + Number(params.get("expires_in") || 3600) * 1000,
 	};
@@ -300,6 +312,12 @@ export function applyOAuthTokens(rawUrl) {
 	// the implicit flow does not include the profile — fetch it now
 	fetchProfile().catch(() => undefined);
 	return true;
+}
+
+/** Trims/normalises a fragment token (empty string when absent). */
+function normalizeToken(value) {
+	const token = String(value || "").trim();
+	return token || "";
 }
 
 /**
