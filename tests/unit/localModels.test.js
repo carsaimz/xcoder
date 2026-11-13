@@ -64,6 +64,21 @@ describe("local model catalog", () => {
 		).toBe(true);
 	});
 
+	it("ships the official Liquid AI LFM2.5-230M ONNX export", () => {
+		const model = getLocalModel("lfm2.5-230m");
+		expect(model.repo).toBe("LiquidAI/LFM2.5-230M-ONNX");
+		expect(model.dtype).toBe("q4");
+		const paths = modelFiles(model).map((file) => file.path);
+		expect(paths).toContain("onnx/model_q4.onnx");
+		expect(paths).toContain("onnx/model_q4.onnx_data");
+		expect(paths).toContain("chat_template.jinja");
+		// the Liquid export has no special_tokens_map.json on the repo —
+		// listing it would 404 the download manager
+		expect(paths).not.toContain("special_tokens_map.json");
+		// verified against the HF blob sizes (2026-11-13): 216,0 MB
+		expect(model.sizeBytes).toBe(216_011_102);
+	});
+
 	it("exposes llm ids for the Local provider and stable dirs", () => {
 		expect(localLlmIds()).toEqual(
 			modelsByKind("llm").map((model) => model.id),

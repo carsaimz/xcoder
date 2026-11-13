@@ -7,6 +7,40 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.27] - 2026-11-13
+
+### Added
+- **Modelo local LFM2.5 230M (Liquid AI) no catálogo offline** —
+  o LLM mais novo da Liquid AI, feito para rodar no aparelho:
+  - ~216 MB, multilingue com **português** entre os 10 idiomas
+    (en, pt, es, fr, de, it, ar, zh, ja, ko), arquitetura híbrida
+    conv+atenção otimizada para CPU — rápido até em telemóveis modestos.
+  - Export oficial ONNX (`LiquidAI/LFM2.5-230M-ONNX`, dtype `q4`) no
+    runtime transformers.js existente — aparece entre o SmolLM2 135M e o
+    360M no ecrã de modelos e no provedor «Local (no aparelho)».
+  - Download sob demanda direto do CDN da Hugging Face para o armazenamento
+    do aparelho (`xcoder-models/lfm2.5-230m/`) com retomada e manifesto —
+    nada entra nos repositórios do XCoder nem passa por qualquer servidor
+    nosso (a inferência é 100% local, zero custo de servidor).
+  - Ficheiros do catálogo verificados blob a blob na HF: o export Liquid
+    não tem `special_tokens_map.json` e usa `chat_template.jinja` à parte —
+    listados exatamente para o gestor de downloads não 404.
+
+### Nota
+- A variante **«heretic»** (sem censura) só existe em GGUF para
+  llama.cpp (~153 MB) — acima do limite de ficheiros do GitHub e
+  incompatível com o runtime ONNX; se um dia for desejada, pede um
+  segundo motor (llama.cpp WASM). O modelo adicionado é a mesma base
+  de 230M no export oficial.
+
+English summary: the local catalog gains Liquid AI's LFM2.5-230M (~216 MB,
+Portuguese among 10 languages, hybrid conv+attention built for on-device
+speed) as the official ONNX export for the existing transformers.js runtime,
+downloaded on demand straight from the Hugging Face CDN into app storage
+with resume + manifest — never through our servers or repos, all inference
+stays on-device. Catalog files are blob-verified (the Liquid export ships
+no special_tokens_map.json and uses a standalone chat_template.jinja).
+
 ## [1.8.26] - 2026-11-13
 
 ### Added

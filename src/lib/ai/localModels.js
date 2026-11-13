@@ -79,6 +79,32 @@ export const LOCAL_MODELS = [
 		files: [...LLM_META, "onnx/model_q4f16.onnx"],
 	},
 	{
+		id: "lfm2.5-230m",
+		kind: "llm",
+		name: "LFM2.5 230M (Liquid AI)",
+		repo: "LiquidAI/LFM2.5-230M-ONNX",
+		dtype: "q4",
+		task: "text-generation",
+		lang: "multi",
+		descPt:
+			"~216MB da Liquid AI, multilingue (português incluído): arquitetura híbrida feita para rodar rápido no aparelho, boa em instruções e extração de dados. Export oficial ONNX — a variante «heretic» sem censura só existe em GGUF (llama.cpp).",
+		descEn:
+			"~216MB from Liquid AI, multilingual (Portuguese included): hybrid architecture built for fast on-device inference, good at instructions and data extraction. Official ONNX export — the uncensored «heretic» variant only exists as GGUF (llama.cpp).",
+		sizeBytes: 216_011_102,
+		// the Liquid export ships no special_tokens_map.json — listing
+		// LLM_META verbatim would 404 the download manager; it puts
+		// the chat template in a standalone chat_template.jinja
+		files: [
+			"config.json",
+			"generation_config.json",
+			"tokenizer.json",
+			"tokenizer_config.json",
+			"chat_template.jinja",
+			"onnx/model_q4.onnx",
+			"onnx/model_q4.onnx_data",
+		],
+	},
+	{
 		id: "smollm2-360m",
 		kind: "llm",
 		name: "SmolLM2 360M Instruct",
