@@ -3,8 +3,11 @@ import Page from "components/page";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
+import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import actionStack from "lib/actionStack";
+import { onCustomModelsChanged, removeCustomModel } from "lib/ai/customModels";
+import { importModelFromLink } from "lib/ai/hfImport";
 import { formatBytes, modelsByKind } from "lib/ai/localModels";
 import {
 	cancelDownload,
@@ -14,7 +17,9 @@ import {
 	isModelDownloaded,
 	localStorageUsage,
 } from "lib/ai/modelDownloads";
+import { findModelFolders, importModelFromFolder } from "lib/ai/modelImport";
 import { setProviderModel } from "lib/ai/providers";
+import { getRoot } from "lib/ai/vshell";
 import appSettings from "lib/settings";
 import helpers from "utils/helpers";
 
@@ -91,6 +96,12 @@ export default function modelsPage() {
 	renderTabs();
 	renderFilters();
 	renderStorage();
+	renderImportRow();
+
+	// imported models (files/link) appear as soon as they are registered
+	onCustomModelsChanged(() => {
+		if ($page.isConnected) renderList();
+	});
 
 	$page.body = (
 		<div className="models-body">
@@ -107,6 +118,139 @@ export default function modelsPage() {
 
 	app.append($page);
 	renderList();
+
+	/** Buttons: baixar via link + importar arquivos do aparelho. */
+	function renderImportRow() {
+		const $row = <div className="models-import-row"></div>;
+		$row.append(
+			<button className="models-import-btn" onclick={importByLink}>
+				<span className="icon link"></span>
+				{strings["local models import link"] || "Baixar via link"}
+			</button>,
+			<button className="models-import-btn" onclick={importFromFiles}>
+				<span className="icon folder_open"></span>
+				{strings["local models import files"] || "Importar arquivos"}
+			</button>,
+		);
+		$filters.after($row);
+	}
+
+	/** Adds a Hugging Face model by link and offers to download it now. */
+	async function importByLink() {
+		const input = await prompt(
+			strings["local models link prompt"] ||
+				"Link do modelo (https://huggingface.co/org/repo)",
+			"",
+			"text",
+		);
+		if (!input) return;
+		const hide = await loader.create(
+			strings["local models importing"] || "Importando modelo…",
+			input,
+			{ timeout: 0 },
+		);
+		let entry;
+		try {
+			({ entry } = await importModelFromLink(input));
+		} catch (error) {
+			hide.destroy();
+			helpers.error(error);
+			return;
+		}
+		hide.destroy();
+		const size = entry.sizeBytes > 0 ? formatBytes(entry.sizeBytes) : "?";
+		const ok = await confirm(
+			entry.name,
+			`${strings["local models link found"] || "Modelo detectado"}: ${entry.dtype.toUpperCase()} · ${size}. ${
+				strings["local models link download"] || "Baixar agora?"
+			}`,
+		);
+		if (!ok) {
+			renderList();
+			return;
+		}
+		await downloadWithLoader(entry);
+	}
+
+	/** Copies model files from a workspace folder into the model store. */
+	async function importFromFiles() {
+		const root = getRoot();
+		const folders = await findModelFolders(root);
+		if (!folders.length) {
+			toast(
+				strings["local models no folders"] ||
+					"Nenhuma pasta de modelo encontrada. Abra no editor a pasta que contém config.json + onnx/ e tente de novo.",
+				5000,
+			);
+			return;
+		}
+		const chosen = await select(
+			strings["local models pick folder"] || "Pasta do modelo",
+			folders.map((folder) => ({
+				value: folder.url,
+				text: folder.name,
+				icon: "folder",
+			})),
+		);
+		if (!chosen) return;
+		const hide = await loader.create(
+			strings["local models importing"] || "Importando modelo…",
+			chosen,
+			{ timeout: 0 },
+		);
+		try {
+			const { entry } = await importModelFromFolder(chosen);
+			toast(
+				`${strings["local models imported"] || "Modelo importado"}: ${entry.name}`,
+				4000,
+			);
+		} catch (error) {
+			helpers.error(error);
+		} finally {
+			try {
+				hide.destroy();
+			} catch {
+				/* noop */
+			}
+			renderList();
+			renderStorage();
+		}
+	}
+
+	/** Shared loader-driven download (used by the link import flow). */
+	async function downloadWithLoader(entry) {
+		const $loader = await loader.create(entry.name, "", { timeout: 0 });
+		const result = await downloadModel(entry, {
+			onEvent: (event) => {
+				if (event.status === "downloading") {
+					const pct =
+						event.total > 0
+							? Math.round((event.loaded / event.total) * 100)
+							: 0;
+					$loader.setMessage(`${pct}%`);
+				} else if (event.status === "done") {
+					toast(
+						`${strings["local models done"] || "Modelo instalado"}: ${entry.name}`,
+					);
+				} else if (event.status === "error") {
+					toast(
+						`${strings["local models failed"] || "Falha no download"}: ${event.error}`,
+						4000,
+					);
+				}
+			},
+		});
+		try {
+			$loader.destroy();
+		} catch {
+			/* noop */
+		}
+		renderList();
+		renderStorage();
+		if (!result.ok && !result.cancelled && result.error) {
+			helpers.error(new Error(result.error));
+		}
+	}
 
 	function renderTabs() {
 		$tabs.content = "";
@@ -274,6 +418,13 @@ function ModelCard(model, onChange) {
 		<div className="models-card-meta">
 			<span className="models-chip">{size}</span>
 			<span className="models-chip">{langLabel}</span>
+			{model.custom ? (
+				<span className="models-chip">
+					{model.source === "link"
+						? strings["local models source link"] || "Link HF"
+						: strings["local models source files"] || "Importado"}
+				</span>
+			) : null}
 		</div>
 	);
 	const $desc = <div className="models-card-desc">{desc}</div>;
@@ -413,6 +564,7 @@ function ModelCard(model, onChange) {
 		try {
 			loader.showTitleLoader();
 			await deleteLocalModel(model.id);
+			if (model.custom) await removeCustomModel(model.id);
 			toast(strings["local models deleted"] || "Modelo apagado");
 			onChange();
 		} catch (error) {

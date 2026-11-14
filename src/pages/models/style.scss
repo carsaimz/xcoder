@@ -245,3 +245,36 @@ wc-page.models-page {
 		}
 	}
 }
+
+/* Import actions: link download + device files (v1.8.29). */
+.models-import-row {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+}
+
+.models-import-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.45rem 0.85rem;
+	border: 1px dashed var(--hairline, var(--border-color));
+	border-radius: var(--radius-sm, 8px);
+	background: transparent;
+	color: var(--primary-text-color);
+	font-size: 0.8rem;
+	font-weight: var(--fw-medium, 500);
+	transition:
+		background var(--dur-fast, 120ms) ease,
+		border-color var(--dur-fast, 120ms) ease;
+
+	.icon {
+		font-size: 1rem;
+		opacity: 0.8;
+	}
+
+	&:active {
+		background: var(--surface-hover, color-mix(in srgb, var(--active-color) 12%, transparent));
+		border-color: color-mix(in srgb, var(--active-color) 45%, transparent);
+	}
+}

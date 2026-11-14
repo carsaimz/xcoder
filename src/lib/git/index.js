@@ -8,7 +8,6 @@
  * the sidebar and the AI terminal stay in sync.
  */
 import * as git from "isomorphic-git";
-import http from "isomorphic-git/http/web";
 import { describeGhError } from "lib/ghAuth";
 import settings from "lib/settings";
 import Url from "utils/Url";
@@ -19,6 +18,7 @@ import {
 } from "./credentials";
 import { emitGitChange } from "./events";
 import { createGitFs } from "./gitFs";
+import http from "./httpClient";
 
 export { emitGitChange, onGitChange, resetGitListeners } from "./events";
 export { FsError } from "./gitFs";
@@ -99,6 +99,16 @@ async function opts(root, extra = {}) {
 /** Maps engine errors to friendly, actionable messages. */
 export function describeGitError(error) {
 	const raw = String(error?.message || error || "");
+	if (
+		/não foi possível conectar|failed to fetch|network|getaddrinfo|ECONN|timed out/i.test(
+			raw,
+		)
+	) {
+		return (
+			strings["git network error"] ||
+			"Sem conexão com o servidor git — verifique a internet e tente novamente (ou use o terminal Alpine)."
+		);
+	}
 	if (error?.code === "NotFoundError" || /could not find/i.test(raw)) {
 		return (
 			strings["git not found"] || "Not a git repository — Initialize first."
@@ -117,6 +127,23 @@ export function describeGitError(error) {
 		return describeGhError(401, raw);
 	}
 	return raw;
+}
+
+/**
+ * One-line workspace git summary for the AI system prompt (cheap:
+ * branch + remote only — statusMatrix would be too slow per request).
+ * @returns {Promise<string>} "" when the workspace has no repo
+ */
+export async function workspaceSummary() {
+	try {
+		if (!(await hasRepo())) return "";
+		const branch = await currentBranch();
+		const remote = await remoteUrl();
+		const repo = settings.value.ghRepo || "";
+		return `Git workspace: branch ${branch || "detached"}${remote ? `, remote ${remote}` : ", sem remote"}${repo ? `, repo ativo no GitHub: ${repo}` : ""}. File tools operate on this folder; 'git add/commit/push' via run_command or the terminal publishes it.`;
+	} catch {
+		return "";
+	}
 }
 
 /**

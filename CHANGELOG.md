@@ -7,7 +7,102 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
-## [1.8.28] - 2026-11-13
+## [1.8.29] - 2026-11-14
+
+### Git — clone que funciona de verdade
+
+- **Fim do «Failed to fetch» ao clonar** — o WebView impõe CORS e os
+  endpoints git smart-HTTP do GitHub não enviam cabeçalhos CORS, então
+  o cliente padrão do isomorphic-git falhava SEMPRE em clonar/push/pull.
+  Agora o app usa um cliente HTTP próprio com três transportes em
+  cascata: **nativo** (cordova-plugin-advanced-http, sem CORS, corpos
+  binários via serializer `raw`, timeout de 30min) → **fetch direto**
+  → **proxy CORS** (`cors.isomorphic-git.org`, configurável em
+  `gitCorsProxy`). Falhas HTTP (401/404) continuam sendo RESPOSTAS para
+  o isomorphic-git mapear autenticação — só erro de transporte cai para
+  o próximo transporte.
+- **Clonar pelo terminal Alpine (fallback automático)** — quando o git
+  interno não conecta, o painel Git oferece clonar pelo terminal: o
+  comando roda headless via Executor do plugin de terminal (sem abrir
+  aba PTY), **instala o git sozinho** (`apk add git`) se o Alpine não
+  tiver, injeta o token da sessão na URL (mascarado em toasts/logs),
+  respeita os binds `/sdcard` `/storage` `/data` e confere o exit code.
+  Nova ação «Abrir terminal do projeto (git no Alpine)» no menu de
+  ações abre o terminal já dentro da pasta do projeto.
+- **Meus repositórios** — o painel Git lista os repositórios da conta
+  (owner + colaborador) na welcome view e no menu SCM: escolher um
+  repo e clonar direto para o projeto (com fallback de terminal) ou
+  definir como repositório ativo (GitHub tools/bot). Depois de clonar,
+  o app pergunta «Abrir pasta clonada?» e abre o repo como projeto
+  ativo (o SCM passa a rastrear o repo na hora).
+
+### Git — o bot agora trabalha em repositórios
+
+- **Três novas tools do agente** — `repo_list` (lista os repos da
+  conta), `repo_open` (define o repo ativo p/ github_read/github_write
+  e o painel Git) e `repo_clone` (clona para o workspace — engine com
+  fallback de terminal — e aponta o ambiente de trabalho para a pasta
+  clonada). Depois disso o bot lê/edita ficheiros com as file tools e
+  publica com `git add/commit/push` via run_command ou terminal.
+- O prompt do sistema do agente passou a incluir o **contexto git do
+  workspace** (branch, remote e repo GitHub ativo), então "trabalhe no
+  repo X" funciona de ponta a ponta: listar → clonar → editar →
+  commitar → push.
+
+### IA — mais modelos, importar e baixar via link
+
+- **Novos modelos no catálogo** (tamanhos verificados blob a blob na HF):
+  - **Whisper Tiny** (q8, ~44MB) — a voz → texto mais leve (pt + 98
+    idiomas), para aparelhos modestos;
+  - **MMS TTS English** (fp16, ~58MB) — texto → voz em inglês, na faixa
+    50–100MB pedida.
+- **Baixar modelo via link** — cole um link do Hugging Face
+  (huggingface.co/org/repo, inclusive /tree, /blob, /resolve e .git) na
+  tela de Modelos: o app consulta a API do HF, detecta a tarefa
+  (pipeline_tag, com fallback no config.json), escolhe a menor
+  quantização ONNX realmente presente (q4f16 → q4 → q8 → int8 → fp16 →
+  fp32, inclusive shards externos `.onnx_data`), registra o modelo no
+  catálogo com tamanho real e baixa com o gestor de downloads normal
+  (com retomada).
+- **Importar arquivos do aparelho** — modelos já baixados na internet
+  (pasta com config.json + tokenizer + onnx/) viram modelo local sem
+  re-download: o app procura pastas de modelo no projeto aberto,
+  detecta tipo/dtype pelos nomes dos ficheiros, copia para
+  `xcoder-models/<id>/`, escreve o `_manifest.json` de instalação e o
+  modelo aparece (com chip «Importado»/«Link HF») funcionando offline
+  via o cache de disco do runtime.
+
+### Atualização — notificação + download nativo
+
+- **Notificação de nova versão agora é padrão** — `checkForAppUpdates`
+  era `false` por omissão, então o app nunca avisava de releases novas;
+  agora nasce `true` (desativável nas configurações).
+- **Download via DownloadManager nativo do Android** — novo plugin
+  `com.carsaimz.xcoder.downloader`: o APK da release vai para a pasta
+  Downloads com **notificação nativa de progresso**, sem os timeouts de
+  leitura de 60s que matavam o download anterior (o transporte antigo
+  agora também usa readTimeout de 30min), com cancelamento, retomada do
+  sistema e abertura automática do instalador ao terminar. Cascata
+  completa: DownloadManager → download interno (advanced-http) →
+  navegador (página de releases).
+
+### English summary
+
+**Git**: clone/push/pull now work in the WebView via a 3-transport HTTP
+client (native advanced-http → fetch → CORS proxy); automatic Alpine
+terminal fallback for clones that **auto-installs git**; account repo
+picker in the Git panel (clone / set active) and repo-aware agent tools
+(`repo_list`, `repo_open`, `repo_clone`) with git context in the system
+prompt — the bot can download, read, modify, commit and push to a
+specific repo. **AI**: catalog additions (Whisper Tiny ~44MB, MMS TTS
+English ~58MB), import models by Hugging Face link (task/dtype auto
+detection, real sizes) and from device files (copy + manifest, offline
+ready). **Update**: update notifications are ON by default again and
+the APK downloads through the native Android DownloadManager (progress
+notification, no timeouts, installer opens automatically) with
+in-app/browser fallbacks.
+
+
 
 ### Fixed
 - **«PATH NOT FOUND» ao baixar modelos** — a causa era a escrita em

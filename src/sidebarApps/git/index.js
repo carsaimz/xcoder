@@ -1,12 +1,13 @@
 import "./style.scss";
 import sidebarApps from "sidebarApps";
 import toast from "components/toast";
+import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import Ref from "html-tag-js/ref";
 import vshell from "lib/ai/vshell";
-import { pickAndApplyGhRepo } from "lib/ghRepos";
+import { applyGhRepo, listGhRepos, pickAndApplyGhRepo } from "lib/ghRepos";
 import {
 	refreshGhProfile,
 	signInGitHubFlow,
@@ -14,6 +15,7 @@ import {
 } from "lib/ghSignIn";
 import * as git from "lib/git";
 import { echoGitCommand } from "lib/git/terminalEcho";
+import { executorAvailable, terminalClone } from "lib/git/terminalGit";
 import {
 	readVcsDb,
 	restore as snapshotRestore,
@@ -464,6 +466,10 @@ function renderShell(mode) {
 						<span className="icon copy"></span>
 						{strings["git clone"] || "Clonar repositório…"}
 					</button>
+					<button className="git-btn ghost" onclick={onAccountRepos}>
+						<span className="icon folder"></span>
+						{strings["git account repos"] || "Meus repositórios…"}
+					</button>
 				</div>
 
 				<div className="git-section">
@@ -769,6 +775,18 @@ async function scmActions() {
 			disabled: !remote,
 		},
 		{
+			value: "repos",
+			text: strings["git account repos"] || "Meus repositórios…",
+			icon: "folder",
+		},
+		{
+			value: "terminal",
+			text:
+				strings["git open terminal"] ||
+				"Abrir terminal do projeto (git no Alpine)",
+			icon: "terminal",
+		},
+		{
 			value: "clone",
 			text: strings["git clone"] || "Clonar repositório…",
 			icon: "copy",
@@ -799,6 +817,12 @@ async function scmActions() {
 			break;
 		case "fetch":
 			await onFetch();
+			break;
+		case "repos":
+			await onAccountRepos();
+			break;
+		case "terminal":
+			await openProjectTerminal();
 			break;
 		case "clone":
 			await onClone();
@@ -1073,6 +1097,8 @@ async function onInit() {
 
 /**
  * Clone from URL into a subfolder of the current workspace.
+ * The in-app engine tries first; on network failures the REAL git of the
+ * Alpine terminal takes over (auto-installing git when missing).
  */
 async function onClone() {
 	const url = await prompt(
@@ -1082,26 +1108,189 @@ async function onClone() {
 		"text",
 	);
 	if (!url) return;
+	await runClone(url.trim());
+}
+
+/** Shared clone pipeline: engine → terminal fallback → open folder. */
+async function runClone(url, repo = null) {
 	const hide = await loader.create(
 		strings["git clone"] || "Clonar repositório",
 		url,
 		{ timeout: 0 },
 	);
+	let dirUrl = "";
 	try {
-		const dir = await git.clone({ url: url.trim() });
-		echoGitCommand(`git clone ${url.trim()}`);
-		toast(`${strings["git cloned"] || "Clonado"} → ${Url.basename(dir)}`, 4000);
-	} catch (error) {
-		toast(`clone: ${error.message || error}`, 5000);
-	} finally {
+		dirUrl = await git.clone({ url });
+		echoGitCommand(`git clone ${url}`);
+		toast(
+			`${strings["git cloned"] || "Clonado"} → ${Url.basename(dirUrl)}`,
+			4000,
+		);
+	} catch (engineError) {
 		hide.destroy();
-		refresh();
+		dirUrl = await cloneViaTerminal(url, engineError);
+	} finally {
+		try {
+			hide.destroy();
+		} catch {
+			/* already destroyed */
+		}
 	}
+	if (!dirUrl) return;
+	if (repo) await applyGhRepo(repo);
+	await offerOpenCloned(dirUrl);
+	refresh();
 }
 
 /**
- * Commit history from real git (with checkout + copy actions).
+ * Network failure fallback: clone through the Alpine terminal.
+ * @returns {Promise<string>} cloned folder url ("" when declined/failed)
  */
+async function cloneViaTerminal(url, engineError) {
+	const message = String(engineError?.message || engineError);
+	const networkish =
+		/conectar|failed to fetch|network|getaddrinfo|econn|timeout|timed out/i.test(
+			message,
+		);
+	if (!networkish || !executorAvailable()) {
+		toast(`clone: ${message}`, 5000);
+		return "";
+	}
+	const ok = await confirm(
+		strings["git clone terminal title"] || "Clonar pelo terminal?",
+		strings["git clone terminal hint"] ||
+			"O git interno não conseguiu conectar ao servidor. Tentar clonar pelo terminal Alpine? O git é instalado automaticamente se necessário.",
+	);
+	if (!ok) return "";
+	const dirName = Url.basename(url).replace(/\.git$/, "") || "repo";
+	try {
+		const root = await git.gitRoot(null);
+		const { dirUrl } = await terminalClone({ url, root, dir: dirName });
+		echoGitCommand(`git clone ${url}  # via terminal Alpine`);
+		toast(
+			`${strings["git cloned"] || "Clonado"} (terminal) → ${dirName}`,
+			4000,
+		);
+		return dirUrl;
+	} catch (error) {
+		toast(`clone (terminal): ${error.message || error}`, 5000);
+		return "";
+	}
+}
+
+/** Offers to open the freshly cloned folder as the active project. */
+async function offerOpenCloned(dirUrl) {
+	const ok = await confirm(
+		strings["git open cloned"] || "Abrir pasta clonada?",
+		Url.basename(dirUrl),
+	);
+	if (!ok) return;
+	const { default: openFolder } = await import("lib/openFolder");
+	const { setCwd } = await import("lib/ai/vshell");
+	openFolder(dirUrl, { name: Url.basename(dirUrl) });
+	setCwd(dirUrl);
+}
+
+/**
+ * Lists the signed-in account's repositories and clones/activates one.
+ * This is how the panel, the GitHub tools and the AI bot agree on WHICH
+ * repo is being worked on.
+ */
+async function onAccountRepos() {
+	if (!settings.value.ghToken && !settings.value.ghUserLogin) {
+		const signed = await signInGitHubFlow();
+		if (!signed) return;
+	}
+	const hide = await loader.create(
+		strings["github repos"] || "Meus repositórios",
+		"",
+		{ timeout: 0 },
+	);
+	let repos = [];
+	try {
+		repos = await listGhRepos();
+	} catch (error) {
+		toast(String(error.message || error), 4000);
+		return;
+	} finally {
+		try {
+			hide.destroy();
+		} catch {
+			/* noop */
+		}
+	}
+	if (!repos.length) {
+		toast(strings["github no repos"] || "Nenhum repositório encontrado", 3000);
+		return;
+	}
+	const fullName = await select(
+		strings["github repos"] || "Meus repositórios",
+		repos.slice(0, 60).map((repo) => ({
+			value: repo.full_name,
+			text: repo.full_name,
+			icon: "folder",
+		})),
+	);
+	const repo = repos.find((item) => item.full_name === fullName);
+	if (!repo) return;
+	const action = await select(repo.full_name, [
+		{
+			value: "clone",
+			text: strings["git account clone"] || "Clonar para o projeto",
+			icon: "copy",
+		},
+		{
+			value: "set",
+			text:
+				strings["git account set"] ||
+				"Definir como repositório ativo (GitHub/bot)",
+			icon: "public",
+		},
+	]);
+	if (action === "clone") {
+		await runClone(
+			repo.clone_url || `https://github.com/${repo.full_name}.git`,
+			repo,
+		);
+	} else if (action === "set") {
+		await applyGhRepo(repo);
+	}
+}
+
+/** Opens (or reuses) a local terminal inside the project folder. */
+async function openProjectTerminal() {
+	try {
+		const { TerminalManager } = await import("components/terminal");
+		let entry;
+		for (const candidate of TerminalManager.terminals.values()) {
+			if (candidate?.component && !candidate.component.remoteSsh) {
+				entry = candidate;
+				break;
+			}
+		}
+		if (!entry) {
+			entry = await TerminalManager.createTerminal({
+				name: strings["git terminal"] || "Git",
+			});
+		}
+		const { activeProjectCd } = await import("lib/terminalCwd");
+		const { addedFolder } = await import("lib/openFolder");
+		const cd = activeProjectCd(
+			typeof editorManager !== "undefined" ? editorManager.activeFile : null,
+			addedFolder.map((folder) => folder.url),
+		);
+		if (cd && entry.component?.isConnected) {
+			entry.component.write(`${cd}\n`);
+		}
+		toast(
+			strings["git terminal open"] || "Terminal Alpine aberto no projeto",
+			2500,
+		);
+	} catch (error) {
+		toast(`terminal: ${error.message || error}`, 4000);
+	}
+}
+
 async function renderGitHistory() {
 	const $body = container?._$historyBody;
 	if (!$body?.isConnected) return;

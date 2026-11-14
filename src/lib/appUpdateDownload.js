@@ -2,6 +2,10 @@ import fsOperation from "fileSystem";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
+import {
+	nativeDownloaderAvailable,
+	nativeDownload as systemDownload,
+} from "lib/nativeDownloader";
 import Url from "utils/Url";
 
 /**
@@ -127,12 +131,17 @@ async function nativeDownload(asset, destUrl, { signal, onProgress }) {
 		onProgress,
 	);
 	try {
+		// sendRequest (not the downloadFile wrapper) so we can raise the
+		// read timeout — the 60s default kills ~40MB APKs on slow networks
 		await new Promise((resolve, reject) => {
-			http.downloadFile(
+			http.sendRequest(
 				asset.url,
-				{},
-				{},
-				nativePathOf(destUrl),
+				{
+					method: "download",
+					filePath: nativePathOf(destUrl),
+					connectTimeout: 60,
+					readTimeout: 1800,
+				},
 				resolve,
 				/** @param {any} error */
 				(error) =>
@@ -262,10 +271,55 @@ export function canInstallInApp(env) {
 }
 
 /**
+ * Path 1: system Android DownloadManager (no read timeouts, native
+ * progress notification, survives kills). Errors fall through to the
+ * legacy in-app download.
+ */
+async function runNativeUpdatePath(update, asset, ctx) {
+	const strings = globalThis.strings || {};
+	const abort = new AbortController();
+	const $loader = ctx.loaderFactory.create(
+		strings["downloading update"] || "Downloading update",
+		"",
+		{
+			timeout: 0,
+			oncancel: () => abort.abort(),
+		},
+	);
+	try {
+		const info = await ctx.nativeDownload(asset.url, asset.name, {
+			signal: abort.signal,
+			onProgress: (loaded, total) => {
+				const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
+				$loader.setMessage(
+					`${pct}% — ${formatBytesShort(loaded)} / ${formatBytesShort(total || asset.size)}`,
+				);
+			},
+		});
+		$loader?.destroy?.();
+		ctx.notify(
+			strings["update downloaded"] || "Update downloaded — opening installer…",
+		);
+		await ctx.install(info.localUri || asset.name, asset.name);
+		return { handled: true, value: { ok: true, installed: true } };
+	} catch (error) {
+		$loader?.destroy?.();
+		if (abort.signal.aborted || error?.code === "cancelled") {
+			return { handled: true, value: { ok: false, cancelled: true } };
+		}
+		ctx.notify(
+			strings["update native fallback"] ||
+				"DownloadManager falhou — tentando outro caminho…",
+		);
+		return { handled: false };
+	}
+}
+
+/**
  * Runs the full in-app update flow for a detected update:
- * confirm (with size) → download with progress → launch installer.
- * Falls back to opening the release page when the environment cannot
- * install in-app (browser, PWA, non-Android) or when anything fails.
+ * confirm (with size) → system DownloadManager → in-app download →
+ * launch installer. Falls back to opening the release page when the
+ * environment cannot download/install or when every attempt fails.
  *
  * @param {{hasUpdate: boolean, tag: string, url: string, assets?: any[]}} update
  * @param {object} [opts]
@@ -275,6 +329,8 @@ export function canInstallInApp(env) {
  * @param {()=>void} [opts.openInBrowser]
  * @param {(asset: object, opts: object)=>Promise<string>} [opts.download]
  * @param {(fileUrl: string, name: string)=>Promise<boolean>} [opts.install]
+ * @param {(url: string, name: string, opts: object)=>Promise<{localUri: string}>} [opts.nativeDownload]
+ * @param {boolean} [opts.nativeAvailable] force the native downloader probe
  * @param {object} [opts.env] environment probe overrides
  * @returns {Promise<{ok: boolean, fallback?: "browser", cancelled?: boolean, installed?: boolean, error?: string}>}
  */
@@ -293,14 +349,19 @@ export async function runUpdateFlow(update, opts = {}) {
 	const loaderFactory = opts.loaderFactory || {
 		create: (t, m, o) => loader.create(t, m, o),
 	};
-
-	if (!canInstallInApp(env)) {
-		openInBrowser();
-		return { ok: true, fallback: "browser" };
-	}
+	const ctx = {
+		loaderFactory,
+		notify,
+		install,
+		nativeDownload: opts.nativeDownload || systemDownload,
+	};
+	const nativeReady =
+		opts.nativeAvailable !== undefined
+			? opts.nativeAvailable
+			: nativeDownloaderAvailable();
 
 	const asset = pickApkAsset(update);
-	if (!asset) {
+	if (!asset || (!canInstallInApp(env) && !nativeReady)) {
 		openInBrowser();
 		return { ok: true, fallback: "browser" };
 	}
@@ -317,54 +378,67 @@ export async function runUpdateFlow(update, opts = {}) {
 		: false;
 	if (!confirmed) return { ok: false, cancelled: true };
 
-	const abort = new AbortController();
-	const $loader = loaderFactory.create(
-		strings["downloading update"] || "Downloading update",
-		"",
-		{
-			timeout: 0,
-			oncancel: () => abort.abort(),
-		},
-	);
+	// path 1 — system DownloadManager (device builds)
+	if (nativeReady) {
+		const native = await runNativeUpdatePath(update, asset, ctx);
+		if (native.handled) return native.value;
+	}
 
-	let fileUrl;
-	try {
-		fileUrl = await download(asset, {
-			signal: abort.signal,
-			onProgress: (loaded, total) => {
-				const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
-				$loader.setMessage(
-					`${pct}% — ${formatBytesShort(loaded)} / ${formatBytesShort(total)}`,
-				);
+	// path 2 — advanced-http download into the app cache + installer
+	if (canInstallInApp(env)) {
+		const abort = new AbortController();
+		const $loader = loaderFactory.create(
+			strings["downloading update"] || "Downloading update",
+			"",
+			{
+				timeout: 0,
+				oncancel: () => abort.abort(),
 			},
-		});
-	} catch (error) {
-		$loader?.destroy?.();
-		if (abort.signal.aborted || error?.code === "cancelled") {
-			return { ok: false, cancelled: true };
+		);
+
+		let fileUrl;
+		try {
+			fileUrl = await download(asset, {
+				signal: abort.signal,
+				onProgress: (loaded, total) => {
+					const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
+					$loader.setMessage(
+						`${pct}% — ${formatBytesShort(loaded)} / ${formatBytesShort(total)}`,
+					);
+				},
+			});
+		} catch (error) {
+			$loader?.destroy?.();
+			if (abort.signal.aborted || error?.code === "cancelled") {
+				return { ok: false, cancelled: true };
+			}
+			notify(
+				strings["update download failed"] || "Failed to download the update",
+			);
+			openInBrowser();
+			return { ok: false, error: String(error?.message || error) };
 		}
+
+		$loader?.destroy?.();
 		notify(
-			strings["update download failed"] || "Failed to download the update",
+			strings["update downloaded"] || "Update downloaded — opening installer…",
 		);
-		openInBrowser();
-		return { ok: false, error: String(error?.message || error) };
+
+		try {
+			await install(fileUrl, asset.name);
+			return { ok: true, installed: true };
+		} catch (error) {
+			notify(
+				strings["update install failed"] || "Could not start the installation",
+			);
+			openInBrowser();
+			return { ok: false, error: String(error?.message || error) };
+		}
 	}
 
-	$loader?.destroy?.();
-	notify(
-		strings["update downloaded"] || "Update downloaded — opening installer…",
-	);
-
-	try {
-		await install(fileUrl, asset.name);
-		return { ok: true, installed: true };
-	} catch (error) {
-		notify(
-			strings["update install failed"] || "Could not start the installation",
-		);
-		openInBrowser();
-		return { ok: false, error: String(error?.message || error) };
-	}
+	// path 3 — hand the download to the browser (release page)
+	openInBrowser();
+	return { ok: true, fallback: "browser" };
 }
 
 export default {

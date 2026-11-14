@@ -472,6 +472,124 @@ export const TOOLS = [
 		},
 	},
 	{
+		name: "repo_list",
+		description:
+			"List the GitHub repositories of the signed-in account (owner + collaborator). Returns name, default branch, visibility and last update — pick one with repo_open or repo_clone.",
+		danger: "read",
+		parameters: { type: "object", properties: {} },
+		async run() {
+			const { listGhRepos } = await import("lib/ghRepos");
+			const repos = await listGhRepos();
+			if (!repos.length) return "(no repositories found)";
+			return repos
+				.slice(0, 40)
+				.map(
+					(repo) =>
+						`${repo.full_name} — branch ${repo.default_branch || "main"}${repo.private ? " (private)" : ""}, updated ${String(repo.updated_at || "?").slice(0, 10)}`,
+				)
+				.join("\n");
+		},
+	},
+	{
+		name: "repo_open",
+		description:
+			"Set WHICH GitHub repository the GitHub tools (github_read/github_write) operate on, by 'owner/name' (from repo_list). It also updates the repository selected in the Git panel.",
+		danger: "write",
+		parameters: {
+			type: "object",
+			properties: {
+				repo: { type: "string", description: "owner/name or full github url" },
+			},
+			required: ["repo"],
+		},
+		async run({ repo }) {
+			const fullName = String(repo || "")
+				.trim()
+				.replace(/^https?:\/\/[^/]+\//i, "")
+				.replace(/\.git$/, "");
+			if (!fullName) return "ERROR: repo is required (owner/name).";
+			const { ghApiGet, ghToken, applyGhRepo } = await import("lib/ghRepos");
+			const info = await ghApiGet(
+				`https://api.github.com/repos/${fullName}`,
+				ghToken(),
+			);
+			await applyGhRepo(info);
+			return `Active repository: ${info.full_name} (branch ${info.default_branch || "main"}). github_read/github_write now target it; use repo_clone to get a local working copy.`;
+		},
+	},
+	{
+		name: "repo_clone",
+		description:
+			"Clone a GitHub repository (owner/name) or any https git URL into the workspace and make it the working folder — after this, list_dir/read_file/create_file/edit_file operate on the repo and 'git add/commit/push' via run_command publishes it. Falls back to the Alpine terminal (auto-installs git) when the internal engine cannot connect.",
+		danger: "write",
+		parameters: {
+			type: "object",
+			properties: {
+				repo: {
+					type: "string",
+					description: "owner/name or full https git url",
+				},
+				dir: {
+					type: "string",
+					description: "destination folder name (default: repo name)",
+				},
+			},
+			required: ["repo"],
+		},
+		async run({ repo, dir }) {
+			const input = String(repo || "").trim();
+			const url = /^https?:\/\//i.test(input)
+				? input
+				: `https://github.com/${input.replace(/\.git$/, "")}.git`;
+			const { default: Url } = await import("utils/Url");
+			const git = await import("lib/git");
+			const root = await git.gitRoot(null);
+			const name =
+				String(dir || "").trim() ||
+				Url.basename(url).replace(/\.git$/, "") ||
+				"repo";
+			let dirUrl = "";
+			let via = "engine";
+			try {
+				dirUrl = await git.clone({ url, dir: name });
+			} catch (engineError) {
+				const { terminalClone, executorAvailable } = await import(
+					"lib/git/terminalGit"
+				);
+				if (!executorAvailable()) {
+					return `ERROR: engine clone failed (${engineError.message || engineError}) and the Alpine terminal is unavailable.`;
+				}
+				try {
+					const out = await terminalClone({ url, root, dir: name });
+					dirUrl = out.dirUrl;
+					via = "terminal (git auto-instalado se necessário)";
+				} catch (terminalError) {
+					return `ERROR: clone failed — engine: ${engineError.message || engineError}; terminal: ${terminalError.message || terminalError}`;
+				}
+			}
+			const { setCwd } = await import("lib/ai/vshell");
+			setCwd(dirUrl);
+			if (/github\.com/i.test(url)) {
+				try {
+					const { ghApiGet, ghToken, applyGhRepo } = await import(
+						"lib/ghRepos"
+					);
+					const fullName = url
+						.replace(/^https?:\/\/[^/]+\//, "")
+						.replace(/\.git$/, "");
+					const info = await ghApiGet(
+						`https://api.github.com/repos/${fullName}`,
+						ghToken(),
+					);
+					await applyGhRepo(info);
+				} catch {
+					/* repo context is best-effort */
+				}
+			}
+			return `Repository cloned (${via}) into ${dirUrl} — it is now the working folder. Read/modify files with the file tools, then commit and push with run_command ('git add -A', 'git commit -m ...', 'git push').`;
+		},
+	},
+	{
 		name: "load_skill",
 		description:
 			"Load a skill: a short markdown playbook with step-by-step guidance (debug-build, code-review, write-tests, git-hygiene, refactor-safe, plus workspace .xcoder/skills). Load it when its description matches the task, follow it, then continue the task.",

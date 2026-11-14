@@ -16,6 +16,7 @@
 
 import { isPremium, maxTokensLimit } from "lib/premium";
 import settings from "lib/settings";
+import { onCustomModelsChanged } from "./customModels";
 import { localLlmIds } from "./localModels";
 import { normalizeModelId } from "./modelId";
 import { PROVIDER_LOGO_SVGS } from "./providerLogos";
@@ -317,6 +318,13 @@ export const PROVIDERS = [
 export const PROVIDER_MAP = Object.fromEntries(
 	PROVIDERS.map((provider) => [provider.id, provider]),
 );
+
+// imported models (files/link) become selectable in the Local provider
+// as soon as they are registered (models screen → import)
+onCustomModelsChanged(() => {
+	const local = PROVIDER_MAP.local;
+	if (local) local.models = localLlmIds();
+});
 
 /**
  * Visual identity for each provider: an emoji/letter glyph plus a brand

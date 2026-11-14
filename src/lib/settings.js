@@ -179,7 +179,7 @@ class Settings {
 			lineHeight: 2,
 			leftMargin: 50,
 			checkFiles: true,
-			checkForAppUpdates: false,
+			checkForAppUpdates: true, // notificar novas versões ao abrir (o download usa o DownloadManager nativo)
 			desktopMode: false,
 			console: this.CONSOLE_LEGACY,
 			keyboardMode: this.KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE,
@@ -239,6 +239,7 @@ class Settings {
 			aiActiveBot: "", // active AI bot persona ("" = none)
 			aiUserBots: [], // user-created AI bots (lib/ai/bots.js)
 			gitRemoteUrl: "",
+			gitCorsProxy: "https://cors.isomorphic-git.org", // fetch fallback p/ git smart-HTTP ("" desativa)
 			ghRepo: "",
 			ghToken: "",
 			ghBranch: "main",

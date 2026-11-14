@@ -1,4 +1,5 @@
-import { getLocalModel, LOCAL_MODELS, modelFiles } from "./localModels";
+import { onCustomModelsChanged } from "./customModels";
+import { allLocalModels, getLocalModel, modelFiles } from "./localModels";
 import {
 	ensureModelDirPath,
 	installedFileUrl,
@@ -39,9 +40,15 @@ function loadEngine() {
 
 /** repo id → catalog model, for URL → file mapping. */
 const REPO_INDEX = new Map();
-for (const model of LOCAL_MODELS) {
+for (const model of allLocalModels()) {
 	REPO_INDEX.set(model.repo, model);
 }
+// imported models (device files / HF link) join the index when added
+onCustomModelsChanged(() => {
+	for (const model of allLocalModels()) {
+		REPO_INDEX.set(model.repo, model);
+	}
+});
 
 /** Map a transformers.js request url onto an installed file path. */
 export function pathForRequestUrl(url) {

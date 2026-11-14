@@ -39,6 +39,10 @@
 
 const HF = "https://huggingface.co";
 
+// Imported models (device files / HF link) — merged into every lookup
+// below. one-way import keeps the module graph acyclic.
+import { customModelsCache } from "./customModels";
+
 /** Common LLM metadata files (tokenizer + configs). */
 const LLM_META = [
 	"config.json",
@@ -392,14 +396,28 @@ export function modelFiles(model) {
 	return list;
 }
 
-/** Catalog entry by id (or null). */
-export function getLocalModel(id) {
-	return LOCAL_MODELS.find((model) => model.id === id) || null;
+/**
+ * Every catalog model: the built-in entries PLUS user-imported ones
+ * (device files / HF link — see customModels.js). The custom cache is
+ * hydrated asynchronously at import and refreshed via its own event.
+ * @returns {LocalModel[]}
+ */
+export function allLocalModels() {
+	return [...LOCAL_MODELS, ...customModelsCache()];
 }
 
-/** Catalog entries of one kind, lightest first. */
+/** Catalog entry by id — built-in or imported. */
+export function getLocalModel(id) {
+	return (
+		LOCAL_MODELS.find((model) => model.id === id) ||
+		customModelsCache().find((model) => model.id === id) ||
+		null
+	);
+}
+
+/** Catalog entries of one kind (built-in + imported). */
 export function modelsByKind(kind) {
-	return LOCAL_MODELS.filter((model) => model.kind === kind);
+	return allLocalModels().filter((model) => model.kind === kind);
 }
 
 /** Local directory (relative to the app storage root) for a model. */

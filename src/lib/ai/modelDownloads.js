@@ -126,7 +126,8 @@ function modelsRoot() {
 }
 
 /**
- * Writes a model file whether or not it already exists.
+ * Writes a model file whether or not it already exists. Exported for the
+ * importers (customModels/hfImport) that place files outside downloads.
  *
  * Why this exists: internalFs.writeFile resolves the entry with
  * `getFile(name, { create: false })`, so writing a MISSING file fails
@@ -135,7 +136,7 @@ function modelsRoot() {
  * `_manifest.json` write both target files that don't exist yet — which
  * is the «PATH NOT FOUND» users saw when downloading models.
  */
-async function writeModelFile(fileUrl, data) {
+export async function writeModelFile(fileUrl, data) {
 	const fs = fsOperation(fileUrl);
 	if (await fs.exists()) {
 		return fs.writeFile(data);
@@ -184,7 +185,7 @@ export function installedFileUrl(modelId, path) {
 }
 
 /** Root url of one model's directory. */
-function modelRootUrl(modelId) {
+export function modelRootUrl(modelId) {
 	return Url.join(modelsRoot(), modelId);
 }
 
@@ -247,11 +248,11 @@ export async function isModelDownloaded(modelId) {
 	return required.every((path) => (manifest.files[path] || 0) > 0);
 }
 
-/** Ids of fully installed catalog models. */
+/** Ids of fully installed catalog models (built-in + imported). */
 export async function downloadedLocalModels() {
-	const { LOCAL_MODELS } = await import("./localModels");
+	const { allLocalModels } = await import("./localModels");
 	const out = [];
-	for (const model of LOCAL_MODELS) {
+	for (const model of allLocalModels()) {
 		if (await isModelDownloaded(model.id)) out.push(model.id);
 	}
 	return out;
@@ -264,12 +265,12 @@ export async function modelStorageBytes(modelId) {
 	return Number(manifest.totalBytes || 0);
 }
 
-/** Aggregate storage usage of installed models. */
+/** Aggregate storage usage of installed models (built-in + imported). */
 export async function localStorageUsage() {
-	const { LOCAL_MODELS } = await import("./localModels");
+	const { allLocalModels } = await import("./localModels");
 	let bytes = 0;
 	let count = 0;
-	for (const model of LOCAL_MODELS) {
+	for (const model of allLocalModels()) {
 		const size = await modelStorageBytes(model.id);
 		if (size > 0) {
 			bytes += size;

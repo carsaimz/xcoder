@@ -1,7 +1,7 @@
 {
 	"name": "xcoder-desktop",
 	"productName": "XCoder",
-	"version": "1.8.25",
+	"version": "1.8.29",
 	"description": "XCoder desktop — the XCoder web IDE packaged for Windows and Linux with Electron",
 	"main": "main.cjs",
 	"private": true,

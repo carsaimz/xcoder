@@ -132,6 +132,13 @@ export class Agent {
 		if (ghContext) {
 			parts.push("", ghContext);
 		}
+		try {
+			const { workspaceSummary } = await import("lib/git");
+			const gitSummary = await workspaceSummary();
+			if (gitSummary) parts.push("", gitSummary);
+		} catch {
+			/* git context is best-effort */
+		}
 		if (settings.value.aiSystemPrompt) {
 			parts.push(
 				"",
