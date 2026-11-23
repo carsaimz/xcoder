@@ -34,6 +34,7 @@ import Sidebar from "components/sidebar";
 import getStatusBar from "components/statusBar";
 import tile from "components/tile";
 import toast from "components/toast";
+import { initIconTooltips } from "components/tooltip";
 import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import intentHandler, { processPendingIntents } from "handlers/intent";
@@ -692,6 +693,7 @@ async function loadApp() {
 	editorManager.onupdate = onEditorUpdate;
 	root.on("show", mainPageOnShow);
 	app.addEventListener("click", onClickApp);
+	initIconTooltips();
 	editorManager.on("rename-file", onFileUpdate);
 	editorManager.on("switch-file", onFileUpdate);
 	editorManager.on("file-loaded", onFileUpdate);

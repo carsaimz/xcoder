@@ -249,20 +249,21 @@ async function expandList($list) {
 
 	if (!$ul) return;
 
-	// Cleanup existing file tree
-	if ($ul._fileTree) {
-		$ul._fileTree.destroy();
-		$ul._fileTree = null;
-	}
+	// Cleanup existing file tree, including one still loading: toggling while
+	// it loads would otherwise render both trees into the same list.
+	for (const tree of [$ul._fileTree, $ul._pendingFileTree]) tree?.destroy();
+	$ul._fileTree = null;
+	$ul._pendingFileTree = null;
 	$ul.innerHTML = "";
 
 	if (saveState) listState[url] = $list.unclasped;
 	if (!$list.unclasped) return;
 
+	let fileTree;
 	try {
 		startLoading();
 
-		const fileTree = new FileTree($ul, {
+		fileTree = new FileTree($ul, {
 			getEntries: (dirUrl) => fsOperation(dirUrl).lsDir(),
 			expandedState: listState,
 			onExpandedChange: (folderUrl, isExpanded) => {
@@ -283,9 +284,16 @@ async function expandList($list) {
 			},
 		});
 
+		$ul._pendingFileTree = fileTree;
 		await fileTree.load(url);
+		// A later toggle replaced this tree while it loaded.
+		if ($ul._pendingFileTree !== fileTree) return;
+		$ul._pendingFileTree = null;
 		$ul._fileTree = fileTree;
 	} catch (err) {
+		// A newer toggle owns the list now; don't collapse it.
+		if ($ul._pendingFileTree !== fileTree) return;
+		$ul._pendingFileTree = null;
 		$list.collapse();
 		if (err?.includes?.("Invalid message length")) {
 			console.error(err);
@@ -294,7 +302,8 @@ async function expandList($list) {
 		}
 		helpers.error(err);
 	} finally {
-		stopLoading();
+		// Leave the loading bar to a newer load that is still running.
+		if (!$ul._pendingFileTree) stopLoading();
 	}
 }
 
@@ -1412,6 +1421,137 @@ async function refreshRenamedEntryInOpenFolders(
 	});
 
 	await Promise.all(refreshUrls.map(refreshOpenFolder));
+}
+
+/**
+ * Move entries into a folder (Explorer drag & drop), skipping those already
+ * in the destination and folder-into-itself drops. Returns the moved count.
+ * @param {{url: string, type?: string, name?: string, $el?: HTMLElement}[]} items
+ * @param {string} targetUrl
+ * @returns {Promise<number>}
+ */
+export async function moveEntries(items, targetUrl) {
+	const movable = items.filter(
+		({ url }) => !areSameOpenFolderUrl(getParentUrl(url), targetUrl),
+	);
+	if (!movable.length) return 0;
+
+	const $title = openFolder.find(targetUrl)?.$node.$title;
+	$title?.classList.add("loading");
+	let moved = 0;
+	let lastError;
+	try {
+		for (const { url } of movable) {
+			try {
+				if (await moveOneEntry(url, targetUrl)) moved++;
+			} catch (error) {
+				console.error(error);
+				lastError = error;
+			}
+		}
+	} finally {
+		$title?.classList.remove("loading");
+	}
+
+	if (lastError) helpers.error(lastError);
+	else if (moved) toast(strings.success);
+	return moved;
+}
+
+/**
+ * Move one entry into destUrl (cut semantics). Returns true when moved,
+ * false when skipped (self-drop, declined overwrite).
+ * @param {string} srcUrl
+ * @param {string} destUrl
+ */
+async function moveOneEntry(srcUrl, destUrl) {
+	const fs = fsOperation(srcUrl);
+	const stat = await fs.stat();
+	const IS_DIR = Boolean(stat.isDirectory);
+
+	// A folder can't move into itself or its own subdirectories.
+	const sourceUrl = Url.parse(srcUrl).url;
+	const targetUrl = Url.parse(destUrl).url;
+	if (IS_DIR && areSameOpenFolderUrl(sourceUrl, targetUrl)) return false;
+	if (
+		IS_DIR &&
+		(targetUrl.startsWith(sourceUrl + "/") ||
+			targetUrl.startsWith(sourceUrl + "\\"))
+	) {
+		return false;
+	}
+
+	const itemName = Url.basename(srcUrl);
+	const conflictUrl = Url.join(destUrl, itemName);
+	if (await fsOperation(conflictUrl).exists()) {
+		const confirmation = await confirm(
+			strings.warning,
+			strings["already exists"]
+				? strings["already exists"].replace("{name}", itemName)
+				: `"${itemName}" already exists in this location.`,
+		);
+		if (!confirmation) return false;
+	}
+
+	let newUrl;
+	if (isTerminalSafUri(srcUrl) && IS_DIR) {
+		// SAF folders backed by terminal providers can't rename across trees;
+		// transfer manually, like the clipboard's cut path does.
+		newUrl = await moveSafDirectoryRecursively(srcUrl, destUrl);
+	} else {
+		try {
+			newUrl = await fs.moveTo(destUrl);
+		} catch (error) {
+			// Cross-provider moves: copy with exclusions, then delete the source.
+			const result = await copyEntry(srcUrl, destUrl, {
+				excludePatterns: appSettings.value.excludeFolders,
+			});
+			if (!result?.url) return false;
+			await fs.delete();
+			newUrl = result.url;
+		}
+	}
+
+	if (!IS_DIR) {
+		const file = editorManager.getFile(srcUrl, "uri");
+		if (file) file.uri = newUrl;
+	} else {
+		helpers.updateUriOfAllActiveFiles(srcUrl, newUrl);
+		migrateOpenFolderStateUrls(srcUrl, newUrl);
+	}
+	removeEntryFromOpenFolder(srcUrl);
+	FileList.rename(srcUrl, newUrl);
+	appendEntryToOpenFolder(destUrl, newUrl, IS_DIR ? "folder" : "file");
+	return true;
+}
+
+/**
+ * Move a SAF directory through a terminal provider recursively.
+ * @param {string} source
+ * @param {string} targetParentUrl
+ * @returns {Promise<string>} new url
+ */
+async function moveSafDirectoryRecursively(source, targetParentUrl) {
+	const sourceFs = fsOperation(source);
+	const sourceName = Url.basename(source);
+	const targetUrl = Url.join(targetParentUrl, sourceName);
+
+	await fsOperation(targetParentUrl).createDirectory(sourceName);
+
+	const entries = await sourceFs.lsDir();
+	for (const entry of entries) {
+		if (entry.isDirectory) {
+			await moveSafDirectoryRecursively(entry.url, targetUrl);
+		} else {
+			const fileContent = await fsOperation(entry.url).readFile();
+			const fileName = entry.name || Url.basename(entry.url);
+			await fsOperation(targetUrl).createFile(fileName, fileContent);
+			await fsOperation(entry.url).delete();
+		}
+	}
+
+	await sourceFs.delete();
+	return targetUrl;
 }
 
 /**

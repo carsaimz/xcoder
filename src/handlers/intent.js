@@ -21,15 +21,22 @@ export default async function HandleIntent(intent) {
 	intent = intent || {};
 	const type = intent.action?.split(".").slice(-1)[0];
 
-	if (["SEND", "VIEW", "EDIT"].includes(type)) {
+	if (["SEND", "SEND_MULTIPLE", "VIEW", "EDIT"].includes(type)) {
 		/**@type {string} */
 		const url =
 			intent.fileUri ||
 			intent.data ||
 			intent.extras?.["android.intent.extra.STREAM"];
-		if (!url) return;
-
-		if (url.startsWith("xcoder://") || url.startsWith("acode://")) {
+		// Shared documents arrive as EXTRA_STREAM / ClipData, collected by the
+		// native plugin into `uris` (SEND_MULTIPLE sends several at once).
+		const sharedUris = [
+			...new Set(
+				[url, ...(Array.isArray(intent.uris) ? intent.uris : [])].filter(
+					(uri) => typeof uri === "string" && /^(content|file):\/\//i.test(uri),
+				),
+			),
+		];
+		if (typeof url === "string" && /^(xcoder|acode):\/\//i.test(url)) {
 			// Both schemes share the same URL grammar: xcoder:// (native) and
 			// acode:// (compatibility with links made for the Acode editor).
 			const path = url.replace(/^(xcoder|acode):\/\//, "").split("#")[0];
@@ -61,20 +68,31 @@ export default async function HandleIntent(intent) {
 			return;
 		}
 
+		if (!sharedUris.length) return;
+
 		const options = {
 			mode: "single",
 			render: true,
 			persistInSession: false,
 		};
+		// Only the last opened file gets focus, mirroring VS Code's
+		// multi-file drop behaviour.
+		const batch = sharedUris.map((uri, index) => ({
+			url: uri,
+			options: { ...options, render: index === sharedUris.length - 1 },
+		}));
 
 		if (sessionStorage.getItem("isfilesRestored") === "true") {
-			await openFile(url, options);
+			for (const entry of batch) {
+				try {
+					await openFile(entry.url, entry.options);
+				} catch (error) {
+					helpers.error(error);
+				}
+			}
 		} else {
 			// Store the intent for later processing when files are restored
-			pendingIntents.push({
-				url,
-				options,
-			});
+			pendingIntents.push(...batch);
 		}
 	}
 }

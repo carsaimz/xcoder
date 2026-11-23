@@ -1844,5 +1844,9 @@
 	"lsp-size-download": "download",
 	"lsp-size-installed": "on disk",
 	"lsp-size-unknown": "—",
-	"lsp-refreshing": "Refreshing servers…"
+	"lsp-refreshing": "Refreshing servers…",
+	"use native index": "Use native index",
+	"use native index hint": "Search with the workspace index — faster on large folders",
+	"persist replaced files": "Persist replaced files",
+	"persist replaced files hint": "Keep a list of files changed by replace-all, to undo later"
 }

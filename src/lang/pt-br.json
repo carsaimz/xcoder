@@ -1961,5 +1961,9 @@
 	"lsp-size-download": "download",
 	"lsp-size-installed": "no disco",
 	"lsp-size-unknown": "—",
-	"lsp-refreshing": "A atualizar servidores…"
+	"lsp-refreshing": "A atualizar servidores…",
+	"use native index": "Usar índice nativo",
+	"use native index hint": "Pesquisa pelo índice do espaço de trabalho — mais rápido em pastas grandes",
+	"persist replaced files": "Manter arquivos substituídos",
+	"persist replaced files hint": "Guarda a lista de arquivos alterados pelo substituir-tudo, para desfazer depois"
 }

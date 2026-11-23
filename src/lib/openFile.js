@@ -171,8 +171,9 @@ export default async function openFile(file, options = {}) {
 			}
 		}
 
-		if (text) {
-			// If file is not opened and has unsaved text
+		if (text != null) {
+			// If file is not opened and has unsaved text (may be "" after a
+			// replace-all that emptied the file)
 			createEditor(true, text);
 			return;
 		}

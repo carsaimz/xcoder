@@ -7,6 +7,67 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.34] - 2026-11-24
+
+### Novidades do Acode oficial, portadas para o XCoder
+
+Esta versão traz as novidades mais importantes do repositório oficial do
+Acode (Acode-Foundation/Acode), adaptadas ao XCoder:
+
+- **Arrastar e largar no Explorador** — segure um ficheiro (ou uma seleção
+  inteira do modo multi-seleção) e arraste-o para outra pasta para o mover;
+  pastas fechadas abrem-se sozinhas ao pairar (spring-loaded), a lista faz
+  scroll nas bordas, o cartão de arrasto mostra um selo com a quantidade de
+  itens e pastas não podem cair dentro de si mesmas. Funciona por toque e
+  por rato, com vibração e animações de assentamento. Movimentos
+  entre-provedores (ex.: SFTP ↔ local) transferem por cópia + remoção
+  quando a renomeação direta não está disponível.
+- **Guarda `color-mix()` com `@supports`** — toda a camada de redesign
+  (tokens, vscode-ui, inspector, chat IA, dragMove…) agora compila cada
+  declaração com `color-mix()` dentro de um bloco
+  `@supports (color: color-mix(…))`, com o fallback simples antes. WebViews
+  antigos deixam de perder cores (o valor com `var()` era "invalid at
+  computed-value time" e ficava transparente) — 118 guardas no CSS principal.
+- **Fullscreen imersivo + API de orientação** — o WebView Android entra em
+  modo imersivo real (barras escondidas, Back entregue à sessão de
+  fullscreen via `xcoder.require("fullscreen")`) e pede orientação
+  temporária (`xcoder.require("orientation").lock("landscape")`) durante a
+  sessão; restaurado ao sair. O hook nativo (ImmersiveFullscreen.java)
+  vive no CordovaLib injetado no prepare, sem substituir o WebChromeClient.
+- **Partilhar documentos de outras apps** — o manifest agora aceita
+  SEND / SEND_MULTIPLE (pdf, docx, xlsx, pptx, ods, csv, tsv); a
+  inicial nativa recolhe todos os uris (EXTRA_STREAM + ClipData) com
+  persistência de permissões quando possível, e o XCoder abre os ficheiros
+  partilhados em lote (o último recebe o foco).
+- **Pré-visualização com tamanho de dispositivo predefinido** — no modo
+  Dispositivos do browser interno, «Fixar como predefinição» e «Limpar
+  predefinição» guardam o tamanho (reajustado ao ecrã atual ao restaurar);
+  o preview reabre no modo guardado sem recarregar duas vezes.
+- **Markdown com GFM** — o modo markdown do editor usa o
+  `markdownLanguage` (GFM: tabelas, risco, listas de tarefas, autolinks).
+- **Dicas nos filtros de pesquisa** — os botões aA / a-z / .* / IDX / HD
+  ganham dica por toque longo (novo sistema de tooltips por long-press
+  com título + descrição, inclusive dentro de shadow roots), com
+  `title`/`aria-label` para acessibilidade.
+- **Ligações `file://` em documentação LSP abrem no editor** — em vez de
+  irem para o browser (que crashava com FileUriExposedException), com
+  suporte a fragmentos `#L12:5`; e o `openInBrowser` nativo recusa `file:`
+  e já não mata o app se não houver activity.
+- **Substituição nativa com regras do JavaScript** — o índice nativo
+  expande `$1…$99`, `$<nome>`, `$&`, `` $` ``, `$'` e `$$` igual ao
+  `String.prototype.replace`, incluindo grupos nomeados.
+- Correcções portadas do Acode oficial:
+  - **Substituir-tudo com substituição vazia** funciona (apaga todas as
+    ocorrências) e um ficheiro fechado cujo conteúdo foi substituído por
+    "" recarrega certo;
+  - **Barra de rolagem** já não reabre o teclado ao arrastar (touchend
+    cancelado) e reposiciona o polegar ao reaparecer/medir sempre;
+  - **Pastas** não são renderizadas duas vezes quando abre/fecha durante o
+    carregamento (gerações + destruição do tree pendente);
+  - **Colar texto CRLF** mantém o cursor dentro do documento;
+  - **Dobrar tudo** é fiável em ficheiros grandes (parsing forçado).
+
+
 ## [1.8.33] - 2026-11-24
 
 ### Redesign completo estilo VS Code (para além dos ícones)
@@ -2430,6 +2491,47 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.34] - 2026-11-24
+
+### Highlights from the official Acode, ported to XCoder
+
+- **Drag & drop in the Explorer** — long-press a file (or a whole
+  multi-selection) and drop it on a folder to move it; closed folders
+  spring open on hover, the list auto-scrolls at the edges, the drag card
+  shows an item-count badge, and folders cannot be dropped into
+  themselves. Touch and mouse, with haptics and settle animations.
+  Cross-provider moves transfer via copy + delete when a plain rename is
+  unavailable.
+- **`color-mix()` guarded with `@supports`** — every redesign declaration
+  using `color-mix()` compiles into an `@supports` block with a plain
+  fallback first, so old WebViews keep colors instead of falling back to
+  transparent.
+- **Immersive fullscreen + orientation API** — real Android immersive mode
+  with Back delivery for the fullscreen owner
+  (`xcoder.require("fullscreen")`) and temporary orientation lock
+  (`xcoder.require("orientation").lock("landscape")`), injected into
+  CordovaLib by a prepare hook.
+- **Documents shared from other apps** — SEND / SEND_MULTIPLE intent
+  filter (pdf, docx, xlsx, pptx, ods, csv, tsv); the native plugin
+  collects every uri (EXTRA_STREAM + ClipData), persists grants when
+  possible, and XCoder opens the batch (last file gets focus).
+- **Default device size for the in-app preview** — "Set as Default" /
+  "Clear Default" menu items in Devices mode; presets are re-fitted to the
+  current screen on restore and the preview reopens without double reloads.
+- **Markdown with GFM** syntax in the editor mode.
+- **Search option hints** — long-press tooltips (title + description,
+  shadow-root aware) on the aA / a-z / .* / IDX / HD toggles, with
+  title/aria-label accessibility attributes.
+- **`file://` links in LSP docs open in the editor** (with `#L12:5`
+  fragments) instead of crashing into the system browser; the native
+  `openInBrowser` refuses `file:` and survives missing activities.
+- **Native replace follows JS substitution rules** ($1…$99, $<name>, $&,
+  `` $` ``, $', $$) including named groups.
+- Ported fixes: replace-all with an empty replacement; scrollbar keyboard
+  reopen + thumb measurement; folders rendered twice while loading; CRLF
+  paste cursor; reliable fold-all on large files.
+
 
 ## [1.8.33] - 2026-11-24
 

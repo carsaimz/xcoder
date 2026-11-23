@@ -37,6 +37,9 @@ export function updateSwitchHandle($handle, checked, animateToggle = true) {
  * @property {string} [id]
  * @property {string} [size]
  * @property {"checkbox"|"radio"} [type]
+ * @property {string} [title] Hint text shown by long-press tooltips
+ * @property {string} [ariaLabel] Accessible name when the label is only an icon
+ * @property {string} [description] Secondary hint text for the tooltip
  */
 
 /**
@@ -51,14 +54,30 @@ export function updateSwitchHandle($handle, checked, animateToggle = true) {
  * @returns {Checkbox & HTMLLabelElement}
  */
 function Checkbox(text, checked, name, id, type, ref, size, isSwitch) {
+	let title;
+	let ariaLabel;
+	let description;
 	if (typeof text === "object") {
-		({ text, checked, name, id, type, ref, size, isSwitch } = text);
+		({
+			text,
+			checked,
+			name,
+			id,
+			type,
+			ref,
+			size,
+			isSwitch,
+			title,
+			ariaLabel,
+			description,
+		} = text);
 	}
 
 	size = size || "1rem";
 
 	const $input = ref || Ref();
 	const $handle = Ref();
+	const label = ariaLabel || title;
 	const $checkbox = (
 		<label className={`input-checkbox ${isSwitch ? "switch" : ""}`}>
 			<input
@@ -75,6 +94,10 @@ function Checkbox(text, checked, name, id, type, ref, size, isSwitch) {
 			<span>{text}</span>
 		</label>
 	);
+
+	if (title) $checkbox.setAttribute("title", title);
+	if (label) $checkbox.setAttribute("aria-label", label);
+	if (description) $checkbox.dataset.description = description;
 
 	function updateToggle(animateToggle = true) {
 		const isSwitch =

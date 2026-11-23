@@ -187,8 +187,24 @@ function collapseAll() {
  * Initialize files app
  * @param {HTMLElement} el
  */
+/** Set once the drag-to-move controller is attached to the explorer. */
+let dragMoveReady = false;
+
+/**
+ * Attaches drag-to-move lazily: dragMove is a sizeable module and the files
+ * app sits in the sidebar boot graph, so it must not be a static import.
+ */
+function initDragMove() {
+	if (dragMoveReady || !container) return;
+	dragMoveReady = true;
+	import("./dragMove")
+		.then(({ default: dragMove }) => dragMove.init(container))
+		.catch((error) => console.error("dragMove init failed:", error));
+}
+
 function initApp(el) {
 	container = el;
+	initDragMove();
 	container.classList.add("files");
 	container.setAttribute("data-msg", strings["open folder"]);
 	// VS Code Explorer-style section header (rendered via CSS ::before)

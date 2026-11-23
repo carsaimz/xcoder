@@ -56,6 +56,7 @@ import fileIndex from "lib/fileIndex";
 import files from "lib/fileList";
 import fileTypeHandler from "lib/fileTypeHandler";
 import fonts from "lib/fonts";
+import fullscreen from "lib/fullscreen";
 import linterRegistry from "lib/linterRegistry";
 import {
 	BROKEN_PLUGINS,
@@ -65,6 +66,7 @@ import {
 } from "lib/loadPlugins";
 import notificationManager from "lib/notificationManager";
 import openFolder, { addedFolder } from "lib/openFolder";
+import orientation from "lib/orientation";
 import projects from "lib/projects";
 import selectionMenu from "lib/selectionMenu";
 import appSettings from "lib/settings";
@@ -438,6 +440,8 @@ class XCoder {
 		this.define("webview", webview);
 		this.define("codemirror", codemirrorModule);
 		this.define("codeHighlight", codeHighlightModule);
+		this.define("fullscreen", fullscreen);
+		this.define("orientation", orientation);
 		this.define("@codemirror/autocomplete", cmAutocomplete);
 		this.define("@codemirror/commands", cmCommands);
 		this.define("@codemirror/language", cmLanguage);
