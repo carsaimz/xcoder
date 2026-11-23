@@ -7,6 +7,26 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.35] - 2026-11-24
+
+### Inspecção e scraping na tela de pré-visualização
+
+- **O ecrã de pré-visualização ganhou «Inspecionar» e «Scrape»** — dois
+  novos itens no menu do preview nativo (ícones `< >` e globo). Um toque
+  entrega o URL atual ao editor: o Inspector (Elementos/Consola/Rede) abre
+  com a página carregada, ou o Scraper busca a fonte **renderizada** (o
+  resultado do JavaScript) e mostra recursos, segredos e endpoints. O
+  preview fica na pilha — voltar com o botão Back.
+  - Funciona para QUALQUER URL em preview, incluindo `http://localhost`
+    do servidor embutido (o servidor continua vivo quando a ferramenta
+    abre, com a mesma sessão).
+  - A entrega sobrevive à restauração: se os ficheiros ainda não
+    reabriram, o pedido fica em fila e é executado depois.
+- **Novos glifos no conjunto de ícones nativo** — `CODE` (`< >`) e
+  `GLOBE`, usados nos novos itens de menu.
+- O modo apenas-consola do preview não mostra os novos itens.
+
+
 ## [1.8.34] - 2026-11-24
 
 ### Novidades do Acode oficial, portadas para o XCoder
@@ -2491,6 +2511,22 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.35] - 2026-11-24
+
+### Inspection & scraping on the preview screen
+
+- **The native preview menu gained "Inspect" and "Scrape"** — one tap
+  hands the current URL to the editor: the Inspector (Elements/Console/
+  Network) opens with the page loaded, or the Scraper fetches the
+  **rendered** source (post-JavaScript) with assets, secrets and
+  endpoints. The preview stays in the back stack.
+  - Works for any previewed URL, including the embedded server's
+    `http://localhost` (the server stays alive when the tool opens).
+  - The hand-off survives restoration: queued until files reopen.
+- **New native icon glyphs** — `CODE` (`< >`) and `GLOBE`.
+- The console-only preview mode hides the new items.
+
 
 ## [1.8.34] - 2026-11-24
 

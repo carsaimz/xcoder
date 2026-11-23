@@ -9,6 +9,44 @@ const handlers = [];
  * @type {Array<{url: string, options: object}>}
  */
 const pendingIntents = [];
+/**
+ * Tool hand-offs from the native preview ("Inspect" / "Scrape" menu) that
+ * arrive before files are restored.
+ * @type {Array<{tool: "inspector"|"scrape", url: string}>}
+ */
+const pendingTools = [];
+
+/**
+ * Opens an editor tool (Inspector / Scraper sidebar app) with a URL
+ * handed over from the native preview screen.
+ * @param {"inspector"|"scrape"} tool
+ * @param {string} [url]
+ */
+async function openTool(tool, url) {
+	if (sessionStorage.getItem("isfilesRestored") !== "true") {
+		pendingTools.push({ tool, url });
+		return;
+	}
+
+	try {
+		const { default: sidebarApps } = await import("sidebarApps");
+		const app = sidebarApps.get(
+			tool === "inspector" ? "inspectorApp" : "scrapeApp",
+		);
+		if (app) app.active = true;
+		if (url) {
+			const mod =
+				tool === "inspector"
+					? await import("sidebarApps/inspector")
+					: await import("sidebarApps/scrape");
+			if (tool === "inspector") await mod.openInspectorWith(url);
+			else await mod.openScraperWith(url, "rendered");
+		}
+	} catch (error) {
+		console.error(error);
+		helpers.error(error);
+	}
+}
 
 /**
  *
@@ -20,6 +58,18 @@ export default async function HandleIntent(intent) {
 	// explicitly (a null intent must be a no-op, never a TypeError).
 	intent = intent || {};
 	const type = intent.action?.split(".").slice(-1)[0];
+
+	// Tool hand-off from the native preview screen (Browser "Inspect" /
+	// "Scrape" menu items) — MAIN action with xcoder_tool extras.
+	const tool = intent.extras?.xcoder_tool;
+	if (tool === "inspector" || tool === "scrape") {
+		const toolUrl =
+			typeof intent.extras?.xcoder_url === "string"
+				? intent.extras.xcoder_url
+				: "";
+		await openTool(tool, toolUrl);
+		return;
+	}
 
 	if (["SEND", "SEND_MULTIPLE", "VIEW", "EDIT"].includes(type)) {
 		/**@type {string} */
@@ -117,6 +167,28 @@ export function removeIntentHandler(handler) {
  */
 export async function processPendingIntents() {
 	if (sessionStorage.getItem("isfilesRestored") !== "true") return;
+
+	// Tool hand-offs queued before restoration
+	while (pendingTools.length > 0) {
+		const { tool, url } = pendingTools.shift();
+		try {
+			const { default: sidebarApps } = await import("sidebarApps");
+			const app = sidebarApps.get(
+				tool === "inspector" ? "inspectorApp" : "scrapeApp",
+			);
+			if (app) app.active = true;
+			if (url) {
+				const mod =
+					tool === "inspector"
+						? await import("sidebarApps/inspector")
+						: await import("sidebarApps/scrape");
+				if (tool === "inspector") await mod.openInspectorWith(url);
+				else await mod.openScraperWith(url, "rendered");
+			}
+		} catch (error) {
+			helpers.error(error);
+		}
+	}
 
 	// Process all pending intents
 	while (pendingIntents.length > 0) {

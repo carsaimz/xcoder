@@ -681,6 +681,18 @@ function renderAnalysis() {
 	}
 }
 
+/**
+ * Opens the scraper at `url` — used by the native preview screen's
+ * "Scrape" menu and by intents (xcoder_tool extras).
+ * @param {string} url
+ * @param {"raw"|"rendered"} [mode]
+ */
+export async function openScraperWith(url, mode = "raw") {
+	if (!$url) return;
+	$url.value = url;
+	await fetchSource(mode);
+}
+
 export default [
 	"cod:cloud-download",
 	"scrapeApp",

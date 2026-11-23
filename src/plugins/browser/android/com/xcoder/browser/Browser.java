@@ -241,6 +241,12 @@ public class Browser extends LinearLayout {
     menu.addItem(Ui.Icons.REFRESH, "Clear Default");
     menu.setVisible("Set as Default", false);
     menu.setVisible("Clear Default", false);
+    if (!onlyConsole) {
+      // DevTools-grade follow-ups on the previewed page: they hand the URL
+      // to the editor's Inspector / Scraper sidebar tools.
+      menu.addItem(Ui.Icons.CODE, "Inspect");
+      menu.addItem(Ui.Icons.GLOBE, "Scrape");
+    }
     menu.addItem(Ui.Icons.OPEN_IN_BROWSER, "Open in Browser");
     menu.addItem(Ui.Icons.EXIT, "Exit");
 
@@ -316,6 +322,12 @@ public class Browser extends LinearLayout {
                 .setCacheMode(
                   checked ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_DEFAULT
                 );
+              break;
+            case "Inspect":
+              sendToApp("inspector");
+              break;
+            case "Scrape":
+              sendToApp("scrape");
               break;
             case "Open in Browser":
               Intent browserIntent = new Intent(
@@ -462,6 +474,24 @@ public class Browser extends LinearLayout {
     if (reload) {
       webView.reload();
     }
+  }
+
+  /**
+   * Hands the previewed URL to the editor's Inspector/Scraper tool: brings
+   * MainActivity forward with extras; the JS intent handler opens the tool
+   * with the address preloaded. The preview stays in the back stack.
+   */
+  private void sendToApp(String tool) {
+    Intent launch = context
+      .getPackageManager()
+      .getLaunchIntentForPackage(context.getPackageName());
+    if (launch == null) return;
+    launch.addFlags(
+      Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
+    );
+    launch.putExtra("xcoder_tool", tool);
+    launch.putExtra("xcoder_url", url);
+    context.startActivity(launch);
   }
 
   public void setDesktopMode() {

@@ -930,6 +930,17 @@ function onSelected() {
 	}
 }
 
+/**
+ * Opens the inspector at `url` — used by the native preview screen's
+ * "Inspect" menu and by intents (xcoder_tool extras).
+ * @param {string} url
+ */
+export async function openInspectorWith(url) {
+	if (!$url) return;
+	$url.value = url;
+	await go();
+}
+
 export default [
 	"cod:inspect",
 	"inspectorApp",
