@@ -47,6 +47,9 @@ extend-exclude = [
     "src/res/plugin-registry.json",
     # --- catalogo CDN de bibliotecas (descricoes pt+en geradas) ---
     "src/lib/catalogLibs.js",
+    # --- vscode-icons gerado (ids/keys de icones upstream legitimas:
+    #     paket, cmo, wll, abl...) ---
+    "src/lib/fileIconsVscodeData.ts",
     # --- bibliotecas web de terceiros (minificadas / unicode-ranges) ---
     "src/res/libs",
     # --- conteúdo primário em pt-br (o typos não sabe português; v1.4.19+) ---
