@@ -100,6 +100,16 @@ export default function PluginsInclude(updates) {
 		},
 		"attribute:author": { type: "author", baseLabel: authorLabel },
 		"attribute:keywords": { type: "keywords", baseLabel: keywordsLabel },
+		"source:xcoder": {
+			type: "source",
+			value: "xcoder",
+			baseLabel: strings["x plugins"] || "XCoder plugins",
+		},
+		"source:acode": {
+			type: "source",
+			value: "acode",
+			baseLabel: strings["acode plugins"] || "Acode plugins",
+		},
 	};
 
 	async function applyFilter(filterState) {
@@ -164,6 +174,8 @@ export default function PluginsInclude(updates) {
 			[verifiedLabel, "attribute:verified"],
 			[authorLabel, "attribute:author"],
 			[keywordsLabel, "attribute:keywords"],
+			[strings["x plugins"] || "XCoder plugins", "source:xcoder"],
+			[strings["acode plugins"] || "Acode plugins", "source:acode"],
 		],
 		async onselect(action) {
 			const option = filterOptions[action];
@@ -473,6 +485,10 @@ export default function PluginsInclude(updates) {
 						pluginKeyword.includes(keyword),
 					),
 				);
+			}
+			case "source": {
+				const sourceVendor = plugin.vendor || "xcoder";
+				return sourceVendor === filterState.value;
 			}
 			default:
 				return true;

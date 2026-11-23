@@ -7,9 +7,11 @@ import loader from "dialogs/loader";
 import { reopenWithNewEncoding } from "palettes/changeEncoding";
 import { decode, detectEncoding } from "utils/encodings";
 import helpers from "utils/helpers";
+import Url from "utils/Url";
 import EditorFile from "./editorFile";
 import { promoteSessionPersistence } from "./fileSessionPersistence";
 import fileTypeHandler from "./fileTypeHandler";
+import { isPluginArchiveFile } from "./pluginFiles";
 import recents from "./recents";
 import appSettings from "./settings";
 
@@ -36,6 +38,14 @@ export default async function openFile(file, options = {}) {
 	try {
 		let uri = typeof file === "string" ? file : file.uri;
 		if (!uri) return;
+
+		// Plugin packages (.xcoder, .acode, ...) are installable archives,
+		// not editable documents — offer installation instead of opening
+		// binary garbage in the editor.
+		if (isPluginArchiveFile(uri)) {
+			const handled = await installPluginPackage(uri);
+			if (handled) return;
+		}
 
 		/**@type {EditorFile} */
 		const existingFile = editorManager.getFile(uri, "uri");
@@ -458,6 +468,27 @@ export default async function openFile(file, options = {}) {
 	} finally {
 		loader.removeTitleLoader();
 	}
+}
+
+/**
+ * Offers installation when a plugin package file is opened.
+ * @param {string} uri package url
+ * @returns {Promise<boolean>} true when the open request was consumed
+ */
+async function installPluginPackage(uri) {
+	try {
+		const confirmation = await confirm(
+			strings.install || "Install",
+			"Do you want to install this plugin package in XCoder?",
+		);
+		if (!confirmation) return true; // declined — never open it as text
+		const { default: installPlugin } = await import("lib/installPlugin");
+		await installPlugin(uri, Url.basename(uri));
+		window.toast?.(strings["success"] || "Plugin installed", 3000);
+	} catch (error) {
+		helpers.error(error);
+	}
+	return true;
 }
 
 /**

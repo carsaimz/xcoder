@@ -7,6 +7,41 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.30] - 2026-11-23
+
+### Plugins — ponte com o marketplace do Acode
+
+- **XCoder agora lista, instala e executa plugins do Acode** — o
+  marketplace do app passou a mesclar o registro nativo com a loja
+  oficial do Acode (`acode.app/api`): 350 pacotes aparecem na mesma
+  lista, com badge «Acode» nos itens, novo filtro por fonte
+  (XCoder / Acode), busca e paginação unificadas. O download vai direto
+  ao endpoint oficial (`/api/plugin/download/<id>`) — sem servidor
+  intermediário. Plugins pagos (IAP do Acode) e pacotes feitos para
+  outro núcleo de editor são ocultados automaticamente.
+- **Compatibilidade de runtime (ponte `window.acode`)** — o XCoder expõe
+  a mesma API sob o global que os plugins do Acode esperam:
+  `acode.require()`, `acode.setPluginInit/setPluginUnmount`,
+  `acode.execCommand`, formatters, temas do editor, terminal e demais
+  módulos funcionam idênticos. Plugins `.acode` rodam sem modificação ao
+  lado dos `.xcoder`, inclusive quando um plugin do Acode pede
+  dependências (`acode.installPlugin` resolve na lista mesclada).
+- **Suporte simultâneo a .xcoder e .acode** — arquivos `.xcoder`,
+  `.xcoder-plugin`, `.acode` e `.acode-plugin` são instaláveis pelo
+  navegador de arquivos (tocar oferece instalar; o menu de ações ganha
+  «Instalar como plugin»), por URL no «Adicionar origem» e por deep
+  link: o app agora responde também a `acode://plugin/install/<id>`
+  (além do `xcoder://`), aceitando os ids com underscore do ecossistema
+  Acode.
+- **Página de detalhes como na loja do Acode** — para plugins da ponte,
+  o app busca o readme markdown, changelogs, contribuidores e metadados
+  direto da loja (com cache), então a descrição fica completa como no
+  Acode. A verificação de `min_version_code` é mantida.
+- **Instalador mais robusto** — manifests legados sem `id` recebem um id
+  estável derivado do nome/ficheiro; o download de plugins ganhou
+  fallback `fetch` para desktop/webviews sem o plugin HTTP nativo.
+
+
 ## [1.8.29] - 2026-11-14
 
 ### Git — clone que funciona de verdade
@@ -2248,6 +2283,41 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.30] - 2026-11-23
+
+### Plugins — bridge with the Acode marketplace
+
+- **XCoder now lists, installs and runs Acode plugins** — the in-app
+  marketplace merges the native registry with the official Acode store
+  (`acode.app/api`): 350 packages show up in the same list, with an
+  "Acode" badge, a new source filter (XCoder / Acode), unified search and
+  pagination. Downloads go straight to the official endpoint
+  (`/api/plugin/download/<id>`) — no middleman server. Paid plugins
+  (Acode IAP) and packages built for another editor core are hidden
+  automatically.
+- **Runtime compatibility (`window.acode` bridge)** — XCoder exposes the
+  same API under the global Acode plugins expect: `acode.require()`,
+  `acode.setPluginInit/setPluginUnmount`, `acode.execCommand`,
+  formatters, editor themes, terminal and every other module behave
+  identically. `.acode` plugins run unmodified next to `.xcoder` ones —
+  including when an Acode plugin requests dependencies
+  (`acode.installPlugin` resolves through the merged registry).
+- **Simultaneous .xcoder and .acode support** — `.xcoder`,
+  `.xcoder-plugin`, `.acode` and `.acode-plugin` files are installable
+  from the file browser (tapping offers installation; the actions menu
+  gains "Install as plugin"), from any URL via "Add source", and through
+  deep links: the app now also answers `acode://plugin/install/<id>`
+  (besides `xcoder://`), accepting the underscore-style ids of the Acode
+  ecosystem.
+- **Plugin details like the Acode store** — for bridged plugins the app
+  fetches the markdown readme, changelogs, contributors and metadata
+  from the store (cached), so descriptions render complete exactly like
+  in Acode. The `min_version_code` guard is preserved.
+- **Hardened installer** — legacy manifests without an `id` get a stable
+  one derived from name/file name; plugin downloads gained a `fetch`
+  fallback for desktop builds/webviews without the native HTTP plugin.
+
 
 ## 🇺🇸 English
 

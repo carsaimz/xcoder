@@ -35,6 +35,7 @@ import intentHandler, { processPendingIntents } from "handlers/intent";
 import keyboardHandler, { keydownState } from "handlers/keyboard";
 import quickToolsInit from "handlers/quickToolsInit";
 import windowResize from "handlers/windowResize";
+import { ensureAcodeCompat } from "lib/acodeCompat";
 import actionStack from "lib/actionStack";
 import ajax from "lib/ajax";
 import applySettings from "lib/applySettings";
@@ -221,6 +222,9 @@ async function onDeviceReady() {
 		return true;
 	})();
 	window.xcoder = xcoder;
+	// Expose the same API under the Acode global so plugins built for the
+	// Acode store run unmodified (lib/acodeCompat.js).
+	ensureAcodeCompat(xcoder);
 	initDesktopMenu();
 	ensureAceCompatApi();
 

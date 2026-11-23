@@ -311,4 +311,19 @@
       box-shadow: 0 2px 8px color-mix(in srgb, var(--button-background-color), transparent 55%);
     }
   }
+
+  .plugin-vendor {
+    font-size: 0.62rem;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--link-text-color);
+    background: var(--primary-color);
+    padding: 0.25rem 0.4rem;
+    border-radius: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 0.25rem;
+  }
 }

@@ -6,6 +6,7 @@ import pluginIcon from "./plugin-icon.png";
  * @param {object} param0
  * @param {string} [param0.id]
  * @param {string} [param0.name]
+ * @param {string} [param0.vendor] marketplace the plugin came from
  * @param {string} [param0.icon]
  * @param {string} [param0.version]
  * @param {number} [param0.downloads]
@@ -22,6 +23,7 @@ export default function Item({
 	version,
 	license,
 	author,
+	vendor,
 	price,
 	currencySymbol,
 	author_verified,
@@ -61,6 +63,13 @@ export default function Item({
 								{name}
 							</span>
 							<span className="plugin-version">v{version}</span>
+							{vendor === "acode" ? (
+								<span className="plugin-vendor" title="Acode plugin">
+									Acode
+								</span>
+							) : (
+								""
+							)}
 						</div>
 						<div className="plugin-meta">
 							<div

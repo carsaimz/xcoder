@@ -10,6 +10,7 @@ import { isVersionGreater } from "utils/version";
 import config from "./config";
 import InstallState from "./installState";
 import { loadPluginWithTimeout } from "./loadPlugins";
+import { adaptPluginManifest } from "./pluginFiles";
 
 /** @type {import("dialogs/loader").Loader} */
 let loaderDialog;
@@ -94,6 +95,12 @@ export default async function installPlugin(
 			const pluginJson = JSON.parse(
 				await zip.files["plugin.json"].async("text"),
 			);
+
+			// Normalize the manifest for both package families (.xcoder and
+			// .acode): guarantees a stable id (legacy Acode zips may omit it)
+			// and keeps the rest of the manifest untouched.
+			const adapted = adaptPluginManifest(pluginJson, pluginUrl);
+			pluginJson.id = adapted.id;
 
 			/** patch main in manifest */
 			if (!zip.files[pluginJson.main]) {
@@ -416,7 +423,9 @@ function downloadPlugin(url, loaderDialog) {
 			);
 		});
 	}
-	// cordova http plugin for others
+	// cordova http plugin for others (native transport, no CORS limits),
+	// with a plain fetch fallback for environments without the plugin
+	// (desktop builds, stripped webviews).
 	return new Promise((resolve, reject) => {
 		cordova.plugin.http.sendRequest(
 			url,
@@ -432,6 +441,14 @@ function downloadPlugin(url, loaderDialog) {
 				reject(error);
 			},
 		);
+	}).catch((error) => {
+		if (typeof fetch !== "function") throw error;
+		return fetch(url).then((response) => {
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}`);
+			}
+			return response.arrayBuffer();
+		});
 	});
 }
 

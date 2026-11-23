@@ -12,6 +12,7 @@ import select from "dialogs/select";
 import escapeStringRegexp from "escape-string-regexp";
 import fileIcons from "lib/fileIcons";
 import * as fileSelection from "lib/fileSelection";
+import { isPluginArchiveFile } from "lib/pluginFiles";
 import copyEntry from "utils/copyEntry";
 import helpers from "utils/helpers";
 import Path from "utils/Path";
@@ -366,7 +367,10 @@ async function handleContextmenu(type, url, name, $target) {
 
 	if (helpers.isFile(type)) {
 		options = [SELECT, COPY, CUT, COPY_RELATIVE_PATH, RENAME, REMOVE];
-		if (
+		if (isPluginArchiveFile(url)) {
+			// .xcoder/.acode packages: the manifest lives inside the archive.
+			options.push(INSTALL_PLUGIN);
+		} else if (
 			url.toLowerCase().endsWith(".zip") &&
 			(await fsOperation(
 				Url.dirname(url) + XCODER_PLUGIN_MANIFEST_FILE,
@@ -585,13 +589,18 @@ function execOperation(type, action, url, $target, name) {
 
 	async function installPlugin() {
 		try {
-			const manifest = JSON.parse(
-				await fsOperation(
-					Url.dirname(url) + XCODER_PLUGIN_MANIFEST_FILE,
-				).readFile("utf8"),
-			);
+			let pluginName = name;
+			if (!isPluginArchiveFile(url)) {
+				// Generic zip: the manifest sits next to the archive.
+				const manifest = JSON.parse(
+					await fsOperation(
+						Url.dirname(url) + XCODER_PLUGIN_MANIFEST_FILE,
+					).readFile("utf8"),
+				);
+				pluginName = manifest.name || pluginName;
+			}
 			const { default: installPlugin } = await import("lib/installPlugin");
-			await installPlugin(url, manifest.name);
+			await installPlugin(url, pluginName);
 			toast(strings["success"], 3000);
 		} catch (error) {
 			helpers.error(error);

@@ -29,8 +29,10 @@ export default async function HandleIntent(intent) {
 			intent.extras?.["android.intent.extra.STREAM"];
 		if (!url) return;
 
-		if (url.startsWith("xcoder://")) {
-			const path = url.replace("xcoder://", "").split("#")[0];
+		if (url.startsWith("xcoder://") || url.startsWith("acode://")) {
+			// Both schemes share the same URL grammar: xcoder:// (native) and
+			// acode:// (compatibility with links made for the Acode editor).
+			const path = url.replace(/^(xcoder|acode):\/\//, "").split("#")[0];
 			const [module, action, value] = path.split("/");
 
 			let defaultPrevented = false;
@@ -48,7 +50,7 @@ export default async function HandleIntent(intent) {
 			if (module === "plugin" && action === "install") {
 				const { default: Plugin } = await import("pages/plugin");
 
-				if (!value || !/^([a-z0-9\.]+)$/.test(value)) {
+				if (!value || !/^([a-z0-9._-]+)$/i.test(value)) {
 					return;
 				}
 

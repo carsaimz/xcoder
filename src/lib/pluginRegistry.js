@@ -1,12 +1,17 @@
 import { backendConfig, ensureBackendConfig } from "lib/backend";
 import settings from "lib/settings";
 import registryJson from "res/plugin-registry.json";
+import config from "./config";
 
 /**
  * Xcoder plugin marketplace.
  *
- * The marketplace is backed by the `carsaimz/xcoder-plugins` repository.
- * The plugin list is fetched from the remote registry (jsDelivr CDN with a
+ * The list merges three sources: the XCoder registry
+ * (`carsaimz/xcoder-plugins` repository + bundled fallback), an optional
+ * custom registry URL, and the official Acode plugin store
+ * (`https://acode.app/api`) — the bridge that lets plugins published for
+ * the Acode editor show up, install and run in XCoder. The XCoder
+ * registry is fetched from the remote registry (jsDelivr CDN with a
  * raw.githubusercontent.com fallback), cached locally so the marketplace
  * keeps working offline, and merged with the bundled fallback registry
  * (`src/res/plugin-registry.json`). A custom marketplace URL can be set in
@@ -29,11 +34,23 @@ const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 const CUSTOM_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 const FETCH_TIMEOUT = 10 * 1000;
 
+// --- Acode plugin store bridge (https://acode.app) ---
+const ACODE_API_BASE = "https://acode.app/api";
+const ACODE_CACHE_KEY = "xcoder.pluginRegistry.acodeCache";
+const ACODE_DETAIL_CACHE_KEY = "xcoder.pluginRegistry.acodeDetail";
+const ACODE_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+const ACODE_DETAIL_TTL = 30 * 60 * 1000; // 30 minutes
+const ACODE_PAGE_SIZE = 50;
+const ACODE_MAX_PAGES = 30; // hard cap: 1500 store plugins
+
 /** @type {Array<object>|null} remote registry entries (cached/fetched) */
 let remotePlugins = null;
 /** @type {Array<object>|null} custom registry entries */
 let customPlugins = null;
+/** @type {Array<object>|null} Acode store entries (mapped) */
+let acodePlugins = null;
 let revalidating = false;
+let acodeRevalidating = false;
 let customUrlInFlight = null;
 
 function normalizeEntry(entry) {
@@ -152,6 +169,184 @@ function revalidate() {
 		});
 }
 
+/**
+ * Parses the keywords field of an Acode store item (a JSON string).
+ * @param {string|string[]|null} raw raw keywords value
+ * @returns {string[]}
+ */
+export function parsePluginKeywords(raw) {
+	if (Array.isArray(raw)) return raw.filter(Boolean);
+	if (typeof raw !== "string") return [];
+	const trimmed = raw.trim();
+	if (!trimmed) return [];
+	try {
+		const parsed = JSON.parse(trimmed);
+		if (Array.isArray(parsed)) return parsed.filter(Boolean);
+	} catch (error) {
+		// Not JSON — treat as a plain comma separated list.
+	}
+	return trimmed
+		.split(",")
+		.map((keyword) => keyword.trim())
+		.filter(Boolean);
+}
+
+/**
+ * Maps an Acode store item into the XCoder registry entry shape.
+ *
+ * Download URLs point at the official store endpoint
+ * (`/api/plugin/download/<id>`) — the same one the Acode editor uses.
+ * Paid plugins (Acode in-app purchases) and packages built for another
+ * editor core are filtered out.
+ * @param {object} item Acode store item
+ * @returns {object|null} registry entry marked with vendor "acode"
+ */
+export function mapAcodePlugin(item) {
+	if (!item || !item.id || !item.name) return null;
+	const editor = item.supported_editor;
+	if (editor && editor !== config.SUPPORTED_EDITOR && editor !== "all") {
+		return null;
+	}
+	if (Number(item.price) > 0) return null;
+	const id = String(item.id);
+	const source = `${ACODE_API_BASE}/plugin/download/${encodeURIComponent(id)}`;
+	return normalizeEntry({
+		id,
+		name: String(item.name),
+		version: item.version || "0.0.0",
+		icon: item.icon,
+		author: typeof item.author === "string" ? item.author : item.author?.name,
+		author_github: item.author_github,
+		author_email: item.author_email,
+		author_verified: Boolean(item.author_verified),
+		downloads: item.downloads,
+		license: item.license,
+		keywords: parsePluginKeywords(item.keywords),
+		repository: item.repository,
+		supported_editor: editor || config.SUPPORTED_EDITOR,
+		min_version_code: item.min_version_code ?? item.minVersionCode,
+		description: typeof item.description === "string" ? item.description : "",
+		source,
+		vendor: "acode",
+	});
+}
+
+/**
+ * Fetches every page of the Acode store catalog.
+ * @returns {Promise<Array<object>>} raw store items
+ */
+async function fetchAllAcodePlugins() {
+	const items = [];
+	for (let page = 1; page <= ACODE_MAX_PAGES; page++) {
+		const data = await httpGetJson(
+			`${ACODE_API_BASE}/plugins?page=${page}&limit=${ACODE_PAGE_SIZE}&supported_editor=${config.SUPPORTED_EDITOR}`,
+		);
+		const batch = Array.isArray(data)
+			? data
+			: Array.isArray(data?.plugins)
+				? data.plugins
+				: [];
+		items.push(...batch);
+		if (batch.length < ACODE_PAGE_SIZE) break;
+	}
+	return items;
+}
+
+/**
+ * Guarantees that every Acode entry carries a download source — caches
+ * written by older app versions may lack the field.
+ * @param {object} entry registry entry
+ * @returns {object} entry with a guaranteed source url
+ */
+function withAcodeSource(entry) {
+	if (!entry || entry.vendor !== "acode" || entry.source) return entry;
+	return {
+		...entry,
+		source: `${ACODE_API_BASE}/plugin/download/${encodeURIComponent(entry.id)}`,
+	};
+}
+
+function revalidateAcode() {
+	if (acodeRevalidating) return;
+	acodeRevalidating = true;
+	fetchAllAcodePlugins()
+		.then((items) => {
+			acodePlugins = items
+				.map(mapAcodePlugin)
+				.filter(Boolean)
+				.map(withAcodeSource);
+			writeCache(ACODE_CACHE_KEY, acodePlugins);
+			document.dispatchEvent(new CustomEvent("pluginregistryupdate"));
+		})
+		.catch((error) => {
+			console.warn("Acode plugin store refresh failed:", error?.message);
+		})
+		.finally(() => {
+			acodeRevalidating = false;
+		});
+}
+
+function ensureAcode() {
+	if (acodePlugins) return;
+	const cache = readCache(ACODE_CACHE_KEY, ACODE_CACHE_TTL);
+	if (cache) {
+		acodePlugins = cache.plugins
+			.map(normalizeEntry)
+			.filter(Boolean)
+			.map(withAcodeSource);
+		if (cache.expired) revalidateAcode();
+		return;
+	}
+	revalidateAcode();
+}
+
+/**
+ * Enriches an Acode entry with the store detail payload (readme markdown,
+ * changelogs, contributors...) so the plugin page renders like in Acode.
+ * @param {object} entry mapped Acode registry entry
+ * @returns {Promise<object>} enriched entry
+ */
+async function enrichAcodeEntry(entry) {
+	const downloadSource =
+		entry.source ||
+		`${ACODE_API_BASE}/plugin/download/${encodeURIComponent(entry.id)}`;
+	const cacheKey = `${ACODE_DETAIL_CACHE_KEY}:${entry.id}`;
+	const cache = readCache(cacheKey, ACODE_DETAIL_TTL);
+	let detail = cache ? cache.plugins?.[0] : null;
+	if (!detail) {
+		try {
+			detail = await httpGetJson(
+				`${ACODE_API_BASE}/plugin/${encodeURIComponent(entry.id)}`,
+			);
+			if (!detail || detail.id !== entry.id) detail = null;
+			if (detail) writeCache(cacheKey, [detail]);
+		} catch (error) {
+			console.warn(`Acode plugin detail failed (${entry.id}):`, error?.message);
+			detail = null;
+		}
+	}
+	if (!detail) {
+		return { ...entry, source: downloadSource };
+	}
+	const keywords = parsePluginKeywords(detail.keywords);
+	return normalizeEntry({
+		...entry,
+		version: detail.version || entry.version,
+		description: detail.description || entry.description,
+		changelogs: detail.changelogs || entry.changelogs,
+		contributors: detail.contributors || entry.contributors,
+		repository: detail.repository || entry.repository,
+		keywords: keywords.length ? keywords : entry.keywords,
+		author_github: detail.author_github || entry.author_github,
+		author_email: detail.author_email || entry.author_email,
+		min_version_code: detail.min_version_code ?? entry.min_version_code,
+		supported_editor: detail.supported_editor || entry.supported_editor,
+		downloads: detail.downloads ?? entry.downloads,
+		source: downloadSource,
+		vendor: "acode",
+	});
+}
+
 function customRegistryUrl() {
 	try {
 		const url = String(settings.value?.marketplaceUrl || "").trim();
@@ -209,6 +404,7 @@ function mergeLists() {
 		...(customPlugins || []),
 		...(remotePlugins || []),
 		...bundledPlugins(),
+		...(acodePlugins || []),
 	]) {
 		const normalized = normalizeEntry(entry);
 		if (!normalized || seen.has(normalized.id)) continue;
@@ -244,6 +440,7 @@ function ensureRemote() {
 function allPlugins() {
 	loadCustomRegistry();
 	ensureRemote();
+	ensureAcode();
 	return mergeLists();
 }
 
@@ -261,7 +458,12 @@ export default {
 	 */
 	async get(id) {
 		if (!id) return null;
-		return allPlugins().find((plugin) => plugin.id === id) || null;
+		const entry = allPlugins().find((plugin) => plugin.id === id) || null;
+		if (!entry) return null;
+		if (entry.vendor === "acode") {
+			return enrichAcodeEntry(entry);
+		}
+		return entry;
 	},
 
 	/**
