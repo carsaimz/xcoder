@@ -420,6 +420,19 @@ function Icon({ icon, id, title }) {
 	// rail icons are glyph-only: the name appears when the option is
 	// pressed (panel title bar) or on long-press (tooltip), never beside
 	// the glyph
+	// Codicon pack (VS Code): icons registered as "cod:<name>" render with
+	// the bundled codicon font (styles/codicons.scss) — the chrome matches
+	// VS Code's activity bar exactly.
+	if (icon?.startsWith("cod:")) {
+		return (
+			<span
+				data-action="sidebar-app"
+				data-id={id}
+				title={title}
+				className={`icon codicon-${icon.slice(4)}`}
+			/>
+		);
+	}
 	// SVG icon pack (Lucide): icons registered as "svg:<name>" render as inline
 	// vectors — tier 1 of the hybrid icon convention (docs/ICONS.md).
 	if (icon?.startsWith("svg:")) {

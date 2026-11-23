@@ -1031,6 +1031,48 @@ class FileIconRegistry {
 		return false;
 	}
 
+	/**
+	 * Single shared stylesheet holding the ACTIVE theme's icon rules.
+	 * Editor tabs live in shadow roots that adopt document stylesheets
+	 * (see editorFile.js) — a shared CSSStyleSheet registered in
+	 * `document.adoptedStyleSheets` propagates there automatically and
+	 * updates in place on every theme switch (replaceSync).
+	 */
+	#themeSheet: CSSStyleSheet | null = null;
+
+	#ensureThemeSheet(): CSSStyleSheet | null {
+		if (this.#themeSheet) return this.#themeSheet;
+		if (typeof CSSStyleSheet === "undefined") return null;
+		const doc = getDocument();
+		if (!doc || !Array.isArray(doc.adoptedStyleSheets)) return null;
+		try {
+			const sheet = new CSSStyleSheet();
+			doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, sheet];
+			this.#themeSheet = sheet;
+			return sheet;
+		} catch {
+			return null;
+		}
+	}
+
+	/** The active theme's icon CSS — used by tab shadow roots on creation. */
+	getThemeCSSText(): string {
+		const compiled = this.#compiled.get(this.#activeId);
+		if (!compiled) return "";
+		const rules: string[] = [];
+		for (const [iconId, def] of compiled.icons) {
+			if (def.src)
+				rules.push(
+					cssForSrc(
+						assetClassName(compiled.id, iconId),
+						def.src,
+						!!def.monochrome,
+					),
+				);
+		}
+		return rules.join("\n");
+	}
+
 	#applyThemeStyles(compiled: CompiledTheme): void {
 		const doc = getDocument();
 		if (!doc) return;
@@ -1047,6 +1089,19 @@ class FileIconRegistry {
 				);
 		}
 
+		const text = rules.join("\n");
+
+		// primary: shared adopted stylesheet (propagates to shadow roots)
+		const sheet = this.#ensureThemeSheet();
+		if (sheet) {
+			try {
+				sheet.replaceSync(text);
+			} catch {
+				/* fall through to the head <style> */
+			}
+		}
+
+		// fallback / belt-and-braces: plain <style> in the head
 		let style = doc.head.querySelector(
 			`style[data-file-icon="${compiled.id}"]`,
 		);
@@ -1059,7 +1114,7 @@ class FileIconRegistry {
 			style.setAttribute("data-file-icon", compiled.id);
 			doc.head.appendChild(style);
 		}
-		style.textContent = rules.join("\n");
+		style.textContent = text;
 	}
 
 	#removeThemeStyles(id: string): void {

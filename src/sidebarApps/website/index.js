@@ -215,7 +215,7 @@ function onSelected() {
 }
 
 export default [
-	"svg:globe",
+	"cod:globe",
 	"websiteApp",
 	strings["website"] || "Website",
 	initApp,

@@ -7,7 +7,7 @@ import settings from "lib/settings";
 let container;
 
 export default [
-	"svg:files", // icon
+	"cod:files", // icon (VS Code explorer)
 	"files", // id
 	strings["files"], // title
 	initApp, // init function

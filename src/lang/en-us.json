@@ -1745,5 +1745,7 @@
 	"git actions": "Git actions",
 	"git no commits real": "No commits yet.",
 	"git settings hint": "Repository, remote and branch are configured in the Git panel",
-	"settings-info-git-panel": "Open the Git sidebar app to pick the repository, set the remote and publish — all in one place, like VS Code."
+	"settings-info-git-panel": "Open the Git sidebar app to pick the repository, set the remote and publish — all in one place, like VS Code.",
+	"credits vscode icons": "VS Code icons",
+	"credits vscode icons desc": "File icons (vscode-icons) and UI codicons — MIT"
 }

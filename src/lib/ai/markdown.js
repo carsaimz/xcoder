@@ -1,3 +1,4 @@
+import toast from "components/toast";
 import DOMPurify from "dompurify";
 import markdownIt from "markdown-it";
 import markdownItTaskLists from "markdown-it-task-lists";
@@ -100,6 +101,37 @@ export async function highlightMarkdownCode(root) {
 }
 
 /**
+ * Copies text to the clipboard (Cordova plugin first, web API fallback).
+ * Mirrors the chat helper so code-block copy buttons work everywhere.
+ * @param {string} text
+ * @returns {Promise<boolean>}
+ */
+async function writeClipboard(text) {
+	try {
+		if (cordova?.plugins?.clipboard) {
+			cordova.plugins.clipboard.copy(text);
+			return true;
+		}
+	} catch {
+		/* fall through to the web APIs */
+	}
+	try {
+		await navigator.clipboard.writeText(text);
+		return true;
+	} catch {
+		const $ta = document.createElement("textarea");
+		$ta.value = text;
+		$ta.style.position = "fixed";
+		$ta.style.opacity = "0";
+		document.body.append($ta);
+		$ta.select();
+		const ok = document.execCommand("copy");
+		$ta.remove();
+		return ok;
+	}
+}
+
+/**
  * Renders model text into a styled element (markdown), wiring:
  *  - external links → system browser
  *  - async code highlighting (editor theme)
@@ -131,7 +163,7 @@ export function renderMarkdownElement(text) {
 		$wrap.append($table);
 	}
 
-	// code blocks: class + language tag + tap hint
+	// code blocks: VS Code-style frame with language header + copy button
 	for (const $pre of $el.querySelectorAll("pre")) {
 		let lang = "";
 		const $code = $pre.querySelector("code");
@@ -143,8 +175,36 @@ export function renderMarkdownElement(text) {
 				}
 			}
 		}
-		$pre.classList.add("ai-md-code", "tappable");
+		$pre.classList.add("ai-md-code");
 		$pre.dataset.lang = lang;
+
+		// VS Code chat style: bordered frame, header bar with the language
+		// label and a copy button; the body keeps tap-for-code-actions.
+		const $frame = <div className="ai-md-code-frame" />;
+		const $head = (
+			<div className="ai-md-code-head">
+				<span className="ai-md-code-lang">{lang || "code"}</span>
+				<button
+					className="ai-md-code-copy"
+					type="button"
+					title={strings.copy || "Copy"}
+					onclick={async () => {
+						const ok = await writeClipboard($pre.textContent || "");
+						toast(
+							ok
+								? strings.copied || "Copiado \u2713"
+								: strings["copy failed"] || "N\u00e3o foi poss\u00edvel copiar",
+							1500,
+						);
+					}}
+				>
+					<span className="icon codicon-copy" />
+				</button>
+			</div>
+		);
+		$pre.parentNode.insertBefore($frame, $pre);
+		$frame.append($head, $pre);
+
 		$pre.title = strings["ai code actions"] || "Tap for code actions";
 		$pre.dataset.hint = strings["ai tap hint"] || "tap for actions";
 		$pre.addEventListener("click", () => {

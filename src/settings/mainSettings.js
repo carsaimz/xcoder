@@ -46,7 +46,7 @@ export default function mainSettings() {
 		{
 			key: "app-settings",
 			text: strings["app settings"],
-			icon: "svg:sliders-horizontal",
+			icon: "cod:settings-gear",
 			info: strings["settings-info-main-app-settings"],
 			category: categories.core,
 			chevron: true,
@@ -54,7 +54,7 @@ export default function mainSettings() {
 		{
 			key: "editor-settings",
 			text: strings["editor settings"],
-			icon: "svg:file-code",
+			icon: "cod:file-code",
 			info: strings["settings-info-main-editor-settings"],
 			category: categories.core,
 			chevron: true,
@@ -62,7 +62,7 @@ export default function mainSettings() {
 		{
 			key: "terminal-settings",
 			text: `${strings["terminal settings"]}`,
-			icon: "svg:square-terminal",
+			icon: "cod:terminal",
 			info: strings["settings-info-main-terminal-settings"],
 			category: categories.core,
 			chevron: true,
@@ -70,7 +70,7 @@ export default function mainSettings() {
 		{
 			key: "preview-settings",
 			text: strings["preview settings"],
-			icon: "svg:globe",
+			icon: "cod:globe",
 			info: strings["settings-info-main-preview-settings"],
 			category: categories.core,
 			chevron: true,
@@ -79,7 +79,7 @@ export default function mainSettings() {
 		{
 			key: "theme",
 			text: strings.theme,
-			icon: "svg:palette",
+			icon: "cod:paintcan",
 			info: strings["settings-info-main-theme"],
 			category: categories.appearance,
 			chevron: true,
@@ -87,7 +87,7 @@ export default function mainSettings() {
 		{
 			key: "font-settings",
 			text: strings["font manager"] || "Fontes",
-			icon: "svg:type",
+			icon: "cod:case-sensitive",
 			info:
 				strings["settings-info-main-fonts"] ||
 				"Instale fontes por URL e escolha a fonte do editor e do app.",
@@ -98,7 +98,7 @@ export default function mainSettings() {
 		{
 			key: "formatter",
 			text: strings.formatter,
-			icon: "svg:braces",
+			icon: "cod:json",
 			info: strings["settings-info-main-formatter"],
 			category: categories.code,
 			chevron: true,
@@ -109,7 +109,7 @@ export default function mainSettings() {
 				strings?.lsp_settings ||
 				strings["language servers"] ||
 				"Language servers",
-			icon: "svg:zap",
+			icon: "cod:sparkle",
 			info: strings["settings-info-main-lsp-settings"],
 			category: categories.code,
 			chevron: true,
@@ -117,7 +117,7 @@ export default function mainSettings() {
 		{
 			key: "ai-settings",
 			text: strings["ai settings"] || "AI assistant",
-			icon: "svg:bot",
+			icon: "cod:copilot",
 			info:
 				strings["settings-info-main-ai"] ||
 				"Configure AI providers and agent behavior.",
@@ -127,7 +127,7 @@ export default function mainSettings() {
 		{
 			key: "plugins",
 			text: strings["plugins"],
-			icon: "svg:puzzle",
+			icon: "cod:extensions",
 			info: strings["settings-info-main-plugins"],
 			category: categories.code,
 			chevron: true,
@@ -149,7 +149,7 @@ export default function mainSettings() {
 		{
 			key: "gh-settings",
 			text: strings["github settings"] || "GitHub",
-			icon: "svg:github",
+			icon: "cod:github",
 			info:
 				strings["settings-info-main-gh"] ||
 				"GitHub account, personal access token, repositories and branch.",
@@ -159,7 +159,7 @@ export default function mainSettings() {
 		{
 			key: "ssh-settings",
 			text: strings["ssh sessions"] || "Sessões SSH",
-			icon: "svg:server",
+			icon: "cod:server",
 			info:
 				strings["settings-info-main-ssh"] ||
 				"Sessões SSH salvas: abra um terminal remoto com um toque.",
@@ -170,7 +170,7 @@ export default function mainSettings() {
 		{
 			key: "editSettings",
 			text: `${strings["edit"]} settings.json`,
-			icon: "svg:file-cog",
+			icon: "cod:gear",
 			info: strings["settings-info-main-edit-settings"],
 			category: categories.maintenance,
 			chevron: true,
@@ -178,7 +178,7 @@ export default function mainSettings() {
 		{
 			key: "reset",
 			text: strings["restore default settings"],
-			icon: "svg:rotate-ccw",
+			icon: "cod:discard",
 			info: strings["settings-info-main-reset"],
 			category: categories.maintenance,
 			chevron: true,
@@ -189,7 +189,7 @@ export default function mainSettings() {
 			text: getPremiumStatus()?.active
 				? strings["support premium active"] || "Premium ativo ✓"
 				: strings["support the project"] || "Apoie o projeto",
-			icon: "svg:heart",
+			icon: "cod:star-full",
 			info:
 				strings["settings-info-support"] ||
 				"Doe para ativar o Premium: sem anúncios, temas exclusivos e agente IA ilimitado.",
@@ -199,7 +199,7 @@ export default function mainSettings() {
 		{
 			key: "about",
 			text: strings.about,
-			icon: "svg:info",
+			icon: "cod:info",
 			info: `Version ${BuildInfo.version}`,
 			category: categories.aboutXCoder,
 			chevron: true,
@@ -207,7 +207,7 @@ export default function mainSettings() {
 		{
 			key: "changeLog",
 			text: `${strings["changelog"]}`,
-			icon: "svg:history",
+			icon: "cod:history",
 			info: strings["settings-info-main-changelog"],
 			category: categories.aboutXCoder,
 			chevron: true,

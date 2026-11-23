@@ -2170,7 +2170,7 @@ function onSelected(el) {
 }
 
 export default [
-	"svg:palette",
+	"cod:tools",
 	"devtools",
 	strings["dev tools"] || "Dev Tools",
 	initApp,

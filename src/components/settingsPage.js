@@ -417,11 +417,15 @@ function createListItemElement(item, options, useInfoAsDescription, callback) {
 	const $tail = Ref();
 	const isCheckboxItem = isBooleanSetting(item);
 	const state = getItemDisplayState(item, useInfoAsDescription, options);
-	// "svg:<name>" renders a vector from the SVG icon pack (utils/svgIcons)
-	// instead of a glyph from the icon font — fallback to the font when the
-	// name is not registered.
+	// "cod:<name>" renders a VS Code codicon (styles/codicons.scss);
+	// "svg:<name>" renders a vector from the SVG icon pack
+	// (utils/svgIcons) — both fall back to the icon font otherwise.
+	const codName =
+		typeof item.icon === "string" && item.icon.startsWith("cod:")
+			? item.icon.slice(4)
+			: null;
 	const svgName =
-		typeof item.icon === "string" && item.icon.startsWith("svg:")
+		!codName && typeof item.icon === "string" && item.icon.startsWith("svg:")
 			? item.icon.slice(4)
 			: null;
 	const $svg = svgName ? svgIcon(svgName) : null;
@@ -437,9 +441,11 @@ function createListItemElement(item, options, useInfoAsDescription, callback) {
 				className={
 					item.fileIcon
 						? `icon ${fileIcons.icon(item.fileIcon)}`
-						: $svg
-							? "icon xc-svgicon"
-							: `icon ${item.icon || (item.image ? "" : "no-icon")}`
+						: codName
+							? `icon codicon-${codName}`
+							: $svg
+								? "icon xc-svgicon"
+								: `icon ${item.icon || (item.image ? "" : "no-icon")}`
 				}
 				data-file-icon-name={item.fileIcon?.name}
 				data-file-icon-kind={item.fileIcon?.kind}

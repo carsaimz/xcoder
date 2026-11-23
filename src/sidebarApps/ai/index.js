@@ -131,7 +131,7 @@ let cleanupOnHide = null;
  * @returns {Array} sidebar app descriptor
  */
 export default [
-	"svg:bot",
+	"cod:copilot",
 	"ai",
 	strings["ai assistant"] || "AI",
 	initApp,
@@ -1252,9 +1252,22 @@ function appendEvent(event, opts = {}) {
 	}
 
 	if (event.type === "error") {
+		// VS Code chat style: error bubble with an explicit retry action
+		// (long-press still offers Copy / Regenerate / Detail).
 		$messages.append(
 			<div className="ai-msg error">
 				<div className="ai-bubble">{event.payload}</div>
+				<button
+					className="ai-error-retry"
+					type="button"
+					onclick={(e) => {
+						const $row = e.target.closest(".ai-msg");
+						if ($row) regenerateMessage($row);
+					}}
+				>
+					<span className="icon codicon-debug-restart" />
+					{strings["ai act regenerate"] || "Regenerar"}
+				</button>
 			</div>,
 		);
 	}

@@ -18,11 +18,11 @@ describe("devtools sidebar app wiring", () => {
                         path.join(repoRoot, "src/sidebarApps/devtools/index.js"),
                         "utf-8",
                 );
-                expect(source).toContain('"svg:palette"');
+                expect(source).toContain('"cod:tools"');
                 expect(source).toContain('"devtools"');
                 expect(source).toContain(
-					'{ titleKey: "dev tools", group: "tools", floating: true }',
-				);
+                                        '{ titleKey: "dev tools", group: "tools", floating: true }',
+                                );
         });
 
         it("generators live in lib/webdevTools.js (not the Eruda devTools)", () => {

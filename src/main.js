@@ -4,6 +4,9 @@ import "html-tag-js/dist/polyfill";
 import "./main.scss";
 import "res/icons/style.css";
 import "res/file-icons/style.css";
+// Codicon skin (VS Code UI icons) — must load after the legacy icon font
+// so the `.icon.<name>` re-skin overrides win the cascade.
+import "styles/codicons.scss";
 import "styles/overrideAceStyle.scss";
 import "styles/wideScreen.scss";
 // Editor tabs use a shadow root that only links build/main.css.
@@ -46,6 +49,7 @@ import initDesktopMenu from "lib/desktopMenu";
 import EditorFile from "lib/editorFile";
 import EditorManager from "lib/editorManager";
 import fileIcons from "lib/fileIcons";
+import { createVscodeIconsTheme } from "lib/fileIconsVscode";
 import { initFileList } from "lib/fileList";
 import fonts from "lib/fonts";
 import { registerGhIntentHandler } from "lib/ghWebFlow";
@@ -298,6 +302,9 @@ async function onDeviceReady() {
 
 	xcoder.setLoadingMessage("Loading settings...");
 	await settings.init();
+	// Bundled VS Code icons file-icon pack: register before settings bind
+	// so the stored preference resolves on first sync (issue: About fix).
+	fileIcons.register(createVscodeIconsTheme());
 	fileIcons.bindSettings(settings);
 	fileIcons.syncFromSettings();
 	themes.init();

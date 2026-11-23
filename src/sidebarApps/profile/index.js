@@ -11,7 +11,7 @@ import logger from "lib/logger";
  * feel "dead" (reported: "Ícone de conta não funciona").
  */
 export default [
-	"svg:user", // icon
+	"cod:account", // icon
 	"profileApp", // id
 	strings.profile?.capitalize() || "Profile", // title
 	(/**@type {HTMLElement} */ el) => {

@@ -234,9 +234,9 @@ const system = createBuiltInTheme("System", "dark", "free");
 
 export function getSystemEditorTheme(darkTheme) {
 	if (darkTheme) {
-		return "one_dark";
+		return "vscodeDark";
 	} else {
-		return "noctisLilac";
+		return "vscodeLight";
 	}
 }
 

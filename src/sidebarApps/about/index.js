@@ -6,7 +6,7 @@ import Sidebar from "components/sidebar";
  * last sidebar section (same pattern as settingsApp).
  */
 export default [
-	"svg:info", // icon
+	"cod:info", // icon
 	"aboutApp", // id
 	strings.about?.capitalize() || "About", // title
 	(/**@type {HTMLElement} */ el) => {

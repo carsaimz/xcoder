@@ -91,7 +91,7 @@ let searchTimeout = null;
 let installedPlugins = [];
 
 export default [
-	"svg:puzzle", // icon
+	"cod:extensions", // icon
 	"extensions", // id
 	strings.plugins, // title
 	initApp, // init function

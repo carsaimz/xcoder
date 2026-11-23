@@ -8,6 +8,8 @@ declare type LangStrings = {
   "credits acode": string;
   "credits acode desc": string;
   "credits libraries": string;
+  "credits vscode icons": string;
+  "credits vscode icons desc": string;
   "credits contributors": string;
   "credits contributors desc": string;
   "credits community": string;

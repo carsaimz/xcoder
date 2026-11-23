@@ -87,7 +87,7 @@ let lastMode = "";
  * @returns {Array} sidebar app descriptor
  */
 export default [
-	"svg:git-branch",
+	"cod:source-control",
 	"git",
 	strings["git panel"] || "Git",
 	initApp,
@@ -754,7 +754,7 @@ async function scmActions() {
 		{
 			value: "branches",
 			text: strings["git branches"] || "Branches",
-			icon: "svg:git-branch",
+			icon: "cod:source-control",
 		},
 		{
 			value: "pull",
@@ -842,7 +842,7 @@ async function chooseBranch() {
 		const options = list.all.map((branch) => ({
 			value: branch.name,
 			text: `${branch.current ? "✓ " : ""}${branch.name}`,
-			icon: "svg:git-branch",
+			icon: "cod:source-control",
 		}));
 		options.push({
 			value: "__create__",
@@ -878,7 +878,7 @@ async function chooseBranch() {
 					.map((branch) => ({
 						value: branch.name,
 						text: branch.name,
-						icon: "svg:git-branch",
+						icon: "cod:source-control",
 					})),
 			);
 			if (!name) return;

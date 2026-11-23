@@ -7,6 +7,46 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.32] - 2026-11-23
+
+### Look VS Code — ícones de verdade em todo o app
+
+- **Pacote de ícones de ficheiros vscode-icons completo** — os 843 ícones
+  oficiais (MIT) ficam embutidos no app: navegador de ficheiros, abas do
+  editor, quick open e diálogos mostram os ícones coloridos do VS Code
+  (TypeScript azul, JavaScript amarelo, Rust laranja, pastas especiais
+  como `src/`/`.github/`…), com mapeamento por nome de ficheiro,
+  extensão e linguagem. Ativo por defeito; o pack antigo continua
+  disponível em Definições › Icon pack.
+- **Codicons em toda a interface** — a fonte oficial @vscode/codicons
+  (570 glifos) substitui os glifos Material da interface: menus, caixas
+  de diálogo, definições e a activity bar (Explorador, Pesquisa, Source
+  Control, Extensões, IA, Terminal…) passam a usar os mesmos ícones do
+  VS Code.
+- **Tema de editor VS Code Dark+ por defeito** — novos utilizadores
+  recebem `vscodeDark`/`vscodeLight` e há migração única dos antigos
+  `one_dark`/`noctisLilac`, em sintonia com o tema do app (Dark Modern).
+
+### Chat IA mais robusto
+
+- **Blocos de código estilo VS Code** — cabeçalho com o nome da
+  linguagem e botão de copiar em cada bloco; tocar no corpo continua a
+  abrir as ações de código.
+- **Botão «Regenerar» direto nas bolhas de erro** — além do gesto de
+  long-press, os erros passam a oferecer um retry explícito.
+
+### Correções
+
+- **About volta a abrir** — a lista de bibliotecas OSS referenciava um
+  global que nunca era definido (ReferenceError) e derrubava a página;
+  agora importa `res/oss-libraries.json` diretamente.
+- **Tamanhos sem tag &lt;span&gt; à vista** — a lista de bibliotecas
+  (local/CDN) mostrava literalmente «&lt;span&gt;43KB&lt;/span&gt&gt;»;
+  o tamanho agora renderiza como elemento.
+- **Ícones de ficheiro nas abas do editor** — o shadow root das abas
+  agora adota a stylesheet do tema de ícones ativo (repartida via
+  `adoptedStyleSheets`), para os ícones aparecerem também nas abas.
+
 ## [1.8.31] - 2026-11-23
 
 ### Git — clone corrigido de vez
@@ -2318,6 +2358,43 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.32] - 2026-11-23
+
+### VS Code look — real icons across the whole app
+
+- **Full bundled vscode-icons file icon pack** — all 843 official icons
+  (MIT) ship inside the app: the file browser, editor tabs, quick open
+  and dialogs now show VS Code's colored file icons (blue TypeScript,
+  yellow JavaScript, orange Rust, special folders like `src/`/`.github/`
+  …), matched by file name, extension and language. Enabled by default;
+  the old pack remains available under Settings › Icon pack.
+- **Codicons for the entire UI** — the official @vscode/codicons font
+  (570 glyphs) replaces the Material UI glyphs: menus, dialogs, settings
+  and the activity bar (Explorer, Search, Source Control, Extensions,
+  AI, Terminal…) now use the very icons VS Code uses.
+- **VS Code Dark+ editor theme by default** — new users get
+  `vscodeDark`/`vscodeLight` and a one-time migration replaces the old
+  `one_dark`/`noctisLilac` defaults, matching the Dark Modern app theme.
+
+### More robust AI chat
+
+- **VS Code-style code blocks** — a header with the language name and a
+  copy button on every block; tapping the body still opens code actions.
+- **Explicit «Regenerate» button on error bubbles** — on top of the
+  long-press gesture, errors now offer a direct retry.
+
+### Fixes
+
+- **About opens again** — the OSS libraries list referenced a global
+  that was never defined (ReferenceError) and crashed the page; it now
+  imports `res/oss-libraries.json` directly.
+- **No visible &lt;span&gt; tags in library sizes** — the libraries list
+  (local/CDN) literally rendered «&lt;span&gt;43KB&lt;/span&gt;»; the
+  size now renders as an element.
+- **File icons in editor tabs** — the tab shadow root now adopts the
+  active icon theme stylesheet (shared via `adoptedStyleSheets`), so
+  icons render in tabs too.
 
 ## [1.8.31] - 2026-11-23
 

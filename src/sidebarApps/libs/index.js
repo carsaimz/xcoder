@@ -149,7 +149,7 @@ function libCard(lib) {
 						? t("local libs offline", "Offline")
 						: t("local libs cdn", "CDN")}
 				</span>
-				{libSize(lib) > 0 ? `<span>${formatBytes(libSize(lib))}</span>` : ""}
+				{libSize(lib) > 0 ? <span>{formatBytes(libSize(lib))}</span> : ""}
 				<span>
 					{lib.files.length} {lib.files.length === 1 ? "file" : "files"}
 				</span>
@@ -258,7 +258,7 @@ function libDetail(lib) {
 			<h2 className="libs-title">{lib.name}</h2>
 			<div className="libs-meta">
 				<span>v{lib.version}</span>
-				{libSize(lib) > 0 ? `<span>${formatBytes(libSize(lib))}</span>` : ""}
+				{libSize(lib) > 0 ? <span>{formatBytes(libSize(lib))}</span> : ""}
 				<span>{lib.license}</span>
 				<span>{lib.site.replace(/^https?:\/\//, "")}</span>
 			</div>
@@ -346,7 +346,7 @@ function onSelected(el) {
 }
 
 export default [
-	"svg:book-open",
+	"cod:library",
 	"libs",
 	strings["local libs"] || "Bibliotecas",
 	initApp,

@@ -9,6 +9,7 @@ import Reactive from "html-tag-js/reactive";
 import actionStack from "lib/actionStack";
 import config from "lib/config";
 import { isPremium } from "lib/premium";
+import OSS_LIBS from "res/oss-libraries.json";
 import helpers from "utils/helpers";
 import { enhanceIcons } from "utils/iconEnhancer";
 
@@ -259,6 +260,21 @@ export default function AboutInclude() {
 							</div>
 						</div>
 					</div>
+					<a
+						href="https://github.com/vscode-icons/vscode-icons"
+						className="info-item"
+					>
+						<div className="info-item-icon">
+							<span className="icon codicon-file"></span>
+						</div>
+						<div className="info-item-text">
+							{strings["credits vscode icons"] || "VS Code icons"}
+							<div className="info-item-subtext">
+								{strings["credits vscode icons desc"] ||
+									"File icons (vscode-icons) and UI codicons — MIT"}
+							</div>
+						</div>
+					</a>
 					<a
 						href={`${config.GITHUB_URL}/graphs/contributors`}
 						className="info-item"

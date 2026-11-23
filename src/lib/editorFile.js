@@ -16,6 +16,7 @@ import DOMPurify from "dompurify";
 import startDrag from "handlers/editorFileTab";
 import actions from "handlers/quickTools";
 import tag from "html-tag-js";
+import fileIcons from "lib/fileIcons";
 import mimeTypes from "mime-types";
 import { applyHighlightStyles } from "utils/codeHighlight";
 import helpers from "utils/helpers";
@@ -574,7 +575,20 @@ export default class EditorFile {
 					let adopted = false;
 					if (sharedSheet) {
 						try {
-							shadow.adoptedStyleSheets = [sharedSheet];
+							// main.css + the runtime file-icon theme sheet (VS Code
+							// icons) — the latter is replaced in place on theme
+							// switches, so shadows stay in sync automatically
+							const extraSheets = (
+								Array.isArray(document.adoptedStyleSheets)
+									? document.adoptedStyleSheets
+									: []
+							).filter(
+								(sheet) =>
+									sheet &&
+									sheet !== sharedSheet &&
+									sheet.cssRules !== undefined,
+							);
+							shadow.adoptedStyleSheets = [sharedSheet, ...extraSheets];
 							adopted = true;
 						} catch (e) {
 							console.warn(
@@ -590,7 +604,9 @@ export default class EditorFile {
 										.map((rule) => rule.cssText)
 										.join("\n");
 									const constructedSheet = new CSSStyleSheet();
-									constructedSheet.replaceSync(cssText);
+									constructedSheet.replaceSync(
+										`${cssText}\n${fileIcons.getThemeCSSText()}`,
+									);
 									shadow.adoptedStyleSheets = [constructedSheet];
 									adopted = true;
 									mainCSSStyleSheet = constructedSheet;

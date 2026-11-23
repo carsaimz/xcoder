@@ -56,7 +56,7 @@ function safeStorage() {
 }
 
 export default [
-	"svg:square-terminal",
+	"cod:terminal",
 	"repl",
 	strings["js console"] || "JS Console",
 	initApp,

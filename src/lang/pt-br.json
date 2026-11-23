@@ -1862,5 +1862,7 @@
 	"git actions": "Ações do Git",
 	"git no commits real": "Ainda não há commits.",
 	"git settings hint": "Repositório, remote e branch ficam no painel Git",
-	"settings-info-git-panel": "Abra o app Git na barra lateral para escolher o repositório, configurar o remote e publicar — tudo em um só lugar, como no VS Code."
+	"settings-info-git-panel": "Abra o app Git na barra lateral para escolher o repositório, configurar o remote e publicar — tudo em um só lugar, como no VS Code.",
+	"credits vscode icons": "Ícones VS Code",
+	"credits vscode icons desc": "Ícones de ficheiros (vscode-icons) e codicons da UI — MIT"
 }

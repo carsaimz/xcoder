@@ -132,7 +132,7 @@ class Settings {
 			uiZoom: 100,
 			fontSize: "12px",
 			cursorWidth: 2,
-			editorTheme: "one_dark",
+			editorTheme: "vscodeDark",
 			textWrap: false,
 			wrappingIndent: "same",
 			softTab: true,
@@ -267,7 +267,10 @@ class Settings {
 			developerMode: false,
 			shiftClickSelection: true,
 			showShareButton: true,
-			iconTheme: "builtin",
+			iconTheme: "vscode-icons",
+			// one-time migrations (v1.8.32): vscode-icons pack + Dark+ editor
+			vscodeIconsMigrated: false,
+			editorThemeMigrated: false,
 		};
 		this.value = structuredClone(this.#defaultSettings);
 	}
@@ -310,6 +313,26 @@ class Settings {
 
 			this.value = structuredClone(settings);
 			this.#oldSettings = structuredClone(settings);
+
+			// One-time migrations (v1.8.32): ship the bundled vscode-icons
+			// pack and the Dark+ editor theme to users still on the legacy
+			// builtin pack / old editor defaults. Explicit user choices
+			// (any other pack or editor theme) are kept untouched.
+			if (!this.value.vscodeIconsMigrated) {
+				this.value.vscodeIconsMigrated = true;
+				if (!this.value.iconTheme || this.value.iconTheme === "builtin") {
+					this.value.iconTheme = "vscode-icons";
+				}
+			}
+			if (!this.value.editorThemeMigrated) {
+				this.value.editorThemeMigrated = true;
+				if (this.value.editorTheme === "one_dark") {
+					this.value.editorTheme = "vscodeDark";
+				} else if (this.value.editorTheme === "noctisLilac") {
+					this.value.editorTheme = "vscodeLight";
+				}
+			}
+
 			try {
 				themes.update(ThemeBuilder.fromJSON(this.value.customTheme));
 			} catch (error) {
