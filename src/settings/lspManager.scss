@@ -1,0 +1,202 @@
+/* Language Servers manager page — VS Code-style filterable list. */
+
+.lsp-manager-body {
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.lsp-toolbar {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px 10px;
+	background: var(--secondary-color);
+	border-bottom: 1px solid var(--border-color);
+}
+
+.lsp-chips {
+	display: flex;
+	gap: 6px;
+	overflow-x: auto;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.lsp-chip {
+	flex-shrink: 0;
+	border: 1px solid var(--border-color);
+	border-radius: 999px;
+	padding: 4px 12px;
+	font-size: 12px;
+	background: transparent;
+	color: var(--primary-text-color);
+	opacity: 0.75;
+
+	&.active {
+		background: var(--active-color);
+		border-color: transparent;
+		color: #fff;
+		opacity: 1;
+		font-weight: 600;
+	}
+}
+
+.lsp-toolbar-actions {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.lsp-toolbar-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	border: 1px solid var(--border-color);
+	border-radius: 6px;
+	padding: 4px 10px;
+	background: transparent;
+	color: var(--primary-text-color);
+	font-size: 12px;
+
+	.icon {
+		font-size: 14px;
+		opacity: 0.8;
+	}
+}
+
+.lsp-toolbar-btn-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.lsp-server-list {
+	flex: 1;
+	padding: 4px 0;
+}
+
+.lsp-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	cursor: pointer;
+
+	&:active {
+		background: var(--active-color);
+	}
+
+	&.static {
+		cursor: default;
+	}
+}
+
+.lsp-row-icon {
+	font-size: 20px;
+	opacity: 0.85;
+	flex-shrink: 0;
+}
+
+.lsp-row-main {
+	flex: 1;
+	min-width: 0;
+}
+
+.lsp-row-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.lsp-row-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.lsp-row-sub {
+	margin-top: 2px;
+	font-size: 11px;
+	opacity: 0.65;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.lsp-row-size {
+	margin-top: 3px;
+	font-size: 11px;
+	color: var(--active-color);
+	opacity: 0.9;
+}
+
+.lsp-size-pending {
+	opacity: 0.55;
+	color: var(--primary-text-color);
+}
+
+.lsp-row-go {
+	font-size: 18px;
+	opacity: 0.4;
+	flex-shrink: 0;
+}
+
+.lsp-pill {
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	padding: 2px 8px;
+	border-radius: 999px;
+	text-transform: uppercase;
+
+	&.installed {
+		background: color-mix(in srgb, #4ec9b0 22%, transparent);
+		color: #4ec9b0;
+	}
+
+	&.missing {
+		background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
+		color: var(--primary-text-color);
+		opacity: 0.7;
+	}
+
+	&.failed {
+		background: color-mix(in srgb, #f48771 20%, transparent);
+		color: #f48771;
+	}
+
+	&.unknown {
+		background: color-mix(in srgb, #dcdcaa 18%, transparent);
+		color: #dcdcaa;
+	}
+
+	&.checking {
+		background: color-mix(in srgb, var(--primary-text-color) 8%, transparent);
+		color: var(--primary-text-color);
+		opacity: 0.6;
+	}
+}
+
+.lsp-footer {
+	border-top: 1px solid var(--border-color);
+	padding: 4px 0 10px;
+}
+
+.lsp-foot-switch {
+	margin: 0 12px;
+}

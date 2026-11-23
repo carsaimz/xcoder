@@ -175,6 +175,10 @@ async function loadApps() {
 		["repl", () => import("./repl")],
 		// webdev utilities (shadow/gradient/card/placeholder generators)
 		["devtools", () => import("./devtools")],
+		// page inspector (elements/console/network via native webview)
+		["inspector", () => import("./inspector")],
+		// web scraper + reverse engineering tools
+		["scrape", () => import("./scrape")],
 		// offline web libraries (htmx, bootstrap, icon fonts…) shipped in the app
 		["libs", () => import("./libs")],
 		// embedded webview of the official site (docs/marketplace/sponsor)

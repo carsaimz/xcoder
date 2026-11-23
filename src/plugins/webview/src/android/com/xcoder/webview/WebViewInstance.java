@@ -74,6 +74,11 @@ public class WebViewInstance {
   /** Content requested before the fullscreen WebView exists yet. */
   private String pendingUrl = null;
   private String pendingHtml = null;
+  /**
+   * Optional page-side script (DevTools capture hooks) injected at
+   * document start and document end, right after the messaging bridge.
+   */
+  private volatile String userScript = null;
 
   WebViewInstance(
     String id, String mode, String title,
@@ -164,8 +169,37 @@ public class WebViewInstance {
     settings.setAllowUniversalAccessFromFileURLs(false);
   }
 
-  private static void injectBridge(WebView view) {
+  private void injectBridge(WebView view) {
     view.evaluateJavascript(BRIDGE_JS, null);
+    String script = userScript;
+    if (script != null && !script.isEmpty()) {
+      view.evaluateJavascript(script, null);
+    }
+  }
+
+  /**
+   * Registers a page-side script (idempotent capture hooks for the
+   * Inspector) that is re-injected on every navigation.
+   */
+  void setInjectScript(String script, final CallbackContext callbackContext) {
+    if (isDestroyed) {
+      callbackContext.error("WebView has been destroyed");
+      return;
+    }
+    userScript = script == null || script.isEmpty() ? null : script;
+    // Apply immediately to an existing page as well; callers that want
+    // document-start capture set the script BEFORE loadURL.
+    if (webView != null && userScript != null) {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if (webView != null) {
+            webView.evaluateJavascript(userScript, null);
+          }
+        }
+      });
+    }
+    callbackContext.success();
   }
 
   /**
@@ -445,6 +479,7 @@ public class WebViewInstance {
           webView.destroy();
         }
         webView = null;
+        userScript = null;
       }
     });
   }

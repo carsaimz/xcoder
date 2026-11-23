@@ -46,7 +46,7 @@ const GLYPHS = {
 	update: "sync",
 	language: "globe",
 	menu_book: "book",
-	tune: "settings-gear",
+	tune: "sparkle",
 	phone_android: "device-mobile",
 	github: "github",
 	error_outline: "error",

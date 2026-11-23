@@ -110,6 +110,17 @@ class WebView {
 		await nativeBridge.postMessage(this.id, message);
 	}
 
+	/**
+	 * Registers a page-side script (Inspector capture hooks) that the
+	 * native side (re-)injects at document start + document end of
+	 * every navigation. Set it BEFORE loadURL for document-start capture.
+	 * @param {string} script
+	 */
+	async setInjectScript(script) {
+		this._checkDestroyed();
+		await nativeBridge.setInjectScript(this.id, script);
+	}
+
 	async show() {
 		this._checkDestroyed();
 		await nativeBridge.show(this.id);

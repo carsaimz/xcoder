@@ -60,6 +60,9 @@ public class WebViewPlugin extends CordovaPlugin {
         case "postMessage":
           postMessage(args.getString(0), args.getString(1), callbackContext);
           return true;
+        case "setInjectScript":
+          setInjectScript(args.getString(0), args.getString(1), callbackContext);
+          return true;
         case "show":
           show(args.getString(0), callbackContext);
           return true;
@@ -176,6 +179,12 @@ public class WebViewPlugin extends CordovaPlugin {
     WebViewInstance instance = getInstance(id);
     if (instance == null) { callbackContext.error("WebView not found: " + id); return; }
     instance.postMessage(message, callbackContext);
+  }
+
+  private void setInjectScript(String id, String script, CallbackContext callbackContext) {
+    WebViewInstance instance = getInstance(id);
+    if (instance == null) { callbackContext.error("WebView not found: " + id); return; }
+    instance.setInjectScript(script, callbackContext);
   }
 
   private void show(String id, CallbackContext callbackContext) {

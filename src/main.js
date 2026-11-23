@@ -9,6 +9,8 @@ import "res/file-icons/style.css";
 import "styles/codicons.scss";
 import "styles/overrideAceStyle.scss";
 import "styles/wideScreen.scss";
+// VS Code chrome layer (v1.8.33 redesign) — loads last to win the cascade.
+import "styles/vscode-ui.scss";
 // Editor tabs use a shadow root that only links build/main.css.
 import "pages/welcome/welcome.scss";
 

@@ -7,6 +7,78 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.33] - 2026-11-24
+
+### Redesign completo estilo VS Code (para além dos ícones)
+
+- **Camada de interface `vscode-ui.scss`** — o chrome todo foi afinado para
+  a linguagem visual do VS Code desktop: geometria viva (raios de 2–6px em
+  vez do arredondado 6–18px), elevação plana (hairlines em vez de sombras
+  grandes), métricas exatas (abas de 35px, activity bar de 48px, entradas
+  de 32px), scrollbars de 9px que só aparecem ao rolar, abas ativas com
+  filete superior no acento e que derretem na superfície do editor, ponto
+  de «não guardado» em vez do asterisco, menus de contexto e diálogos com
+  borda fina e canto pequeno. Os temas continuam a mandar nas CORES — tudo
+  funciona em claro e escuro.
+- **Fim das duas engrenagens no chatbot IA** — o botão de modelos (tune)
+  e as definições da IA usavam o mesmo glifo de engrenagem; o seletor de
+  modelos agora usa o ícone «sparkle» do VS Code (✨), distinto das
+  Definições.
+
+### Inspector — ferramentas de inspecção como no PC (com URL)
+
+- **Novo app Inspector na activity bar** — abre QUALQUER site num webview
+  nativo com um script de captura injetado ANTES dos scripts da página
+  (document start + document end, em cada navegação), como o DevTools do
+  Chrome:
+  - **Elementos** — árvore DOM navegável (expandir/colapsar por nível),
+    atributos, estilos computados, box model, HTML do nó (copiar/inserir
+    no editor), busca por selector CSS e **realce do elemento na página**.
+  - **Consola** — console.log/warn/error da página, erros e rejeições não
+    tratadas, e um campo para **executar JavaScript** no contexto da página.
+  - **Rede** — log de fetch/XHR com método, URL, estado, tempo e tamanho,
+    com filtros por tipo (XHR/JSON, JS, CSS, imagens, fontes).
+  - Barra de endereço própria (URL incluído), recarregar, abrir a página
+    em tela cheia e fechar a sessão.
+
+### Scraper + engenharia reversa
+
+- **Novo app Scraper** — baixa o código-fonte de qualquer site de duas
+  formas: **bruto** via cliente HTTP nativo (sem CORS, com User-Agent de
+  browser) ou **renderizado** num webview escondido (pega o DOM depois do
+  JavaScript — resolve sites que são uma casca vazia de JS). O código fica
+  pré-visualizado e pode ser **guardado no projeto**, **aberto no editor**,
+  copiado ou **embelezado** (Prettier para HTML/CSS/JS/JSON).
+- **Recursos** — extrai imagens (src + srcset + CSS url()), scripts,
+  folhas de estilo, fontes e media com URLs absolutos; descarregue item a
+  item, os seleccionados ou **todas as imagens** de uma vez para a pasta
+  Download/<site>/ do app.
+- **Análise de engenharia reversa** — metadados da página (title,
+  description, generator, Open Graph, canonical), **detecção de segredos**
+  no código (chaves AWS, Google, OpenAI, tokens GitHub/Slack/GitLab, JWT,
+  chaves privadas e atribuições api_key/secret — mascarados na lista, com
+  linha e contexto) e **endpoints de API** (`/api/...`, /graphql, /v1…)
+  e URLs absolutos referenciados.
+
+### Servidores de linguagem — gestor com filtros e tamanhos
+
+- **Página refeita** («Definições › Servidores de linguagem»): busca por
+  texto, **filtros Todos/Instalados/Não instalados**, filtro por
+  **linguagem**, ordenação por nome/linguagem/estado/**tamanho** e botão
+  de atualizar; cada linha mostra o estado real (verificado na shell do
+  runtime, com versão), as linguagens e **os dois tamanhos**: estimativa
+  de **download antes de instalar** (APIs do npm registry, PyPI e
+  crates.io) e **tamanho no disco depois de instalar** (`du -sk` nos
+  caminhos reais de cada instalador — npm global, pip site-packages,
+  base de dados do apk, binários). A criação de servidores personalizados
+  continua no botão «+» do cabeçalho.
+
+### Plataforma
+
+- **Plugin webview nativo com `setInjectScript`** — registre um script
+  que o Android reinjeta no início E no fim de cada navegação (base das
+  capturas do Inspector; API pública para apps/plugins).
+
 ## [1.8.32] - 2026-11-23
 
 ### Look VS Code — ícones de verdade em todo o app
@@ -2358,6 +2430,73 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.33] - 2026-11-24
+
+### Full VS Code redesign (beyond icons)
+
+- **`vscode-ui.scss` chrome layer** — the whole shell tuned to the VS Code
+  desktop design language: crisp geometry (2–6px radii replacing the
+  rounded 6–18px scale), flat elevation (hairlines over big shadows),
+  exact chrome metrics (35px tabs, 48px activity bar, 32px inputs),
+  9px scrollbars that reveal on hover, active tabs melting into the
+  editor surface with a top accent line, unsaved dot instead of an
+  asterisk, hairline-bordered context menus and dialogs. Themes still own
+  the COLORS — everything works in light and dark.
+- **No more double gear in the AI chat** — the model picker (tune) and AI
+  settings both rendered a gear; the model picker now uses the VS Code
+  "sparkle" glyph (✨), clearly distinct from Settings.
+
+### Inspector — PC-grade inspection tools (URL included)
+
+- **New Inspector app in the activity bar** — opens ANY site in a native
+  webview with a capture script injected BEFORE the page's own scripts
+  (document start + end, on every navigation), Chrome DevTools style:
+  - **Elements** — navigable DOM tree (per-level expand/collapse),
+    attributes, computed styles, box model, node HTML (copy/insert into
+    the editor), CSS selector search and **on-page element highlight**.
+  - **Console** — page console.log/warn/error, uncaught errors and
+    unhandled rejections, plus a field to **run JavaScript** in the page.
+  - **Network** — fetch/XHR log with method, URL, status, timing and
+    size, filterable by type (XHR/JSON, JS, CSS, images, fonts).
+  - Dedicated URL bar (as requested), reload, fullscreen page view and
+    session close.
+
+### Scraper + reverse engineering
+
+- **New Scraper app** — downloads the source of any site two ways:
+  **raw** through the native HTTP client (no CORS, browser User-Agent) or
+  **rendered** in a hidden webview (DOM after JavaScript runs — handles
+  JS-shell sites). Source is previewed and can be **saved to the
+  project**, **opened in the editor**, copied or **beautified** (Prettier
+  for HTML/CSS/JS/JSON).
+- **Assets** — extracts images (src + srcset + CSS url()), scripts,
+  stylesheets, fonts and media with absolute URLs; download one by one,
+  selected items or **all images** at once into the app's
+  Download/<site>/ folder.
+- **Reverse engineering analysis** — page metadata (title, description,
+  generator, Open Graph, canonical), **secret detection** in code (AWS,
+  Google, OpenAI keys; GitHub/Slack/GitLab tokens; JWTs; private keys;
+  generic api_key/secret assignments — masked, with line and context)
+  and **API endpoints** (`/api/...`, /graphql, /v1…) plus absolute URLs.
+
+### Language servers — filterable manager with sizes
+
+- **Rebuilt page** ("Settings › Language servers"): text search,
+  **All/Installed/Not installed filters**, **language filter**, sorting by
+  name/language/status/**size** and a refresh action; each row shows the
+  real install status (checked in the runtime shell, with version), the
+  languages and **both sizes**: the **estimated download before
+  installing** (npm registry, PyPI and crates.io APIs) and the **on-disk
+  size after installing** (`du -sk` over each installer's real paths —
+  npm global prefix, pip site-packages, apk database, binaries). Custom
+  server creation stays in the header "+" action.
+
+### Platform
+
+- **Native webview plugin gains `setInjectScript`** — register a script
+  that Android re-injects at the start AND end of every navigation (the
+  Inspector capture foundation; public API for apps/plugins).
 
 ## [1.8.32] - 2026-11-23
 

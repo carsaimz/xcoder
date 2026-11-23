@@ -1,0 +1,303 @@
+/**
+ * VS Code UI layer (v1.8.33 redesign) — the "mudança completa" pass.
+ *
+ * Loads LAST (main.js) so it wins the cascade over the rounded v1.8.25
+ * design. This layer sharpens the whole app into the VS Code desktop
+ * design language:
+ *
+ *   - crisp geometry: 2-6px radii instead of the rounded 6-18px scale
+ *   - flat elevation: VS Code uses hairlines + panels, not big shadows
+ *   - exact chrome metrics: 35px tabs, 48px activity bar, 22px status bar
+ *   - VS Code scrollbars (10px, hover-visible thumb)
+ *   - quick-input / context-menu / input control fidelity
+ *
+ * Themes keep owning the COLORS — every rule derives from theme variables,
+ * so light/dark themes are skinned automatically.
+ */
+
+/* ---------------------------------------------------------------- tokens */
+
+:root {
+	/* crisp VS Code geometry (was the rounded v1.8.25 scale) */
+	--radius-xs: 3px;
+	--radius-sm: 4px;
+	--radius-md: 5px;
+	--radius-lg: 6px;
+	--radius-xl: 8px;
+
+	/* flat VS Code elevation: hairlines first, shadows only for overlays */
+	--shadow-1: 0 0 0 1px var(--hairline, rgba(128, 128, 128, 0.25));
+	--shadow-2: 0 2px 8px rgba(0, 0, 0, 0.14);
+	--shadow-3: 0 4px 14px rgba(0, 0, 0, 0.22);
+
+	/* VS Code chrome metrics */
+	--vsc-tab-height: 35px;
+	--vsc-statusbar-height: 22px;
+	--vsc-activity-width: 48px;
+	--vsc-input-height: 32px;
+
+	/* thicker, VS Code-like scrollbars */
+	--scrollbar-width: 9px;
+}
+
+/* ------------------------------------------------------------- scrollbars */
+
+.list,
+.scroll,
+.prompt,
+[data-scroll],
+main,
+body {
+	&::-webkit-scrollbar {
+		width: var(--scrollbar-width);
+		height: var(--scrollbar-width);
+	}
+
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: color-mix(in srgb, var(--primary-text-color) 20%, transparent);
+		border-radius: 0;
+		border: 2px solid transparent;
+		background-clip: padding-box;
+
+		&:hover {
+			background-color: color-mix(
+				in srgb,
+				var(--primary-text-color) 34%,
+				transparent
+			);
+		}
+	}
+}
+
+/* ------------------------------------------------------------ editor tabs */
+
+.open-file-list {
+	height: var(--vsc-tab-height);
+	background: color-mix(in srgb, var(--secondary-color) 45%, transparent);
+	border-bottom: 1px solid var(--border-color);
+
+	li.tile {
+		height: var(--vsc-tab-height);
+		font-size: 13px;
+		border-radius: 0;
+		background: transparent;
+		color: color-mix(in srgb, var(--primary-text-color) 72%, transparent);
+		border-right: 1px solid var(--hairline, var(--border-color));
+		border-top: none;
+
+		.text {
+			font-weight: 400;
+			letter-spacing: 0.01em;
+		}
+
+		&:not(.active):hover {
+			background: color-mix(
+				in srgb,
+				var(--primary-text-color) 6%,
+				transparent
+			);
+		}
+
+		/* VS Code Dark Modern active tab: melts into the editor surface and
+		   carries a 1px top accent (inset so the strip stays clean) */
+		&.active {
+			background: var(--primary-color);
+			color: var(--primary-text-color);
+			box-shadow: inset 0 1px 0 0 var(--active-color);
+			border-top: none;
+
+			.text {
+				font-weight: 500;
+			}
+		}
+
+		/* unsaved dot — VS Code shows a filled circle instead of the x */
+		&.notice::before {
+			content: "";
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			margin-right: 4px;
+			border-radius: 50%;
+			background: currentColor;
+			opacity: 0.9;
+		}
+
+		.file,
+		.icon {
+			height: 22px;
+			width: 22px;
+			background-size: 18px;
+		}
+
+		.icon.cancel {
+			font-size: 1.1em;
+		}
+	}
+}
+
+/* ---------------------------------------------------------- activity bar */
+
+#sidebar .apps {
+	width: var(--vsc-activity-width);
+	min-width: var(--vsc-activity-width);
+}
+
+#sidebar .apps .app-icons-container {
+	padding: 4px 0;
+	gap: 2px;
+}
+
+#sidebar .apps .app-icons-container > .icon,
+#sidebar .apps .apps-group > .icon {
+	height: var(--vsc-activity-width);
+	width: 100%;
+	font-size: 24px;
+	opacity: 0.62;
+	position: relative;
+	border-radius: 0;
+
+	/* VS Code active view indicator — 2px left accent bar */
+	&.active {
+		opacity: 1;
+		background: transparent !important;
+
+		&::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 8px;
+			bottom: 8px;
+			width: 2px;
+			background: var(--active-color);
+		}
+	}
+}
+
+/* activity bar badge — VS Code count pill */
+#sidebar .apps .icon .app-badge,
+#sidebar .apps .icon.badge::after {
+	background: var(--active-color);
+	border-radius: 999px;
+	font-size: 9px;
+	line-height: 14px;
+	height: 14px;
+	min-width: 14px;
+	padding: 0 4px;
+}
+
+/* ------------------------------------------------------------- statusbar */
+
+#statusbar,
+footer[data-shown="true"] .statusbar,
+.statusbar {
+	font-size: 11px;
+}
+
+.statusbar-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0 6px;
+	height: 100%;
+
+	.icon {
+		font-size: 13px;
+	}
+}
+
+/* ---------------------------------------------------------------- inputs */
+
+input,
+textarea,
+select {
+	border-radius: var(--radius-sm) !important;
+}
+
+input[type="search"],
+input[type="text"],
+input[type="url"],
+input[type="number"] {
+	min-height: var(--vsc-input-height);
+	height: auto;
+	text-indent: 8px;
+}
+
+/* VS Code dropdowns/checkboxes keep the native accent color */
+input[type="checkbox"],
+input[type="radio"] {
+	accent-color: var(--active-color);
+}
+
+/* -------------------------------------------------------- context menus */
+
+.context-menu {
+	border-radius: var(--radius-lg) !important;
+	border: 1px solid var(--hairline-strong, var(--border-color));
+	box-shadow: var(--shadow-3) !important;
+	padding: 4px !important;
+	font-size: 13px;
+	min-width: 200px;
+
+	li {
+		border-radius: var(--radius-xs);
+		margin: 1px 2px;
+
+		.icon {
+			font-size: 16px;
+			opacity: 0.85;
+		}
+	}
+}
+
+/* ------------------------------------------------------------- dialogs */
+
+.dialog {
+	box-shadow: var(--shadow-3);
+	border-radius: var(--radius-lg) !important;
+	border: 1px solid var(--hairline-strong, var(--border-color));
+}
+
+/* ------------------------------------------------------ surface hierarchy */
+
+/* cards and popups stop being "soft rounded" and become VS Code panels:
+   flat background + hairline border */
+.xcoder-ad,
+.notification-item,
+.wc-page .list > * {
+	border-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------- quick input palette */
+
+#palette,
+.quick-input {
+	font-size: 13px;
+}
+
+/* ------------------------------------------------- selection & focus ring */
+
+::selection {
+	background: color-mix(in srgb, var(--active-color) 32%, transparent);
+}
+
+:focus-visible {
+	outline: 1px solid var(--active-color);
+	outline-offset: -1px;
+}
+
+/* ------------------------------------------------- floating icon buttons */
+
+.floating.icon {
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-2);
+}
+
+/* buttons inside primary sections: VS Code default button geometry */
+.section.primary button {
+	border-radius: var(--radius-xs) !important;
+}

@@ -50,6 +50,17 @@ function postMessage(id, message) {
   });
 }
 
+/**
+ * Registers a page-side script that is (re-)injected at document start and
+ * document end of every navigation — the Inspector's capture hooks ride
+ * this, so console/network recording starts before the page's own scripts.
+ */
+function setInjectScript(id, script) {
+  return new Promise((resolve, reject) => {
+    cordova.exec(resolve, reject, SERVICE, "setInjectScript", [id, script || ""]);
+  });
+}
+
 function show(id) {
   return new Promise((resolve, reject) => {
     cordova.exec(resolve, reject, SERVICE, "show", [id]);
@@ -81,6 +92,7 @@ export default {
   loadHTML,
   evaluate,
   postMessage,
+  setInjectScript,
   show,
   hide,
   reload,
