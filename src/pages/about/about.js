@@ -126,8 +126,7 @@ export default function AboutInclude() {
 			<div className="version-info">
 				<h1 className="version-title">XCoder</h1>
 				<div className="version-number" id="version-number">
-					{strings.version || "Version"} {BuildInfo.version} (
-					{BuildInfo.versionCode})
+					{`${strings.version || "Version"} ${BuildInfo.version} (${BuildInfo.versionCode})`}
 				</div>
 				{isPremium() && (
 					<div className="premium-badge">
@@ -249,15 +248,14 @@ export default function AboutInclude() {
 							</div>
 						</div>
 					</a>
-					<div className="info-item">
+					<div className="info-item" id="oss-libs-item" role="button">
 						<div className="info-item-icon">
 							<span className="icon javascript"></span>
 						</div>
 						<div className="info-item-text">
 							{strings["credits libraries"] || "Open-source libraries"}
 							<div className="info-item-subtext">
-								CodeMirror 6 · xterm.js · markdown-it · KaTeX · Mermaid ·
-								DOMPurify · Emmet · motion · html-tag-js
+								{`${OSS_LIBS.libraries.length} packages · CodeMirror 6 · xterm.js · markdown-it · KaTeX · Mermaid · DOMPurify · Emmet · motion · html-tag-js`}
 							</div>
 						</div>
 					</div>
@@ -320,6 +318,23 @@ export default function AboutInclude() {
 	$page.body
 		.querySelector("#check-updates-item")
 		?.addEventListener("click", checkForUpdates);
+
+	// Tap "Open-source libraries" — the full list is generated from
+	// package.json into res/oss-libraries.json (all runtime deps).
+	$page.body
+		.querySelector("#oss-libs-item")
+		?.addEventListener("click", async () => {
+			const options = OSS_LIBS.libraries.map((lib) => [
+				lib.homepage || "",
+				`${lib.name} — v${lib.version} · ${lib.license}`,
+				"link",
+			]);
+			const url = await select(
+				strings["credits libraries"] || "Open-source libraries",
+				options,
+			);
+			if (url) system.openInBrowser(url);
+		});
 
 	// Hidden developer menu: tap the version number 2 times (1.5s window)
 	$page.body.querySelector("#version-number")?.addEventListener("click", () => {

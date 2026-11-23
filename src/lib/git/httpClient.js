@@ -108,20 +108,34 @@ export function headersLike(source = {}) {
 		([name, value]) =>
 			/** @type {[string, string]} */ ([String(name), String(value)]),
 	);
-	return {
-		entries: () => entries.map((pair) => [...pair]),
-		forEach(callback) {
+	// A plain object with lowercase keys — isomorphic-git reads response
+	// headers with direct property access (headers['content-type']) —
+	// plus Headers-style helpers for consumers that prefer .get().
+	const headers = {};
+	for (const [name, value] of entries) {
+		headers[name.toLowerCase()] = value;
+	}
+	const get = (name) => {
+		const needle = String(name).toLowerCase();
+		const hit = entries.find(([key]) => key.toLowerCase() === needle);
+		return hit ? hit[1] : null;
+	};
+	Object.defineProperty(headers, "entries", {
+		value: () => entries.map((pair) => [...pair]),
+		enumerable: false,
+	});
+	Object.defineProperty(headers, "forEach", {
+		value: (callback) => {
 			for (const pair of entries) callback(pair[1], pair[0]);
 		},
-		get(name) {
-			const needle = String(name).toLowerCase();
-			const hit = entries.find(([key]) => key.toLowerCase() === needle);
-			return hit ? hit[1] : null;
-		},
-		has(name) {
-			return this.get(name) !== null;
-		},
-	};
+		enumerable: false,
+	});
+	Object.defineProperty(headers, "get", { value: get, enumerable: false });
+	Object.defineProperty(headers, "has", {
+		value: (name) => get(name) !== null,
+		enumerable: false,
+	});
+	return headers;
 }
 
 /**
@@ -235,6 +249,11 @@ function toGitResponse(raw, onProgress) {
 	return {
 		status: raw.status,
 		statusText: raw.statusText,
+		// isomorphic-git's smart-HTTP layer reads the node-style names:
+		// without them every response fails with
+		// «HTTP Error: undefined undefined» — even successful ones.
+		statusCode: raw.status,
+		statusMessage: raw.statusText,
 		headers: headersLike(raw.headers),
 		body: bodyIterator(buffer),
 	};

@@ -1,0 +1,645 @@
+{
+	"_generated": "From package.json dependencies (name/version/license/homepage read from node_modules). Regenerate with scripts/gen_oss_libraries.py",
+	"libraries": [
+		{
+			"name": "@codemirror/autocomplete",
+			"version": "6.20.3",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/autocomplete",
+			"required": "^6.20.3"
+		},
+		{
+			"name": "@codemirror/commands",
+			"version": "6.11.0",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/commands",
+			"required": "^6.11.0"
+		},
+		{
+			"name": "@codemirror/lang-angular",
+			"version": "0.1.4",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-angular",
+			"required": "^0.1.4"
+		},
+		{
+			"name": "@codemirror/lang-cpp",
+			"version": "6.0.3",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-cpp",
+			"required": "^6.0.3"
+		},
+		{
+			"name": "@codemirror/lang-css",
+			"version": "6.3.1",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-css",
+			"required": "^6.3.1"
+		},
+		{
+			"name": "@codemirror/lang-go",
+			"version": "6.0.1",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-go",
+			"required": "^6.0.1"
+		},
+		{
+			"name": "@codemirror/lang-html",
+			"version": "6.4.12",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/lang-html",
+			"required": "^6.4.12"
+		},
+		{
+			"name": "@codemirror/lang-java",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-java",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "@codemirror/lang-javascript",
+			"version": "6.2.5",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-javascript",
+			"required": "^6.2.5"
+		},
+		{
+			"name": "@codemirror/lang-jinja",
+			"version": "6.0.1",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/lang-jinja",
+			"required": "^6.0.1"
+		},
+		{
+			"name": "@codemirror/lang-json",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-json",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "@codemirror/lang-less",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-less",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "@codemirror/lang-liquid",
+			"version": "6.3.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-liquid",
+			"required": "^6.3.2"
+		},
+		{
+			"name": "@codemirror/lang-markdown",
+			"version": "6.5.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/lang-markdown",
+			"required": "^6.5.2"
+		},
+		{
+			"name": "@codemirror/lang-php",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-php",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "@codemirror/lang-python",
+			"version": "6.2.1",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-python",
+			"required": "^6.2.1"
+		},
+		{
+			"name": "@codemirror/lang-rust",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-rust",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "@codemirror/lang-sass",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-sass",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "@codemirror/lang-sql",
+			"version": "6.10.0",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-sql",
+			"required": "^6.10.0"
+		},
+		{
+			"name": "@codemirror/lang-vue",
+			"version": "0.1.3",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-vue",
+			"required": "^0.1.3"
+		},
+		{
+			"name": "@codemirror/lang-wast",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-wast",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "@codemirror/lang-xml",
+			"version": "6.1.0",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-xml",
+			"required": "^6.1.0"
+		},
+		{
+			"name": "@codemirror/lang-yaml",
+			"version": "6.1.3",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/lang-yaml",
+			"required": "^6.1.3"
+		},
+		{
+			"name": "@codemirror/language",
+			"version": "6.12.4",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/language",
+			"required": "^6.12.4"
+		},
+		{
+			"name": "@codemirror/language-data",
+			"version": "6.5.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/language-data",
+			"required": "^6.5.2"
+		},
+		{
+			"name": "@codemirror/legacy-modes",
+			"version": "6.5.3",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/legacy-modes",
+			"required": "^6.5.3"
+		},
+		{
+			"name": "@codemirror/lint",
+			"version": "6.9.7",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/lint",
+			"required": "^6.9.7"
+		},
+		{
+			"name": "@codemirror/lsp-client",
+			"version": "6.2.5-acode.1",
+			"license": "MIT",
+			"author": "Marijn Haverbeke <marijn@haverbeke.berlin>",
+			"homepage": "https://github.com/Acode-Foundation/codemirror-lsp-client",
+			"required": "github:Acode-Foundation/codemirror-lsp-client#db6930c2b6db67e14978f08ae8f5aeb149d29468"
+		},
+		{
+			"name": "@codemirror/search",
+			"version": "6.7.1",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/search",
+			"required": "^6.7.1"
+		},
+		{
+			"name": "@codemirror/state",
+			"version": "6.7.1",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/state",
+			"required": "^6.7.1"
+		},
+		{
+			"name": "@codemirror/theme-one-dark",
+			"version": "6.1.3",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/theme-one-dark",
+			"required": "^6.1.3"
+		},
+		{
+			"name": "@codemirror/view",
+			"version": "6.43.9",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://code.haverbeke.berlin/codemirror/view",
+			"required": "^6.43.9"
+		},
+		{
+			"name": "@deadlyjack/ajax",
+			"version": "1.2.6",
+			"license": "MIT",
+			"author": "Ajit Kumar",
+			"homepage": "https://github.com/deadlyjack/ajax.git#readme",
+			"required": "^1.2.6"
+		},
+		{
+			"name": "@emmetio/codemirror6-plugin",
+			"version": "0.4.1",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://www.npmjs.com/package/@emmetio/codemirror6-plugin",
+			"required": "^0.4.1"
+		},
+		{
+			"name": "@lezer/common",
+			"version": "1.5.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke <marijn@haverbeke.berlin>",
+			"homepage": "https://github.com/lezer-parser/common",
+			"required": "^1.5.2"
+		},
+		{
+			"name": "@lezer/highlight",
+			"version": "1.2.3",
+			"license": "MIT",
+			"author": "Marijn Haverbeke <marijn@haverbeke.berlin>",
+			"homepage": "https://github.com/lezer-parser/highlight",
+			"required": "^1.2.3"
+		},
+		{
+			"name": "@lezer/lr",
+			"version": "1.4.10",
+			"license": "MIT",
+			"author": "Marijn Haverbeke <marijn@haverbeke.berlin>",
+			"homepage": "https://code.haverbeke.berlin/lezer/lr",
+			"required": "^1.4.10"
+		},
+		{
+			"name": "@ungap/custom-elements",
+			"version": "1.3.0",
+			"license": "ISC",
+			"author": "Andrea Giammarchi",
+			"homepage": "https://github.com/ungap/custom-elements#readme",
+			"required": "^1.3.0"
+		},
+		{
+			"name": "@xterm/addon-attach",
+			"version": "0.12.0",
+			"license": "MIT",
+			"author": "The xterm.js authors",
+			"homepage": "https://github.com/xtermjs/xterm.js/tree/master/addons/addon-attach",
+			"required": "^0.12.0"
+		},
+		{
+			"name": "@xterm/addon-fit",
+			"version": "0.11.0",
+			"license": "MIT",
+			"author": "The xterm.js authors",
+			"homepage": "https://github.com/xtermjs/xterm.js/tree/master/addons/addon-fit",
+			"required": "^0.11.0"
+		},
+		{
+			"name": "@xterm/addon-image",
+			"version": "0.9.0",
+			"license": "MIT",
+			"author": "The xterm.js authors",
+			"homepage": "https://github.com/xtermjs/xterm.js/tree/master/addons/addon-image",
+			"required": "^0.9.0"
+		},
+		{
+			"name": "@xterm/addon-search",
+			"version": "0.16.0",
+			"license": "MIT",
+			"author": "The xterm.js authors",
+			"homepage": "https://github.com/xtermjs/xterm.js/tree/master/addons/addon-search",
+			"required": "^0.16.0"
+		},
+		{
+			"name": "@xterm/addon-unicode11",
+			"version": "0.9.0",
+			"license": "MIT",
+			"author": "The xterm.js authors",
+			"homepage": "https://github.com/xtermjs/xterm.js/tree/master/addons/addon-unicode11",
+			"required": "^0.9.0"
+		},
+		{
+			"name": "@xterm/addon-web-links",
+			"version": "0.12.0",
+			"license": "MIT",
+			"author": "The xterm.js authors",
+			"homepage": "https://github.com/xtermjs/xterm.js/tree/master/addons/addon-web-links",
+			"required": "^0.12.0"
+		},
+		{
+			"name": "@xterm/addon-webgl",
+			"version": "0.19.0",
+			"license": "MIT",
+			"author": "The xterm.js authors",
+			"homepage": "https://github.com/xtermjs/xterm.js/tree/master/addons/addon-webgl",
+			"required": "^0.19.0"
+		},
+		{
+			"name": "@xterm/xterm",
+			"version": "6.0.0",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://github.com/xtermjs/xterm.js",
+			"required": "^6.0.0"
+		},
+		{
+			"name": "acorn",
+			"version": "8.18.0",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://github.com/acornjs/acorn",
+			"required": "^8.18.0"
+		},
+		{
+			"name": "autosize",
+			"version": "6.0.1",
+			"license": "MIT",
+			"author": "Jack Moore",
+			"homepage": "http://www.jacklmoore.com/autosize",
+			"required": "^6.0.1"
+		},
+		{
+			"name": "buffer",
+			"version": "6.0.3",
+			"license": "MIT",
+			"author": "Feross Aboukhadijeh",
+			"homepage": "https://github.com/feross/buffer",
+			"required": "^6.0.3"
+		},
+		{
+			"name": "codemirror",
+			"version": "6.0.2",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/basic-setup",
+			"required": "^6.0.2"
+		},
+		{
+			"name": "cordova",
+			"version": "13.0.0",
+			"license": "Apache-2.0",
+			"author": "Apache Software Foundation",
+			"homepage": "https://github.com/apache/cordova-cli",
+			"required": "13.0.0"
+		},
+		{
+			"name": "core-js",
+			"version": "3.50.0",
+			"license": "MIT",
+			"author": "Denis Pushkarev",
+			"homepage": "https://core-js.io",
+			"required": "^3.50.0"
+		},
+		{
+			"name": "dayjs",
+			"version": "1.11.23",
+			"license": "MIT",
+			"author": "iamkun",
+			"homepage": "https://day.js.org",
+			"required": "^1.11.23"
+		},
+		{
+			"name": "dompurify",
+			"version": "3.4.14",
+			"license": "(MPL-2.0 OR Apache-2.0)",
+			"author": "Dr.-Ing. Mario Heiderich, Cure53 <mario@cure53.de> (https://cure53.de/)",
+			"homepage": "https://github.com/cure53/DOMPurify",
+			"required": "^3.4.14"
+		},
+		{
+			"name": "escape-string-regexp",
+			"version": "5.0.0",
+			"license": "MIT",
+			"author": "Sindre Sorhus",
+			"homepage": "https://github.com/sindresorhus/escape-string-regexp",
+			"required": "^5.0.0"
+		},
+		{
+			"name": "filesize",
+			"version": "11.0.22",
+			"license": "BSD-3-Clause",
+			"author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
+			"homepage": "https://filesizejs.com",
+			"required": "^11.0.22"
+		},
+		{
+			"name": "html-tag-js",
+			"version": "2.4.16",
+			"license": "MIT",
+			"author": "Ajit Kumar",
+			"homepage": "https://github.com/deadlyjack/tag.git#readme",
+			"required": "^2.4.16"
+		},
+		{
+			"name": "isomorphic-git",
+			"version": "1.44.11",
+			"license": "MIT",
+			"author": "William Hilton <wmhilton@gmail.com>",
+			"homepage": "https://isomorphic-git.org/",
+			"required": "^1.44.11"
+		},
+		{
+			"name": "jszip",
+			"version": "3.10.1",
+			"license": "(MIT OR GPL-3.0-or-later)",
+			"author": "Stuart Knightley <stuart@stuartk.com>",
+			"homepage": "https://github.com/Stuk/jszip",
+			"required": "^3.10.1"
+		},
+		{
+			"name": "katex",
+			"version": "0.18.4",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://katex.org",
+			"required": "^0.18.4"
+		},
+		{
+			"name": "markdown-it",
+			"version": "15.0.1",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://github.com/markdown-it/markdown-it",
+			"required": "^15.0.1"
+		},
+		{
+			"name": "markdown-it-anchor",
+			"version": "9.2.1",
+			"license": "Unlicense",
+			"author": "",
+			"homepage": "https://github.com/valeriangalliat/markdown-it-anchor",
+			"required": "^9.2.1"
+		},
+		{
+			"name": "markdown-it-emoji",
+			"version": "3.1.0",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://github.com/markdown-it/markdown-it-emoji",
+			"required": "^3.1.0"
+		},
+		{
+			"name": "markdown-it-footnote",
+			"version": "4.0.0",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://github.com/markdown-it/markdown-it-footnote",
+			"required": "^4.0.0"
+		},
+		{
+			"name": "markdown-it-github-alerts",
+			"version": "1.0.1",
+			"license": "MIT",
+			"author": "Anthony Fu <anthonyfu117@hotmail.com>",
+			"homepage": "https://github.com/antfu/markdown-it-github-alerts#readme",
+			"required": "^1.0.1"
+		},
+		{
+			"name": "markdown-it-task-lists",
+			"version": "2.1.1",
+			"license": "ISC",
+			"author": "Revin Guillen",
+			"homepage": "https://github.com/revin/markdown-it-task-lists#readme",
+			"required": "^2.1.1"
+		},
+		{
+			"name": "markdown-it-texmath",
+			"version": "1.0.0",
+			"license": "MIT",
+			"author": "Stefan Goessner <fang03@web.de>",
+			"homepage": "https://github.com/goessner/markdown-it-texmath",
+			"required": "^1.0.0"
+		},
+		{
+			"name": "mermaid",
+			"version": "11.17.2",
+			"license": "MIT",
+			"author": "Knut Sveidqvist",
+			"homepage": "https://github.com/mermaid-js/mermaid",
+			"required": "^11.17.2"
+		},
+		{
+			"name": "mime-types",
+			"version": "3.0.2",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://github.com/jshttp/mime-types",
+			"required": "^3.0.2"
+		},
+		{
+			"name": "motion",
+			"version": "13.1.1",
+			"license": "MIT",
+			"author": "Matt Perry",
+			"homepage": "https://github.com/motiondivision/motion",
+			"required": "^13.1.1"
+		},
+		{
+			"name": "mustache",
+			"version": "4.2.0",
+			"license": "MIT",
+			"author": "mustache.js Authors <http://github.com/janl/mustache.js>",
+			"homepage": "https://github.com/janl/mustache.js",
+			"required": "^4.2.0"
+		},
+		{
+			"name": "picomatch",
+			"version": "4.0.7",
+			"license": "MIT",
+			"author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+			"homepage": "https://github.com/micromatch/picomatch",
+			"required": "^4.0.7"
+		},
+		{
+			"name": "sweetalert2",
+			"version": "11.26.25",
+			"license": "MIT",
+			"author": "Limon Monte (https://limonte.github.io)",
+			"homepage": "https://sweetalert2.github.io/",
+			"required": "^11.26.25"
+		},
+		{
+			"name": "url-parse",
+			"version": "1.5.10",
+			"license": "MIT",
+			"author": "Arnout Kazemier",
+			"homepage": "https://github.com/unshiftio/url-parse",
+			"required": "^1.5.10"
+		},
+		{
+			"name": "vanilla-picker",
+			"version": "2.12.3",
+			"license": "ISC",
+			"author": "Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)",
+			"homepage": "https://vanilla-picker.js.org",
+			"required": "^2.12.3"
+		},
+		{
+			"name": "vscode-css-languageservice",
+			"version": "6.3.10",
+			"license": "MIT",
+			"author": "Microsoft Corporation",
+			"homepage": "https://github.com/Microsoft/vscode-css-languageservice",
+			"required": "6.3.10"
+		},
+		{
+			"name": "vscode-html-languageservice",
+			"version": "5.6.2",
+			"license": "MIT",
+			"author": "Microsoft Corporation",
+			"homepage": "https://github.com/Microsoft/vscode-html-languageservice",
+			"required": "5.6.2"
+		},
+		{
+			"name": "vscode-json-languageservice",
+			"version": "5.7.2",
+			"license": "MIT",
+			"author": "Microsoft Corporation",
+			"homepage": "https://github.com/Microsoft/vscode-json-languageservice",
+			"required": "5.7.2"
+		},
+		{
+			"name": "vscode-languageserver-textdocument",
+			"version": "1.0.14",
+			"license": "MIT",
+			"author": "Microsoft Corporation",
+			"homepage": "https://github.com/Microsoft/vscode-languageserver-node",
+			"required": "1.0.14"
+		},
+		{
+			"name": "yargs",
+			"version": "18.1.0",
+			"license": "MIT",
+			"author": "",
+			"homepage": "https://yargs.js.org/",
+			"required": "^18.1.0"
+		}
+	]
+}

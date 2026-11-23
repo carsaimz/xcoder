@@ -174,3 +174,13 @@
   }
 
 }
+
+/* Long URLs (website, docs, license...) must never overflow the row. */
+#about-page {
+	.info-item-text,
+	.info-item-subtext {
+		min-width: 0;
+		overflow-wrap: anywhere;
+		word-break: break-word;
+	}
+}

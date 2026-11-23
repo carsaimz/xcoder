@@ -7,6 +7,41 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.31] - 2026-11-23
+
+### Git — clone corrigido de vez
+
+- **Fim do «HTTP Error: undefined undefined»** — o isomorphic-git lê
+  `statusCode`/`statusMessage` e `headers['content-type']` (estilo Node),
+  mas o cliente HTTP nativo respondia `status`/`statusText` com headers
+  sem acesso direto por propriedade: TODA resposta — mesmo um 200! — era
+  rejeitada como erro. O cliente agora devolve os dois formatos e headers
+  em objeto plano (lowercase, com helpers `.get()`), então clonar, push,
+  pull e fetch voltaram a funcionar de verdade no painel Git e no bot.
+
+### Sobre / Changelog
+
+- **Changelog da versão atual sempre correto** — a aba «versão atual» lê
+  primeiro o CHANGELOG.md empacotado no build (seção da versão em
+  execução) em vez do resumo de commits do release do GitHub, que
+  repetia as mesmas informações curtas; as notas bilíngues completas
+  aparecem como no repositório.
+- **Todas as bibliotecas open-source no About** — «Open-source libraries»
+  agora cobre as 80 dependências de produção (nome, versão, licença e
+  site), geradas do package.json; toque num item para abrir a página do
+  projeto.
+- **«Version xx.xx» com espaço** — o rótulo e o número da versão deixaram
+  de aparecer colados no topo do About.
+- **Links não vazam mais da tela** — URLs longas quebram dentro do item
+  no About e no changelog (overflow-wrap + word-break).
+
+### Web
+
+- O site passou a publicar o **CHANGELOG.md completo** na página
+  /changelog (além do resumo das releases) e recebeu os anúncios das
+  versões 1.8.28–1.8.30.
+
+
 ## [1.8.30] - 2026-11-23
 
 ### Plugins — ponte com o marketplace do Acode
@@ -2283,6 +2318,41 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.31] - 2026-11-23
+
+### Git — clone fixed for good
+
+- **End of «HTTP Error: undefined undefined»** — isomorphic-git reads
+  `statusCode`/`statusMessage` and `headers['content-type']` (Node
+  style), but the native HTTP client answered with `status`/`statusText`
+  and headers without direct property access: EVERY response — even a
+  200! — was rejected as an error. The client now returns both shapes
+  plus plain lowercase headers (with `.get()` helpers), so clone, push,
+  pull and fetch work again in the Git panel and the bot.
+
+### About / Changelog
+
+- **Current-version changelog always correct** — the "current version"
+  tab reads the CHANGELOG.md bundled with the build first (the running
+  version's section) instead of the GitHub release commit summary that
+  repeated the same short info; the full bilingual notes now show
+  exactly like in the repository.
+- **Every open-source library in About** — "Open-source libraries" now
+  covers all 80 production dependencies (name, version, license and
+  homepage), generated from package.json; tap an entry to open the
+  project page.
+- **"Version xx.xx" with a space** — the label and the version number
+  are no longer glued together at the top of About.
+- **Links no longer overflow the screen** — long URLs wrap inside their
+  row in About and the changelog (overflow-wrap + word-break).
+
+### Web
+
+- The site now publishes the **full CHANGELOG.md** on the /changelog
+  page (besides the release summaries) and received announcements for
+  versions 1.8.28–1.8.30.
+
 
 ## [1.8.30] - 2026-11-23
 

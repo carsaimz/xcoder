@@ -166,3 +166,61 @@ describe("git httpClient", () => {
 		expect(nativeAvailable()).toBe(true);
 	});
 });
+
+describe("git http response contract (isomorphic-git 1.44)", () => {
+	it("exposes node-style statusCode/statusMessage aliases", async () => {
+		setGitHttpPorts({
+			native: {
+				sendRequest: (url, options, success) =>
+					success({
+						status: 200,
+						data: new Uint8Array([1]).buffer,
+						headers: {
+							"Content-Type":
+								"application/x-git-upload-pack-advertisement",
+						},
+					}),
+			},
+		});
+		const response = await request({
+			url: "https://github.com/a/b/info/refs?service=git-upload-pack",
+			method: "GET",
+		});
+		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
+		expect(response.statusMessage).toBe("");
+		// plain property access — exactly how isomorphic-git reads headers
+		expect(response.headers["content-type"]).toBe(
+			"application/x-git-upload-pack-advertisement",
+		);
+		expect(response.headers.get("content-type")).toBe(
+			"application/x-git-upload-pack-advertisement",
+		);
+		expect(response.headers.get("Content-Type")).toBe(
+			"application/x-git-upload-pack-advertisement",
+		);
+	});
+
+	it("plain headers object survives the native error path too", async () => {
+		setGitHttpPorts({
+			native: {
+				sendRequest: (url, options, success, failure) =>
+					failure({ status: 404, error: "no repo", headers: { "x-a": "b" } }),
+			},
+		});
+		const response = await request({
+			url: "https://github.com/a/b/info/refs?service=git-upload-pack",
+			method: "GET",
+		});
+		expect(response.statusCode).toBe(404);
+		expect(response.headers["x-a"]).toBe("b");
+	});
+
+	it("headersLike keeps lowercase plain keys plus helpers", () => {
+		const headers = headersLike({ "Content-Type": "text/plain" });
+		expect(headers["content-type"]).toBe("text/plain");
+		expect(headers.get("content-type")).toBe("text/plain");
+		expect(headers.has("CONTENT-TYPE")).toBe(true);
+		expect(headers.get("missing")).toBeNull();
+	});
+});

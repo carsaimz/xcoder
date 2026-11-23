@@ -10,6 +10,7 @@ import config from "lib/config";
 import markdownIt from "markdown-it";
 import markdownItFootnote from "markdown-it-footnote";
 import markdownItTaskLists from "markdown-it-task-lists";
+import { extractChangelogSection } from "utils/changelogSection";
 import helpers from "utils/helpers";
 
 export default async function Changelog() {
@@ -139,14 +140,22 @@ export default async function Changelog() {
 	}
 
 	async function loadVersionChangelog() {
+		selectedVersion = currentVersion;
+		selectedStatus = "current";
+		updateVersionSelector();
+
+		// 1) The bundled CHANGELOG.md ships with this exact build, so its
+		// section always matches the running version. The GitHub release
+		// body is only a fallback: it is generated from commit titles and
+		// repeats the same short summary for every version.
+		const local = localSection(currentVersion);
+		if (local) return renderChangelog(local);
+
 		try {
 			const releases = await fsOperation(GITHUB_API_URL).readFile("json");
 			const currentRelease = releases.find(
 				(r) => r.tag_name.replace("v", "") === currentVersion,
 			);
-			selectedVersion = currentVersion;
-			selectedStatus = "current";
-			updateVersionSelector();
 			if (currentRelease?.body) {
 				return renderChangelog(currentRelease.body);
 			}
@@ -160,8 +169,9 @@ export default async function Changelog() {
 			// then keep the bundled changelog silently instead of an error toast.
 			window.log("warn", "Failed to load version changelog:", error);
 			const rawSection = await loadRawChangelogSection(currentVersion);
-			updateVersionSelector();
-			return renderChangelog(rawSection || localChangelogMd);
+			return renderChangelog(
+				rawSection || localSection(currentVersion) || localChangelogMd,
+			);
 		}
 	}
 
@@ -189,18 +199,25 @@ export default async function Changelog() {
 		// 2) raw CHANGELOG.md from the repo
 		try {
 			const text = await fsOperation(CHANGELOG_FILE_URL).readFile("utf8");
-			const escaped = version.replace(/\./g, "\\.");
-			const pattern = new RegExp(
-				`(^|\\n)#{2,3}\\s*\\[?v?${escaped}\\]?[^\\n]*\\n([\\s\\S]*?)(?=\\n#{2,3}\\s|$)`,
-			);
-			const match = text.match(pattern);
-			if (match?.[2]?.trim()) {
-				return `## v${version}\n${match[2].trim()}`;
+			const body = extractChangelogSection(text, version);
+			if (body) {
+				return `## v${version}\n${body}`;
 			}
 		} catch (error) {
 			window.log("warn", "Raw changelog fallback failed:", error);
 		}
 		return null;
+	}
+
+	/**
+	 * Section of the bundled CHANGELOG.md for a version — it ships with
+	 * the build, so it matches the running app with no network at all.
+	 * @param {string} version
+	 * @returns {string|null}
+	 */
+	function localSection(version) {
+		const body = extractChangelogSection(localChangelogMd, version);
+		return body ? `## v${version}\n${body}` : null;
 	}
 
 	function renderChangelog(text) {

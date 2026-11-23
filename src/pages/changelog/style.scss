@@ -61,3 +61,11 @@
     opacity: 0.6;
   }
 }
+
+/* Long links/URLs from markdown must wrap instead of overflowing. */
+#changelog {
+	a {
+		overflow-wrap: anywhere;
+		word-break: break-word;
+	}
+}
