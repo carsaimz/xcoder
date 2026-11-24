@@ -8,8 +8,10 @@ import {
         findEndpoints,
         findSecrets,
         guessLanguage,
+        looksMinified,
         maskSecret,
         resolveUrl,
+        seoAudit,
 } from "../../src/lib/webScraper";
 
 describe("webScraper", () => {
@@ -216,6 +218,100 @@ describe("webScraper", () => {
                         );
                         expect(pretty).toContain("function a() {");
                         expect(pretty.split("\n").length).toBeGreaterThan(1);
+                });
+        });
+
+        describe("looksMinified", () => {
+                it("flags few-very-long-line bundles as minified", () => {
+                        const bundle = `${"<!doctype html><html><head></head><body>".padEnd(120, "x")}<script>${"a;".repeat(3000)}</script></body></html>`;
+                        expect(looksMinified(bundle)).toBe(true);
+                });
+
+                it("flags sources with a huge single line as minified", () => {
+                        const source = `line one\n${"x".repeat(6000)}\nline three`;
+                        expect(looksMinified(source)).toBe(true);
+                });
+
+                it("keeps normal multi-line sources untouched", () => {
+                        const html = Array.from(
+                                { length: 40 },
+                                (_, i) => `<p>parágrafo ${i} com conteúdo legível</p>`,
+                        ).join("\n");
+                        expect(looksMinified(html)).toBe(false);
+                        expect(looksMinified("<p>curto</p>")).toBe(false);
+                        expect(looksMinified("")).toBe(false);
+                });
+        });
+
+        describe("seoAudit", () => {
+                const buildGoodPage = () => `
+                        <!doctype html>
+                        <html lang="pt-BR">
+                        <head>
+                                <meta charset="utf-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1">
+                                <title>Guia definitivo de SEO para iniciantes em web</title>
+                                <meta name="description" content="Um guia completo com mais de cinquenta caracteres para passar na auditoria de meta description.">
+                                <link rel="canonical" href="https://ex.com/guia">
+                                <link rel="icon" href="/favicon.ico">
+                                <meta property="og:title" content="Guia SEO">
+                                <meta property="og:description" content="Guia completo">
+                                <meta property="og:image" content="https://ex.com/cover.jpg">
+                                <meta name="twitter:card" content="summary_large_image">
+                                <script type="application/ld+json">{"@type":"Article"}</script>
+                        </head>
+                        <body>
+                                <h1>Guia de SEO</h1>
+                                <h2>Introdução</h2>
+                                <p>${"conteúdo relevante ".repeat(200)}</p>
+                                <img src="/a.png" alt="banner">
+                        </body>
+                        </html>
+                `;
+
+                it("scores a well-formed page high", () => {
+                        const result = seoAudit(buildGoodPage(), "https://ex.com/guia");
+                        expect(result.overall).toBeGreaterThanOrEqual(90);
+                        expect(result.categories.length).toBe(5);
+                        for (const category of result.categories) {
+                                expect(category.score).toBeGreaterThanOrEqual(80);
+                        }
+                });
+
+                it("scores a bare page low and reports the failures", () => {
+                        const result = seoAudit("<html><body>oi</body></html>", "http://ex.com/");
+                        expect(result.overall).toBeLessThan(50);
+                        const failedTitles = result.categories.flatMap((c) =>
+                                c.checks.filter((ch) => ch.status === "fail").map((ch) => ch.title),
+                        );
+                        expect(failedTitles).toContain("Título da página");
+                        expect(failedTitles).toContain("HTTPS");
+                        expect(failedTitles).toContain("Viewport móvel");
+                });
+
+                it("penalises noindex and multiple h1", () => {
+                        const html = buildGoodPage().replace(
+                                "<head>",
+                                '<head><meta name="robots" content="noindex, nofollow">',
+                        ).replace("<h1>Guia de SEO</h1>", "<h1>Um</h1><h1>Dois</h1>");
+                        const result = seoAudit(html, "https://ex.com/");
+                        const robots = result.categories
+                                .flatMap((c) => c.checks)
+                                .find((ch) => ch.title === "Meta robots");
+                        const h1 = result.categories
+                                .flatMap((c) => c.checks)
+                                .find((ch) => ch.title === "Estrutura de títulos (h1)");
+                        expect(robots.status).toBe("fail");
+                        expect(h1.status).toBe("warn");
+                });
+
+                it("weights categories into the overall score", () => {
+                        const result = seoAudit(buildGoodPage(), "https://ex.com/");
+                        const weighted = result.categories.reduce(
+                                (acc, c) => acc + c.score * c.weight,
+                                0,
+                        );
+                        expect(result.overall).toBe(Math.round(weighted / 100));
                 });
         });
 });

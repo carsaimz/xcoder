@@ -5,6 +5,8 @@
   <description>In app browser</description>
   <license>Apache 2.0</license>
 
+  <asset src="res/android/seo-audit.js" target="browser/seo-audit.js" />
+
   <platform name="android">
 
     <config-file target="res/xml/config.xml" parent="/*">

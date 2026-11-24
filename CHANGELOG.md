@@ -7,6 +7,49 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.36] - 2026-11-25
+
+### Pré-visualização: SEO e correções nas ferramentas web
+
+- **Auditoria SEO na pré-visualização** — o menu do preview nativo ganhou
+  o item **«SEO»**: abre, dentro da própria página, um relatório detalhado
+  com **pontuações** (geral 0–100 e por categoria: Meta & tags,
+  Conteúdo, Social & partilha, Técnico, Performance). Cada verificação
+  mostra estado (✓ / ! / ✕), o valor medido e uma dica de correção:
+  título, description, canónico, robots/noindex, lang, charset, h1/h2,
+  volume de texto, imagens sem alt, ligações vazias, Open Graph,
+  Twitter Card, HTTPS, viewport, favicon, JSON-LD, peso do HTML,
+  scripts bloqueantes, TTFB/tempo de carga e pedidos de recursos.
+  - Botões **Copiar** (relatório em texto), **Atualizar** e fechar;
+    nada sai da página — o preview não é abandonado.
+- **«Inspecionar» e «Scrape» removidos do menu do preview** (pedido do
+  utilizador): as ferramentas continuam no sidebar, e um toque nelas não
+  devolve mais ao editor — o menu do preview fica só com as suas próprias
+  funções.
+- **Inspector funciona de vez** — duas causas de raiz corrigidas:
+  1. no nativo, uma sessão em ecrã inteiro criada *invisível* agora constrói
+     a WebView headless imediatamente (antes o `loadURL` só estacionava o
+     endereço e todos os comandos falhavam com "WebView is not ready");
+  2. no JS, ao terminar o carregamento a árvore DOM é buscada de imediato
+     (com uma segunda tentativa para SPAs que hidratam tarde) — acabou o
+     spinner eterno.
+- **Scraper: fim do «código criptografado»** — fontes minificadas
+  (uma/ poucas linhas gigantes) são **formatadas automaticamente** com
+  Prettier logo após a captura; o botão passa a alternar
+  «Embelezar ↔ Bruto» e o original fica sempre disponível.
+  - Se o pedido **bruto** falhar (403/bloqueio), a captura cai
+    automaticamente para a página **renderizada**; respostas vazias são
+    sinalizadas em vez de mostrarem uma tela em branco.
+  - O separador **Análise** ganhou o cartão **Auditoria SEO** com as
+    mesmas pontuações (auditada a partir do código-fonte).
+- **Sidebar com muitas opções agora rola** — a barra de apps (15+ itens
+  transborda em qualquer telemóvel) usa `touch-action: pan-y` e o gesto de
+  slide ignora arrastos verticais dentro dela: os ícones escondidos são
+  alcançáveis com scroll.
+- **Copiar problemas** — a página Problemas tem um botão «copiar tudo» no
+  cabeçalho (`ficheiro:linha:coluna [tipo] mensagem`) e um ícone de copiar
+  em cada problema.
+
 ## [1.8.35] - 2026-11-24
 
 ### Inspecção e scraping na tela de pré-visualização
@@ -2511,6 +2554,39 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.36] - 2026-11-25
+
+### Preview SEO & web-tool fixes
+
+- **SEO audit in the preview** — the native preview menu gained **"SEO"**:
+  it opens, inside the page itself, a detailed report with **scores**
+  (overall 0–100 plus per-category: Meta & tags, Content, Social,
+  Technical, Performance). Every check shows status (✓ / ! / ✕), the
+  measured value and a fix tip: title, description, canonical, robots/
+  noindex, lang, charset, h1/h2, text volume, images missing alt, empty
+  links, Open Graph, Twitter Card, HTTPS, viewport, favicon, JSON-LD,
+  HTML weight, blocking scripts, TTFB/load time and resource requests.
+  - **Copy** (plain-text report), **Refresh** and close buttons; nothing
+    leaves the page — the preview is never abandoned.
+- **"Inspect" and "Scrape" removed from the preview menu** (user
+  request): the tools remain in the sidebar, and tapping them no longer
+  bounces you back to the editor.
+- **Inspector finally works** — two root causes fixed: native side now
+  builds the WebView headless for invisible fullscreen sessions (commands
+  no longer fail with "WebView is not ready"), and on page load the DOM
+  tree is fetched immediately (with a hydration retry for late-painting
+  SPAs) — no more eternal spinner.
+- **Scraper: no more "encrypted" source** — minified captures are
+  **auto-formatted** with Prettier; the button toggles
+  "Beautify ↔ Raw" and the original bytes stay available. Raw fetch
+  failures fall back to the rendered page automatically; empty responses
+  are surfaced instead of a blank screen. The Analysis tab gained an SEO
+  audit card with the same scores.
+- **Overflowing sidebar rail now scrolls** — `touch-action: pan-y` plus a
+  slide-gesture exemption for vertical drags inside the icon rail.
+- **Copy problems** — the Problems page gained a copy-all header action
+  and a per-problem copy icon.
 
 ## [1.8.35] - 2026-11-24
 

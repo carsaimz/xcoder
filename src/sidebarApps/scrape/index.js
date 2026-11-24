@@ -12,6 +12,8 @@ import {
 	findSecrets,
 	guessLanguage,
 	httpFetch,
+	looksMinified,
+	seoAudit,
 } from "lib/webScraper";
 import { copyText } from "utils/clipboard";
 import Url from "utils/Url";
@@ -43,8 +45,10 @@ let $sourceBadge = null;
 let $assetsBadge = null;
 /** @type {HTMLElement|null} */
 let $analysisBadge = null;
+/** @type {HTMLElement|null} */
+let $beautifyLabel = null;
 
-/** @type {{text: string, url: string, mode: string, title: string}|null} */
+/** @type {{text: string, raw: string, url: string, mode: string, title: string, formatted: boolean}|null} */
 let source = null;
 /** @type {ReturnType<typeof extractAssets>|null} */
 let assets = null;
@@ -77,6 +81,7 @@ function initApp(el) {
 		$sourceBadge = null;
 		$assetsBadge = null;
 		$analysisBadge = null;
+		$beautifyLabel = null;
 	};
 }
 
@@ -151,7 +156,9 @@ function buildUi() {
 				</button>
 				<button type="button" onclick={() => beautify()}>
 					<span className="icon codicon-wand" />
-					{t("scraper beautify", "Embelezar")}
+					<span ref={(el) => ($beautifyLabel = el)}>
+						{t("scraper beautify", "Embelezar")}
+					</span>
 				</button>
 				<button type="button" onclick={() => source && copyText(source.text)}>
 					<span className="icon codicon-copy" />
@@ -244,28 +251,56 @@ async function fetchSource(mode) {
 		let text = "";
 		let finalUrl = url;
 		let title = "";
+		let effectiveMode = mode;
 		if (mode === "raw") {
-			text = String(await httpFetch(url));
-		} else {
+			try {
+				text = String(await httpFetch(url));
+			} catch (rawError) {
+				// raw capture failed (403 / bot-blocked / offline) —
+				// fall back to the rendered page so the user still
+				// gets content instead of an empty view
+				setStatus(
+					`${t("scraper raw failed", "Bruto falhou")}: ${rawError?.message || rawError} — ${t("scraper trying rendered", "a tentar renderizado…")}`,
+				);
+				effectiveMode = "rendered";
+			}
+		}
+		if (effectiveMode === "rendered") {
 			const result = await fetchRenderedHtml(url);
 			text = result.html;
 			finalUrl = result.url;
 			title = result.title;
 		}
+		if (!String(text).trim()) {
+			throw new Error(t("scraper empty response", "resposta vazia"));
+		}
 
-		source = { text, url: finalUrl, mode, title };
+		source = {
+			text,
+			raw: text,
+			url: finalUrl,
+			mode: effectiveMode,
+			title,
+			formatted: false,
+		};
 		analyse();
 		renderSource();
 		renderAssets();
 		renderAnalysis();
+		updateBeautifyLabel();
 		const lines = String(text).split("\n").length;
 		setStatus(
 			`${lines} ${t("scraper lines", "linhas")} • ${(text.length / 1024).toFixed(0)} KB • ${
-				mode === "raw"
+				effectiveMode === "raw"
 					? t("scraper mode raw", "bruto")
 					: t("scraper mode rendered", "renderizado")
 			}`,
 		);
+		// bundled/minified pages read like "código criptografado" —
+		// format them automatically before display (raw stays one tap away)
+		if (looksMinified(source.raw)) {
+			await autoFormat();
+		}
 	} catch (error) {
 		setStatus(`${t("scraper failed", "Falhou")}: ${error?.message || error}`);
 		toast(`${t("scraper failed", "Falhou")}: ${error?.message || error}`, 3000);
@@ -407,19 +442,70 @@ async function openInEditor() {
 	}
 }
 
+/**
+ * Formats source.raw with Prettier into source.text (keeps the original
+ * bytes around so the Embelezar button can toggle back).
+ */
+async function formatSource() {
+	const lang = guessLanguage(source.url, source.raw);
+	const formatted = await beautifyCode(source.raw, lang);
+	source.text = formatted;
+	source.formatted = true;
+	renderSource();
+	updateBeautifyLabel();
+	return lang;
+}
+
+/** Auto-formats a minified capture right after fetch (silent on failure). */
+async function autoFormat() {
+	if (!source || source.formatted) return;
+	setStatus(
+		t("scraper formatting", "Código minificado detetado — a formatar…"),
+	);
+	try {
+		const lang = await formatSource();
+		setStatus(
+			`${t("scraper auto formatted", "Formatado automaticamente")} (${lang}) — ${t("scraper toggle raw", "«Bruto» restaura o original")}`,
+		);
+	} catch {
+		setStatus(
+			t(
+				"scraper format failed",
+				"Não foi possível formatar — a mostrar o original",
+			),
+		);
+	}
+}
+
 async function beautify() {
 	if (!source) return;
+	// toggle: formatted → back to the original raw bytes
+	if (source.formatted) {
+		source.text = source.raw;
+		source.formatted = false;
+		renderSource();
+		updateBeautifyLabel();
+		setStatus(t("scraper raw restored", "Código original (bruto)"));
+		return;
+	}
 	setStatus(t("scraper beautifying", "A embelezar…"));
 	try {
-		const lang = guessLanguage(source.url, source.text);
-		source.text = await beautifyCode(source.text, lang);
-		renderSource();
+		source.raw = source.raw || source.text;
+		const lang = await formatSource();
 		setStatus(`${t("scraper beautified", "Embelezado")} (${lang})`);
 	} catch (error) {
 		setStatus(
 			`${t("scraper beautify failed", "Embelezar falhou")}: ${error?.message || error}`,
 		);
 	}
+}
+
+/** Keeps the Embelezar/Bruto button label in sync with the toggle state. */
+function updateBeautifyLabel() {
+	if (!$beautifyLabel) return;
+	$beautifyLabel.textContent = source?.formatted
+		? t("scraper show raw", "Bruto")
+		: t("scraper beautify", "Embelezar");
 }
 
 // ----------------------------------------------------------------- assets
@@ -537,6 +623,52 @@ function renderAnalysis() {
 		);
 		return;
 	}
+
+	// --- SEO ------------------------------------------------------------
+	const seo = seoAudit(source.raw || source.text, source.url);
+	$analysis.append(
+		<div className="scr-analysis-card scr-seo">
+			<div className="scr-analysis-title">
+				<span className="icon codicon-search" />
+				{t("scraper seo", "Auditoria SEO")} —{" "}
+				<strong
+					className={`scr-seo-score ${seo.overall >= 90 ? "good" : seo.overall >= 50 ? "mid" : "bad"}`}
+				>
+					{seo.overall}/100
+				</strong>
+			</div>
+			{seo.categories.map((category) => (
+				<details className="scr-seo-cat">
+					<summary>
+						{category.name}
+						<span
+							className={`scr-seo-score ${category.score >= 90 ? "good" : category.score >= 50 ? "mid" : "bad"}`}
+						>
+							{category.score}
+						</span>
+					</summary>
+					{category.checks.map((check) => (
+						<div className={`scr-seo-check ${check.status}`}>
+							<span className="scr-seo-mark">
+								{check.status === "pass"
+									? "✓"
+									: check.status === "warn"
+										? "!"
+										: "✕"}
+							</span>
+							<div className="scr-seo-check-body">
+								<span className="scr-seo-check-title">{check.title}</span>
+								<span className="scr-seo-check-detail">{check.detail}</span>
+								{check.tip ? (
+									<span className="scr-seo-tip">💡 {check.tip}</span>
+								) : null}
+							</div>
+						</div>
+					))}
+				</details>
+			))}
+		</div>,
+	);
 
 	// --- meta ------------------------------------------------------------
 	if (meta) {

@@ -93,6 +93,13 @@ body.no-animation {
       flex-direction: column;
       gap: 4px;
 
+      // native vertical panning: with 15+ apps the rail overflows on every
+      // phone — the sidebar slide handler must not eat vertical drags here
+      // (touch-action lets the browser scroll natively; horizontal swipes
+      // still slide the sidebar closed)
+      touch-action: pan-y;
+      overscroll-behavior: contain;
+
       @supports not (gap: 1px) {
         > * + * { margin-top: 4px; }
       }

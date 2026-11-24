@@ -110,11 +110,19 @@ public class WebViewPlugin extends CordovaPlugin {
 
         try {
           if (instance.isFullscreen()) {
-            // The WebView is created lazily by WebViewActivity. When the
-            // caller asked for an initially hidden instance, the launch is
-            // deferred until show() is called.
             if (visible) {
+              // Launched right away: the WebView is built lazily by
+              // WebViewActivity when the activity comes up.
               showFullscreenActivity(id);
+            } else {
+              // Initially hidden fullscreen session: build the WebView
+              // headless NOW. Previously nothing was created until show(),
+              // so loadURL only parked the address and every postMessage/
+              // evaluate failed with "WebView is not ready" — the Inspector
+              // (mode "fullscreen", visible false) showed an empty page.
+              // A headless WebView loads, runs JS and answers commands; the
+              // hosting activity later reparents the same view (show()).
+              instance.createWebView(cordova.getActivity());
             }
           } else {
             // "hidden" mode: a headless WebView that is never displayed.

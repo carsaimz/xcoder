@@ -2,13 +2,24 @@ import "./style.scss";
 import { focusEditorIfEditable } from "cm/editorReadOnly";
 import { getLspDiagnostics } from "cm/lsp/diagnostics";
 import Page from "components/page";
+import toast from "components/toast";
 import actionStack from "lib/actionStack";
 import EditorFile from "lib/editorFile";
 import { getLinterDiagnostics } from "lib/linterRegistry";
+import { copyText } from "utils/clipboard";
 import helpers from "utils/helpers";
 
 export default function Problems() {
-	const $page = Page(strings["problems"]);
+	const $page = Page(strings["problems"], {
+		tail: (
+			<span
+				className="icon codicon-copy problems-copy-all"
+				title={strings["problems copy all"] || "Copiar problemas"}
+				role="button"
+				onclick={copyAll}
+			/>
+		),
+	});
 	/**@type {EditorFile[]} */
 	const files = editorManager.files;
 	const $content = <div id="problems"></div>;
@@ -20,7 +31,7 @@ export default function Problems() {
 
 		const title = `${file.name} (${annotations.length})`;
 		$content.append(
-			<details open="true" className="single-file">
+			<details open="true" className="single-file" data-file-name={file.name}>
 				<summary>{title}</summary>
 				<div className="problems">
 					{annotations.map((annotation) => {
@@ -41,6 +52,13 @@ export default function Problems() {
 								<span className="problem-line">
 									{row + 1}:{column + 1}
 								</span>
+								<span
+									className="icon codicon-copy problem-copy"
+									data-action="copy"
+									title={strings["problems copy one"] || "Copiar problema"}
+									annotation={annotation}
+									data-file-name={file.name}
+								></span>
 							</div>
 						);
 					})}
@@ -68,6 +86,11 @@ export default function Problems() {
 	 * @param {MouseEvent} e
 	 */
 	function clickHandler(e) {
+		const $copy = e.target.closest("[data-action='copy']");
+		if ($copy) {
+			copyProblem($copy);
+			return;
+		}
 		const $target = e.target.closest("[data-action='goto']");
 		if (!$target) return;
 		const { action } = $target.dataset;
@@ -87,6 +110,42 @@ export default function Problems() {
 				focusEditorIfEditable(editorManager.editor);
 			}, 100);
 		}
+	}
+
+	/**
+	 * Copies a single problem as "file:line:column [severity] message".
+	 * @param {HTMLElement} $el the copy icon carrying the annotation
+	 */
+	function copyProblem($el) {
+		const annotation = $el.annotation;
+		if (!annotation) return;
+		const row = normalizeIndex(annotation.row);
+		const column = normalizeIndex(annotation.column);
+		const line = `${$el.dataset.fileName || ""}:${row + 1}:${column + 1} [${annotation.type}] ${annotation.text}`;
+		copyText(line)
+			.then(() => toast(strings["copied"] || "Copiado", 1500))
+			.catch(() => {});
+	}
+
+	/** Copies every listed problem, grouped by file. */
+	function copyAll() {
+		const lines = [];
+		$content.querySelectorAll("details.single-file").forEach(($file) => {
+			const fileName = $file.dataset.fileName || "";
+			$file.querySelectorAll(".problem").forEach(($problem) => {
+				const annotation = $problem.annotation;
+				if (!annotation) return;
+				const row = normalizeIndex(annotation.row);
+				const column = normalizeIndex(annotation.column);
+				lines.push(
+					`${fileName}:${row + 1}:${column + 1} [${annotation.type}] ${annotation.text}`,
+				);
+			});
+		});
+		if (!lines.length) return;
+		copyText(lines.join("\n"))
+			.then(() => toast(strings["copied"] || "Copiado", 1500))
+			.catch(() => {});
 	}
 
 	function collectAnnotations(file) {

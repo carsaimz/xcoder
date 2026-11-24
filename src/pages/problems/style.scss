@@ -49,3 +49,26 @@
     }
   }
 }
+// copy affordances (user request: "deveria ser possível copiar os problemas")
+.problems-copy-all {
+  padding: 6px 10px;
+  font-size: 16px;
+  opacity: 0.85;
+  cursor: pointer;
+
+  &:active {
+    opacity: 1;
+  }
+}
+
+.problem .problem-copy {
+  pointer-events: auto;
+  margin-left: 6px;
+  font-size: 0.85rem;
+  opacity: 0.55;
+  cursor: pointer;
+
+  &:active {
+    opacity: 1;
+  }
+}

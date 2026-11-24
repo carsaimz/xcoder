@@ -383,6 +383,15 @@ function handleEvent(event, data) {
 			ts: Date.now(),
 		});
 		renderConsole();
+		// pull the DOM tree right away (previously the root fetch only
+		// happened on tab switches, leaving a spinner forever) — with
+		// one hydration retry for SPA pages that paint late
+		fetchTree("");
+		setTimeout(() => {
+			if (activeInspectorSession() && !treeCache.has("")) {
+				fetchTree("");
+			}
+		}, 1200);
 		return;
 	}
 

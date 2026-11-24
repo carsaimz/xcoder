@@ -619,6 +619,16 @@ preventSlideTests.push((target) => {
 	}
 });
 
+// The activity-bar rail scrolls natively once it overflows (15+ apps on a
+// phone) — the slide gesture must never engage for drags that start there,
+// otherwise touchmove preventDefault() kills the scroll (user report:
+// "quando tem muitas opções não dá para dar scroll").
+preventSlideTests.push((target) => {
+	const rail = target?.closest?.(".app-icons-container");
+	if (!rail) return false;
+	return rail.scrollHeight > rail.offsetHeight;
+});
+
 preventSlideTests.push((target) => {
 	return (
 		target instanceof HTMLInputElement ||

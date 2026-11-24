@@ -35,9 +35,11 @@ import com.xcoder.browser.Emulator;
 import com.xcoder.browser.Menu;
 import com.xcoder.system.Ui;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -242,10 +244,9 @@ public class Browser extends LinearLayout {
     menu.setVisible("Set as Default", false);
     menu.setVisible("Clear Default", false);
     if (!onlyConsole) {
-      // DevTools-grade follow-ups on the previewed page: they hand the URL
-      // to the editor's Inspector / Scraper sidebar tools.
-      menu.addItem(Ui.Icons.CODE, "Inspect");
-      menu.addItem(Ui.Icons.GLOBE, "Scrape");
+      // SEO audit of the previewed page — opens a detailed, scored report
+      // as an overlay inside the page (nothing leaves the preview screen).
+      menu.addItem(Ui.Icons.GLOBE, "SEO");
     }
     menu.addItem(Ui.Icons.OPEN_IN_BROWSER, "Open in Browser");
     menu.addItem(Ui.Icons.EXIT, "Exit");
@@ -323,11 +324,8 @@ public class Browser extends LinearLayout {
                   checked ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_DEFAULT
                 );
               break;
-            case "Inspect":
-              sendToApp("inspector");
-              break;
-            case "Scrape":
-              sendToApp("scrape");
+            case "SEO":
+              runSeoAudit();
               break;
             case "Open in Browser":
               Intent browserIntent = new Intent(
@@ -474,24 +472,6 @@ public class Browser extends LinearLayout {
     if (reload) {
       webView.reload();
     }
-  }
-
-  /**
-   * Hands the previewed URL to the editor's Inspector/Scraper tool: brings
-   * MainActivity forward with extras; the JS intent handler opens the tool
-   * with the address preloaded. The preview stays in the back stack.
-   */
-  private void sendToApp(String tool) {
-    Intent launch = context
-      .getPackageManager()
-      .getLaunchIntentForPackage(context.getPackageName());
-    if (launch == null) return;
-    launch.addFlags(
-      Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
-    );
-    launch.putExtra("xcoder_tool", tool);
-    launch.putExtra("xcoder_url", url);
-    context.startActivity(launch);
   }
 
   public void setDesktopMode() {
@@ -724,6 +704,29 @@ public class Browser extends LinearLayout {
 
     webView.destroy();
     ((Activity) context).finish();
+  }
+
+  /**
+   * Runs the SEO audit overlay inside the previewed page. The script is
+   * bundled as an asset (browser/seo-audit.js) and is idempotent — running
+   * it again refreshes the report. Nothing leaves the preview screen.
+   */
+  private void runSeoAudit() {
+    try {
+      InputStream input = context.getAssets().open("browser/seo-audit.js");
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      byte[] chunk = new byte[8192];
+      int read;
+      while ((read = input.read(chunk)) != -1) {
+        buffer.write(chunk, 0, read);
+      }
+      input.close();
+      String script = "(function(){" + buffer.toString("UTF-8") + "})();";
+      webView.evaluateJavascript(script, null);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Toast.makeText(context, "SEO audit unavailable", Toast.LENGTH_SHORT).show();
+    }
   }
 }
 
