@@ -10,16 +10,52 @@ const handlers = [];
  */
 const pendingIntents = [];
 /**
- * Tool hand-offs from the native preview ("Inspect" / "Scrape" menu) that
- * arrive before files are restored.
- * @type {Array<{tool: "inspector"|"scrape", url: string}>}
+ * Tool hand-offs from the native preview ("Inspect" / "Scrape" / "Analyze"
+ * menu) that arrive before files are restored.
+ * @type {Array<{tool: "inspector"|"scrape"|"analyzer", url: string}>}
  */
 const pendingTools = [];
 
+/** Sidebar app + static module loader per native preview tool. */
+const TOOL_APPS = {
+	inspector: {
+		app: "inspectorApp",
+		load: () => import("sidebarApps/inspector"),
+	},
+	scrape: { app: "scrapeApp", load: () => import("sidebarApps/scrape") },
+	analyzer: { app: "analyzerApp", load: () => import("sidebarApps/analyzer") },
+};
+
 /**
- * Opens an editor tool (Inspector / Scraper sidebar app) with a URL
- * handed over from the native preview screen.
- * @param {"inspector"|"scrape"} tool
+ * Activates the tool's sidebar app and hands it the URL.
+ * @param {keyof typeof TOOL_APPS} tool
+ * @param {string} [url]
+ */
+async function openToolApp(tool, url) {
+	const entry = TOOL_APPS[tool];
+	if (!entry) return;
+	try {
+		const { default: sidebarApps } = await import("sidebarApps");
+		// the real SidebarApp instance is activated via setActiveApp() —
+		// sidebarApps.get() returns the container element and `.active`
+		// was a silent no-op on it
+		sidebarApps.setActiveApp(entry.app);
+		if (url) {
+			const mod = await entry.load();
+			if (tool === "inspector") await mod.openInspectorWith(url);
+			else if (tool === "scrape") await mod.openScraperWith(url, "rendered");
+			else if (tool === "analyzer") await mod.openAnalyzerWith(url);
+		}
+	} catch (error) {
+		console.error(error);
+		helpers.error(error);
+	}
+}
+
+/**
+ * Opens an editor tool (Inspector / Scraper / Analyzer sidebar app) with a
+ * URL handed over from the native preview screen.
+ * @param {keyof typeof TOOL_APPS} tool
  * @param {string} [url]
  */
 async function openTool(tool, url) {
@@ -27,28 +63,7 @@ async function openTool(tool, url) {
 		pendingTools.push({ tool, url });
 		return;
 	}
-
-	try {
-		const { default: sidebarApps } = await import("sidebarApps");
-		// sidebarApps.get() returns the app's CONTAINER element — setting
-		// `.active` on it did nothing, so the tool panel never opened after
-		// a preview hand-off («Inspecionar/Scrape» looked dead). The real
-		// SidebarApp instance is activated via setActiveApp().
-		sidebarApps.setActiveApp(
-			tool === "inspector" ? "inspectorApp" : "scrapeApp",
-		);
-		if (url) {
-			const mod =
-				tool === "inspector"
-					? await import("sidebarApps/inspector")
-					: await import("sidebarApps/scrape");
-			if (tool === "inspector") await mod.openInspectorWith(url);
-			else await mod.openScraperWith(url, "rendered");
-		}
-	} catch (error) {
-		console.error(error);
-		helpers.error(error);
-	}
+	await openToolApp(tool, url);
 }
 
 /**
@@ -63,9 +78,9 @@ export default async function HandleIntent(intent) {
 	const type = intent.action?.split(".").slice(-1)[0];
 
 	// Tool hand-off from the native preview screen (Browser "Inspect" /
-	// "Scrape" menu items) — MAIN action with xcoder_tool extras.
+	// "Scrape" / "Analyze" menu items) — MAIN action with xcoder_tool extras.
 	const tool = intent.extras?.xcoder_tool;
-	if (tool === "inspector" || tool === "scrape") {
+	if (TOOL_APPS[tool]) {
 		const toolUrl =
 			typeof intent.extras?.xcoder_url === "string"
 				? intent.extras.xcoder_url
@@ -175,20 +190,18 @@ export async function processPendingIntents() {
 	while (pendingTools.length > 0) {
 		const { tool, url } = pendingTools.shift();
 		try {
-			const { default: sidebarApps } = await import("sidebarApps");
 			// same fix as openTool(): activate the real SidebarApp instance
 			// (get() returns the container element — `.active` on it was a
 			// silent no-op and the tool panel never opened)
-			sidebarApps.setActiveApp(
-				tool === "inspector" ? "inspectorApp" : "scrapeApp",
-			);
+			const entry = TOOL_APPS[tool];
+			if (!entry) continue;
+			const { default: sidebarApps } = await import("sidebarApps");
+			sidebarApps.setActiveApp(entry.app);
 			if (url) {
-				const mod =
-					tool === "inspector"
-						? await import("sidebarApps/inspector")
-						: await import("sidebarApps/scrape");
+				const mod = await entry.load();
 				if (tool === "inspector") await mod.openInspectorWith(url);
-				else await mod.openScraperWith(url, "rendered");
+				else if (tool === "scrape") await mod.openScraperWith(url, "rendered");
+				else if (tool === "analyzer") await mod.openAnalyzerWith(url);
 			}
 		} catch (error) {
 			helpers.error(error);

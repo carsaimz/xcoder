@@ -7,6 +7,47 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.39] - 2026-11-26
+
+### Added
+- **Analisador de Sites** (ferramenta nova na barra lateral, glifo
+  telescópio) — descobre «o que foi usado para se basear»: frameworks
+  (Next.js, React, Vue, Angular, Astro, SvelteKit, Nuxt…), linguagens
+  (PHP, Python, Java, C#, Ruby, Node.js…), servidores e CDNs (Cloudflare,
+  Vercel, nginx, Apache, CloudFront…), CMSs e lojas (WordPress, Shopify,
+  Wix, WooCommerce…), analytics, fontes, captchas, widgets — **110+
+  assinaturas** de deteção, cada correspondência mostrada com a sua
+  **EVIDÊNCIA** (linha de cabeçalho ou fragmento HTML). Aba Detalhes com
+  meta da página + cabeçalhos da resposta; «Versão renderizada» carrega a
+  página numa WebView interna e analisa o DOM final (resolve SPAs e
+  bloqueios); relatório completo copiável. O menu do preview nativo ganhou
+  **«Analyze»** (glifo SEARCH no icon.ttf do preview) que entrega o URL ao
+  analisador — e o novo `httpFetchDetailed` devolve cabeçalhos + estado
+  sem rejeitar respostas 4xx/5xx (um intersticial 403 ainda identifica a
+  stack que protege o site).
+- **Aprender** (ferramenta nova na barra lateral, glifo láurea) — catálogo
+  com **43 sites principais** para estudar e consultar qualquer linguagem
+  ou ferramenta de programação e desenvolvimento web (MDN, W3Schools,
+  freeCodeCamp, javascript.info, roadmap.sh, Pro Git, SQLBolt,
+  LearnGitBranching, desafios Codewars/LeetCode/Exercism…), organizados em
+  11 categorias com pesquisa e filtros. Cada site abre na **WebView
+  interna flutuante** (iframe dentro da janela flutuante do app, com
+  barra Voltar/Recarregar/Externo) — e quando o site bloqueia
+  incorporação (X-Frame-Options / CSP frame-ancestors detetados nos
+  cabeçalhos por uma sonda HTTP), salta automaticamente para a **WebView
+  nativa interna** (atividade em ecrã cheio); há sempre o botão «Abrir na
+  WebView interna» à mão.
+
+### Internationalization
+- **68 chaves novas × 31 línguas** — todas as línguas do app a 100% (0
+  ausentes, 0 vazias). «Framework» mantido como termo técnico onde a
+  tradução genérica enganaria (Rahmenwerke/Рамки/Cadres → Frameworks).
+
+### Tests
+- 1368/1368 no total — 12 testes novos para o motor de deteção
+  (assinaturas de cabeçalhos/HTML, derivação de linguagens, limite de
+  evidências, política de incorporação, construtor do relatório).
+
 ## [1.8.38] - 2026-11-26
 
 ### Fixed
@@ -2613,6 +2654,45 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.39] - 2026-11-26
+
+### Added
+- **Site Analyzer** (new sidebar tool, telescope glyph) — finds what a
+  site is built with: frameworks (Next.js, React, Vue, Angular, Astro,
+  SvelteKit, Nuxt…), languages (PHP, Python, Java, C#, Ruby, Node.js…),
+  servers & CDNs (Cloudflare, Vercel, nginx, Apache, CloudFront…), CMS &
+  commerce (WordPress, Shopify, Wix, WooCommerce…), analytics, fonts,
+  captchas, widgets — **110+ detection signatures**, every match shown
+  WITH its **evidence** (header line or HTML snippet). Details tab with
+  page meta + response headers; a "Rendered version" pass loads the page
+  in an internal WebView and analyzes the final DOM (handles SPAs and
+  blocked requests); full copyable report. The native preview menu gained
+  **"Analyze"** (SEARCH glyph in the preview icon.ttf) which hands the
+  URL over — and the new `httpFetchDetailed` returns headers + status
+  without rejecting 4xx/5xx responses (a 403 interstitial still
+  identifies the stack guarding the site).
+- **Learn** (new sidebar tool, mortar-board glyph) — a curated catalog of
+  **43 top sites** to study and consult any programming language or web
+  tool (MDN, W3Schools, freeCodeCamp, javascript.info, roadmap.sh, Pro
+  Git, SQLBolt, LearnGitBranching, Codewars/LeetCode/Exercism
+  challenges…), grouped in 11 categories with search and filters. Every
+  site opens in the **floating internal WebView** (iframe inside the
+  app's floating window, with Back/Reload/External toolbar) — and when a
+  site blocks embedding (X-Frame-Options / CSP frame-ancestors detected
+  on the headers by an HTTP probe), it automatically falls back to the
+  **native internal WebView** (fullscreen activity); an "Open in internal
+  WebView" button stays one tap away.
+
+### Internationalization
+- **68 new keys × 31 languages** — every app language at 100% (0 missing,
+  0 empty). "Framework" kept as the technical term where the generic
+  translation would mislead (Rahmenwerke/Рамки/Cadres → Frameworks).
+
+### Tests
+- 1368/1368 total — 12 new tests for the detection engine (header/HTML
+  signatures, language derivation, evidence cap, embedding policy,
+  report builder).
 
 ## [1.8.36] - 2026-11-25
 

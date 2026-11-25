@@ -29,6 +29,7 @@ public class Ui {
     public static final String TABLET_APPLE = "\uE92A";
     public static final String CODE = "\uE91C";
     public static final String GLOBE = "\uE91E";
+    public static final String SEARCH = "\uEA6D";
     public static final String DESKTOP = "\uE90A";
     public static final String DEVICES = "\uE907";
     public static final String LAPTOP = "\uE90D";

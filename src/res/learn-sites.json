@@ -1,0 +1,260 @@
+[
+	{
+		"name": "MDN Web Docs",
+		"url": "https://developer.mozilla.org/",
+		"cat": "general",
+		"desc": "Documentação definitiva de HTML, CSS e JavaScript."
+	},
+	{
+		"name": "W3Schools",
+		"url": "https://www.w3schools.com/",
+		"cat": "general",
+		"desc": "Tutoriais interativos de HTML, CSS, JS, SQL e mais."
+	},
+	{
+		"name": "DevDocs",
+		"url": "https://devdocs.io/",
+		"cat": "general",
+		"desc": "Toda a documentação de APIs numa interface rápida."
+	},
+	{
+		"name": "Stack Overflow",
+		"url": "https://stackoverflow.com/",
+		"cat": "general",
+		"desc": "Perguntas e respostas sobre programação."
+	},
+	{
+		"name": "freeCodeCamp",
+		"url": "https://www.freecodecamp.org/",
+		"cat": "general",
+		"desc": "Cursos gratuitos com certificados de conclusão."
+	},
+	{
+		"name": "The Odin Project",
+		"url": "https://www.theodinproject.com/",
+		"cat": "general",
+		"desc": "Currículo completo de desenvolvimento web."
+	},
+	{
+		"name": "roadmap.sh",
+		"url": "https://roadmap.sh/",
+		"cat": "general",
+		"desc": "Mapas de estudo por área de desenvolvimento."
+	},
+	{
+		"name": "Can I use",
+		"url": "https://caniuse.com/",
+		"cat": "general",
+		"desc": "Suporte de APIs e atributos por navegador."
+	},
+	{
+		"name": "web.dev",
+		"url": "https://web.dev/",
+		"cat": "htmlcss",
+		"desc": "Cursos e boas práticas do Google (performance, Lighthouse)."
+	},
+	{
+		"name": "CSS-Tricks",
+		"url": "https://css-tricks.com/",
+		"cat": "htmlcss",
+		"desc": "Guias, snippets e notícias sobre CSS."
+	},
+	{
+		"name": "Flexbox Froggy",
+		"url": "https://flexboxfroggy.com/",
+		"cat": "htmlcss",
+		"desc": "Jogo para aprender Flexbox."
+	},
+	{
+		"name": "Grid Garden",
+		"url": "https://cssgridgarden.com/",
+		"cat": "htmlcss",
+		"desc": "Jogo para aprender CSS Grid."
+	},
+	{
+		"name": "CSS Battle",
+		"url": "https://cssbattle.dev/",
+		"cat": "htmlcss",
+		"desc": "Desafios de replicação de designs em CSS."
+	},
+	{
+		"name": "javascript.info",
+		"url": "https://javascript.info/",
+		"cat": "js",
+		"desc": "O tutorial moderno de JavaScript, do básico ao avançado."
+	},
+	{
+		"name": "Eloquent JavaScript",
+		"url": "https://eloquentjavascript.net/",
+		"cat": "js",
+		"desc": "Livro interativo sobre JavaScript e programação."
+	},
+	{
+		"name": "TypeScript Handbook",
+		"url": "https://www.typescriptlang.org/docs/handbook/",
+		"cat": "js",
+		"desc": "Manual oficial do TypeScript."
+	},
+	{
+		"name": "You Don't Know JS Yet",
+		"url": "https://github.com/getify/You-Dont-Know-JS",
+		"cat": "js",
+		"desc": "Série de livros sobre os fundamentos do JavaScript."
+	},
+	{
+		"name": "Tutorial oficial Python",
+		"url": "https://docs.python.org/3/tutorial/",
+		"cat": "python",
+		"desc": "Tutorial oficial da linguagem Python."
+	},
+	{
+		"name": "Real Python",
+		"url": "https://realpython.com/",
+		"cat": "python",
+		"desc": "Tutoriais aprofundados de Python."
+	},
+	{
+		"name": "Automate the Boring Stuff",
+		"url": "https://automatetheboringstuff.com/",
+		"cat": "python",
+		"desc": "Automatizar tarefas com Python — livro gratuito."
+	},
+	{
+		"name": "Tutorial Java (Oracle)",
+		"url": "https://docs.oracle.com/javase/tutorial/",
+		"cat": "jvm",
+		"desc": "Tutorial oficial da linguagem Java."
+	},
+	{
+		"name": "Kotlin Docs",
+		"url": "https://kotlinlang.org/docs/home.html",
+		"cat": "jvm",
+		"desc": "Documentação oficial do Kotlin."
+	},
+	{
+		"name": "Learn C",
+		"url": "https://www.learn-c.org/",
+		"cat": "clang",
+		"desc": "Tutorial interativo de C."
+	},
+	{
+		"name": "LearnCpp",
+		"url": "https://www.learncpp.com/",
+		"cat": "clang",
+		"desc": "Tutorial completo de C++, do básico ao moderno."
+	},
+	{
+		"name": "C# Docs",
+		"url": "https://learn.microsoft.com/dotnet/csharp/",
+		"cat": "clang",
+		"desc": "Documentação e tutoriais de C# da Microsoft."
+	},
+	{
+		"name": "Pro Git",
+		"url": "https://git-scm.com/book",
+		"cat": "git",
+		"desc": "O livro oficial do Git, gratuito e completo."
+	},
+	{
+		"name": "Learn Git Branching",
+		"url": "https://learngitbranching.js.org/",
+		"cat": "git",
+		"desc": "Aprender Git de forma visual e interativa."
+	},
+	{
+		"name": "GitHub Skills",
+		"url": "https://skills.github.com/",
+		"cat": "git",
+		"desc": "Cursos práticos de GitHub e colaboração."
+	},
+	{
+		"name": "Node.js Learn",
+		"url": "https://nodejs.org/en/learn",
+		"cat": "backend",
+		"desc": "Guias oficiais do Node.js."
+	},
+	{
+		"name": "Express",
+		"url": "https://expressjs.com/",
+		"cat": "backend",
+		"desc": "Framework web para Node.js."
+	},
+	{
+		"name": "Django",
+		"url": "https://docs.djangoproject.com/",
+		"cat": "backend",
+		"desc": "Documentação oficial do Django."
+	},
+	{
+		"name": "Flask",
+		"url": "https://flask.palletsprojects.com/",
+		"cat": "backend",
+		"desc": "Micro-framework Python para APIs e sites."
+	},
+	{
+		"name": "Laravel",
+		"url": "https://laravel.com/docs",
+		"cat": "backend",
+		"desc": "Documentação do framework Laravel (PHP)."
+	},
+	{
+		"name": "Rails Guides",
+		"url": "https://guides.rubyonrails.org/",
+		"cat": "backend",
+		"desc": "Guias oficiais do Ruby on Rails."
+	},
+	{
+		"name": "Codewars",
+		"url": "https://www.codewars.com/",
+		"cat": "practice",
+		"desc": "Desafios de código por nível de dificuldade."
+	},
+	{
+		"name": "LeetCode",
+		"url": "https://leetcode.com/",
+		"cat": "practice",
+		"desc": "Problemas de entrevistas técnicas."
+	},
+	{
+		"name": "HackerRank",
+		"url": "https://www.hackerrank.com/",
+		"cat": "practice",
+		"desc": "Desafios e certificações de programação."
+	},
+	{
+		"name": "Exercism",
+		"url": "https://exercism.org/",
+		"cat": "practice",
+		"desc": "Exercícios com mentoria gratuita em várias linguagens."
+	},
+	{
+		"name": "Frontend Mentor",
+		"url": "https://www.frontendmentor.io/",
+		"cat": "practice",
+		"desc": "Desafios de frontend com designs reais."
+	},
+	{
+		"name": "SQLBolt",
+		"url": "https://sqlbolt.com/",
+		"cat": "data",
+		"desc": "Aprender SQL com lições interativas."
+	},
+	{
+		"name": "PostgreSQL Tutorial",
+		"url": "https://www.postgresqltutorial.com/",
+		"cat": "data",
+		"desc": "Tutorial completo de PostgreSQL."
+	},
+	{
+		"name": "Docker Get Started",
+		"url": "https://docs.docker.com/get-started/",
+		"cat": "devops",
+		"desc": "Primeiros passos com Docker e contentores."
+	},
+	{
+		"name": "OWASP Top 10",
+		"url": "https://owasp.org/www-project-top-ten/",
+		"cat": "devops",
+		"desc": "As dez vulnerabilidades web mais críticas."
+	}
+]

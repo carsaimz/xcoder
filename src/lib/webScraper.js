@@ -136,6 +136,104 @@ export async function httpFetch(url, options = {}) {
 }
 
 /**
+ * httpFetch that also returns status + response headers — the Site
+ * Analyzer reads server / CDN / framework markers from headers that the
+ * plain text-only httpFetch throws away. Non-2xx responses are NOT
+ * rejected: a 403 Cloudflare interstitial still tells which stack guards
+ * the site, so the analyzer wants the headers either way.
+ * @param {string} url
+ * @param {{headers?: Record<string, string>, timeoutMs?: number}} [options]
+ * @returns {Promise<{ok: boolean, status: number, statusText: string, headers: Record<string, string>, text: string, url: string}>}
+ */
+export async function httpFetchDetailed(url, options = {}) {
+	const headers = buildRequestHeaders(url, options.headers);
+	const ceiling = options.timeoutMs || HTTP_FETCH_HARD_TIMEOUT;
+	const timeoutMessage = `request timed out after ${Math.round(ceiling / 1000)}s`;
+	if (typeof cordova !== "undefined" && cordova.plugin?.http?.sendRequest) {
+		return withHardTimeout(
+			new Promise((resolve, reject) => {
+				cordova.plugin.http.sendRequest(
+					url,
+					{
+						method: "GET",
+						headers,
+						serializer: "utf8",
+						responseType: "text",
+						timeout: ceiling,
+					},
+					(response) => {
+						const data = response?.data ?? "";
+						resolve({
+							ok: (response?.status || 0) < 400,
+							status: response?.status || 0,
+							statusText: response?.statusText || "",
+							headers: normalizeHeaderRecord(response?.headers),
+							text: typeof data === "string" ? data : JSON.stringify(data),
+							url,
+						});
+					},
+					(error) => {
+						// advanced-http routes non-2xx here, but the response is
+						// still readable — surface it instead of losing the headers
+						const text = error?.errorResponse ?? error?.response ?? "";
+						resolve({
+							ok: false,
+							status: error?.status || 0,
+							statusText: error?.statusText || error?.message || "",
+							headers: normalizeHeaderRecord(error?.headers),
+							text: typeof text === "string" ? text : String(text || ""),
+							url,
+						});
+					},
+				);
+			}),
+			ceiling,
+			timeoutMessage,
+		);
+	}
+	return withHardTimeout(
+		(async () => {
+			// desktop fallback: the browser may answer the cross-origin
+			// request opaquely — headers then stay empty and the analyzer
+			// falls back to HTML-only fingerprints
+			const response = await fetch(url, { headers });
+			let text = "";
+			try {
+				text = await response.text();
+			} catch {
+				/* opaque body */
+			}
+			const headerRecord = {};
+			response.headers?.forEach?.((value, key) => {
+				headerRecord[key.toLowerCase()] = value;
+			});
+			return {
+				ok: response.ok,
+				status: response.status,
+				statusText: response.statusText,
+				headers: headerRecord,
+				text,
+				url,
+			};
+		})(),
+		ceiling,
+		timeoutMessage,
+	);
+}
+
+/** Flattens the native header object (array values possible) into strings. */
+function normalizeHeaderRecord(raw) {
+	const out = {};
+	if (!raw || typeof raw !== "object") return out;
+	for (const [key, value] of Object.entries(raw)) {
+		out[String(key).toLowerCase()] = Array.isArray(value)
+			? value.join(", ")
+			: String(value ?? "");
+	}
+	return out;
+}
+
+/**
  * Resolves a possibly relative URL against a base, filtering out
  * data:/blob:/javascript: and anchors.
  * @param {string} raw

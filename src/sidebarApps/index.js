@@ -179,8 +179,12 @@ async function loadApps() {
 		["inspector", () => import("./inspector")],
 		// web scraper + reverse engineering tools
 		["scrape", () => import("./scrape")],
+		// site analyzer — tech stack fingerprints (framework, server, CDN…)
+		["analyzer", () => import("./analyzer")],
 		// offline web libraries (htmx, bootstrap, icon fonts…) shipped in the app
 		["libs", () => import("./libs")],
+		// curated learning sites opened in the internal WebView
+		["learn", () => import("./learn")],
 		// embedded webview of the official site (docs/marketplace/sponsor)
 		["websiteApp", () => import("./website")],
 		["notification", () => import("./notification")],
