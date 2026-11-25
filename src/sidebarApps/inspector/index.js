@@ -13,6 +13,7 @@ import {
 	sendInspectorCommand,
 	showInspectorPage,
 } from "lib/webInspector";
+import { httpFetch } from "lib/webScraper";
 import { copyText } from "utils/clipboard";
 
 /**
@@ -66,6 +67,15 @@ const consoleEntries = [];
 const networkEntries = [];
 let networkFilter = "all";
 let consoleErrors = 0;
+
+/**
+ * Raw-HTML fallback (DOMParser document) — keeps Elementos/selector search
+ * working even when the native webview never reports pageFinished (some
+ * sites block the headless load; the user still sees the DOM from the
+ * HTTP source, and a live session upgrades it when it loads).
+ * @type {{doc: Document, url: string}|null}
+ */
+let fallbackPage = null;
 
 /**
  * @param {HTMLElement} el container provided by the sidebar
@@ -313,6 +323,21 @@ async function go() {
 	updateBadges();
 	renderNetwork();
 
+	// guarantee visible content: parse the raw HTML while the live session
+	// opens (the old flow showed an eternal spinner whenever the webview
+	// never fired pageFinished)
+	fallbackPage = null;
+	loadFallbackPage(target);
+
+	let pageLoaded = false;
+	const finishedListener = () => {
+		pageLoaded = true;
+	};
+	onInspectorEvent((event, data) => {
+		if (event === "pageFinished") finishedListener();
+		handleEvent(event, data);
+	});
+
 	try {
 		await openInspectorSession(target, { mode: "fullscreen", visible: false });
 	} catch (error) {
@@ -323,7 +348,17 @@ async function go() {
 			`${t("inspector failed", "Falhou ao abrir")}: ${error?.message || error}`,
 			3000,
 		);
+		return;
 	}
+
+	// watchdog — surface a real diagnosis instead of hanging on «A abrir…»
+	setTimeout(() => {
+		if (container && !pageLoaded && activeInspectorSession()) {
+			setStatus(
+				`${t("inspector page quiet", "A página não respondeu")} — ${t("inspector fallback note", "a árvore abaixo vem da fonte (HTTP); tente recarregar ou ver em tela cheia")}`,
+			);
+		}
+	}, 18000);
 }
 
 async function reload() {
@@ -350,6 +385,7 @@ async function openPageFullscreen() {
 
 async function stopSession() {
 	await closeInspectorSession();
+	fallbackPage = null;
 	pageTitle = "";
 	pageUrl = "";
 	setStatus(t("inspector idle", "Introduza um endereço para inspecionar"));
@@ -447,6 +483,130 @@ function setStatus(text) {
 	if ($status) $status.textContent = text;
 }
 
+// ------------------------------------------------- raw-HTML fallback tree
+
+/** Element-only child list mirroring the page-side inspector script. */
+function fallbackChildren(node, parentPath) {
+	const total = node.children ? node.children.length : 0;
+	const children = [];
+	for (let i = 0; i < total && children.length < 60; i += 1) {
+		const child = node.children[i];
+		const path = parentPath ? `${parentPath}.${i}` : String(i);
+		children.push({
+			path,
+			tag:
+				child.nodeType === 1
+					? child.tagName.toLowerCase()
+					: String(child.nodeName || "?"),
+			id: child.id || "",
+			classes: child.classList?.length
+				? Array.prototype.join.call(child.classList, " ")
+				: "",
+			childCount: child.children ? child.children.length : 0,
+			text: child.children?.length
+				? ""
+				: String(child.textContent || "")
+						.trim()
+						.slice(0, 120),
+			attrs: fallbackAttrs(child),
+		});
+	}
+	return { children, total };
+}
+
+function fallbackAttrs(node) {
+	const attrs = {};
+	if (node.attributes) {
+		for (const attr of node.attributes) attrs[attr.name] = attr.value;
+	}
+	return attrs;
+}
+
+/** Walks an index chain of elements — same grammar as the page side. */
+function fallbackNodeAt(path) {
+	let node = fallbackPage?.doc;
+	if (!node) return null;
+	const parts = String(path || "")
+		.split(".")
+		.filter((part) => part !== "");
+	for (const part of parts) {
+		node = node.children?.[Number(part)];
+		if (!node) return null;
+	}
+	return node;
+}
+
+/** Caches a fallback tree level so renderNode() can display it. */
+function cacheFallbackLevel(path) {
+	if (!fallbackPage) return;
+	const node = path === "" ? fallbackPage.doc : fallbackNodeAt(path);
+	if (!node) return;
+	const { children, total } = fallbackChildren(node, path);
+	const self =
+		path === ""
+			? {
+					path: "",
+					tag: "#document",
+					id: "",
+					classes: "",
+					childCount: total,
+					text: "",
+					attrs: {},
+				}
+			: {
+					path,
+					tag:
+						node.nodeType === 1
+							? node.tagName.toLowerCase()
+							: String(node.nodeName || "?"),
+					id: node.id || "",
+					classes: node.classList?.length
+						? Array.prototype.join.call(node.classList, " ")
+						: "",
+					childCount: node.children ? node.children.length : 0,
+					text: node.children?.length
+						? ""
+						: String(node.textContent || "")
+								.trim()
+								.slice(0, 120),
+					attrs: fallbackAttrs(node),
+				};
+	treeCache.set(path, { self, children, total });
+}
+
+/**
+ * Fetches the raw HTML and builds the fallback tree. Always safe to call:
+ * failures simply leave the previous view in place.
+ * @param {string} url
+ */
+async function loadFallbackPage(url) {
+	try {
+		const html = String(await httpFetch(url));
+		if (!html.trim()) return;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		fallbackPage = { doc, url };
+		treeCache.set("", null);
+		treeCache.delete("");
+		cacheFallbackLevel("");
+		if (container && !treeCache.get("")) {
+			// parse produced nothing useful — keep the empty state
+			fallbackPage = null;
+			return;
+		}
+		renderTree();
+		if (!activeInspectorSession()) {
+			setStatus(
+				t(
+					"inspector fallback mode",
+					"Árvore pela fonte (HTTP) — consola/rede exigem a página viva",
+				),
+			);
+		}
+	} catch {
+		/* offline / blocked — the live session may still work */
+	}
+}
+
 function updateBadges() {
 	if ($consoleBadge) {
 		$consoleBadge.textContent = consoleErrors ? String(consoleErrors) : "";
@@ -464,15 +624,33 @@ function updateBadges() {
 
 /** @param {string} path */
 async function fetchTree(path) {
+	if (fallbackPage && !activeInspectorSession()) {
+		cacheFallbackLevel(path);
+		renderTree();
+		return;
+	}
 	if (!activeInspectorSession()) return;
 	try {
 		const data = await sendInspectorCommand("getTree", { path });
 		if (data) {
 			treeCache.set(path, data);
 			renderTree();
+		} else if (!path) {
+			setStatus(
+				t(
+					"inspector tree empty",
+					"A página viva não devolveu a árvore — mostrando a fonte (HTTP)",
+				),
+			);
 		}
-	} catch {
-		/* page not ready — ignored */
+	} catch (error) {
+		if (fallbackPage && !path) {
+			cacheFallbackLevel("");
+			renderTree();
+			setStatus(
+				`${t("inspector tree error", "Árvore viva falhou")}: ${error?.message || error} — ${t("inspector using fallback", "usando a fonte (HTTP)")}`,
+			);
+		}
 	}
 }
 
@@ -499,7 +677,7 @@ function renderTree() {
 	if (!$tree) return;
 	$tree.innerHTML = "";
 
-	if (!activeInspectorSession()) {
+	if (!activeInspectorSession() && !fallbackPage) {
 		$tree.append(
 			<div className="ins-empty">
 				{t(
@@ -509,6 +687,10 @@ function renderTree() {
 			</div>,
 		);
 		return;
+	}
+	if (!treeCache.has("")) {
+		if (fallbackPage) cacheFallbackLevel("");
+		else fetchTree("");
 	}
 	$tree.append(renderNode("", 0));
 }
@@ -608,12 +790,49 @@ function toggleNode(path) {
 async function selectNode(path) {
 	selectedPath = path;
 	renderTree();
+	if (fallbackPage && !activeInspectorSession()) {
+		renderDetails(fallbackInspect(path));
+		return;
+	}
 	try {
 		const data = await sendInspectorCommand("inspect", { path });
 		renderDetails(data);
-	} catch {
+	} catch (error) {
+		if (fallbackPage) {
+			renderDetails(fallbackInspect(path));
+			return;
+		}
 		renderDetails(null);
 	}
+}
+
+/** Builds inspect-style details from the raw-HTML document. */
+function fallbackInspect(path) {
+	const node = fallbackNodeAt(path);
+	if (!node) return null;
+	const html = (node.outerHTML || "").slice(0, 20000);
+	return {
+		self: {
+			path,
+			tag: node.tagName?.toLowerCase() || String(node.nodeName || "?"),
+			id: node.id || "",
+			classes: node.classList?.length
+				? Array.prototype.join.call(node.classList, " ")
+				: "",
+			childCount: node.children ? node.children.length : 0,
+			text: node.children?.length
+				? ""
+				: String(node.textContent || "")
+						.trim()
+						.slice(0, 120),
+			attrs: fallbackAttrs(node),
+		},
+		html,
+		htmlTruncated: (node.outerHTML || "").length > 20000,
+		box: null,
+		styles: null,
+		fallback: true,
+	};
 }
 
 /** @param {any} data */
@@ -638,18 +857,26 @@ function renderDetails(data) {
 
 	const self = data.self;
 	const attrs = Object.entries(self.attrs || {});
-	const box = data.box || {};
-	const styles = Object.entries(data.styles || {}).filter(([, value]) =>
-		String(value || "").trim(),
-	);
+	const box = data.box || null;
+	const styles = data.styles
+		? Object.entries(data.styles).filter(([, value]) =>
+				String(value || "").trim(),
+			)
+		: [];
 
 	$details.append(
 		<div className="ins-details-body">
 			<div className="ins-details-head">
 				<span className="ins-node-tag">{nodeLabel(self)}</span>
-				<span className="ins-box">
-					{box.w}×{box.h} @ {box.x},{box.y}
-				</span>
+				{box ? (
+					<span className="ins-box">
+						{box.w}×{box.h} @ {box.x},{box.y}
+					</span>
+				) : (
+					<span className="ins-box">
+						{t("inspector source mode", "modo fonte (HTTP)")}
+					</span>
+				)}
 			</div>
 			<div className="ins-attrs">
 				{attrs.length ? (
@@ -901,7 +1128,25 @@ async function clearHighlight() {
 /** @param {HTMLInputElement} $input */
 async function searchDom($input) {
 	const selector = $input?.value?.trim();
-	if (!selector || !activeInspectorSession()) return;
+	if (!selector) return;
+	if (fallbackPage && !activeInspectorSession()) {
+		const matches = [];
+		let nodes = [];
+		try {
+			nodes = Array.prototype.slice.call(
+				fallbackPage.doc.querySelectorAll(selector),
+			);
+		} catch {
+			toast(t("inspector no matches", "Sem correspondências"), 2000);
+			return;
+		}
+		for (const node of nodes.slice(0, 100)) {
+			matches.push(fallbackDescribeForSearch(node));
+		}
+		await applySearchMatches(matches, nodes.length);
+		return;
+	}
+	if (!activeInspectorSession()) return;
 	try {
 		const data = await sendInspectorCommand("searchDom", { selector });
 		const matches = data?.matches || [];
@@ -909,28 +1154,77 @@ async function searchDom($input) {
 			toast(t("inspector no matches", "Sem correspondências"), 2000);
 			return;
 		}
-		expanded.clear();
-		treeCache.clear();
-		const first = matches[0];
-		const parts = String(first.path || "")
-			.split(".")
-			.filter(Boolean);
-		let acc = "";
-		for (const part of parts) {
-			acc = acc ? `${acc}.${part}` : part;
-			expanded.add(acc);
-		}
-		renderTree();
-		// lazily load each level of the chain, then select the target
-		for (let i = 0; i < parts.length; i += 1) {
-			const parentPath = parts.slice(0, i).join(".");
-			// eslint-disable-next-line no-await-in-loop
-			await fetchTree(parentPath);
-		}
-		selectNode(first.path);
+		await applySearchMatches(matches, data?.total || matches.length);
 	} catch (error) {
 		toast(String(error?.message || error), 2500);
 	}
+}
+
+/**
+ * Expands the tree to the first match and selects it (shared by the live
+ * and fallback search paths).
+ * @param {any[]} matches
+ * @param {number} total
+ */
+async function applySearchMatches(matches, total) {
+	if (!matches.length) {
+		toast(t("inspector no matches", "Sem correspondências"), 2000);
+		return;
+	}
+	expanded.clear();
+	treeCache.clear();
+	const first = matches[0];
+	const parts = String(first.path || "")
+		.split(".")
+		.filter(Boolean);
+	let acc = "";
+	for (const part of parts) {
+		acc = acc ? `${acc}.${part}` : part;
+		expanded.add(acc);
+	}
+	renderTree();
+	// lazily load each level of the chain, then select the target
+	for (let i = 0; i < parts.length; i += 1) {
+		const parentPath = parts.slice(0, i).join(".");
+		// eslint-disable-next-line no-await-in-loop
+		await fetchTree(parentPath);
+	}
+	selectNode(first.path);
+}
+
+/** describe() shape for a fallback search match (path computed here). */
+function fallbackDescribeForSearch(node) {
+	const path = fallbackPathOf(node);
+	return {
+		path,
+		tag: node.tagName?.toLowerCase() || String(node.nodeName || "?"),
+		id: node.id || "",
+		classes: node.classList?.length
+			? Array.prototype.join.call(node.classList, " ")
+			: "",
+		childCount: node.children ? node.children.length : 0,
+		text: node.children?.length
+			? ""
+			: String(node.textContent || "")
+					.trim()
+					.slice(0, 120),
+		attrs: fallbackAttrs(node),
+	};
+}
+
+/** Index-chain path of a node inside the fallback document. */
+function fallbackPathOf(node) {
+	const parts = [];
+	let cursor = node;
+	while (cursor && cursor !== fallbackPage?.doc) {
+		const parent = cursor.parentElement;
+		if (!parent) return null;
+		parts.unshift(
+			String(Array.prototype.indexOf.call(parent.children, cursor)),
+		);
+		cursor = parent;
+	}
+	return parts.join(".");
 }
 
 function onSelected() {
@@ -945,8 +1239,14 @@ function onSelected() {
  * @param {string} url
  */
 export async function openInspectorWith(url) {
+	// the hand-off can arrive before the sidebar app rendered its input —
+	// wait for it instead of silently dropping the request
+	for (let i = 0; i < 50 && !$url; i += 1) {
+		await new Promise((resolve) => setTimeout(resolve, 60));
+	}
 	if (!$url) return;
 	$url.value = url;
+	switchTab("elements");
 	await go();
 }
 

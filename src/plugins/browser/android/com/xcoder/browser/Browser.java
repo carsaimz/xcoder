@@ -713,7 +713,20 @@ public class Browser extends LinearLayout {
    */
   private void runSeoAudit() {
     try {
-      InputStream input = context.getAssets().open("browser/seo-audit.js");
+      InputStream input = null;
+      // Cordova packages plugin <asset> files under assets/www/ (cordova-android
+      // 7+); older layouts put them directly in assets/. Try both.
+      for (String path : new String[] { "www/browser/seo-audit.js", "browser/seo-audit.js" }) {
+        try {
+          input = context.getAssets().open(path);
+          break;
+        } catch (IOException notFound) {
+          // try the next location
+        }
+      }
+      if (input == null) {
+        throw new IOException("seo-audit.js not found in APK assets");
+      }
       ByteArrayOutputStream buffer = new ByteArrayOutputStream();
       byte[] chunk = new byte[8192];
       int read;
@@ -721,7 +734,9 @@ public class Browser extends LinearLayout {
         buffer.write(chunk, 0, read);
       }
       input.close();
-      String script = "(function(){" + buffer.toString("UTF-8") + "})();";
+      String script = buffer.toString("UTF-8");
+      // The asset is already an IIFE; evaluate it as-is so the overlay's
+      // idempotency guard and window.__xcoderSeoAudit hook stay intact.
       webView.evaluateJavascript(script, null);
     } catch (Exception e) {
       e.printStackTrace();

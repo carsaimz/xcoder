@@ -26,6 +26,7 @@ tsconfig.tsbuildinfo
 .pnpm-store/
 # generated build artifacts (copied from src/res/libs by utils/config.js)
 /www/res
+/www/browser
 
 # desktop build outputs (generated)
 desktop/node_modules/

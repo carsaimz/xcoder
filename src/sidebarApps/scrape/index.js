@@ -2,7 +2,11 @@ import "./style.scss";
 import fsOperation from "fileSystem";
 import toast from "components/toast";
 import prompt from "dialogs/prompt";
-import { defaultDownloadDir, startDownload } from "lib/downloadManager";
+import {
+	defaultDownloadDir,
+	ensureDirDeep,
+	startDownload,
+} from "lib/downloadManager";
 import { fetchRenderedHtml } from "lib/webInspector";
 import {
 	beautifyCode,
@@ -241,36 +245,58 @@ async function fetchSource(mode) {
 	const url = /^(https?:\/\/)/i.test(target) ? target : `https://${target}`;
 	if ($url) $url.value = url;
 
-	setStatus(
-		mode === "raw"
-			? t("scraper fetching raw", "A obter código-fonte…")
-			: t("scraper fetching rendered", "A renderizar página…"),
-	);
+	// clear previous capture so a failed attempt never leaves stale rows
+	source = null;
+	analyse();
+	renderSource();
+	renderAssets();
+	renderAnalysis();
+	updateBadges();
+
+	const log = (message) => setStatus(message);
 
 	try {
 		let text = "";
 		let finalUrl = url;
 		let title = "";
 		let effectiveMode = mode;
+
 		if (mode === "raw") {
+			log(t("scraper fetching raw", "A obter código-fonte…"));
 			try {
 				text = String(await httpFetch(url));
 			} catch (rawError) {
-				// raw capture failed (403 / bot-blocked / offline) —
-				// fall back to the rendered page so the user still
-				// gets content instead of an empty view
-				setStatus(
+				// raw capture failed (403 / bot-blocked / offline) — try the
+				// rendered page so the user still gets content
+				log(
 					`${t("scraper raw failed", "Bruto falhou")}: ${rawError?.message || rawError} — ${t("scraper trying rendered", "a tentar renderizado…")}`,
 				);
 				effectiveMode = "rendered";
 			}
 		}
+
 		if (effectiveMode === "rendered") {
-			const result = await fetchRenderedHtml(url);
-			text = result.html;
-			finalUrl = result.url;
-			title = result.title;
+			log(t("scraper fetching rendered", "A renderizar página…"));
+			try {
+				const result = await fetchRenderedHtml(url, { timeoutMs: 25000 });
+				text = result.html;
+				finalUrl = result.url;
+				title = result.title;
+			} catch (renderError) {
+				if (mode === "rendered") {
+					// user explicitly asked for the rendered page — fall back to
+					// the raw source rather than showing nothing
+					log(
+						`${t("scraper rendered failed", "Renderizado falhou")}: ${renderError?.message || renderError} — ${t("scraper trying raw", "a tentar bruto…")}`,
+					);
+					text = String(await httpFetch(url));
+					effectiveMode = "raw";
+				} else {
+					throw renderError;
+				}
+			}
 		}
+
 		if (!String(text).trim()) {
 			throw new Error(t("scraper empty response", "resposta vazia"));
 		}
@@ -296,10 +322,15 @@ async function fetchSource(mode) {
 					: t("scraper mode rendered", "renderizado")
 			}`,
 		);
-		// bundled/minified pages read like "código criptografado" —
-		// format them automatically before display (raw stays one tap away)
+		// bundled/minified pages read like "código criptografado" — format
+		// them automatically. The upgrade runs AFTER a paint delay: awaiting
+		// prettier inline blocked the main thread before the captured source
+		// was ever painted, so the UI looked stuck on «A obter código-fonte…»
+		// with nothing rendered.
 		if (looksMinified(source.raw)) {
-			await autoFormat();
+			setTimeout(() => {
+				autoFormat();
+			}, 120);
 		}
 	} catch (error) {
 		setStatus(`${t("scraper failed", "Falhou")}: ${error?.message || error}`);
@@ -400,12 +431,8 @@ async function saveSource() {
 	);
 	if (!path) return;
 	try {
+		await ensureDirDeep(Url.dirname(path));
 		const dirFs = fsOperation(Url.dirname(path));
-		if (!(await dirFs.exists())) {
-			await fsOperation(Url.dirname(Url.dirname(path))).createDirectory(
-				Url.basename(Url.dirname(path)),
-			);
-		}
 		const fs = fsOperation(path);
 		if (await fs.exists()) {
 			await fs.writeFile(source.text);
@@ -425,10 +452,8 @@ async function openInEditor() {
 		const name =
 			source.mode === "rendered" ? "index-rendered.html" : "index.html";
 		const path = Url.join(dir, name);
+		await ensureDirDeep(dir);
 		const dirFs = fsOperation(dir);
-		if (!(await dirFs.exists())) {
-			await fsOperation(Url.dirname(dir)).createDirectory(Url.basename(dir));
-		}
 		const fs = fsOperation(path);
 		if (await fs.exists()) {
 			await fs.writeFile(source.text);
@@ -459,11 +484,22 @@ async function formatSource() {
 /** Auto-formats a minified capture right after fetch (silent on failure). */
 async function autoFormat() {
 	if (!source || source.formatted) return;
+	// prettier runs on the main thread — a multi-megabyte bundle would freeze
+	// the app for minutes, so only small sources are formatted automatically.
+	if (source.raw.length > 120000) {
+		setStatus(
+			t(
+				"scraper format skipped big",
+				"Código grande demais para formatar automaticamente — use «Embelezar»",
+			),
+		);
+		return;
+	}
 	setStatus(
 		t("scraper formatting", "Código minificado detetado — a formatar…"),
 	);
 	try {
-		const lang = await formatSource();
+		const lang = await withFormatTimeout(formatSource());
 		setStatus(
 			`${t("scraper auto formatted", "Formatado automaticamente")} (${lang}) — ${t("scraper toggle raw", "«Bruto» restaura o original")}`,
 		);
@@ -475,6 +511,20 @@ async function autoFormat() {
 			),
 		);
 	}
+}
+
+/**
+ * Races a formatting promise against a hard timeout so a pathological
+ * input can never leave the UI spinning forever.
+ * @param {Promise<string>} promise
+ */
+function withFormatTimeout(promise, ms = 15000) {
+	return Promise.race([
+		promise,
+		new Promise((_, reject) =>
+			setTimeout(() => reject(new Error("format timeout")), ms),
+		),
+	]);
 }
 
 async function beautify() {
@@ -491,7 +541,7 @@ async function beautify() {
 	setStatus(t("scraper beautifying", "A embelezar…"));
 	try {
 		source.raw = source.raw || source.text;
-		const lang = await formatSource();
+		const lang = await withFormatTimeout(formatSource());
 		setStatus(`${t("scraper beautified", "Embelezado")} (${lang})`);
 	} catch (error) {
 		setStatus(
@@ -555,6 +605,19 @@ function renderAssets() {
 			: assets.all.filter((asset) => asset.type === assetsFilter);
 
 	for (const asset of rows) {
+		const $thumb =
+			asset.type === "img" ? (
+				<img
+					className="scr-asset-thumb"
+					src={asset.url}
+					loading="lazy"
+					referrerpolicy="no-referrer"
+					alt=""
+					onerror={(e) => {
+						e.target.classList.add("hidden");
+					}}
+				/>
+			) : null;
 		$assets.append(
 			<div
 				className={`scr-asset-row${selectedAssets.has(asset.url) ? " selected" : ""}`}
@@ -567,6 +630,7 @@ function renderAssets() {
 				<span
 					className={`icon codicon-${selectedAssets.has(asset.url) ? "check" : "blank"}`}
 				/>
+				{$thumb}
 				<span className={`scr-asset-type type-${asset.type}`}>
 					{asset.type}
 				</span>
@@ -589,7 +653,7 @@ function downloadAssets(urls) {
 	if (!source || !urls.length) return;
 	const dir = hostDir(source.url);
 	for (const url of urls) {
-		startDownload({ url, dir });
+		startDownload({ url, dir, noBrowserFallback: true });
 	}
 	toast(
 		`${t("scraper downloading", "A descarregar")} ${urls.length} → ${dir}`,
@@ -820,8 +884,15 @@ function renderAnalysis() {
  * @param {"raw"|"rendered"} [mode]
  */
 export async function openScraperWith(url, mode = "raw") {
+	// the hand-off can arrive before the sidebar app rendered its input —
+	// wait for it instead of silently dropping the request («abrindo…» and
+	// nothing else ever happened for preview hand-offs)
+	for (let i = 0; i < 50 && !$url; i += 1) {
+		await new Promise((resolve) => setTimeout(resolve, 60));
+	}
 	if (!$url) return;
 	$url.value = url;
+	switchTab("source");
 	await fetchSource(mode);
 }
 

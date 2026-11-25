@@ -57,7 +57,14 @@ export async function httpFetch(url, options = {}) {
 					responseType,
 					timeout: 45000,
 				},
-				(response) => resolve(response?.data ?? ""),
+				(response) => {
+					// advanced-http auto-parses JSON bodies into objects — the
+					// callers treat this as text, so stringify non-strings.
+					const data = response?.data ?? "";
+					resolve(
+						typeof data === "string" ? data : JSON.stringify(data, null, 2),
+					);
+				},
 				(error) => {
 					reject(
 						new Error(
@@ -72,7 +79,17 @@ export async function httpFetch(url, options = {}) {
 	if (!response.ok)
 		throw new Error(`${response.status}: ${response.statusText}`);
 	if (responseType === "arraybuffer") return response.arrayBuffer();
-	return response.text();
+	const text = await response.text();
+	try {
+		// application/json responses arrive as objects through the native
+		// client; keep both transports consistent for the callers.
+		const parsed = JSON.parse(text);
+		if (parsed && typeof parsed === "object")
+			return JSON.stringify(parsed, null, 2);
+	} catch {
+		/* plain text — keep as is */
+	}
+	return text;
 }
 
 /**

@@ -44,16 +44,48 @@ export function guessNameFromUrl(url) {
 	return name || `download-${Date.now()}`;
 }
 
+/**
+ * Creates a directory AND every missing parent (cordova's
+ * createDirectory fails with NOT_FOUND_ERR — "Path not found" — when the
+ * parent does not exist, so a single-level create broke
+ * DATA_STORAGE/Download/<host> whenever «Download» itself was missing).
+ * @param {string} dir
+ */
+export async function ensureDirDeep(dir) {
+	const dirUrl = String(dir || "").replace(/\/+$/, "");
+	if (!dirUrl) return;
+	const parts = [];
+	let cursor = dirUrl;
+	for (;;) {
+		// Url.dirname() leaves a trailing slash — normalize so the exists()
+		// probe and the parent walk stay consistent
+		const probe = cursor.replace(/\/+$/, "");
+		const exists = await fsOperation(probe)
+			.exists()
+			.catch(() => false);
+		if (exists) break;
+		parts.unshift(probe);
+		const parent = Url.dirname(probe).replace(/\/+$/, "");
+		if (
+			!parent ||
+			parent === probe ||
+			// scheme root («file:///», «file:») — nothing above it can be created
+			/^[a-z][a-z0-9+.-]*:(\/\/)?\/?$/i.test(parent)
+		) {
+			break;
+		}
+		cursor = parent;
+	}
+	for (const folder of parts) {
+		await fsOperation(Url.dirname(folder)).createDirectory(
+			Url.basename(folder),
+		);
+	}
+}
+
 /** file:// url → native absolute path (advanced-http requirement). */
 function nativePathOf(fileUrl) {
 	return decodeURIComponent(String(fileUrl).replace(/^file:\/\//, ""));
-}
-
-async function ensureDir(dir) {
-	if (!dir) return;
-	if (!(await fsOperation(dir).exists())) {
-		await fsOperation(Url.dirname(dir)).createDirectory(Url.basename(dir));
-	}
 }
 
 /** Streams via fetch into memory (browser fallback; tests use this). */
@@ -148,9 +180,23 @@ export async function downloadUrl(opts) {
 		throw new Error("only http(s) downloads are supported");
 	}
 	const dir = opts.dir || defaultDownloadDir();
-	const name = opts.name || guessNameFromUrl(url);
-	await ensureDir(dir);
-	const destUrl = Url.join(dir, name);
+	let name = opts.name || guessNameFromUrl(url);
+	await ensureDirDeep(dir);
+	let destUrl = Url.join(dir, name);
+	if (!(opts.overwrite ?? false)) {
+		let n = 1;
+		while (
+			await fsOperation(destUrl)
+				.exists()
+				.catch(() => false)
+		) {
+			const dot = name.lastIndexOf(".");
+			const stem = dot > 0 ? name.slice(0, dot) : name;
+			const ext = dot > 0 ? name.slice(dot) : "";
+			name = `${stem}-${++n}${ext}`;
+			destUrl = Url.join(dir, name);
+		}
+	}
 
 	const onProgress = opts.onProgress;
 	if (globalThis.cordova?.plugin?.http?.downloadFile) {
@@ -170,7 +216,8 @@ export async function downloadUrl(opts) {
 /**
  * Queued download with notification UI (title = file name, message =
  * live progress, action = Cancel). Sequential on purpose.
- * @param {{url: string, name?: string, dir?: string, install?: boolean}} job
+ * @param {{url: string, name?: string, dir?: string, install?: boolean,
+ *          noBrowserFallback?: boolean, overwrite?: boolean}} job
  * @returns {string} download id (for cancelDownload)
  */
 export function startDownload(job) {
@@ -232,6 +279,7 @@ async function runDownload(id, job, notification) {
 			url: job.url,
 			name: notification.title,
 			dir: job.dir,
+			overwrite: job.overwrite,
 			signal: entry.abort.signal,
 			onProgress: (loaded, total) => {
 				const stored = manager.notifications.find(
@@ -279,15 +327,21 @@ async function runDownload(id, job, notification) {
 			manager.renderNotifications();
 		}
 		if (!cancelled) {
-			// both transports failed — hand the URL to the system
-			// browser so the user can still get the file
-			const opened = openInSystemBrowser(job.url);
-			toast(
-				opened
-					? strings["download failed browser"] ||
-							"Falha no download — aberto no navegador"
-					: `download: ${error?.message || error}`,
-			);
+			const message = `${strings?.["download failed"] || "Download failed"}: ${error?.message || error}`;
+			toast(message, 3500);
+			// scraping/asset downloads fire dozens of URLs — auto-opening each
+			// failure in the system browser looked like "the site opened by
+			// itself". Only single user-initiated downloads fall back.
+			if (!job.noBrowserFallback) {
+				const opened = openInSystemBrowser(job.url);
+				if (opened) {
+					toast(
+						strings["download failed browser"] ||
+							"Falha no download — aberto no navegador",
+						3000,
+					);
+				}
+			}
 		}
 	}
 }

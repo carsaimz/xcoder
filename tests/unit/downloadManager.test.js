@@ -135,14 +135,43 @@ describe("downloadManager.downloadUrl (fetch fallback)", () => {
                 assert.equal(fsState.writes.length, 1);
         });
 
-        test("creates missing target directories", async () => {
+        test("creates missing target directories (every level)", async () => {
                 fsState.existing.clear();
+                fsState.dirs.length = 0;
                 fetchMock.mockResolvedValue(streamResponse([new Uint8Array([1])]));
                 await downloadUrl({
                         url: "https://example.com/x.bin",
                         dir: "file:///cache/DL",
                 });
-                assert.deepEqual(fsState.dirs, ["DL"]);
+                // the old single-level createDirectory broke nested targets with
+                // cordova's «Path not found» (NOT_FOUND_ERR) whenever the parent
+                // folder did not exist yet
+                assert.deepEqual(fsState.dirs, ["cache", "DL"]);
+        });
+
+        test("creates the DATA_STORAGE/Download/<host> chain of scraper downloads", async () => {
+                fsState.existing.clear();
+                fsState.dirs.length = 0;
+                fsState.existing.add("file:///data/user/0/app/files");
+                fetchMock.mockResolvedValue(streamResponse([new Uint8Array([1])]));
+                await downloadUrl({
+                        url: "https://site.com/pics/a.png",
+                        dir: "file:///data/user/0/app/files/Download/site_com",
+                });
+                assert.deepEqual(fsState.dirs, ["Download", "site_com"]);
+        });
+
+        test("dedupes destination names instead of overwriting", async () => {
+                fsState.existing.clear();
+                fsState.dirs.length = 0;
+                fsState.existing.add("file:///cache");
+                fsState.existing.add("file:///cache/a.bin");
+                fetchMock.mockResolvedValue(streamResponse([new Uint8Array([1])]));
+                const { destUrl } = await downloadUrl({
+                        url: "https://example.com/a.bin",
+                        dir: "file:///cache",
+                });
+                expect(destUrl).toBe("file:///cache/a-2.bin");
         });
 
         test("rejects non-http urls", async () => {

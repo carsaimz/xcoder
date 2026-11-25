@@ -59,6 +59,20 @@ try {
 	console.warn(`Unable to copy local libs: ${error.message}`);
 }
 
+// Bundle the native preview's SEO audit overlay into www/ so the Java
+// side can always read it from assets/www/browser/seo-audit.js — plugin
+// <asset> targets used to land in a different assets folder depending on
+// the cordova version, which toasted «SEO audit unavailable» on device.
+try {
+	fs.mkdirSync(path.join(rootDir, "www", "browser"), { recursive: true });
+	fs.copyFileSync(
+		path.join(rootDir, "src", "plugins", "browser", "res", "android", "seo-audit.js"),
+		path.join(rootDir, "www", "browser", "seo-audit.js"),
+	);
+} catch (error) {
+	console.warn(`Unable to copy seo-audit asset: ${error.message}`);
+}
+
 // Keep config.xml version in sync with package.json
 const configPath = path.join(rootDir, "config.xml");
 const packagePath = path.join(rootDir, "package.json");

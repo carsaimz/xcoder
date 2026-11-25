@@ -1860,5 +1860,16 @@
 	"use native index": "Use native index",
 	"use native index hint": "Search with the workspace index — faster on large folders",
 	"persist replaced files": "Persist replaced files",
-	"persist replaced files hint": "Keep a list of files changed by replace-all, to undo later"
+	"persist replaced files hint": "Keep a list of files changed by replace-all, to undo later",
+	"download failed": "Download failed",
+	"scraper rendered failed": "Rendered view failed",
+	"scraper trying raw": "trying raw source…",
+	"scraper format skipped big": "Too large to format automatically — use «Beautify»",
+	"inspector page quiet": "The page did not respond",
+	"inspector fallback note": "the tree below comes from the (HTTP) source — try reloading or open fullscreen",
+	"inspector tree empty": "Live page returned no tree — showing the (HTTP) source",
+	"inspector tree error": "Live tree failed",
+	"inspector using fallback": "using the (HTTP) source",
+	"inspector fallback mode": "Tree from the (HTTP) source — console/network need the live page",
+	"inspector source mode": "source mode (HTTP)"
 }
