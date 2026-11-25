@@ -7,6 +7,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.37] - 2026-11-25
+
+### Fixed
+- Tudo funciona de novo — downloads de imagens sem «Path not found» (ensureDirDeep cria todas as pastas em falta, nomes deduplicados, sem abrir o site no navegador), Scraper nunca mais congela em «A abrir/obter…» (o prettier bloqueava a paint antes de mostrar o código; agora formata depois da 1.ª pintura, com limite de tamanho e timeout, e a cadeia de transporte HTTP nativo → fetch → WebView renderizada com cada passo visível), Inspector mostra SEMPRE a árvore (DOM parseado da fonte HTTP como fallback + watchdog com diagnóstico + erros da árvore viva à vista), SEO do preview nativo lê assets/www/browser/seo-audit.js (o <asset> era empacotado noutra pasta → «SEO audit unavailable»; cópia garantida no build via utils/config.js), miniaturas nas imagens do Scraper, httpFetch stringifica respostas JSON do cliente nativo — e i18n 100%: as 831 chaves em falta traduzidas nas 30 línguas do app (scripts/translate_missing.mjs, placeholders protegidos) — v1.8.37
+
+### Maintenance
+- Palavras pt-br legítimas do scraper/SEO (definitivo, relevante, presentes)
+
+
 ## [1.8.36] - 2026-11-25
 
 ### Pré-visualização: SEO e correções nas ferramentas web
