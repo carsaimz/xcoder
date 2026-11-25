@@ -1888,5 +1888,8 @@
 	"inspector tree error": "L'albero vivo non è riuscito",
 	"inspector using fallback": "utilizzando la sorgente (HTTP).",
 	"inspector fallback mode": "Albero dalla sorgente (HTTP): la console/rete necessita della pagina live",
-	"inspector source mode": "modalità sorgente (HTTP)"
+	"inspector source mode": "modalità sorgente (HTTP)",
+	"scraper gallery title": "Immagini scaricate",
+	"scraper images ok": "immagini salvate",
+	"scraper no images": "Nessuna immagine trovata in questa pagina"
 }

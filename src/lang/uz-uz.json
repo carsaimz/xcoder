@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Jonli daraxt muvaffaqiyatsiz tugadi",
 	"inspector using fallback": "(HTTP) manbasidan foydalanish",
 	"inspector fallback mode": "(HTTP) manbadan daraxt — konsol/tarmoq jonli sahifaga muhtoj",
-	"inspector source mode": "manba rejimi (HTTP)"
+	"inspector source mode": "manba rejimi (HTTP)",
+	"scraper gallery title": "Yuklab olingan rasmlar",
+	"scraper images ok": "rasm saqlandi",
+	"scraper no images": "Bu sahifada rasm topilmadi"
 }

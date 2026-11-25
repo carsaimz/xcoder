@@ -206,6 +206,7 @@ module.exports = (env, options) => {
       jsonLspWorker: './src/cm/lsp/workers/json.worker.ts',
       typescriptLspWorker: './src/cm/lsp/workers/typescript.worker.ts',
       replWorker: './src/lib/replWorker.js',
+      beautifyWorker: './src/lib/beautifyWorker.js',
     },
     output: {
       path: path.resolve(__dirname, 'www/build/'),

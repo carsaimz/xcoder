@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Жыць дрэва не атрымалася",
 	"inspector using fallback": "выкарыстоўваючы крыніцу (HTTP).",
 	"inspector fallback mode": "Дрэва з крыніцы (HTTP) — кансоль/сетка патрабуе жывой старонкі",
-	"inspector source mode": "рэжым крыніцы (HTTP)"
+	"inspector source mode": "рэжым крыніцы (HTTP)",
+	"scraper gallery title": "Загружаныя выявы",
+	"scraper images ok": "выяв захавана",
+	"scraper no images": "На гэтай старонцы не знойдзена выяў"
 }

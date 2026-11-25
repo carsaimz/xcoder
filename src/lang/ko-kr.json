@@ -1888,5 +1888,8 @@
 	"inspector tree error": "라이브 트리 실패",
 	"inspector using fallback": "(HTTP) 소스 사용",
 	"inspector fallback mode": "(HTTP) 소스의 트리 - 콘솔/네트워크에는 라이브 페이지가 필요합니다.",
-	"inspector source mode": "소스 모드(HTTP)"
+	"inspector source mode": "소스 모드(HTTP)",
+	"scraper gallery title": "다운로드한 이미지",
+	"scraper images ok": "개의 이미지 저장됨",
+	"scraper no images": "이 페이지에서 이미지를 찾을 수 없습니다"
 }

@@ -1888,5 +1888,8 @@
 	"inspector tree error": "فشلت الشجرة الحية",
 	"inspector using fallback": "باستخدام مصدر (HTTP).",
 	"inspector fallback mode": "شجرة من مصدر (HTTP) - تحتاج وحدة التحكم/الشبكة إلى الصفحة المباشرة",
-	"inspector source mode": "وضع المصدر (HTTP)"
+	"inspector source mode": "وضع المصدر (HTTP)",
+	"scraper gallery title": "الصور التي تم تنزيلها",
+	"scraper images ok": "صورة تم حفظها",
+	"scraper no images": "لا توجد صور في هذه الصفحة"
 }

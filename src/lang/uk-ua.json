@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Живе дерево не вдалося",
 	"inspector using fallback": "за допомогою джерела (HTTP).",
 	"inspector fallback mode": "Дерево з джерела (HTTP) — консоль/мережа потребують живої сторінки",
-	"inspector source mode": "вихідний режим (HTTP)"
+	"inspector source mode": "вихідний режим (HTTP)",
+	"scraper gallery title": "Завантажені зображення",
+	"scraper images ok": "зображень збережено",
+	"scraper no images": "На цій сторінці немає зображень"
 }

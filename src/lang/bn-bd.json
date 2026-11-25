@@ -1888,5 +1888,8 @@
 	"inspector tree error": "লাইভ ট্রি ব্যর্থ হয়েছে",
 	"inspector using fallback": "(HTTP) উৎস ব্যবহার করে",
 	"inspector fallback mode": "(HTTP) উৎস থেকে ট্রি — কনসোল/নেটওয়ার্কের লাইভ পৃষ্ঠা প্রয়োজন",
-	"inspector source mode": "উৎস মোড (HTTP)"
+	"inspector source mode": "উৎস মোড (HTTP)",
+	"scraper gallery title": "ডাউনলোড করা ছবি",
+	"scraper images ok": "ছবি সংরক্ষিত হয়েছে",
+	"scraper no images": "এই পৃষ্ঠায় কোনো ছবি পাওয়া যায়নি"
 }

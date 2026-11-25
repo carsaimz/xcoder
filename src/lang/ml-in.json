@@ -1888,5 +1888,8 @@
 	"inspector tree error": "ലൈവ് ട്രീ പരാജയപ്പെട്ടു",
 	"inspector using fallback": "(HTTP) ഉറവിടം ഉപയോഗിച്ച്",
 	"inspector fallback mode": "(HTTP) ഉറവിടത്തിൽ നിന്നുള്ള മരം — കൺസോൾ/നെറ്റ്‌വർക്കിന് തത്സമയ പേജ് ആവശ്യമാണ്",
-	"inspector source mode": "ഉറവിട മോഡ് (HTTP)"
+	"inspector source mode": "ഉറവിട മോഡ് (HTTP)",
+	"scraper gallery title": "ഡൗൺലോഡ് ചെയ്ത ചിത്രങ്ങൾ",
+	"scraper images ok": "ചിത്രങ്ങൾ സംരക്ഷിച്ചു",
+	"scraper no images": "ഈ പേജിൽ ചിത്രങ്ങളൊന്നും കണ്ടെത്തിയില്ല"
 }

@@ -38,58 +38,101 @@ export function buildRequestHeaders(url, headers = {}) {
 }
 
 /**
- * Native http GET (no CORS) with a fetch fallback.
+ * Hard ceiling for every httpFetch transport. The native client has its
+ * own timeout, but a wedged WebView network stack can ignore it — the
+ * scraper must always surface an error instead of sitting on «A obter…»
+ * forever.
+ */
+const HTTP_FETCH_HARD_TIMEOUT = 30000;
+
+/** @template T @param {Promise<T>} promise @param {number} ms @param {string} message */
+function withHardTimeout(
+	promise,
+	ms = HTTP_FETCH_HARD_TIMEOUT,
+	message = "request timed out",
+) {
+	return new Promise((resolve, reject) => {
+		const timer = setTimeout(() => reject(new Error(message)), ms);
+		promise.then(
+			(value) => {
+				clearTimeout(timer);
+				resolve(value);
+			},
+			(error) => {
+				clearTimeout(timer);
+				reject(error);
+			},
+		);
+	});
+}
+
+/**
+ * Native http GET (no CORS) with a fetch fallback. Both transports are
+ * wrapped in a hard 30s ceiling so a hung request can never freeze the
+ * scraper UI in silence.
  * @param {string} url
- * @param {{headers?: Record<string, string>, responseType?: "text"|"arraybuffer"}} [options]
+ * @param {{headers?: Record<string, string>, responseType?: "text"|"arraybuffer", timeoutMs?: number}} [options]
  * @returns {Promise<string|ArrayBuffer>}
  */
 export async function httpFetch(url, options = {}) {
 	const headers = buildRequestHeaders(url, options.headers);
 	const responseType = options.responseType || "text";
+	const ceiling = options.timeoutMs || HTTP_FETCH_HARD_TIMEOUT;
+	const timeoutMessage = `request timed out after ${Math.round(ceiling / 1000)}s`;
 	if (typeof cordova !== "undefined" && cordova.plugin?.http?.sendRequest) {
-		return new Promise((resolve, reject) => {
-			cordova.plugin.http.sendRequest(
-				url,
-				{
-					method: "GET",
-					headers,
-					serializer: "utf8",
-					responseType,
-					timeout: 45000,
-				},
-				(response) => {
-					// advanced-http auto-parses JSON bodies into objects — the
-					// callers treat this as text, so stringify non-strings.
-					const data = response?.data ?? "";
-					resolve(
-						typeof data === "string" ? data : JSON.stringify(data, null, 2),
-					);
-				},
-				(error) => {
-					reject(
-						new Error(
-							`${error?.status || "Network"}: ${error?.statusText || "request failed"}`,
-						),
-					);
-				},
-			);
-		});
+		return withHardTimeout(
+			new Promise((resolve, reject) => {
+				cordova.plugin.http.sendRequest(
+					url,
+					{
+						method: "GET",
+						headers,
+						serializer: "utf8",
+						responseType,
+						timeout: ceiling,
+					},
+					(response) => {
+						// advanced-http auto-parses JSON bodies into objects — the
+						// callers treat this as text, so stringify non-strings.
+						const data = response?.data ?? "";
+						resolve(
+							typeof data === "string" ? data : JSON.stringify(data, null, 2),
+						);
+					},
+					(error) => {
+						reject(
+							new Error(
+								`${error?.status || "Network"}: ${error?.statusText || "request failed"}`,
+							),
+						);
+					},
+				);
+			}),
+			ceiling,
+			timeoutMessage,
+		);
 	}
-	const response = await fetch(url, { headers });
-	if (!response.ok)
-		throw new Error(`${response.status}: ${response.statusText}`);
-	if (responseType === "arraybuffer") return response.arrayBuffer();
-	const text = await response.text();
-	try {
-		// application/json responses arrive as objects through the native
-		// client; keep both transports consistent for the callers.
-		const parsed = JSON.parse(text);
-		if (parsed && typeof parsed === "object")
-			return JSON.stringify(parsed, null, 2);
-	} catch {
-		/* plain text — keep as is */
-	}
-	return text;
+	return withHardTimeout(
+		(async () => {
+			const response = await fetch(url, { headers });
+			if (!response.ok)
+				throw new Error(`${response.status}: ${response.statusText}`);
+			if (responseType === "arraybuffer") return response.arrayBuffer();
+			const text = await response.text();
+			try {
+				// application/json responses arrive as objects through the
+				// fetch transport too; keep both transports consistent.
+				const parsed = JSON.parse(text);
+				if (parsed && typeof parsed === "object")
+					return JSON.stringify(parsed, null, 2);
+			} catch {
+				/* plain text — keep as is */
+			}
+			return text;
+		})(),
+		ceiling,
+		timeoutMessage,
+	);
 }
 
 /**
@@ -722,13 +765,127 @@ export function looksMinified(code) {
 }
 
 /**
- * Prettier-based beautifier (js/css/html/json). Loaded lazily so the
- * scraper app does not pull the formatter into the main bundle.
+ * Prettier-based beautifier (js/css/html/json) running in a dedicated Web
+ * Worker — prettier is CPU-bound and takes minutes on minified pages, so
+ * running it inline froze the whole app and made the Promise.race timeout
+ * useless (timers never fire while the main thread is blocked). The worker
+ * keeps the UI alive and can be terminated, which makes the timeout real.
+ * Worker unavailable (very old WebView): small sources fall back to an
+ * inline format; big ones fail fast with a clear message instead of
+ * freezing.
  * @param {string} code
  * @param {"js"|"css"|"html"|"json"} lang
+ * @param {{timeoutMs?: number}} [options] worker timeout (tests use a small one)
  * @returns {Promise<string>}
  */
-export async function beautifyCode(code, lang) {
+export async function beautifyCode(code, lang, options = {}) {
+	const text = String(code ?? "");
+	try {
+		return await formatInWorker(text, lang, options.timeoutMs);
+	} catch (error) {
+		if (
+			!/beautify timeout|worker unavailable/i.test(
+				String(error?.message || error),
+			)
+		) {
+			throw error;
+		}
+		// timeout / no worker — small inputs can still format inline safely
+		if (text.length <= INLINE_FORMAT_LIMIT) {
+			return await formatInline(text, lang);
+		}
+		throw error;
+	}
+}
+
+/** Max characters formatted on the main thread as a fallback. */
+const INLINE_FORMAT_LIMIT = 24000;
+
+/** Shared worker — created on first use, rebuilt after a timeout kill. */
+let worker = null;
+let workerSeq = 0;
+/** @type {Map<number, {resolve: (v: string) => void, reject: (e: Error) => void, timer: ReturnType<typeof setTimeout>}>} */
+const pendingFormats = new Map();
+
+function spawnBeautifyWorker() {
+	try {
+		const instance = new Worker("build/beautifyWorker.js");
+		instance.onmessage = (event) => {
+			const { id, ok, value, error } = event.data || {};
+			const pending = pendingFormats.get(id);
+			if (!pending) return;
+			pendingFormats.delete(id);
+			clearTimeout(pending.timer);
+			if (ok) pending.resolve(value);
+			else pending.reject(new Error(error || "format failed"));
+		};
+		instance.onerror = () => {
+			// the worker file is missing or failed to load — fail every
+			// pending request (so callers fall back) and drop the worker so
+			// the next call respawns or uses the inline format
+			for (const [id, pending] of [...pendingFormats]) {
+				pendingFormats.delete(id);
+				clearTimeout(pending.timer);
+				pending.reject(new Error("beautify worker unavailable"));
+			}
+			killBeautifyWorker();
+		};
+		return instance;
+	} catch {
+		return null;
+	}
+}
+
+function killBeautifyWorker() {
+	if (worker) {
+		try {
+			worker.terminate();
+		} catch {
+			/* already dead */
+		}
+		worker = null;
+	}
+}
+
+/**
+ * Drops the shared beautify worker (tests and memory management: the
+ * next beautify call respawns it lazily).
+ */
+export function disposeBeautifyWorker() {
+	for (const [id, pending] of [...pendingFormats]) {
+		pendingFormats.delete(id);
+		clearTimeout(pending.timer);
+		pending.reject(new Error("beautify worker disposed"));
+	}
+	killBeautifyWorker();
+}
+
+/**
+ * Formats `code` in the worker. Rejects with "beautify timeout" after `ms`
+ * — the timeout can actually fire because the worker thread, not the main
+ * thread, does the heavy lifting.
+ * @param {string} code
+ * @param {"js"|"css"|"html"|"json"} lang
+ * @param {number} [ms]
+ */
+function formatInWorker(code, lang, ms = 20000) {
+	if (!worker) worker = spawnBeautifyWorker();
+	if (!worker) throw new Error("beautify worker unavailable");
+	return new Promise((resolve, reject) => {
+		const id = ++workerSeq;
+		const timer = setTimeout(() => {
+			pendingFormats.delete(id);
+			// a stuck worker is terminated — the next call spawns a fresh one
+			killBeautifyWorker();
+			reject(new Error("beautify timeout"));
+		}, ms);
+		pendingFormats.set(id, { resolve, reject, timer });
+		worker.postMessage({ id, code, lang });
+	});
+}
+
+/** Last-resort inline formatter (small inputs only — see beautifyCode). */
+async function formatInline(code, lang) {
 	const [{ format }, parserBabel, parserEstree, parserHtml, parserPostcss] =
 		await Promise.all([
 			import("prettier/standalone"),
@@ -749,7 +906,7 @@ export async function beautifyCode(code, lang) {
 		},
 	};
 	const config = parsers[lang] || parsers.js;
-	return format(String(code ?? ""), {
+	return format(code, {
 		parser: config.parser,
 		plugins: config.plugins,
 		tabWidth: 2,

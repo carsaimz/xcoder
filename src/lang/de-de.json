@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Der Live-Baum ist fehlgeschlagen",
 	"inspector using fallback": "unter Verwendung der (HTTP)-Quelle",
 	"inspector fallback mode": "Baum aus der (HTTP-)Quelle – Konsole/Netzwerk benötigt die Live-Seite",
-	"inspector source mode": "Quellmodus (HTTP)"
+	"inspector source mode": "Quellmodus (HTTP)",
+	"scraper gallery title": "Heruntergeladene Bilder",
+	"scraper images ok": "Bilder gespeichert",
+	"scraper no images": "Keine Bilder auf dieser Seite gefunden"
 }

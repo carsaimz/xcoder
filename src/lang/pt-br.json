@@ -1988,5 +1988,8 @@
 	"inspector tree error": "Árvore viva falhou",
 	"inspector using fallback": "usando a fonte (HTTP)",
 	"inspector fallback mode": "Árvore pela fonte (HTTP) — consola/rede exigem a página viva",
-	"inspector source mode": "modo fonte (HTTP)"
+	"inspector source mode": "modo fonte (HTTP)",
+	"scraper gallery title": "Imagens descarregadas",
+	"scraper images ok": "imagens guardadas",
+	"scraper no images": "Nenhuma imagem nesta página"
 }

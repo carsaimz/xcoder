@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Élő fa nem sikerült",
 	"inspector using fallback": "a (HTTP) forrás használatával",
 	"inspector fallback mode": "Fa a (HTTP) forrásból – a konzolnak/hálózatnak szüksége van az élő oldalra",
-	"inspector source mode": "forrás mód (HTTP)"
+	"inspector source mode": "forrás mód (HTTP)",
+	"scraper gallery title": "Letöltött képek",
+	"scraper images ok": "kép mentve",
+	"scraper no images": "Nem található kép ezen az oldalon"
 }

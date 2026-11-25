@@ -31,6 +31,10 @@ export const OUTER_HTML_LIMIT = 20000;
 export const CAPTURE_SCRIPT = String.raw`
 (function(){
   if (window.__xcoderInspector) { return; }
+  // mark NOW: the native side re-injects this script on every navigation
+  // AND again on pageFinished — without the flag each injection wrapped
+  // console/fetch/XHR a second time, posting every log twice.
+  window.__xcoderInspector = true;
   var seq = 1;
   var highlighted = null;
   var highlightedPrev = null;

@@ -1888,5 +1888,8 @@
 	"inspector tree error": "活樹失敗",
 	"inspector using fallback": "使用 (HTTP) 來源",
 	"inspector fallback mode": "來自 (HTTP) 來源的樹 — 控制台/網路需要即時頁面",
-	"inspector source mode": "來源模式（HTTP）"
+	"inspector source mode": "來源模式（HTTP）",
+	"scraper gallery title": "已下載的圖片",
+	"scraper images ok": "張圖片已儲存",
+	"scraper no images": "此頁面上未找到圖片"
 }

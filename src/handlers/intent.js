@@ -30,10 +30,13 @@ async function openTool(tool, url) {
 
 	try {
 		const { default: sidebarApps } = await import("sidebarApps");
-		const app = sidebarApps.get(
+		// sidebarApps.get() returns the app's CONTAINER element — setting
+		// `.active` on it did nothing, so the tool panel never opened after
+		// a preview hand-off («Inspecionar/Scrape» looked dead). The real
+		// SidebarApp instance is activated via setActiveApp().
+		sidebarApps.setActiveApp(
 			tool === "inspector" ? "inspectorApp" : "scrapeApp",
 		);
-		if (app) app.active = true;
 		if (url) {
 			const mod =
 				tool === "inspector"
@@ -173,10 +176,12 @@ export async function processPendingIntents() {
 		const { tool, url } = pendingTools.shift();
 		try {
 			const { default: sidebarApps } = await import("sidebarApps");
-			const app = sidebarApps.get(
+			// same fix as openTool(): activate the real SidebarApp instance
+			// (get() returns the container element — `.active` on it was a
+			// silent no-op and the tool panel never opened)
+			sidebarApps.setActiveApp(
 				tool === "inspector" ? "inspectorApp" : "scrapeApp",
 			);
-			if (app) app.active = true;
 			if (url) {
 				const mod =
 					tool === "inspector"

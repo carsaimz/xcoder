@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Canlı ağaç başarısız oldu",
 	"inspector using fallback": "(HTTP) kaynağını kullanma",
 	"inspector fallback mode": "(HTTP) kaynağından gelen ağaç — konsol/ağın canlı sayfaya ihtiyacı var",
-	"inspector source mode": "kaynak modu (HTTP)"
+	"inspector source mode": "kaynak modu (HTTP)",
+	"scraper gallery title": "İndirilen görseller",
+	"scraper images ok": "görsel kaydedildi",
+	"scraper no images": "Bu sayfada görsel bulunamadı"
 }

@@ -7,6 +7,56 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.38] - 2026-11-26
+
+### Fixed
+- **O congelamento das ferramentas web acabou de vez** — o Prettier corria
+  na thread principal e uma página minificada (qualquer site moderno)
+  bloqueava o app durante MINUTOS; o «timeout» de Promise.race nunca
+  disparava porque timers não correm com a thread congelada («A
+  embelezar…» para sempre, «nada funciona»). Agora o Prettier corre num
+  **Web Worker dedicado** (build/beautifyWorker.js, ~0.9 MB, carregado só
+  quando embeleza): a UI continua viva, o timeout de 20 s TERMINA o
+  worker a sério, e fontes pequenas (<24 kB) têm fallback em linha quando
+  o WebView não tem workers. Embelezar automático e botão «Embelezar»
+  usam o novo caminho.
+
+### Added
+- **Galeria das imagens descarregadas** — «Todas as imagens» agora mostra
+  progresso ao vivo (3/12 — nome.png), descarrega uma a uma (erros por
+  imagem à vista, nada de streams paralelos que estagnam) e renderiza uma
+  **galeria local** no separador Recursos: miniaturas lidas dos ficheiros
+  guardados (object URLs, ≤1,5 MB), tamanho, falhas destacadas e toque
+  abre a imagem no visualizador do editor. O que se vê é o que caiu no
+  disco.
+- **Menu do preview volta a ter «Inspect» e «Scrape»** — restaurados
+  (mantêm-se no sidebar também; o «SEO» fica). A entrega do URL ao editor
+  foi corrigida: `sidebarApps.get()` devolve o elemento do painel e
+  `.active = true` nele era um no-op silencioso — a ferramenta nunca
+  abria. Agora `setActiveApp()` activa a SidebarApp real (no arranque e
+  na fila pendente de intents).
+
+### Hardening
+- `httpFetch` com teto rígido de 30 s nos dois transportes (cliente
+  nativo e fetch) — o scraper nunca mais pode ficar pendurado em
+  «A obter código-fonte…» sem diagnosticar.
+- Script de captura do Inspector idempotente a sério
+  (`window.__xcoderInspector = true`): cada re-injecção do nativo voltava
+  a embrulhar console/fetch/XHR — registos duplicados na Consola.
+- Chaves novas («Imagens descarregadas», «imagens guardadas», «Nenhuma
+  imagem nesta página») traduzidas nas **31 línguas** do app.
+
+### English summary
+- Prettier moved to a dedicated Web Worker (UI freeze during beautify is
+  gone; the 20 s timeout really terminates the worker; small sources keep
+  an inline fallback). Local gallery of downloaded images with live
+  progress and disk-read thumbnails. Preview menu restored («Inspect»,
+  «Scrape», «SEO») and the URL hand-off now actually opens the tool
+  (setActiveApp instead of a no-op on a container element). httpFetch has
+  a hard 30 s ceiling; inspector capture is idempotent; new keys
+  translated in all 31 languages.
+
+
 ## [1.8.37] - 2026-11-25
 
 ### Fixed

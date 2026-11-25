@@ -1888,5 +1888,8 @@
 	"inspector tree error": "עץ חי נכשל",
 	"inspector using fallback": "באמצעות מקור (HTTP).",
 	"inspector fallback mode": "עץ מהמקור (HTTP) - המסוף/רשת זקוקים לדף החי",
-	"inspector source mode": "מצב מקור (HTTP)"
+	"inspector source mode": "מצב מקור (HTTP)",
+	"scraper gallery title": "תמונות שהורדו",
+	"scraper images ok": "תמונות נשמרו",
+	"scraper no images": "לא נמצאו תמונות בדף זה"
 }

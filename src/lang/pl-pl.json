@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Nie udało się uruchomić żywego drzewa",
 	"inspector using fallback": "przy użyciu źródła (HTTP).",
 	"inspector fallback mode": "Drzewo ze źródła (HTTP) — konsola/sieć wymaga aktywnej strony",
-	"inspector source mode": "tryb źródłowy (HTTP)"
+	"inspector source mode": "tryb źródłowy (HTTP)",
+	"scraper gallery title": "Pobrane obrazy",
+	"scraper images ok": "obrazów zapisanych",
+	"scraper no images": "Nie znaleziono obrazów na tej stronie"
 }

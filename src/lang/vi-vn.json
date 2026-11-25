@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Cây sống không thành công",
 	"inspector using fallback": "sử dụng nguồn (HTTP)",
 	"inspector fallback mode": "Cây từ nguồn (HTTP) — bảng điều khiển/mạng cần trang trực tiếp",
-	"inspector source mode": "chế độ nguồn (HTTP)"
+	"inspector source mode": "chế độ nguồn (HTTP)",
+	"scraper gallery title": "Hình ảnh đã tải xuống",
+	"scraper images ok": "hình đã lưu",
+	"scraper no images": "Không tìm thấy hình ảnh trên trang này"
 }

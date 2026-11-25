@@ -1871,5 +1871,8 @@
 	"inspector tree error": "Live tree failed",
 	"inspector using fallback": "using the (HTTP) source",
 	"inspector fallback mode": "Tree from the (HTTP) source — console/network need the live page",
-	"inspector source mode": "source mode (HTTP)"
+	"inspector source mode": "source mode (HTTP)",
+	"scraper gallery title": "Downloaded images",
+	"scraper images ok": "images saved",
+	"scraper no images": "No images found on this page"
 }

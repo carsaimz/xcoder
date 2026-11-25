@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Živý strom se nezdařil",
 	"inspector using fallback": "pomocí zdroje (HTTP).",
 	"inspector fallback mode": "Strom ze zdroje (HTTP) — konzole/síť potřebuje aktivní stránku",
-	"inspector source mode": "zdrojový režim (HTTP)"
+	"inspector source mode": "zdrojový režim (HTTP)",
+	"scraper gallery title": "Stažené obrázky",
+	"scraper images ok": "obrázků uloženo",
+	"scraper no images": "Na této stránce nebyly nalezeny žádné obrázky"
 }

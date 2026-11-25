@@ -1888,5 +1888,8 @@
 	"inspector tree error": "ਲਾਈਵ ਰੁੱਖ ਅਸਫਲ ਰਿਹਾ",
 	"inspector using fallback": "(HTTP) ਸਰੋਤ ਦੀ ਵਰਤੋਂ ਕਰਦੇ ਹੋਏ",
 	"inspector fallback mode": "(HTTP) ਸਰੋਤ ਤੋਂ ਟ੍ਰੀ — ਕੰਸੋਲ/ਨੈੱਟਵਰਕ ਨੂੰ ਲਾਈਵ ਪੇਜ ਦੀ ਲੋੜ ਹੁੰਦੀ ਹੈ",
-	"inspector source mode": "ਸਰੋਤ ਮੋਡ (HTTP)"
+	"inspector source mode": "ਸਰੋਤ ਮੋਡ (HTTP)",
+	"scraper gallery title": "ਡਾਊਨਲੋਡ ਕੀਤੀਆਂ ਤਸਵੀਰਾਂ",
+	"scraper images ok": "ਤਸਵੀਰਾਂ ਸੰਭਾਲੀਆਂ ਗਈਆਂ",
+	"scraper no images": "ਇਸ ਸਫ਼ੇ 'ਤੇ ਕੋਈ ਤਸਵੀਰ ਨਹੀਂ ਮਿਲੀ"
 }

@@ -1888,5 +1888,8 @@
 	"inspector tree error": "သစ်ပင်ရှင်သန်ခြင်း မအောင်မြင်ပါ။",
 	"inspector using fallback": "(HTTP) အရင်းအမြစ်ကို အသုံးပြု",
 	"inspector fallback mode": "(HTTP) အရင်းအမြစ်မှ သစ်ပင် — ကွန်ဆိုးလ်/ကွန်ရက်သည် တိုက်ရိုက်စာမျက်နှာ လိုအပ်သည်။",
-	"inspector source mode": "အရင်းအမြစ်မုဒ် (HTTP)"
+	"inspector source mode": "အရင်းအမြစ်မုဒ် (HTTP)",
+	"scraper gallery title": "ဒေါင်းလုဒ်လုပ်ပြီးသော ပုံများ",
+	"scraper images ok": "ပုံများ သိမ်းပြီး",
+	"scraper no images": "ဤစာမျက်နှာတွင် ပုံများ မတွေ့ပါ"
 }

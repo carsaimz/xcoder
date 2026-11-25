@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Nabigo ang buhay na puno",
 	"inspector using fallback": "gamit ang (HTTP) source",
 	"inspector fallback mode": "Puno mula sa pinagmulan (HTTP) — kailangan ng console/network ang live na page",
-	"inspector source mode": "source mode (HTTP)"
+	"inspector source mode": "source mode (HTTP)",
+	"scraper gallery title": "Mga na-download na larawan",
+	"scraper images ok": "larawan na nai-save",
+	"scraper no images": "Walang nakitang larawan sa pahinang ito"
 }

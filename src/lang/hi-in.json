@@ -1888,5 +1888,8 @@
 	"inspector tree error": "जीवित वृक्ष विफल रहा",
 	"inspector using fallback": "(HTTP) स्रोत का उपयोग करना",
 	"inspector fallback mode": "(HTTP) स्रोत से ट्री - कंसोल/नेटवर्क को लाइव पेज की आवश्यकता है",
-	"inspector source mode": "स्रोत मोड (HTTP)"
+	"inspector source mode": "स्रोत मोड (HTTP)",
+	"scraper gallery title": "डाउनलोड की गई छवियाँ",
+	"scraper images ok": "छवियाँ सहेजी गईं",
+	"scraper no images": "इस पृष्ठ पर कोई छवि नहीं मिली"
 }

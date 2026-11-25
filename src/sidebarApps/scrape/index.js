@@ -4,6 +4,7 @@ import toast from "components/toast";
 import prompt from "dialogs/prompt";
 import {
 	defaultDownloadDir,
+	downloadUrl,
 	ensureDirDeep,
 	startDownload,
 } from "lib/downloadManager";
@@ -65,6 +66,16 @@ let meta = null;
 let assetsFilter = "all";
 /** @type {Set<string>} selected asset urls */
 const selectedAssets = new Set();
+/**
+ * Result of every image download of the current capture, keyed by source
+ * url — feeds the local gallery so the user SEES the files that landed
+ * («não consigo ver as imagens»): thumbnails read from disk, tap opens
+ * the image in the editor.
+ * @type {Map<string, {path: string, size: number, ok: boolean, error?: string, thumbLoaded?: boolean}>}
+ */
+const downloadedImages = new Map();
+/** @type {HTMLElement|null} */
+let $gallery = null;
 
 function initApp(el) {
 	container = el;
@@ -81,6 +92,7 @@ function initApp(el) {
 		$status = null;
 		$source = null;
 		$assets = null;
+		$gallery = null;
 		$analysis = null;
 		$sourceBadge = null;
 		$assetsBadge = null;
@@ -199,6 +211,7 @@ function buildUi() {
 					{t("scraper download images", "Todas as imagens")}
 				</button>
 			</div>
+			<div className="scr-gallery hidden" ref={(el) => ($gallery = el)} />
 			<div className="scr-assets scroll" ref={(el) => ($assets = el)} />
 		</div>
 	);
@@ -252,6 +265,8 @@ async function fetchSource(mode) {
 	renderAssets();
 	renderAnalysis();
 	updateBadges();
+	downloadedImages.clear();
+	renderGallery();
 
 	const log = (message) => setStatus(message);
 
@@ -651,14 +666,25 @@ function renderAssets() {
 /** @param {string[]} urls */
 function downloadAssets(urls) {
 	if (!source || !urls.length) return;
-	const dir = hostDir(source.url);
-	for (const url of urls) {
-		startDownload({ url, dir, noBrowserFallback: true });
+	const imageUrls = urls.filter((url) => {
+		const asset = assets?.all.find((candidate) => candidate.url === url);
+		if (asset) return asset.type === "img";
+		return /\.(png|jpe?g|gif|webp|svg|ico|avif|bmp)(\?|#|$)/i.test(url);
+	});
+	const otherUrls = urls.filter((url) => !imageUrls.includes(url));
+	// images go through the sequential downloader + local gallery (visible
+	// results, live progress); the rest keep the notification queue
+	if (imageUrls.length) downloadImagesSequential(imageUrls);
+	if (otherUrls.length) {
+		const dir = hostDir(source.url);
+		for (const url of otherUrls) {
+			startDownload({ url, dir, noBrowserFallback: true });
+		}
+		toast(
+			`${t("scraper downloading", "A descarregar")} ${otherUrls.length} → ${dir}`,
+			3000,
+		);
 	}
-	toast(
-		`${t("scraper downloading", "A descarregar")} ${urls.length} → ${dir}`,
-		3000,
-	);
 }
 
 function downloadSelected() {
@@ -666,8 +692,166 @@ function downloadSelected() {
 }
 
 function downloadAllImages() {
-	if (!assets) return;
-	downloadAssets(assets.images.map((asset) => asset.url));
+	if (!assets?.images.length) {
+		toast(t("scraper no images", "Nenhuma imagem nesta página"), 2500);
+		return;
+	}
+	downloadImagesSequential(assets.images.map((asset) => asset.url));
+}
+
+/**
+ * Downloads images one by one into the capture folder, tracking every
+ * result in `downloadedImages` and rendering the local gallery live.
+ * Sequential on purpose: parallel streams stall on mobile radios and
+ * hide per-file errors.
+ * @param {string[]} urls
+ */
+async function downloadImagesSequential(urls) {
+	if (!source || !urls.length) return;
+	const dir = hostDir(source.url);
+	let ok = 0;
+	let index = 0;
+	for (const url of urls) {
+		index += 1;
+		const name = assetName(url);
+		setStatus(
+			`${t("scraper downloading", "A descarregar")} ${index}/${urls.length} — ${name}`,
+		);
+		try {
+			const { destUrl, size } = await downloadUrl({
+				url,
+				dir,
+				name,
+				overwrite: false,
+			});
+			ok += 1;
+			downloadedImages.set(url, {
+				path: destUrl,
+				size,
+				ok: true,
+			});
+		} catch (error) {
+			downloadedImages.set(url, {
+				path: "",
+				size: 0,
+				ok: false,
+				error: String(error?.message || error),
+			});
+		}
+		renderGallery();
+	}
+	setStatus(
+		`${ok}/${urls.length} ${t("scraper images ok", "imagens guardadas")} → ${dir}`,
+	);
+	toast(
+		`${ok}/${urls.length} ${t("scraper images ok", "imagens guardadas")}`,
+		2500,
+	);
+}
+
+/**
+ * Local gallery of the downloaded images — thumbnails are read from the
+ * saved files (object URLs, ≤1.5 MB each) so what the user sees is what
+ * actually landed on disk. Tap opens the image in the editor viewer.
+ */
+function renderGallery() {
+	if (!$gallery) return;
+	const entries = [...downloadedImages.entries()];
+	$gallery.innerHTML = "";
+	$gallery.classList.toggle("hidden", !entries.length);
+	if (!entries.length) return;
+
+	const okCount = entries.filter(([, item]) => item.ok).length;
+	const title = `${t("scraper gallery title", "Imagens descarregadas")} — ${okCount}/${entries.length}`;
+	const $title = (
+		<div className="scr-gallery-title">
+			<span className="icon codicon-file-media" />
+			{title}
+		</div>
+	);
+
+	const $grid = <div className="scr-gallery-grid" />;
+	for (const [url, item] of entries.slice(0, 60)) {
+		$grid.append(galleryCell(url, item));
+	}
+	$gallery.append($title, $grid);
+}
+
+/**
+ * One gallery cell. Logic lives in named handlers OUTSIDE the JSX —
+ * big inline arrow bodies inside JSX attributes trip the parser
+ * tooling (biome 2.5.x fails to parse this file otherwise).
+ * @param {string} url source url of the image
+ * @param {{path: string, size: number, ok: boolean, error?: string}} item download result
+ */
+function galleryCell(url, item) {
+	const label = item.ok ? assetName(url) : `${assetName(url)} — ${item.error}`;
+	const open = () => {
+		if (!item.ok) {
+			toast(item.error || t("scraper failed", "Falhou"), 2500);
+			return;
+		}
+		import("lib/openFile")
+			.then(({ default: openFile }) => openFile(item.path, { render: true }))
+			.catch((error) => toast(String(error?.message || error), 2500));
+	};
+	const thumb = item.ok ? (
+		<img
+			className="scr-gallery-thumb"
+			alt=""
+			ref={($el) => loadGalleryThumb(item, $el)}
+		/>
+	) : (
+		<span className="icon codicon-error scr-gallery-thumb-icon" />
+	);
+	const size = item.ok ? formatSizeShort(item.size) : "";
+	return (
+		<div
+			className={item.ok ? "scr-gallery-cell" : "scr-gallery-cell failed"}
+			title={item.ok ? item.path : item.error}
+			onclick={open}
+		>
+			{thumb}
+			<span className="scr-gallery-name">{label}</span>
+			<span className="scr-gallery-size">{size}</span>
+		</div>
+	);
+}
+
+/**
+ * Swaps a thumbnail <img> for a media-type icon. DOM APIs on purpose —
+ * HTML strings inside JSX attributes break the JSX tooling.
+ * @param {HTMLElement} $el
+ */
+function replaceWithMediaIcon($el) {
+	const $icon = document.createElement("span");
+	$icon.className = "icon codicon-file-media scr-gallery-thumb-icon";
+	$el.replaceWith($icon);
+}
+
+/**
+ * Loads a local thumbnail into the gallery cell — object URL from the
+ * saved file, so what the user sees is what actually landed on disk.
+ * Files over 1.5 MB render as icons (memory).
+ * @param {{path: string, size: number, ok: boolean, thumbLoaded?: boolean}} item
+ * @param {HTMLImageElement|null} $el
+ */
+function loadGalleryThumb(item, $el) {
+	if (!$el || item.thumbLoaded) return;
+	item.thumbLoaded = true;
+	if (item.size > 1500000) {
+		replaceWithMediaIcon($el);
+		return;
+	}
+	fsOperation(item.path)
+		.readFile()
+		.then((bin) => URL.createObjectURL(new Blob([bin])))
+		.then((objectUrl) => {
+			$el.src = objectUrl;
+		})
+		.catch(() => {
+			replaceWithMediaIcon($el);
+		});
 }
 
 // --------------------------------------------------------------- analysis

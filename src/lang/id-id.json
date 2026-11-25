@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Pohon hidup gagal",
 	"inspector using fallback": "menggunakan sumber (HTTP).",
 	"inspector fallback mode": "Pohon dari sumber (HTTP) — konsol/jaringan memerlukan halaman aktif",
-	"inspector source mode": "mode sumber (HTTP)"
+	"inspector source mode": "mode sumber (HTTP)",
+	"scraper gallery title": "Gambar yang diunduh",
+	"scraper images ok": "gambar disimpan",
+	"scraper no images": "Tidak ada gambar di halaman ini"
 }

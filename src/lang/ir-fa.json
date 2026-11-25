@@ -1888,5 +1888,8 @@
 	"inspector tree error": "درخت زنده شکست خورد",
 	"inspector using fallback": "با استفاده از منبع (HTTP).",
 	"inspector fallback mode": "درخت از منبع (HTTP) - کنسول/شبکه ​​به صفحه زنده نیاز دارد",
-	"inspector source mode": "حالت منبع (HTTP)"
+	"inspector source mode": "حالت منبع (HTTP)",
+	"scraper gallery title": "تصاویر دانلود شده",
+	"scraper images ok": "تصویر ذخیره شد",
+	"scraper no images": "هیچ تصویری در این صفحه یافت نشد"
 }

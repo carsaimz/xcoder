@@ -1888,5 +1888,8 @@
 	"inspector tree error": "ライブツリーが失敗しました",
 	"inspector using fallback": "(HTTP) ソースを使用する",
 	"inspector fallback mode": "(HTTP) ソースからのツリー — コンソール/ネットワークにはライブ ページが必要です",
-	"inspector source mode": "ソースモード(HTTP)"
+	"inspector source mode": "ソースモード(HTTP)",
+	"scraper gallery title": "ダウンロードした画像",
+	"scraper images ok": "枚の画像を保存",
+	"scraper no images": "このページに画像が見つかりません"
 }

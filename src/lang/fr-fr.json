@@ -1888,5 +1888,8 @@
 	"inspector tree error": "Échec de l'arborescence active",
 	"inspector using fallback": "en utilisant la source (HTTP)",
 	"inspector fallback mode": "Arborescence de la source (HTTP) – la console/réseau a besoin de la page en direct",
-	"inspector source mode": "mode source (HTTP)"
+	"inspector source mode": "mode source (HTTP)",
+	"scraper gallery title": "Images téléchargées",
+	"scraper images ok": "images enregistrées",
+	"scraper no images": "Aucune image trouvée sur cette page"
 }
