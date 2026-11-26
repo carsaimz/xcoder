@@ -1,5 +1,5 @@
-// @vitest-environment jsdom
-import { readFileSync } from "node:fs";
+// @vitest-environment happy-dom
+import { existsSync, readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 /**
@@ -211,8 +211,20 @@ function makeCordova() {
 	};
 }
 
-describe("repro: instalação dos plugins Inspector/Analyzer/Scraper", () => {
-	beforeEach(() => {
+// This is a runtime repro with EXTERNAL fixtures: stub zips at
+// /tmp/plugtest/<name>.zip and a static server on 127.0.0.1:8932 serving
+// /tmp/webapp/pluginfs/<id>/main.js (how the Android WebView loads plugin
+// scripts). Without the fixtures the install chain cannot run, so the
+// cases skip instead of failing CI (prepare them locally to run it).
+const FIXTURES_READY =
+	existsSync("/tmp/plugtest/inspector.zip") &&
+	existsSync("/tmp/plugtest/site-analyzer.zip") &&
+	existsSync("/tmp/plugtest/scraper.zip");
+
+describe.runIf(FIXTURES_READY)(
+	"repro: instalação dos plugins Inspector/Analyzer/Scraper",
+	() => {
+		beforeEach(() => {
 		window.strings = { installing: "Installing...", loading: "Loading" };
 		window.cordova = makeCordova();
 	});
@@ -263,6 +275,7 @@ describe("repro: instalação dos plugins Inspector/Analyzer/Scraper", () => {
 			const registered = xcoder.require("sidebarApps").get(`plugin-${plugin}`);
 			expect(registered, `launcher de ${id} registado`).toBeTruthy();
 			xcoder.unmountPlugin(id);
-		});
-	}
-});
+			});
+		}
+	},
+);
