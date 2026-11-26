@@ -2024,5 +2024,11 @@
 	"ai skill view": "Переглянути вміст",
 	"ai skill delete": "Видалити",
 	"ai skill delete confirm": "Видалити цей імпортований навик?",
-	"ai skill deleted": "Навички видалено"
+	"ai skill deleted": "Навички видалено",
+	"tools hub devtools desc": "Генератори коду для робочого процесу: тіні, градієнти, картки, JSON, Base64, ідентифікатори тощо.",
+	"scraper select images": "Виберіть зображення",
+	"scraper clear selection": "Очистити вибір",
+	"scraper nothing selected": "Спочатку виберіть елементи зі списку",
+	"scraper fetch raw": "Отримання вихідного коду",
+	"scraper fetch rendered": "Отримання відтвореної сторінки"
 }

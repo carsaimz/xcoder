@@ -2024,5 +2024,11 @@
 	"ai skill view": "عرض المحتوى",
 	"ai skill delete": "يمسح",
 	"ai skill delete confirm": "هل تريد حذف هذه المهارة المستوردة؟",
-	"ai skill deleted": "تم حذف المهارة"
+	"ai skill deleted": "تم حذف المهارة",
+	"tools hub devtools desc": "مولدات الأكواد البرمجية لسير العمل: الظلال والتدرجات والبطاقات وJSON وBase64 والمعرفات والمزيد.",
+	"scraper select images": "حدد الصور",
+	"scraper clear selection": "مسح التحديد",
+	"scraper nothing selected": "حدد العناصر الموجودة في القائمة أولاً",
+	"scraper fetch raw": "جلب المصدر الخام",
+	"scraper fetch rendered": "جارٍ جلب الصفحة المعروضة"
 }

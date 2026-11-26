@@ -2024,5 +2024,11 @@
 	"ai skill view": "ਸਮੱਗਰੀ ਦੇਖੋ",
 	"ai skill delete": "ਮਿਟਾਓ",
 	"ai skill delete confirm": "ਕੀ ਇਸ ਆਯਾਤ ਹੁਨਰ ਨੂੰ ਮਿਟਾਉਣਾ ਹੈ?",
-	"ai skill deleted": "ਹੁਨਰ ਨੂੰ ਮਿਟਾਇਆ ਗਿਆ"
+	"ai skill deleted": "ਹੁਨਰ ਨੂੰ ਮਿਟਾਇਆ ਗਿਆ",
+	"tools hub devtools desc": "ਵਰਕਫਲੋ ਲਈ ਕੋਡ ਜਨਰੇਟਰ: ਸ਼ੈਡੋ, ਗਰੇਡੀਐਂਟ, ਕਾਰਡ, JSON, Base64, IDs ਅਤੇ ਹੋਰ।",
+	"scraper select images": "ਚਿੱਤਰ ਚੁਣੋ",
+	"scraper clear selection": "ਚੋਣ ਸਾਫ਼ ਕਰੋ",
+	"scraper nothing selected": "ਪਹਿਲਾਂ ਸੂਚੀ ਵਿੱਚ ਆਈਟਮਾਂ ਦੀ ਚੋਣ ਕਰੋ",
+	"scraper fetch raw": "ਕੱਚਾ ਸਰੋਤ ਲਿਆ ਰਿਹਾ ਹੈ",
+	"scraper fetch rendered": "ਰੈਂਡਰ ਕੀਤੇ ਪੰਨੇ ਨੂੰ ਪ੍ਰਾਪਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ"
 }

@@ -2024,5 +2024,11 @@
 	"ai skill view": "Lihat konten",
 	"ai skill delete": "Menghapus",
 	"ai skill delete confirm": "Hapus keterampilan yang diimpor ini?",
-	"ai skill deleted": "Keterampilan dihapus"
+	"ai skill deleted": "Keterampilan dihapus",
+	"tools hub devtools desc": "Generator kode untuk alur kerja: bayangan, gradien, kartu, JSON, Base64, ID, dan lainnya.",
+	"scraper select images": "Pilih gambar",
+	"scraper clear selection": "Hapus pilihan",
+	"scraper nothing selected": "Pilih item dalam daftar terlebih dahulu",
+	"scraper fetch raw": "Mengambil sumber mentah",
+	"scraper fetch rendered": "Mengambil halaman yang dirender"
 }

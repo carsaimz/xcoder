@@ -2024,5 +2024,11 @@
 	"ai skill view": "Прагляд кантэнту",
 	"ai skill delete": "Выдаліць",
 	"ai skill delete confirm": "Выдаліць гэты імпартаваны навык?",
-	"ai skill deleted": "Навык выдалены"
+	"ai skill deleted": "Навык выдалены",
+	"tools hub devtools desc": "Генератары кода для працоўнага працэсу: цені, градыенты, карты, JSON, Base64, ID і многае іншае.",
+	"scraper select images": "Выберыце выявы",
+	"scraper clear selection": "Ачысціць выбар",
+	"scraper nothing selected": "Спачатку абярыце элементы ў спісе",
+	"scraper fetch raw": "Атрыманне зыходнага кода",
+	"scraper fetch rendered": "Атрыманне адлюстраванай старонкі"
 }

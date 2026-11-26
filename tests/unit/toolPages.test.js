@@ -142,53 +142,52 @@ describe("openToolPage caching contract", () => {
         });
 });
 
-describe("structural removal contract", () => {
-        test("no scraper/inspector/analyzer imports or hand-offs remain", async () => {
+describe("structural restoration contract (v1.8.45)", () => {
+        test("internal tools are back: pages, hub, hand-off and preview menu", async () => {
                 const fs = await import("node:fs");
+                // the intent hand-off carries the native preview URL to the tool pages
                 const intent = fs.readFileSync("src/handlers/intent.js", "utf8");
-                expect(intent).not.toContain("pages/tools/scrape");
-                expect(intent).not.toContain("pages/tools/inspector");
-                expect(intent).not.toContain("pages/tools/analyzer");
-                expect(intent).not.toContain("TOOL_APPS");
-                expect(intent).not.toContain("xcoder_tool");
+                expect(intent).toContain("pages/tools/scrape");
+                expect(intent).toContain("pages/tools/inspector");
+                expect(intent).toContain("pages/tools/analyzer");
+                expect(intent).toContain("TOOL_APPS");
+                expect(intent).toContain("xcoder_tool");
+                expect(intent).toContain("pendingTools");
 
-                const chat = fs.readFileSync("src/sidebarApps/ai/index.js", "utf8");
-                expect(chat).not.toContain("openChatUrlInScraper");
-                expect(chat).not.toContain("pages/tools/scrape");
-
-                const learn = fs.readFileSync("src/pages/tools/learn/index.js", "utf8");
-                expect(learn).not.toContain("openInScraper");
-                expect(learn).not.toContain("openScraperWith");
-                expect(learn).not.toContain("lrn-site-scraper");
-
+                // the native preview menu hands the URL over
                 const browser = fs.readFileSync(
                         "src/plugins/browser/android/com/xcoder/browser/Browser.java",
                         "utf8",
                 );
-                expect(browser).not.toContain('"Inspect"');
-                expect(browser).not.toContain('"Scrape"');
-                expect(browser).not.toContain('"Analyze"');
+                expect(browser).toContain('"Inspect"');
+                expect(browser).toContain('"Scrape"');
+                expect(browser).toContain('"Analyze"');
                 // SEO audit stays
                 expect(browser).toContain('"SEO"');
+
+                // the AI chat keeps its v1.8.42 cleanup (no scraper shortcut there)
+                const chat = fs.readFileSync("src/sidebarApps/ai/index.js", "utf8");
+                expect(chat).not.toContain("openChatUrlInScraper");
+
+                // the Learn catalog keeps its v1.8.42 cleanup too
+                const learn = fs.readFileSync("src/pages/tools/learn/index.js", "utf8");
+                expect(learn).not.toContain("openInScraper");
         });
 
-        test("tools hub lists only the remaining tools", async () => {
+        test("tools hub lists every restored tool plus the webdev page", async () => {
                 const fs = await import("node:fs");
                 const hub = fs.readFileSync("src/pages/tools/hub.js", "utf8");
                 for (const opener of [
+                        "openAnalyzerPage",
+                        "openInspectorPage",
+                        "openScraperPage",
                         "openLearnPage",
                         "openLibsPage",
                         "openReplPage",
                         "openWebsitePage",
+                        "openWebdevPage",
                 ]) {
                         expect(hub).toContain(opener);
-                }
-                for (const gone of [
-                        "openAnalyzerPage",
-                        "openInspectorPage",
-                        "openScraperPage",
-                ]) {
-                        expect(hub).not.toContain(gone);
                 }
         });
 });

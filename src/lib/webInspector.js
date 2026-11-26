@@ -140,15 +140,31 @@ export const CAPTURE_SCRIPT = String.raw`
     }
     return node;
   }
+  // Documents have no getBoundingClientRect/attributes — everything the
+  // inspect/highlight paths touch (box, styles, outerHTML, highlight) is
+  // element-only, so an empty path (the tree root) resolves to the
+  // documentElement instead of crashing with
+  // «node.getBoundingClientRect is not a function».
+  function asElement(node){
+    if (!node) return null;
+    if (node.nodeType === 9) return node.documentElement || node.body || null;
+    if (node.nodeType === 3 || node.nodeType === 8) return node.parentElement || null;
+    return node.nodeType === 1 ? node : null;
+  }
   function pathOf(node){
+    if (!node || node === document) return "";
+    if (node === document.documentElement) return "0";
     var parts = [];
-    while (node && node !== document) {
-      var parent = node.parentElement;
+    var cur = node;
+    while (cur && cur !== document) {
+      var parent = cur.parentElement || cur.parentNode;
       if (!parent) return null;
-      var idx = Array.prototype.indexOf.call(parent.children, node);
+      var idx = Array.prototype.indexOf.call(parent.children, cur);
+      if (idx < 0) return null;
       parts.unshift(String(idx));
-      node = parent;
+      cur = parent === document.documentElement ? document : parent;
     }
+    parts.unshift("0");
     return parts.join(".");
   }
   function attrsOf(node){
@@ -163,6 +179,7 @@ export const CAPTURE_SCRIPT = String.raw`
   }
   function describe(node){
     if (!node) return null;
+    if (node.nodeType === 9) node = node.documentElement || node;
     var tag = node.nodeType === 3 ? "#text" : node.tagName ? node.tagName.toLowerCase() : String(node.nodeName || "");
     var text = "";
     if (node.nodeType === 3) { text = String(node.textContent || "").trim().slice(0, 120); }
@@ -193,7 +210,7 @@ export const CAPTURE_SCRIPT = String.raw`
         return;
       }
       case "inspect": {
-        var node = nodeAt(msg.path);
+        var node = asElement(nodeAt(msg.path));
         if (!node) { send({ cmd: "inspect", id: msg.id, data: null }); return; }
         var box = node.getBoundingClientRect();
         var styles = {};
@@ -213,7 +230,7 @@ export const CAPTURE_SCRIPT = String.raw`
         return;
       }
       case "highlight": {
-        var node = nodeAt(msg.path);
+        var node = asElement(nodeAt(msg.path));
         if (!node) { send({ cmd: "highlight", id: msg.id, error: "not found" }); return; }
         clearHighlight();
         highlighted = node;

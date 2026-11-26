@@ -5,12 +5,27 @@ import { describe, expect, it } from "vitest";
 describe("devtools sidebar app wiring", () => {
         const repoRoot = path.resolve(__dirname, "../..");
 
-        it("is registered in the sidebarApps loaders list", () => {
+        it("is reachable from the sidebar «Ferramentas» launcher and the hub", () => {
                 const source = readFileSync(
                         path.join(repoRoot, "src/sidebarApps/index.js"),
                         "utf-8",
                 );
-                expect(source).toContain('["devtools", () => import("./devtools")]');
+                // the generators left the sidebar (v1.8.45): the sidebar gains
+                // a «Ferramentas» launcher that opens the hub, which hosts
+                // the webdev page
+                expect(source).toContain('["tools", () => import("./tools")]');
+                expect(source).not.toContain('["devtools", () => import("./devtools")]');
+                const hub = readFileSync(
+                        path.join(repoRoot, "src/pages/tools/hub.js"),
+                        "utf-8",
+                );
+                expect(hub).toContain('import("./webdev").then((m) => m.openWebdevPage())');
+                expect(hub).toContain("openToolsHub");
+                const launcher = readFileSync(
+                        path.join(repoRoot, "src/sidebarApps/tools/index.js"),
+                        "utf-8",
+                );
+                expect(launcher).toContain("openToolsHub");
         });
 
         it("exports the sidebar app tuple with a palette icon", () => {

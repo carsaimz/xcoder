@@ -2024,5 +2024,11 @@
 	"ai skill view": "Xem nội dung",
 	"ai skill delete": "Xóa bỏ",
 	"ai skill delete confirm": "Xóa kỹ năng đã nhập này?",
-	"ai skill deleted": "Đã xóa kỹ năng"
+	"ai skill deleted": "Đã xóa kỹ năng",
+	"tools hub devtools desc": "Trình tạo mã cho quy trình làm việc: bóng, độ dốc, thẻ, JSON, Base64, ID, v.v.",
+	"scraper select images": "Chọn hình ảnh",
+	"scraper clear selection": "Xóa lựa chọn",
+	"scraper nothing selected": "Chọn các mục trong danh sách trước",
+	"scraper fetch raw": "Đang tìm nạp nguồn thô",
+	"scraper fetch rendered": "Đang tìm nạp trang được hiển thị"
 }

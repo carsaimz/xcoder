@@ -2024,5 +2024,11 @@
 	"ai skill view": "İçeriği görüntüle",
 	"ai skill delete": "Silmek",
 	"ai skill delete confirm": "İçe aktarılan bu beceri silinsin mi?",
-	"ai skill deleted": "Beceri silindi"
+	"ai skill deleted": "Beceri silindi",
+	"tools hub devtools desc": "İş akışı için kod oluşturucular: gölgeler, degradeler, kartlar, JSON, Base64, kimlikler ve daha fazlası.",
+	"scraper select images": "Resimleri seçin",
+	"scraper clear selection": "Seçimi temizle",
+	"scraper nothing selected": "Önce listedeki öğeleri seçin",
+	"scraper fetch raw": "Ham kaynak getiriliyor",
+	"scraper fetch rendered": "İşlenen sayfa getiriliyor"
 }

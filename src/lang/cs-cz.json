@@ -2024,5 +2024,11 @@
 	"ai skill view": "Zobrazit obsah",
 	"ai skill delete": "Vymazat",
 	"ai skill delete confirm": "Smazat tuto importovanou dovednost?",
-	"ai skill deleted": "Dovednost odstraněna"
+	"ai skill deleted": "Dovednost odstraněna",
+	"tools hub devtools desc": "Generátory kódu pro pracovní postup: stíny, přechody, karty, JSON, Base64, ID a další.",
+	"scraper select images": "Vyberte obrázky",
+	"scraper clear selection": "Jasný výběr",
+	"scraper nothing selected": "Nejprve vyberte položky v seznamu",
+	"scraper fetch raw": "Načítání surového zdroje",
+	"scraper fetch rendered": "Načítání vykreslené stránky"
 }

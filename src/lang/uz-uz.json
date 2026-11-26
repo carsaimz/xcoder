@@ -2024,5 +2024,11 @@
 	"ai skill view": "Kontentni ko'rish",
 	"ai skill delete": "Oʻchirish",
 	"ai skill delete confirm": "Ushbu import qilingan mahorat oʻchirilsinmi?",
-	"ai skill deleted": "Ko'nikma o'chirildi"
+	"ai skill deleted": "Ko'nikma o'chirildi",
+	"tools hub devtools desc": "Ish jarayoni uchun kod generatorlari: soyalar, gradientlar, kartalar, JSON, Base64, identifikatorlar va boshqalar.",
+	"scraper select images": "Rasmlarni tanlang",
+	"scraper clear selection": "Tanlovni tozalash",
+	"scraper nothing selected": "Avval ro'yxatdagi narsalarni tanlang",
+	"scraper fetch raw": "Xom manba olinmoqda",
+	"scraper fetch rendered": "Tasvirlangan sahifa olinmoqda"
 }

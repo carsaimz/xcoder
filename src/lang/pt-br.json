@@ -2124,5 +2124,11 @@
 	"ai skill view": "Ver conteúdo",
 	"ai skill delete": "Excluir",
 	"ai skill delete confirm": "Excluir esta skill importada?",
-	"ai skill deleted": "Skill excluída"
+	"ai skill deleted": "Skill excluída",
+	"tools hub devtools desc": "Geradores de código para o fluxo de trabalho: sombras, gradientes, cartões, JSON, Base64, IDs e mais.",
+	"scraper select images": "Selecionar imagens",
+	"scraper clear selection": "Limpar seleção",
+	"scraper nothing selected": "Selecione itens na lista primeiro",
+	"scraper fetch raw": "Buscando código-fonte bruto",
+	"scraper fetch rendered": "Buscando página renderizada"
 }

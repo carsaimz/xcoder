@@ -2024,5 +2024,11 @@
 	"ai skill view": "ഉള്ളടക്കം കാണുക",
 	"ai skill delete": "ഇല്ലാതാക്കുക",
 	"ai skill delete confirm": "ഈ ഇറക്കുമതി ചെയ്ത വൈദഗ്ദ്ധ്യം ഇല്ലാതാക്കണോ?",
-	"ai skill deleted": "കഴിവ് ഇല്ലാതാക്കി"
+	"ai skill deleted": "കഴിവ് ഇല്ലാതാക്കി",
+	"tools hub devtools desc": "വർക്ക്ഫ്ലോയ്ക്കുള്ള കോഡ് ജനറേറ്ററുകൾ: ഷാഡോകൾ, ഗ്രേഡിയൻ്റുകൾ, കാർഡുകൾ, JSON, Base64, ഐഡികൾ എന്നിവയും അതിലേറെയും.",
+	"scraper select images": "ചിത്രങ്ങൾ തിരഞ്ഞെടുക്കുക",
+	"scraper clear selection": "തിരഞ്ഞെടുപ്പ് മായ്‌ക്കുക",
+	"scraper nothing selected": "ആദ്യം ലിസ്റ്റിലെ ഇനങ്ങൾ തിരഞ്ഞെടുക്കുക",
+	"scraper fetch raw": "അസംസ്കൃത ഉറവിടം ലഭ്യമാക്കുന്നു",
+	"scraper fetch rendered": "റെൻഡർ ചെയ്ത പേജ് ലഭ്യമാക്കുന്നു"
 }

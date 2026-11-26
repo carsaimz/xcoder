@@ -7,6 +7,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.45] - 2026-11-26
+
+- Inspector: corrigido `node.getBoundingClientRect is not found` — a raiz da árvore e o `<html>` deixaram de rebentar; Elementos/Consola/Procura funcionam de novo (só a Rede funcionava)
+- Analisador, Inspector e Scraper voltam como FERRAMENTAS INTERNAS (páginas próprias de ecrã inteiro) — os plugins do marketplace continuam disponíveis como alternativa opcional
+- Novo ícone «Ferramentas» na barra lateral: abre o hub com Analisador, Inspector, Scraper, Aprender, Bibliotecas, Consola JS, Site e Dev Tools
+- Dev Tools (geradores de código) saíram da barra lateral e vivem dentro do hub «Ferramentas»
+- Pré-visualização: menu ⋮ volta a ter Inspeccionar / Scrape / Analyze (URL entregue à ferramenta interna)
+- Scraper: botões «Selecionar imagens», «Limpar seleção» e «Descarregar seleccionados» nos recursos
+- Chat IA: avatar do bot corrigido (glifo robot agora visível no círculo)
+- i18n: 8 chaves novas nas 31 línguas (100%)
+
 ## [1.8.44] - 2026-11-26
 
 ### Maintenance

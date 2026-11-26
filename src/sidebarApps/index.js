@@ -176,10 +176,11 @@ async function loadApps() {
 		["ai", () => import("./ai")],
 		["extensions", () => import("./extensions")],
 		// webdev utilities (shadow/gradient/card/placeholder generators)
-		// — the ONLY tool kept in the sidebar: everything else lives in
-		// independent full-screen pages (pages/tools, v1.8.40) reachable
-		// from the main menu «Ferramentas» and from the preview screen
-		["devtools", () => import("./devtools")],
+		// — moved INSIDE the «Ferramentas» hub (v1.8.45, user request);
+		// the hub itself gains its own sidebar launcher below, so every
+		// tool (Inspector, Scraper, Analyzer, Learn, Libs, console,
+		// Website, generators) is one tap away from the activity bar
+		["tools", () => import("./tools")],
 		// study catalog back as its own icon (v1.8.43) — a launcher
 		// that opens the full-screen Learn page on tap
 		["learn", () => import("./learn")],

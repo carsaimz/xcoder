@@ -2024,5 +2024,11 @@
 	"ai skill view": "הצג תוכן",
 	"ai skill delete": "לִמְחוֹק",
 	"ai skill delete confirm": "למחוק את המיומנות המיובאת הזו?",
-	"ai skill deleted": "מיומנות נמחקה"
+	"ai skill deleted": "מיומנות נמחקה",
+	"tools hub devtools desc": "מחוללי קוד לזרימת העבודה: צללים, מעברים, כרטיסים, JSON, Base64, מזהים ועוד.",
+	"scraper select images": "בחר תמונות",
+	"scraper clear selection": "נקה בחירה",
+	"scraper nothing selected": "תחילה בחר פריטים ברשימה",
+	"scraper fetch raw": "מביא מקור גולמי",
+	"scraper fetch rendered": "מביא את הדף שעבר עיבוד"
 }

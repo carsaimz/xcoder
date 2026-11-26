@@ -2024,5 +2024,11 @@
 	"ai skill view": "Tartalom megtekintése",
 	"ai skill delete": "Töröl",
 	"ai skill delete confirm": "Törli ezt az importált készségeket?",
-	"ai skill deleted": "Képesség törölve"
+	"ai skill deleted": "Képesség törölve",
+	"tools hub devtools desc": "Kódgenerátorok a munkafolyamathoz: árnyékok, színátmenetek, kártyák, JSON, Base64, azonosítók és egyebek.",
+	"scraper select images": "Válasszon képeket",
+	"scraper clear selection": "Kiválasztás törlése",
+	"scraper nothing selected": "Először válassza ki az elemeket a listából",
+	"scraper fetch raw": "Nyers forrás lekérése",
+	"scraper fetch rendered": "Renderelt oldal lekérése"
 }

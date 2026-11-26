@@ -2024,5 +2024,11 @@
 	"ai skill view": "বিষয়বস্তু দেখুন",
 	"ai skill delete": "মুছে দিন",
 	"ai skill delete confirm": "এই আমদানি করা দক্ষতা মুছে ফেলবেন?",
-	"ai skill deleted": "দক্ষতা মুছে ফেলা হয়েছে"
+	"ai skill deleted": "দক্ষতা মুছে ফেলা হয়েছে",
+	"tools hub devtools desc": "কর্মপ্রবাহের জন্য কোড জেনারেটর: ছায়া, গ্রেডিয়েন্ট, কার্ড, JSON, Base64, ID এবং আরও অনেক কিছু।",
+	"scraper select images": "ছবি নির্বাচন করুন",
+	"scraper clear selection": "নির্বাচন পরিষ্কার করুন",
+	"scraper nothing selected": "প্রথমে তালিকা থেকে আইটেম নির্বাচন করুন",
+	"scraper fetch raw": "কাঁচা উৎস আনা হচ্ছে",
+	"scraper fetch rendered": "রেন্ডার করা পৃষ্ঠা আনা হচ্ছে"
 }

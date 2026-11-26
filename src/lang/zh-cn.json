@@ -2024,5 +2024,11 @@
 	"ai skill view": "查看内容",
 	"ai skill delete": "删除",
 	"ai skill delete confirm": "删除这个导入的技能吗？",
-	"ai skill deleted": "技能已删除"
+	"ai skill deleted": "技能已删除",
+	"tools hub devtools desc": "工作流程的代码生成器：阴影、渐变、卡片、JSON、Base64、ID 等。",
+	"scraper select images": "选择图像",
+	"scraper clear selection": "清除选择",
+	"scraper nothing selected": "首先选择列表中的项目",
+	"scraper fetch raw": "获取原始源",
+	"scraper fetch rendered": "获取渲染页面"
 }

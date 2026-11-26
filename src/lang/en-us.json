@@ -2007,5 +2007,11 @@
 	"ai skill view": "View content",
 	"ai skill delete": "Delete",
 	"ai skill delete confirm": "Delete this imported skill?",
-	"ai skill deleted": "Skill deleted"
+	"ai skill deleted": "Skill deleted",
+	"tools hub devtools desc": "Code generators for the workflow: shadows, gradients, cards, JSON, Base64, IDs and more.",
+	"scraper select images": "Select images",
+	"scraper clear selection": "Clear selection",
+	"scraper nothing selected": "Select items in the list first",
+	"scraper fetch raw": "Fetching raw source",
+	"scraper fetch rendered": "Fetching rendered page"
 }

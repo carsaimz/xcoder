@@ -2024,5 +2024,11 @@
 	"ai skill view": "مشاهده مطالب",
 	"ai skill delete": "حذف کنید",
 	"ai skill delete confirm": "این مهارت وارد شده حذف شود؟",
-	"ai skill deleted": "مهارت حذف شد"
+	"ai skill deleted": "مهارت حذف شد",
+	"tools hub devtools desc": "تولید کننده کد برای گردش کار: سایه ها، گرادیان ها، کارت ها، JSON، Base64، شناسه ها و موارد دیگر.",
+	"scraper select images": "تصاویر را انتخاب کنید",
+	"scraper clear selection": "پاک کردن انتخاب",
+	"scraper nothing selected": "ابتدا موارد موجود در لیست را انتخاب کنید",
+	"scraper fetch raw": "واکشی منبع خام",
+	"scraper fetch rendered": "در حال واکشی صفحه رندر شده"
 }

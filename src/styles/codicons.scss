@@ -1257,6 +1257,12 @@
 .codicon-robot { font-family: "xcodicon" !important; }
 .codicon-robot:before { content: "\ec20"; }
 
+// legacy "icon bot" (AI chat assistant avatar) — same robot glyph,
+// the generic icon font has no "bot" entry so the avatar circle
+// rendered empty (v1.8.45)
+.icon.bot { font-family: "xcodicon" !important; }
+.icon.bot:before { content: "\ec20"; }
+
 .codicon-rocket { font-family: "xcodicon" !important; }
 .codicon-rocket:before { content: "\eb44"; }
 

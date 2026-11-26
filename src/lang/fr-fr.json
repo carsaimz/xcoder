@@ -2024,5 +2024,11 @@
 	"ai skill view": "Afficher le contenu",
 	"ai skill delete": "Supprimer",
 	"ai skill delete confirm": "Supprimer cette compétence importée ?",
-	"ai skill deleted": "Compétence supprimée"
+	"ai skill deleted": "Compétence supprimée",
+	"tools hub devtools desc": "Générateurs de code pour le flux de travail : ombres, dégradés, cartes, JSON, Base64, identifiants et plus encore.",
+	"scraper select images": "Sélectionnez des images",
+	"scraper clear selection": "Effacer la sélection",
+	"scraper nothing selected": "Sélectionnez d'abord les éléments dans la liste",
+	"scraper fetch raw": "Récupération de la source brute",
+	"scraper fetch rendered": "Récupération de la page rendue"
 }

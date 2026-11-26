@@ -2024,5 +2024,11 @@
 	"ai skill view": "Tingnan ang nilalaman",
 	"ai skill delete": "Tanggalin",
 	"ai skill delete confirm": "Tanggalin ang na-import na kasanayang ito?",
-	"ai skill deleted": "Na-delete ang kasanayan"
+	"ai skill deleted": "Na-delete ang kasanayan",
+	"tools hub devtools desc": "Mga generator ng code para sa daloy ng trabaho: mga anino, gradient, card, JSON, Base64, mga ID at higit pa.",
+	"scraper select images": "Pumili ng mga larawan",
+	"scraper clear selection": "I-clear ang pagpili",
+	"scraper nothing selected": "Pumili muna ng mga item sa listahan",
+	"scraper fetch raw": "Kinukuha ang raw source",
+	"scraper fetch rendered": "Kinukuha ang na-render na page"
 }
