@@ -76,9 +76,17 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add package.json config.xml
-            git commit -m "chore(pre-release): v${VERSION}"
-            git tag -a "v${VERSION}" -m "XCoder Beta v${VERSION}"
-            git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
+            # tolerant re-run: files may already carry the beta identity
+            git diff --cached --quiet || git commit -m "chore(pre-release): v${VERSION}"
+            # the branch may have moved since dispatch — rebase, and only
+            # create the tag when it does not exist yet
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+              git push origin "HEAD:${GITHUB_REF_NAME}"
+            else
+              git tag -a "v${VERSION}" -m "XCoder Beta v${VERSION}"
+              git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
+            fi
           else
             VERSION=$(node -p "require('./package.json').version")
             # tag push: the committed config.xml already carries the beta
