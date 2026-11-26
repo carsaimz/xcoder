@@ -261,3 +261,132 @@
 		transform: rotate(360deg);
 	}
 }
+
+// visited-site memory (lib/learnHistory.js) + «Abrir no Scraper» rows
+.lrn-site-row {
+	display: flex;
+	align-items: stretch;
+	gap: 6px;
+	margin: 5px 0;
+
+	.lrn-site {
+		margin: 0;
+		flex: 1;
+		min-width: 0;
+
+		.lrn-site-name {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			flex-wrap: wrap;
+		}
+	}
+
+	&.visited .lrn-site {
+		border-color: color-mix(in srgb, var(--active-color) 45%, transparent);
+	}
+}
+
+.lrn-visited {
+	font-size: 9px;
+	font-weight: 700;
+	padding: 1px 7px;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--active-color) 18%, transparent);
+	color: var(--active-color);
+	white-space: nowrap;
+}
+
+.lrn-site-scraper {
+	width: 44px;
+	flex-shrink: 0;
+	display: grid;
+	place-items: center;
+	border: 1px solid var(--border-color);
+	border-radius: 9px;
+	background: var(--secondary-color);
+	color: var(--primary-text-color);
+	cursor: pointer;
+
+	.icon {
+		font-size: 17px;
+		opacity: 0.8;
+	}
+
+	&:active {
+		border-color: var(--active-color);
+	}
+}
+
+.lrn-recent {
+	margin: 2px 0 8px;
+
+	.lrn-recent-head {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		opacity: 0.55;
+
+		.icon {
+			font-size: 13px;
+		}
+
+		.lrn-clear {
+			margin-left: auto;
+			display: inline-flex;
+			align-items: center;
+			gap: 3px;
+			background: transparent;
+			border: 0;
+			color: inherit;
+			font-size: 10px;
+			opacity: 0.8;
+			cursor: pointer;
+			padding: 4px 6px;
+			border-radius: 8px;
+			text-transform: none;
+			letter-spacing: normal;
+
+			.icon {
+				font-size: 12px;
+			}
+
+			&:active {
+				background: rgba(128, 128, 128, 0.15);
+			}
+		}
+	}
+
+	.lrn-recent-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 6px;
+	}
+
+	.lrn-recent-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 10px;
+		border-radius: 12px;
+		border: 1px solid var(--border-color);
+		background: var(--secondary-color);
+		color: var(--primary-text-color);
+		font-size: 12px;
+		cursor: pointer;
+
+		&:active {
+			border-color: var(--active-color);
+		}
+	}
+
+	.lrn-recent-count {
+		font-size: 10px;
+		opacity: 0.65;
+	}
+}

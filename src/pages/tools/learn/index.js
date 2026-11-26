@@ -1,5 +1,11 @@
 import "./style.scss";
 import toast from "components/toast";
+import {
+	clearVisited,
+	getRecent,
+	recordVisit,
+	visitCount,
+} from "lib/learnHistory";
 import { embeddingPolicy } from "lib/techDetect";
 import { httpFetchDetailed } from "lib/webScraper";
 import webviewApi from "lib/webview";
@@ -166,6 +172,20 @@ function buildUi() {
 					onclick={() => reloadSite()}
 				/>
 				<span
+					className="icon codicon-cloud-download lrn-act"
+					role="button"
+					aria-label={t("open in scraper", "Abrir no Scraper")}
+					title={t("open in scraper", "Abrir no Scraper")}
+					onclick={() => currentSite && openInScraper(currentSite)}
+				/>
+				<span
+					className="icon codicon-cloud-download lrn-act"
+					role="button"
+					aria-label={t("open in scraper", "Abrir no Scraper")}
+					title={t("open in scraper", "Abrir no Scraper")}
+					onclick={() => currentSite && openInScraper(currentSite)}
+				/>
+				<span
 					className="icon codicon-screen-full lrn-act"
 					role="button"
 					aria-label={t("learn native", "Abrir na WebView interna")}
@@ -234,23 +254,47 @@ function renderCatalog() {
 		<section className="lrn-group">
 			<h3>{categoryLabel(cat)}</h3>
 			{grouped.get(cat).map((site) => (
-				<button
-					type="button"
-					className="lrn-site"
-					data-url={site.url}
-					onclick={() => openSite(site)}
+				<div
+					className={`lrn-site-row${visitCount(site.url) ? " visited" : ""}`}
 				>
-					<span className="lrn-site-text">
-						<span className="lrn-site-name">{site.name}</span>
-						<span className="lrn-site-desc">{site.desc}</span>
-					</span>
-					<span className="icon codicon-chevron-right" />
-				</button>
+					<button
+						type="button"
+						className="lrn-site"
+						data-url={site.url}
+						onclick={() => openSite(site)}
+					>
+						<span className="lrn-site-text">
+							<span className="lrn-site-name">
+								{site.name}
+								{visitCount(site.url) ? (
+									<span className="lrn-visited">
+										{t("learn visited", "Visitado")} {visitCount(site.url)}×
+									</span>
+								) : null}
+							</span>
+							<span className="lrn-site-desc">{site.desc}</span>
+						</span>
+						<span className="icon codicon-chevron-right" />
+					</button>
+					<button
+						type="button"
+						className="lrn-site-scraper"
+						title={t("open in scraper", "Abrir no Scraper")}
+						aria-label={t("open in scraper", "Abrir no Scraper")}
+						onclick={(e) => {
+							e.stopPropagation();
+							openInScraper(site);
+						}}
+					>
+						<span className="icon codicon-cloud-download" />
+					</button>
+				</div>
 			))}
 		</section>
 	));
 
 	$list.replaceChildren(
+		...buildRecents(),
 		...(groups.length
 			? groups
 			: [
@@ -293,6 +337,7 @@ function reloadSite() {
 
 /** Opens the site in the embedded iframe — internal floating WebView. */
 async function openSite(site) {
+	recordVisit(site.url);
 	showViewer(site);
 	if (!$iframe) return;
 	$iframe.src = "about:blank";
@@ -380,6 +425,69 @@ function openExternal() {
 		system.openInBrowser(currentSite.url);
 	} catch {
 		window.open(currentSite.url, "_blank", "noopener");
+	}
+}
+
+/** Finds a catalog site by URL. */
+function siteByUrl(url) {
+	return LEARN_SITES.find((entry) => entry.url === url);
+}
+
+/**
+ * «Recentes» row — the last visited sites with their visit counts,
+ * persisted between sessions (lib/learnHistory.js).
+ */
+function buildRecents() {
+	const recents = getRecent(
+		LEARN_SITES.map((entry) => entry.url),
+		4,
+	);
+	if (!recents.length) return [];
+	return [
+		<div className="lrn-recent">
+			<div className="lrn-recent-head">
+				<span className="icon codicon-history" />
+				{t("learn recent", "Recentes")}
+				<button type="button" className="lrn-clear" onclick={clearHistory}>
+					<span className="icon codicon-clear-all" />
+					{t("learn clear history", "Limpar")}
+				</button>
+			</div>
+			<div className="lrn-recent-row">
+				{recents.map((entry) => {
+					const site = siteByUrl(entry.url);
+					if (!site) return null;
+					return (
+						<button
+							type="button"
+							className="lrn-recent-chip"
+							onclick={() => openSite(site)}
+						>
+							<span className="lrn-recent-name">{site.name}</span>
+							<span className="lrn-recent-count">{entry.count}×</span>
+						</button>
+					);
+				})}
+			</div>
+		</div>,
+	];
+}
+
+/** Clears the visited-site memory and refreshes the catalog. */
+function clearHistory() {
+	clearVisited();
+	renderCatalog();
+	toast(t("learn history cleared", "Histórico limpo"), 2000);
+}
+
+/** Hands the site to the Scraper page (independent, always visible). */
+async function openInScraper(site) {
+	try {
+		recordVisit(site.url);
+		const mod = await import("../scrape");
+		await mod.openScraperWith(site.url, "rendered");
+	} catch (error) {
+		toast(String(error?.message || error), 3000);
 	}
 }
 

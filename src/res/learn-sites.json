@@ -256,5 +256,113 @@
 		"url": "https://owasp.org/www-project-top-ten/",
 		"cat": "devops",
 		"desc": "As dez vulnerabilidades web mais críticas."
+	},
+	{
+		"name": "Curso em Vídeo",
+		"url": "https://cursoemvideo.com/",
+		"cat": "general",
+		"desc": "Aulas gratuitas do professor Gustavo Guanabara: lógica, HTML, CSS, JS, Python e mais."
+	},
+	{
+		"name": "freeCodeCamp em português",
+		"url": "https://www.freecodecamp.org/portuguese/",
+		"cat": "general",
+		"desc": "Currículo completo em português com projetos práticos e certificados gratuitos."
+	},
+	{
+		"name": "MDN em português",
+		"url": "https://developer.mozilla.org/pt-BR/",
+		"cat": "general",
+		"desc": "A referência de HTML, CSS e JavaScript traduzida para o português."
+	},
+	{
+		"name": "W3Schools em português",
+		"url": "https://www.w3schools.pt/",
+		"cat": "general",
+		"desc": "Tutoriais e exercícios de HTML, CSS e JavaScript em português."
+	},
+	{
+		"name": "Stack Overflow em Português",
+		"url": "https://pt.stackoverflow.com/",
+		"cat": "general",
+		"desc": "Perguntas e respostas de programação em português."
+	},
+	{
+		"name": "Khan Academy",
+		"url": "https://pt.khanacademy.org/",
+		"cat": "general",
+		"desc": "Vídeos e exercícios em português — lógica de programação e computação."
+	},
+	{
+		"name": "Escola Virtual (Bradesco)",
+		"url": "https://www.ev.org.br/",
+		"cat": "general",
+		"desc": "Cursos gratuitos com certificado: programação, web e banco de dados."
+	},
+	{
+		"name": "Rocketseat",
+		"url": "https://www.rocketseat.com.br/",
+		"cat": "general",
+		"desc": "Trilhas e eventos gratuitos de React, Node e mais, em português."
+	},
+	{
+		"name": "TabNews",
+		"url": "https://tabnews.com.br/",
+		"cat": "general",
+		"desc": "Comunidade brasileira de tecnologia: conteúdos e discussões."
+	},
+	{
+		"name": "Origamid",
+		"url": "https://www.origamid.com/",
+		"cat": "general",
+		"desc": "Cursos de front-end e UI design em português, vários gratuitos."
+	},
+	{
+		"name": "DIO",
+		"url": "https://www.dio.me/",
+		"cat": "general",
+		"desc": "Cursos, bootcamps e desafios de código em português."
+	},
+	{
+		"name": "JavaScript.info em português",
+		"url": "https://pt.javascript.info/",
+		"cat": "js",
+		"desc": "O tutorial moderno de JavaScript do básico ao avançado, em português."
+	},
+	{
+		"name": "React em português",
+		"url": "https://pt-br.react.dev/",
+		"cat": "js",
+		"desc": "Documentação oficial do React com exemplos interativos, em português."
+	},
+	{
+		"name": "Tutorial Python em português",
+		"url": "https://docs.python.org/pt-br/3/tutorial/",
+		"cat": "python",
+		"desc": "Tutorial oficial da linguagem Python traduzido para português."
+	},
+	{
+		"name": "Python Brasil",
+		"url": "https://www.python.org.br/",
+		"cat": "python",
+		"desc": "Comunidade brasileira de Python: guias de aprendizagem e para novatos."
+	},
+	{
+		"name": "Pro Git em português",
+		"url": "https://git-scm.com/book/pt-br",
+		"cat": "git",
+		"desc": "O livro oficial do Git traduzido: commits, branches, remotes e rebases."
+	},
+	{
+		"name": "Learn Git Branching em português",
+		"url": "https://learngitbranching.js.org/?locale=pt_BR",
+		"cat": "git",
+		"desc": "Git visual e interativo com níveis em português."
+	},
+	{
+		"name": "Microsoft Learn em português",
+		"url": "https://learn.microsoft.com/pt-br/training/",
+		"cat": "clang",
+		"desc": "Treinamentos gratuitos de C#, .NET e Azure em português."
 	}
 ]
