@@ -9,6 +9,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [1.8.42] - 2026-11-26
 
+### Removed
+- Ferramentas Scraper, Inspector e Analisador de Sites (nunca funcionaram de verdade): páginas, entradas do hub «Ferramentas», entrega de URL do preview nativo («Inspect»/«Scrape»/«Analyze») e botões «Abrir no Scraper» no chat e no catálogo Aprender
+
+### Fixed
+- Texto literal «expand_more» no chat: a seta do bloco de pensamento e a barra de artefatos agora mostram o glifo codicon certo
+
+### Added
+- Recursos do plugin oficial Acode AI Agent (Acode Foundation, baseado no Pi) portados para o chat integrado:
+  - Instruções do projeto: AGENTS.md / .agents.md / CLAUDE.md do workspace entram no prompt do agente (AGENTS.md vence, até 24k caracteres)
+  - ask_user_question: o agente mostra opções como botões no chat em vez de adivinhar
+  - todo_write: lista de tarefas ao vivo no chat para trabalhos de vários passos
+- O chat lê os erros do arquivo aberto: a ferramenta active_file_errors devolve os diagnósticos LSP/linter (linha, coluna, severidade, mensagem) para corrigir exatamente o que está marcado
+- Nota: as funções dos outros plugins oficiais da Acode Foundation (python, prettier, lint, git, github, lorem, snippets) já existem como recursos nativos do app
+- i18n: 5 chaves novas nas 31 línguas (100%)
 
 ## [1.8.41] - 2026-11-26
 
