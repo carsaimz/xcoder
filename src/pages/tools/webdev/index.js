@@ -1,5 +1,5 @@
-import { openToolPage } from "../toolPage";
 import devtoolsApp from "sidebarApps/devtools";
+import { openToolPage } from "../toolPage";
 
 /**
  * Web Dev tools page — the shadow/gradient/card/JSON/... generators
