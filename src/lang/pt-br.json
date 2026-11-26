@@ -200,6 +200,7 @@
 	"all": "Tudo",
 	"allFileAccess": "Acesso total aos arquivos",
 	"an error occurred": "Um erro ocorreu",
+	"plugin requires newer app": "Este plugin precisa de uma versão mais recente do app (v{min}) — atualize o XCoder e tente de novo.",
 	"animation": "Animação",
 	"api_error": "Servidor API desativado, por favor, tente depois de algum tempo.",
 	"app font": "Fonte do aplicativo",

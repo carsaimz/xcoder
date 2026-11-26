@@ -182,6 +182,7 @@
 	"connection refused": "Visszautasított kapcsolat",
 	"owner died": "A tulajdonos meghalt",
 	"an error occurred": "Hiba történt",
+	"plugin requires newer app": "Ehhez a bővítményhez az alkalmazás újabb verziója szükséges (v{min}) — frissítse az alkalmazást, majd próbálja újra.",
 	"add ftp": "FTP hozzáadása",
 	"add sftp": "SFTP hozzáadása",
 	"save file": "Fájl mentése",

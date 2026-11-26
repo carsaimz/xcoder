@@ -58,6 +58,16 @@ export default defineConfig({
                 alias: srcAliases,
         },
         test: {
+                environmentOptions: {
+                        jsdom: {
+                                // fetch+execute external <script src> — used by
+                                // the plugin install repro (plugin main.js loads
+                                // from a static server, like the Android WebView
+                                // loads file:// plugin storage)
+                                resources: "usable",
+                                runScripts: "dangerously",
+                        },
+                },
                 // Vitest unit tests live ONLY under `tests/`.
                 // `src/test/` is XCoder's in-app runtime test harness: it runs on-device
                 // inside the WebView (launched from the app commands) and depends on

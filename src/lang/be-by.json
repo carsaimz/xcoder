@@ -182,6 +182,7 @@
 	"connection refused": "Злучэнне адкінута",
 	"owner died": "Уладальнік знік",
 	"an error occurred": "Адбылася памылка",
+	"plugin requires newer app": "Гэты плагін патрабуе навейшай версіі прыкладання (v{min}) — абнавіце праграму і паспрабуйце зноў.",
 	"add ftp": "Дадаць FTP",
 	"add sftp": "Дадаць SFTP",
 	"save file": "Захаваць файл",

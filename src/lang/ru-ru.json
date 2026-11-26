@@ -182,6 +182,7 @@
 	"connection refused": "Отказано в соединении",
 	"owner died": "Владелец умер",
 	"an error occurred": "Произошла ошибка",
+	"plugin requires newer app": "Этому плагину нужна более новая версия приложения (v{min}) — обновите XCoder и попробуйте снова.",
 	"add ftp": "Добавить FTP",
 	"add sftp": "Добавить SFTP",
 	"save file": "Сохранить файл",

@@ -182,6 +182,7 @@
 	"connection refused": "Spojení odmítnuto",
 	"owner died": "Owner died",
 	"an error occurred": "Došlo k chybě",
+	"plugin requires newer app": "Tento plugin vyžaduje novější verzi aplikace (v{min}) — aktualizujte aplikaci a zkuste to znovu.",
 	"add ftp": "Přidat FTP",
 	"add sftp": "Přidat SFTP",
 	"save file": "Uložit soubor",

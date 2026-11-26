@@ -182,6 +182,7 @@
 	"connection refused": "সংযোগ প্রত্যাখ্যান করা হয়েছে",
 	"owner died": "Owner died",
 	"an error occurred": "একটি ত্রুটি ঘটেছে",
+	"plugin requires newer app": "এই প্লাগইনটির অ্যাপের নতুন সংস্করণ প্রয়োজন (v{min}) — অ্যাপ আপডেট করে আবার চেষ্টা করুন।",
 	"add ftp": "FTP সংযোগ করুন",
 	"add sftp": "SFTP সংযোগ করুন",
 	"save file": "ফাইলটি সেভ করুন",

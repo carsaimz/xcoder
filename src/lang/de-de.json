@@ -182,6 +182,7 @@
 	"connection refused": "Verbindung verweigert",
 	"owner died": "Besitzer existiert nicht",
 	"an error occurred": "Es ist ein Fehler aufgetreten",
+	"plugin requires newer app": "Dieses Plugin benötigt eine neuere Version der App (v{min}) — bitte die App aktualisieren und erneut versuchen.",
 	"add ftp": "FTP hinzufügen",
 	"add sftp": "SFTP hinzufügen",
 	"save file": "Datei speichern",

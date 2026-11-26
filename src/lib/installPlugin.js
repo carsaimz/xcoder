@@ -59,6 +59,19 @@ export default async function installPlugin(
 					"Plugin not found in the marketplace. Install plugins from a URL or a local zip file.",
 			);
 		}
+		// The plugin is built for a newer app core — installing it would
+		// crash on init (missing engine modules). Fail with a clear
+		// message instead of a raw TypeError (v1.8.45).
+		const minCode = Number(entry.min_version_code || 0);
+		const appCode = Number(window.BuildInfo?.versionCode || 0);
+		if (minCode > 0 && appCode > 0 && appCode < minCode) {
+			throw new Error(
+				(
+					strings["plugin requires newer app"] ||
+					"Este plugin precisa de uma versão mais recente do app (v{min}). Atualize o XCoder e tente de novo."
+				).replace("{min}", String(entry.min_version_name || minCode)),
+			);
+		}
 		pluginUrl = entry.source;
 		sourceFallback = entry.source_fallback || null;
 	} else {
@@ -101,6 +114,20 @@ export default async function installPlugin(
 			// and keeps the rest of the manifest untouched.
 			const adapted = adaptPluginManifest(pluginJson, pluginUrl);
 			pluginJson.id = adapted.id;
+
+			// The package itself may declare the minimum app version it
+			// needs (plugin.json "min_version_code") — same guard as the
+			// marketplace entries above (v1.8.45).
+			const pkgMinCode = Number(pluginJson.min_version_code || 0);
+			const pkgAppCode = Number(window.BuildInfo?.versionCode || 0);
+			if (pkgMinCode > 0 && pkgAppCode > 0 && pkgAppCode < pkgMinCode) {
+				throw new Error(
+					(
+						strings["plugin requires newer app"] ||
+						"Este plugin precisa de uma versão mais recente do app (v{min}). Atualize o XCoder e tente de novo."
+					).replace("{min}", String(pluginJson.min_version_name || pkgMinCode)),
+				);
+			}
 
 			/** patch main in manifest */
 			if (!zip.files[pluginJson.main]) {

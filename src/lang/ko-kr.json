@@ -182,6 +182,7 @@
 	"connection refused": "Connection refused",
 	"owner died": "Owner died",
 	"an error occurred": "An error occurred",
+	"plugin requires newer app": "이 플러그인에는 앱의 최신 버전이 필요합니다(v{min}). XCoder를 업데이트한 후 다시 시도하세요.",
 	"add ftp": "Add FTP",
 	"add sftp": "Add SFTP",
 	"save file": "Save file",

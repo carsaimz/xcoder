@@ -182,6 +182,7 @@
 	"connection refused": "تم رفض الاتصال",
 	"owner died": "توقف المالك (Owner died)",
 	"an error occurred": "حدث خطأ ما",
+	"plugin requires newer app": "هذا الإضافة يحتاج إلى إصدار أحدث من التطبيق (v{min}) — حدّث التطبيق ثم أعد المحاولة.",
 	"add ftp": "إضافة اتصال FTP",
 	"add sftp": "إضافة اتصال SFTP",
 	"save file": "حفظ الملف",

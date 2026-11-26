@@ -182,6 +182,7 @@
 	"connection refused": "कनेक्शन नहीं हो सका",
 	"owner died": "मालिक मर गया",
 	"an error occurred": "एक त्रुटि पाई गई",
+	"plugin requires newer app": "इस प्लगइन को ऐप के नए संस्करण की आवश्यकता है (v{min}) — ऐप अपडेट करें और फिर से प्रयास करें।",
 	"add ftp": "FTP जोड़ें",
 	"add sftp": "SFTP जोड़ें",
 	"save file": "फ़ाइल सहेजें",

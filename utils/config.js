@@ -66,7 +66,15 @@ try {
 try {
 	fs.mkdirSync(path.join(rootDir, "www", "browser"), { recursive: true });
 	fs.copyFileSync(
-		path.join(rootDir, "src", "plugins", "browser", "res", "android", "seo-audit.js"),
+		path.join(
+			rootDir,
+			"src",
+			"plugins",
+			"browser",
+			"res",
+			"android",
+			"seo-audit.js",
+		),
 		path.join(rootDir, "www", "browser", "seo-audit.js"),
 	);
 } catch (error) {

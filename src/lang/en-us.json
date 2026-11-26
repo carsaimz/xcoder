@@ -83,6 +83,7 @@
 	"all": "All",
 	"allFileAccess": "All file access",
 	"an error occurred": "An error occurred",
+	"plugin requires newer app": "This plugin needs a newer version of the app (v{min}) — update XCoder and try again.",
 	"animation": "Animation",
 	"api_error": "API server down, please try after some time.",
 	"app font": "App font",

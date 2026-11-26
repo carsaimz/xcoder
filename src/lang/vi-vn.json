@@ -182,6 +182,7 @@
 	"connection refused": "Kết nối bị từ chối",
 	"owner died": "Chủ sở hữu đã nằm",
 	"an error occurred": "Đã xảy ra lỗi",
+	"plugin requires newer app": "Plugin này cần phiên bản ứng dụng mới hơn (v{min}) — hãy cập nhật XCoder rồi thử lại.",
 	"add ftp": "Thêm FTP",
 	"add sftp": "Thêm SFTP",
 	"save file": "Lưu tệp",

@@ -1,9 +1,9 @@
+import fsOperation from "fileSystem";
 import toast from "components/toast";
 import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
-import FileBrowser from "pages/fileBrowser";
 import {
 	BUILTIN_SKILLS,
 	listSkills,
@@ -12,12 +12,12 @@ import {
 } from "lib/ai/skills";
 import {
 	deleteImportedSkill,
+	getSkillsIo,
 	githubToRaw,
 	saveImportedSkill,
-	getSkillsIo,
 } from "lib/ai/skillsStorage";
-import fsOperation from "fileSystem";
 import settings from "lib/settings";
+import FileBrowser from "pages/fileBrowser";
 import helpers from "utils/helpers";
 
 const t = (key, fallback) => strings[key] || fallback;

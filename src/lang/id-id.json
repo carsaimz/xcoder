@@ -182,6 +182,7 @@
 	"connection refused": "Koneksi ditolak",
 	"owner died": "Proses induk berhenti.",
 	"an error occurred": "Terjadi kesalahan",
+	"plugin requires newer app": "Plugin ini membutuhkan versi aplikasi yang lebih baru (v{min}) — perbarui XCoder lalu coba lagi.",
 	"add ftp": "Tambahkan FTP",
 	"add sftp": "Tambahkan SFTP",
 	"save file": "Simpan berkas",

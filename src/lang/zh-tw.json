@@ -182,6 +182,7 @@
 	"connection refused": "連線被拒",
 	"owner died": "擁有者失效",
 	"an error occurred": "發生錯誤",
+	"plugin requires newer app": "此外掛需要較新版本的應用程式（v{min}）——請先更新 XCoder 再重試。",
 	"add ftp": "加入 FTP",
 	"add sftp": "加入 SFTP",
 	"save file": "儲存檔案",

@@ -182,6 +182,7 @@
 	"connection refused": "Connexion rejetée",
 	"owner died": "Le propriétaire a disparu",
 	"an error occurred": "Une erreur s'est produite",
+	"plugin requires newer app": "Ce plugin nécessite une version plus récente de l'application (v{min}) — mettez à jour XCoder puis réessayez.",
 	"add ftp": "Ajouter FTP",
 	"add sftp": "Ajouter SFTP",
 	"save file": "Enregistrer le fichier",

@@ -182,6 +182,7 @@
 	"connection refused": "Connection refused",
 	"owner died": "Owner died",
 	"an error occurred": "An error occurred",
+	"plugin requires newer app": "Bu eklenti, uygulamanın daha yeni bir sürümünü gerektiriyor (v{min}) — XCoder'ı güncelleyin ve tekrar deneyin.",
 	"add ftp": "Add FTP",
 	"add sftp": "Add SFTP",
 	"save file": "Save file",

@@ -182,6 +182,7 @@
 	"connection refused": "Connection refused",
 	"owner died": "Owner died",
 	"an error occurred": "An error occurred",
+	"plugin requires newer app": "Bu plagin ilovaning yangi versiyasini talab qiladi (v{min}) — XCoder'ni yangilab, qayta urinib ko'ring.",
 	"add ftp": "Add FTP",
 	"add sftp": "Add SFTP",
 	"save file": "Save file",

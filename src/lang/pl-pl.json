@@ -182,6 +182,7 @@
 	"connection refused": "Połączenie odrzucone",
 	"owner died": "Właściciel zmarł",
 	"an error occurred": "Wystąpił błąd",
+	"plugin requires newer app": "Ta wtyczka wymaga nowszej wersji aplikacji (v{min}) — zaktualizuj XCoder i spróbuj ponownie.",
 	"add ftp": "Dodaj FTP",
 	"add sftp": "Dodaj SFTP",
 	"save file": "Zapisz plik",

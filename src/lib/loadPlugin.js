@@ -61,19 +61,30 @@ export default async function loadPlugin(pluginId, justInstalled = false) {
 		};
 
 		$script.onload = async () => {
-			const $page = Page("Plugin");
-			$page.show = () => {
-				actionStack.push({
-					id: pluginId,
-					action: $page.hide,
-				});
+			// The settings page is optional chrome: a failure building it
+			// must NOT kill the plugin install (v1.8.45). Plugins render
+			// their own pages when launched.
+			let $page = null;
+			try {
+				$page = Page("Plugin");
+				$page.show = () => {
+					actionStack.push({
+						id: pluginId,
+						action: $page.hide,
+					});
 
-				app.append($page);
-			};
+					app.append($page);
+				};
 
-			$page.onhide = function () {
-				actionStack.remove(pluginId);
-			};
+				$page.onhide = function () {
+					actionStack.remove(pluginId);
+				};
+			} catch (pageError) {
+				console.warn(
+					`Plugin settings page unavailable for ${pluginId}:`,
+					pageError,
+				);
+			}
 
 			try {
 				if (!(await fsOperation(cacheFile).exists())) {

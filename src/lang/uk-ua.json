@@ -182,6 +182,7 @@
 	"connection refused": "У зʼєднанні відмовлено",
 	"owner died": "Власник помер",
 	"an error occurred": "Відбулася помилка",
+	"plugin requires newer app": "Цей плагін потребує новішої версії програми (v{min}) — оновіть XCoder і спробуйте ще раз.",
 	"add ftp": "Додати FTP",
 	"add sftp": "Додати SFTP",
 	"save file": "Зберегти файл",

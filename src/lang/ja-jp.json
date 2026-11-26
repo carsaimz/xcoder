@@ -182,6 +182,7 @@
 	"connection refused": "接続が拒否されました",
 	"owner died": "ファイルを所有しているプロセスが死んでいます",
 	"an error occurred": "エラーが発生しました",
+	"plugin requires newer app": "このプラグインにはアプリの新しいバージョンが必要です（v{min}）。XCoder を更新してからもう一度お試しください。",
 	"add ftp": "FTPを追加",
 	"add sftp": "SFTPを追加",
 	"save file": "保存",

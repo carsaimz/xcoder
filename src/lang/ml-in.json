@@ -182,6 +182,7 @@
 	"connection refused": "കണക്ഷൻ പോയി ",
 	"owner died": "ഓണർ പോയി ",
 	"an error occurred": "ഒരു എറർ വന്നു ",
+	"plugin requires newer app": "ഈ പ്ലഗിനിന് അപ്ലിക്കേഷന്റെ പുതിയ പതിപ്പ് ആവശ്യമാണ് (v{min}) — അപ്ലിക്കേഷൻ അപ്ഡേറ്റ് ചെയ്ത് വീണ്ടും ശ്രമിക്കുക.",
 	"add ftp": "ആഡ് FTP ",
 	"add sftp": "ആഡ് SFTP ",
 	"save file": "ഫയൽ സേവ് ചെയുക ",

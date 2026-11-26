@@ -182,6 +182,7 @@
 	"connection refused": "חיבור נדחה",
 	"owner died": "הבעלים נפטר",
 	"an error occurred": "אירעה שגיאה",
+	"plugin requires newer app": "התוסף דורש גרסה חדשה יותר של האפליקציה (v{min}) — עדכנו את האפליקציה ונסו שוב.",
 	"add ftp": "הוסף FTP",
 	"add sftp": "הוסף SFTP",
 	"save file": "שמור קובץ",

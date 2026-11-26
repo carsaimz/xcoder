@@ -182,6 +182,7 @@
 	"connection refused": "ਸੰਬੰਧ ਠੁਕਰਾਉਣਾ",
 	"owner died": "ਮਾਲਕ ਦੀ ਮੌਤ ਹੋ ਗਈ",
 	"an error occurred": "ਇੱਕ ਗਲਤੀ ਆਈ ਹੈ",
+	"plugin requires newer app": "ਇਸ ਪਲੱਗਇਨ ਨੂੰ ਐਪ ਦੇ ਨਵੇਂ ਵਰਜ਼ਨ ਦੀ ਲੋੜ ਹੈ (v{min}) — ਐਪ ਅੱਪਡੇਟ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
 	"add ftp": "FTP ਸ਼ਾਮਲ ਕਰੋ",
 	"add sftp": "SFTP ਸ਼ਾਮਲ ਕਰੋ",
 	"save file": "ਫਾਈਲ ਸੇਵ ਕਰੋ",

@@ -10,15 +10,22 @@ export default class InstallState {
 	updatedStore;
 
 	/**
-	 *
+	 * Builds the per-plugin install state used to dedupe/skip unchanged
+	 * files. NEVER returns undefined — if the native checksum or the
+	 * storage layer fails (older native plugin, read-only storage…), a
+	 * volatile in-memory state is returned so the install keeps going
+	 * instead of crashing with «Cannot read properties of undefined
+	 * (reading 'exists')» (v1.8.45).
 	 * @param {string} id
-	 * @returns
+	 * @returns {Promise<InstallState>}
 	 */
 	static async new(id) {
+		const state = new InstallState();
+		state.updatedStore = {};
+		state.store = {};
 		try {
-			const state = new InstallState();
 			state.id = await checksumText(id);
-			state.updatedStore = {};
+			state.volatile = false;
 
 			if (!(await fsOperation(INSTALL_STATE_STORAGE).exists())) {
 				await fsOperation(DATA_STORAGE).createDirectory(".install-state");
@@ -62,7 +69,15 @@ export default class InstallState {
 
 			return state;
 		} catch (e) {
-			console.error(e);
+			// degrade to a volatile state instead of crashing the install
+			console.warn(
+				"InstallState: storage unavailable, using in-memory state —",
+				e?.message || e,
+			);
+			state.id = String(id).length.toString(16);
+			state.storeUrl = "";
+			state.volatile = true;
+			return state;
 		}
 	}
 
@@ -104,6 +119,7 @@ export default class InstallState {
 
 	async save() {
 		this.store = this.updatedStore;
+		if (this.volatile || !this.storeUrl) return;
 		await fsOperation(this.storeUrl).writeFile(
 			JSON.stringify(this.updatedStore),
 		);
@@ -120,6 +136,7 @@ export default class InstallState {
 		try {
 			this.store = {};
 			this.updatedStore = {};
+			if (this.volatile || !this.storeUrl) return;
 			// Delete the state file entirely to avoid corrupted/partial JSON issues
 			if (await fsOperation(this.storeUrl).exists()) {
 				try {
@@ -145,12 +162,20 @@ export default class InstallState {
  * @returns the derived checksum
  */
 async function checksum(data) {
-	const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
-	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hashHex = hashArray
-		.map((byte) => byte.toString(16).padStart(2, "0"))
-		.join("");
-	return hashHex;
+	if (window.crypto?.subtle) {
+		const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+		const hashArray = Array.from(new Uint8Array(hashBuffer));
+		return hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join("");
+	}
+	// last resort: fast non-cryptographic hash (only used to detect
+	// "same content as before", not for security)
+	const view = new Uint8Array(data);
+	let h1 = 0x811c9dc5;
+	for (const byte of view) {
+		h1 ^= byte;
+		h1 = Math.imul(h1, 0x01000193) >>> 0;
+	}
+	return `fnv-${h1.toString(16)}-${view.length.toString(16)}`;
 }
 
 /**
@@ -159,13 +184,19 @@ async function checksum(data) {
  * @returns
  */
 async function checksumText(text) {
-	return new Promise((resolve, reject) => {
-		cordova.exec(
-			(hash) => resolve(hash),
-			(error) => reject(error),
-			"System",
-			"checksumText",
-			[text],
-		);
-	});
+	try {
+		return await new Promise((resolve, reject) => {
+			cordova.exec(
+				(hash) => resolve(hash),
+				(error) => reject(error),
+				"System",
+				"checksumText",
+				[text],
+			);
+		});
+	} catch (error) {
+		// older native System plugin without the checksumText action —
+		// fall back to the WebCrypto digest (same SHA-256 hex digest)
+		return checksum(new TextEncoder().encode(text));
+	}
 }
