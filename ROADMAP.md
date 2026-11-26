@@ -16,6 +16,50 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
+## ✅ Resumo v1.8.24 → v1.8.43
+
+- **v1.8.43 — skills importadas + 10 plugins novos:** o agente aceita
+  skills importadas de ficheiro, URL/GitHub (conversão blob→raw
+  automática) ou coladas (guardadas em `<DATA_STORAGE>/skills`,
+  com ver/excluir na gestão); marketplace com 10 plugins novos —
+  JWT Decoder, Timestamp, Base Converter, Password Generator,
+  CSV⇄JSON, Diff Tool, HTTP Status, Color Contrast, Query String e
+  Unit Converter (46 plugins no total); `color-mix()` com fallback
+  para WebViews antigos (port do upstream #3025, 231 fallbacks em 40
+  ficheiros); console da pré-visualização persistente; Estudos com
+  ícone na barra lateral; analisador/inspector/scraper como plugins
+  com os motores expostos na API.
+- **v1.8.42:** scraper/inspector/analisador removidos do núcleo e
+  republicados como plugins; correções i18n.
+- **v1.8.40/41:** ferramentas em páginas independentes (hub
+  Ferramentas), Estudos (catálogo de aprendizagem), REPL de JS,
+  bibliotecas locais, análise de sites.
+
+## 🎯 Próximo — v1.8.44+
+
+- **Paridade com o PC (objetivo estratégico):** o APK pode passar de
+  100 MB — o alvo é um editor completo para quem não tem PC. Portar
+  do VS Code: formatter (Prettier/JS beautify), ESLint + Prettier on
+  save, Emmet completo, temas/icon themes em packs, keybindings VS
+  Code, snippets, Task Runner (npm scripts no terminal), test runner
+  UI e suporte a mais LSPs.
+- **Renderizador canvas (upstream #2988/#3066-3088):** avaliar a
+  dependência `@acode.app/canvas-view` (magnifier, gutter border,
+  cores do tema por CSS) para performance com ficheiros enormes.
+- **Perf de abas (#3035)** — fechar/gravar muitas abas mais rápido;
+  **hint nas opções de busca (#3042)**; **scrollbar sem reabrir o
+  teclado (#3069)**; **mermaid no markdown (#2987, lib pele)**.
+- **API launchAppwithFile (#3061)** — abrir o XCoder a partir de
+  outros apps com um ficheiro específico.
+- **Skills:** marketplace de skills (pasta `xcoder-skills` no GitHub),
+  importar skills em lote de um repositório, partilha de skills com
+  subagentes.
+- **Processo de issues:** bugs reportados nos issues do GitHub são
+  verificados, corrigidos e marcados como resolvidos (ou apagados se
+  duplicados/inválidos) a cada sessão.
+- **Desktop:** paridade das ferramentas no build Electron (desktop.yml)
+  — todas as novas páginas funcionam em Windows/Linux.
+
 ## ✅ Concluído até a v1.8.23
 
 - **v1.8.23 — git real + multiselecção + assinatura Windows:** o painel
@@ -755,7 +799,7 @@ referência.
 ## 🧭 Direção contínua
 
 - Manter o CI verde e a pt-br 100% traduzida (`npm run lang:check`).
-- **Acode triado até 26/10 (v1.13.x):** PRs mesados recentes catalogados
+- **Acode triado até 25/11 (v1.13.x):** canvas-view em 0.0.11, recentes: launchAppwithFile (#3061), search hints (#3042), replace-all vazio (#3048), perf de abas (#3035), CRLF colado (#3018), guardas color-mix (#3025), scrollbar/teclado (#3069), multiselecção+drag-drop na árvore (#2999) — **#3025 já portado (v1.8.43)**. PRs mesados recentes catalogados
   nos Lotes — canvas renderer (#2988), mermaid no markdown (#2987),
   webview melhorada (#2924), fullscreen/orientação (#2919), GFM (#2922),
   quicktool de plugins (#2898), consola virtualizada (#2882), busca em
@@ -784,6 +828,47 @@ referência.
 > raising AI limits. Items marked with 💡 come from continuous comparison
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
+
+## ✅ Summary v1.8.24 → v1.8.43
+
+- **v1.8.43 — imported skills + 10 new plugins:** the agent accepts
+  skills imported from a file, URL/GitHub (blob→raw conversion
+  included) or pasted text (stored in `<DATA_STORAGE>/skills`, with
+  view/delete in the manager); marketplace gained 10 new plugins —
+  JWT Decoder, Timestamp, Base Converter, Password Generator,
+  CSV⇄JSON, Diff Tool, HTTP Status, Color Contrast, Query String and
+  Unit Converter (46 plugins total); `color-mix()` fallbacks for old
+  WebViews (upstream #3025 port, 231 fallbacks across 40 files);
+  persistent preview console; Estudos sidebar entry; analyzer/
+  inspector/scraper became marketplace plugins with engines exposed
+  through the API.
+- **v1.8.42:** scraper/inspector/analyzer removed from the core and
+  republished as plugins; i18n fixes.
+- **v1.8.40/41:** tools moved to standalone pages (Tools hub),
+  Estudos (learning catalog), JS REPL, local libs, website analysis.
+
+## 🎯 Next — v1.8.44+
+
+- **PC parity (strategic goal):** the APK may exceed 100 MB — the
+  target is a full editor for people without a PC. Port from VS Code:
+  formatter (Prettier/JS beautify), ESLint + Prettier on save, full
+  Emmet, theme/icon packs, VS Code keybindings, snippets, task runner
+  (npm scripts in the terminal), test runner UI and more LSPs.
+- **Canvas renderer (upstream #2988/#3066-3088):** evaluate
+  `@acode.app/canvas-view` (magnifier, gutter border, theme colors
+  from CSS) for huge-file performance.
+- **Tab perf (#3035)** — closing/saving many tabs faster; **search
+  options hints (#3042)**; **scrollbar without reopening the keyboard
+  (#3069)**; **mermaid in markdown (#2987, pele lib)**.
+- **launchAppwithFile API (#3061)** — launch XCoder from other apps
+  with a specific file.
+- **Skills:** skill marketplace (a `xcoder-skills` GitHub repo),
+  bulk-import skills from a repository, share skills with subagents.
+- **Issues process:** bugs reported in the GitHub issues are verified,
+  fixed and marked resolved (or deleted when duplicates/invalid) every
+  session.
+- **Desktop:** tool parity on the Electron build (desktop.yml) — all
+  new pages work on Windows/Linux.
 
 ## ✅ Done through v1.8.23
 
@@ -1394,7 +1479,7 @@ Rejected/reverted upstream: #2864, #2526, #2930/#2931 (reverted in
 ## 🧭 Ongoing direction
 
 - Keep CI green and pt-br 100% translated (`npm run lang:check`).
-- **Acode triaged through 26/10 (v1.13.x):** recently merged PRs are
+- **Acode triaged through 25/11 (v1.13.x):** recent upstream commits — launchAppwithFile (#3061), search hints (#3042), empty replace-all (#3048), tab perf (#3035), CRLF paste (#3018), color-mix guards (#3025), scrollbar/keyboard (#3069), file tree multi-select & drag-drop (#2999) — **#3025 already ported (v1.8.43)**. Recently merged PRs are
   catalogued in the Batches — canvas renderer (#2988), mermaid in
   markdown (#2987), improved webview (#2924), fullscreen/orientation
   (#2919), GFM (#2922), plugin quicktool (#2898), virtualised console
