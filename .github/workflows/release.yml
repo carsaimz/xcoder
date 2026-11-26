@@ -67,6 +67,18 @@ jobs:
           REF: ${{ github.ref_name }}
         run: |
           set -e
+          # pre-releases NEVER go through the stable pipeline — they would
+          # ship stable-looking APK names (XCoder-vX.Y.Z-beta.apk) over the
+          # beta package and flip the release's prerelease flag off. The
+          # beta channel is prerelease.yml (XCoder-Beta-*.apk, side-by-side
+          # package id com.carsaimz.xcoder.beta).
+          CHECK_VERSION="${INPUT_VERSION:-$REF}"
+          case "$CHECK_VERSION" in
+            *-beta*|*-rc*)
+              echo "::error::'$CHECK_VERSION' is a pre-release — dispatch .github/workflows/prerelease.yml instead (or push the v$CHECK_VERSION tag)"
+              exit 1
+              ;;
+          esac
           # latest existing tag (version-sorted); empty for the first release
           PREV=$(git tag --sort=-v:refname | grep -vx "$REF" | head -n 1 || true)
           if [ "$EVENT" = "workflow_dispatch" ]; then
