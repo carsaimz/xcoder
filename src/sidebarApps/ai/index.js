@@ -181,15 +181,8 @@ export async function askAI(text, opts = {}) {
 
 	if (!agent || opts.readOnly || opts.forceTools) {
 		agent = opts.readOnly
-			? new Agent({
-					onEvent: handleEvent,
-					mode: "agent",
-					tools: READ_ONLY_TOOLS,
-				})
-			: new Agent({
-					onEvent: handleEvent,
-					...(opts.forceTools ? { mode: "agent" } : {}),
-				});
+			? createAgent({ mode: "agent", tools: READ_ONLY_TOOLS })
+			: createAgent(opts.forceTools ? { mode: "agent" } : {});
 		agent.restore(events);
 	}
 
@@ -626,7 +619,7 @@ async function send() {
 	ensureTitle(raw);
 
 	if (!agent) {
-		agent = new Agent({ onEvent: handleEvent });
+		agent = createAgent();
 		agent.restore(events);
 	}
 
@@ -1184,6 +1177,183 @@ function updateToolRow(event) {
 	if ($result) $result.textContent = text;
 }
 
+// ---------------------------------------------------------------------------
+// Consent widget — tool permission requests rendered INSIDE the chat
+// (VS Code style) instead of a blocking system dialog.
+
+/** Danger level labels for the consent card. */
+const CONSENT_DANGER = {
+	read: ["consent danger read", "leitura"],
+	exec: ["consent danger exec", "execução"],
+	write: ["consent danger write", "escrita"],
+	destructive: ["consent danger destructive", "destrutivo"],
+};
+
+/**
+ * Asks the user to approve a tool call with an in-chat card.
+ * @param {{name: string, args: object, danger: string}} request
+ * @returns {Promise<{approved: boolean, always?: boolean}>}
+ */
+function requestConsent(request) {
+	return new Promise((resolve) => {
+		const $card = buildConsentCard(request, resolve);
+		$messages.append($card);
+		scrollToEnd();
+	});
+}
+
+/**
+ * Builds the consent card: tool name + danger badge + argument preview
+ * and Negar / Permitir / Permitir sempre actions.
+ */
+function buildConsentCard({ name, args, danger }, resolve) {
+	const [dangerKey, dangerFallback] =
+		CONSENT_DANGER[danger] || CONSENT_DANGER.write;
+
+	let summary = "";
+	try {
+		summary = JSON.stringify(args, null, 1);
+	} catch {
+		summary = String(args);
+	}
+	if (summary.length > 400) summary = `${summary.slice(0, 400)}…`;
+
+	const finish = (choice) => {
+		const $state = $card.querySelector(".ai-consent-state");
+		if ($state) {
+			$state.textContent = choice.approved
+				? choice.always
+					? strings["consent allowed always"] || "Permitido sempre"
+					: strings["consent allowed"] || "Permitido"
+				: strings["consent denied"] || "Negado";
+		}
+		$card.classList.add(choice.approved ? "approved" : "denied");
+		$card
+			.querySelectorAll("button")
+			.forEach(($button) => ($button.disabled = true));
+		resolve(choice);
+	};
+
+	return (
+		<div className="ai-msg consent">
+			<div className="ai-consent-card">
+				<div className="ai-consent-head">
+					<span className="icon codicon-shield" />
+					<span className="ai-consent-tool">{name}</span>
+					<span className={`ai-consent-danger danger-${danger}`}>
+						{strings[dangerKey] || dangerFallback}
+					</span>
+				</div>
+				<pre className="ai-consent-args">{summary}</pre>
+				<div className="ai-consent-actions">
+					<button
+						type="button"
+						className="ai-consent-deny"
+						onclick={() => finish({ approved: false })}
+					>
+						{strings["consent deny"] || "Negar"}
+					</button>
+					<button
+						type="button"
+						className="ai-consent-always"
+						onclick={() => finish({ approved: true, always: true })}
+					>
+						{strings["consent always"] || "Permitir sempre"}
+					</button>
+					<button
+						type="button"
+						className="ai-consent-allow"
+						onclick={() => finish({ approved: true })}
+					>
+						{strings["consent allow"] || "Permitir"}
+					</button>
+				</div>
+				<span className="ai-consent-state" />
+			</div>
+		</div>
+	);
+}
+
+// ---------------------------------------------------------------------------
+// URL cards — assistant answers that mention sites get an «Abrir» /
+// «Abrir no Scraper» action card per unique host (max 3).
+
+/**
+ * @param {HTMLElement|null} $body .ai-body that hosts the cards
+ * @param {HTMLElement|null} $bubble assistant bubble to scan for links
+ */
+function appendUrlCards($body, $bubble) {
+	if (!$body || !$bubble) return;
+	const links = Array.from($bubble.querySelectorAll("a.ai-md-link"))
+		.map(($link) => $link.dataset.href || $link.getAttribute("href") || "")
+		.filter((href) => /^https?:\/\//i.test(href));
+
+	const seen = new Set();
+	const targets = [];
+	for (const href of links) {
+		let host = "";
+		try {
+			host = new URL(href).host.replace(/^www\./, "");
+		} catch {
+			continue;
+		}
+		if (!host || seen.has(host)) continue;
+		seen.add(host);
+		targets.push({ href, host });
+		if (targets.length >= 3) break;
+	}
+	if (!targets.length) return;
+
+	const $cards = <div className="ai-url-cards" />;
+	for (const target of targets) {
+		$cards.append(
+			<div className="ai-url-card">
+				<span className="icon codicon-globe" />
+				<span className="ai-url-host">{target.host}</span>
+				<span
+					className="icon codicon-browser ai-url-act"
+					title={strings["chat open site"] || "Abrir"}
+					onclick={() => openChatUrlExternal(target.href)}
+				/>
+				<span
+					className="icon codicon-cloud-download ai-url-act"
+					title={strings["open in scraper"] || "Abrir no Scraper"}
+					onclick={() => openChatUrlInScraper(target.href)}
+				/>
+			</div>,
+		);
+	}
+	$body.append($cards);
+}
+
+/** Opens a URL in the system browser. */
+function openChatUrlExternal(href) {
+	try {
+		system.openInBrowser(href);
+	} catch {
+		window.open(href, "_blank", "noopener");
+	}
+}
+
+/** Hands the URL to the Scraper page (independent, always visible). */
+async function openChatUrlInScraper(href) {
+	try {
+		const mod = await import("pages/tools/scrape");
+		await mod.openScraperWith(href, "rendered");
+	} catch (error) {
+		toast(String(error?.message || error), 3000);
+	}
+}
+
+/** Creates an Agent wired to the chat events + consent widget. */
+function createAgent(opts = {}) {
+	return new Agent({
+		...opts,
+		onEvent: handleEvent,
+		consentHandler: opts.consentHandler || requestConsent,
+	});
+}
+
 function appendEvent(event, opts = {}) {
 	if (event.type === "user") {
 		const $chips = renderAttachmentChips(event.attachments);
@@ -1227,6 +1397,7 @@ function appendEvent(event, opts = {}) {
 		for (const call of event.toolCalls || []) {
 			$body.append(toolCallView(call));
 		}
+		appendUrlCards($body, $bubble);
 
 		const idx = opts.evIdx ?? events.indexOf(event);
 		if (idx >= 0) $wrap.dataset.evIdx = String(idx);
@@ -1391,7 +1562,7 @@ async function runQuickPrompt(kind, sourceText) {
 
 	await openAiChat();
 	if (!agent) {
-		agent = new Agent({ onEvent: handleEvent });
+		agent = createAgent();
 		agent.restore(events);
 	}
 	try {
@@ -1443,7 +1614,7 @@ async function regenerateMessage($wrap) {
 	// drop the old answer (and everything after it) — run() re-adds the
 	// user message itself, and a fresh agent rebuilds the transcript
 	events = events.slice(0, userIdx);
-	agent = new Agent({ onEvent: handleEvent });
+	agent = createAgent();
 	agent.restore(events);
 	renderMessages();
 	persist();
@@ -1726,6 +1897,7 @@ function finalizeLiveStream(payload, toolCalls = []) {
 	for (const call of toolCalls) {
 		live.body?.append(toolCallView(call));
 	}
+	appendUrlCards(live.body, $bubble);
 	// the finalized answer is a regular assistant event — give it the
 	// long-press actions too (the live wrap skipped appendEvent)
 	const evIdx = events.findIndex(

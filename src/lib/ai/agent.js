@@ -77,6 +77,14 @@ export class Agent {
 		this.mode = opts.mode || settings.value.aiMode || "agent";
 		this.toolAllowlist = this.mode === "chat" ? [] : opts.tools || null;
 		this.aborted = false;
+		/**
+		 * In-chat consent widget hook — when set, tool-permission prompts
+		 * render inside the conversation instead of a blocking dialog.
+		 * @type {((request: {name: string, args: object, danger: string}) => Promise<{approved: boolean, always?: boolean}>|{approved: boolean, always?: boolean})|undefined}
+		 */
+		this.consentHandler = opts.consentHandler;
+		/** tools the user approved with «permitir sempre» in this conversation */
+		this.allowedAlways = new Set();
 		/** cumulative token usage for the chat UI (usage chip) */
 		this.usage = { prompt: 0, completion: 0, total: 0 };
 		/** @type {Array<object>} OpenAI-format messages */
@@ -514,6 +522,19 @@ export class Agent {
 			return true;
 		}
 		if (this.isSubagent) return danger === "read";
+
+		// «permitir sempre» approved earlier in this conversation
+		if (this.allowedAlways.has(name)) return true;
+
+		// in-chat consent card takes precedence over the blocking dialog
+		if (typeof this.consentHandler === "function") {
+			const choice = await this.consentHandler({ name, args, danger });
+			if (choice?.approved && choice?.always) {
+				this.allowedAlways.add(name);
+				return true;
+			}
+			return Boolean(choice?.approved);
+		}
 
 		const summary = JSON.stringify(args);
 		return confirm(

@@ -1399,3 +1399,187 @@
                 margin: 6px 0;
         }
 }
+
+// in-chat consent card (tool permission widget)
+.ai-chat .ai-msg.consent {
+	margin: 6px 0 0 6px;
+}
+
+.ai-chat .ai-consent-card {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px 12px;
+	border-radius: 12px;
+	border: 1px solid var(--border-color);
+	background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+	max-width: 100%;
+
+	&.approved {
+		border-color: color-mix(in srgb, var(--success-text-color, #7ed07e) 45%, transparent);
+	}
+
+	&.denied {
+		border-color: color-mix(in srgb, var(--danger-color, #dc3c3c) 45%, transparent);
+	}
+}
+
+.ai-chat .ai-consent-head {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-width: 0;
+
+	.icon {
+		font-size: 14px;
+		flex-shrink: 0;
+	}
+}
+
+.ai-chat .ai-consent-tool {
+	font-weight: 600;
+	font-size: 0.82rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ai-chat .ai-consent-danger {
+	flex-shrink: 0;
+	font-size: 0.64rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding: 2px 8px;
+	border-radius: 8px;
+	margin-left: auto;
+
+	&.danger-read {
+		background: color-mix(in srgb, #7b9dff 18%, transparent);
+		color: #9db9ff;
+	}
+
+	&.danger-exec {
+		background: color-mix(in srgb, #ffb057 18%, transparent);
+		color: #ffc98a;
+	}
+
+	&.danger-write {
+		background: color-mix(in srgb, #d0b050 18%, transparent);
+		color: #e0c98a;
+	}
+
+	&.danger-destructive {
+		background: color-mix(in srgb, var(--danger-color, #dc3c3c) 18%, transparent);
+		color: var(--error-text-color, #ff8a8a);
+	}
+}
+
+.ai-chat .ai-consent-args {
+	margin: 0;
+	font-size: 0.7rem;
+	line-height: 1.45;
+	background: color-mix(in srgb, var(--primary-color) 82%, black);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	padding: 7px 9px;
+	max-height: 110px;
+	overflow: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.ai-chat .ai-consent-actions {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.ai-chat .ai-consent-actions button {
+	padding: 7px 14px;
+	border-radius: 9px;
+	border: 1px solid var(--border-color);
+	background: transparent;
+	font-size: 0.78rem;
+	font-weight: 600;
+	color: inherit;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.45;
+		cursor: default;
+	}
+}
+
+.ai-chat .ai-consent-allow {
+	border-color: color-mix(in srgb, var(--success-text-color, #7ed07e) 55%, transparent) !important;
+	color: var(--success-text-color, #7ed07e) !important;
+}
+
+.ai-chat .ai-consent-always {
+	border-color: color-mix(in srgb, var(--active-color, #7b61ff) 55%, transparent) !important;
+	color: var(--active-color, #7b61ff) !important;
+}
+
+.ai-chat .ai-consent-deny {
+	border-color: color-mix(in srgb, var(--danger-color, #dc3c3c) 55%, transparent) !important;
+	color: var(--error-text-color, #ff8a8a) !important;
+}
+
+.ai-chat .ai-consent-state {
+	font-size: 0.72rem;
+	font-weight: 600;
+	opacity: 0.85;
+}
+
+// URL action cards under assistant bubbles
+.ai-chat .ai-url-cards {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.ai-chat .ai-url-card {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 7px 10px;
+	border-radius: 10px;
+	border: 1px solid var(--border-color);
+	background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+	min-width: 0;
+
+	.icon.codicon-globe {
+		font-size: 14px;
+		flex-shrink: 0;
+		opacity: 0.75;
+	}
+}
+
+.ai-chat .ai-url-host {
+	flex: 1;
+	min-width: 0;
+	font-size: 0.76rem;
+	opacity: 0.85;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ai-chat .ai-url-act {
+	width: 34px;
+	height: 34px;
+	display: grid;
+	place-items: center;
+	font-size: 15px;
+	border-radius: 8px;
+	flex-shrink: 0;
+	cursor: pointer;
+	opacity: 0.8;
+
+	&:active {
+		background: rgba(128, 128, 128, 0.2);
+		opacity: 1;
+	}
+}
