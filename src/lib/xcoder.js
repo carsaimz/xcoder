@@ -50,6 +50,7 @@ import keyboardHandler from "handlers/keyboard";
 import windowResize from "handlers/windowResize";
 import actionStack from "lib/actionStack";
 import commands from "lib/commands";
+import * as downloadManager from "lib/downloadManager";
 import EditorFile from "lib/editorFile";
 import fileIcons from "lib/fileIcons";
 import fileIndex from "lib/fileIndex";
@@ -70,9 +71,13 @@ import orientation from "lib/orientation";
 import projects from "lib/projects";
 import selectionMenu from "lib/selectionMenu";
 import appSettings from "lib/settings";
+import * as techDetectApi from "lib/techDetect";
+import * as webInspectorApi from "lib/webInspector";
+import * as webScraperApi from "lib/webScraper";
 import FileBrowser from "pages/fileBrowser";
 import ThemeBuilder from "theme/builder";
 import themes from "theme/list";
+import * as clipboardApi from "utils/clipboard";
 import {
 	applyHighlightStyles,
 	clearHighlightCache,
@@ -438,6 +443,14 @@ class XCoder {
 		this.define("sidebarApps", sidebarAppsModule);
 		this.define("terminal", terminalModule);
 		this.define("webview", webview);
+		// Web tool engines for plugins — the removed core tools (Scraper,
+		// Inspector, Site Analyzer) live on as marketplace plugins and build
+		// on the same tested engines the app uses (v1.8.43).
+		this.define("webScraper", webScraperApi);
+		this.define("techDetect", techDetectApi);
+		this.define("webInspector", webInspectorApi);
+		this.define("clipboard", clipboardApi);
+		this.define("downloadManager", downloadManager);
 		this.define("codemirror", codemirrorModule);
 		this.define("codeHighlight", codeHighlightModule);
 		this.define("fullscreen", fullscreen);
@@ -861,20 +874,20 @@ class XCoder {
 				// Monochrome icons: use mask-image (on ::before) for currentColor/theme support
 				// Using ::before ensures we don't mask the ::after active indicator or the background
 				css = `.icon.${className}::before {
-					content: '';
-					display: inline-block;
-					width: 24px;
-					height: 24px;
-					vertical-align: middle;
-					-webkit-mask: url(${src}) no-repeat center / contain;
-					mask: url(${src}) no-repeat center / contain;
-					background-color: currentColor;
-				}`;
+                                        content: '';
+                                        display: inline-block;
+                                        width: 24px;
+                                        height: 24px;
+                                        vertical-align: middle;
+                                        -webkit-mask: url(${src}) no-repeat center / contain;
+                                        mask: url(${src}) no-repeat center / contain;
+                                        background-color: currentColor;
+                                }`;
 			} else {
 				// Default: preserve original icon colors
 				css = `.icon.${className}{
-					background: url(${src}) no-repeat center / 24px;
-				}`;
+                                        background: url(${src}) no-repeat center / 24px;
+                                }`;
 			}
 			style = <style icon={className}>{css}</style>;
 			document.head.appendChild(style);
