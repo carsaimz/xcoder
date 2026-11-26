@@ -3,6 +3,7 @@ import prompt from "dialogs/prompt";
 import config from "lib/config";
 import { startDownload } from "lib/downloadManager";
 import { installSiteDownloadBridge } from "lib/siteDownloadBridge";
+import { openToolPage } from "../toolPage";
 
 /**
  * Website sidebar app — an in-app webview (iframe) that opens the
@@ -214,12 +215,22 @@ function onSelected() {
 	}
 }
 
-export default [
-	"cod:globe",
-	"websiteApp",
-	strings["website"] || "Website",
-	initApp,
-	false,
-	onSelected,
-	{ titleKey: "website", group: "tools", floating: true },
-];
+/**
+ * Opens the tool as an independent full-screen page (fora da
+ * sidebar e da janela flutuante) — results always visible.
+ * @returns {HTMLElement} the page element
+ */
+export function openWebsitePage() {
+	return openToolPage({
+		id: "website-page",
+		titleKey: "website",
+		title: "Website",
+		className: "website-app",
+		build: initApp,
+		onShow: () => {
+			if ($iframe && !$iframe.getAttribute("src")) {
+				$iframe.src = siteUrl();
+			}
+		},
+	});
+}

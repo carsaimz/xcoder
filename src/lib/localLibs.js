@@ -10,7 +10,7 @@ import { CATALOG_LIBS } from "./catalogLibs";
  * reference) so projects can use them fully offline.
  *
  * This module is pure data + helpers (tag building, sizes, copy plans);
- * the sidebar app (sidebarApps/libs) is only the UI layer.
+ * the tool page (pages/tools/libs) is only the UI layer.
  *
  * Each entry:
  *   - id        folder name under libs/ (local + bundled)

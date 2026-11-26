@@ -382,6 +382,12 @@ export default {
 				).default();
 				break;
 
+			case "tools":
+				(
+					await import(/* webpackChunkName: "toolsHub" */ "pages/tools/hub")
+				).default();
+				break;
+
 			case "file_browser":
 				(await loadFileBrowser())();
 				break;

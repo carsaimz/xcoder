@@ -12,6 +12,7 @@ import {
 	localTags,
 } from "lib/localLibs";
 import Url from "utils/Url";
+import { openToolPage } from "../toolPage";
 
 /**
  * Local Libraries sidebar app — ships htmx, Alpine.js, jQuery, Bootstrap,
@@ -345,12 +346,18 @@ function onSelected(el) {
 	el?.querySelector(".libs-root")?.scrollTo?.(0, 0);
 }
 
-export default [
-	"cod:library",
-	"libs",
-	strings["local libs"] || "Bibliotecas",
-	initApp,
-	false,
-	onSelected,
-	{ titleKey: "local libs", group: "tools", floating: true },
-];
+/**
+ * Opens the tool as an independent full-screen page (fora da
+ * sidebar e da janela flutuante) — results always visible.
+ * @returns {HTMLElement} the page element
+ */
+export function openLibsPage() {
+	return openToolPage({
+		id: "libs-page",
+		titleKey: "local libs",
+		title: "Bibliotecas",
+		className: "libs-app",
+		build: initApp,
+		onShow: () => render(),
+	});
+}

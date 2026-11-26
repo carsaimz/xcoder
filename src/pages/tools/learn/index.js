@@ -1,9 +1,10 @@
 import "./style.scss";
-import LEARN_SITES from "res/learn-sites.json";
 import toast from "components/toast";
-import webviewApi from "lib/webview";
 import { embeddingPolicy } from "lib/techDetect";
 import { httpFetchDetailed } from "lib/webScraper";
+import webviewApi from "lib/webview";
+import LEARN_SITES from "res/learn-sites.json";
+import { openToolPage } from "../toolPage";
 
 /**
  * Learn sidebar app — «opções de sites principais para aprender qualquer
@@ -388,21 +389,22 @@ function openExternal() {
  * @param {string} url
  */
 export async function openLearnWith(url) {
-	for (let i = 0; i < 50 && !$list; i += 1) {
-		await new Promise((resolve) => setTimeout(resolve, 60));
-	}
+	openLearnPage();
 	const site = LEARN_SITES.find((entry) => entry.url === url);
-	if (site) {
-		await openSite(site);
-	}
+	if (site) await openSite(site);
 }
-
-export default [
-	"cod:mortar-board",
-	"learnApp",
-	strings["learn"] || "Learn",
-	initApp,
-	false,
-	() => {},
-	{ titleKey: "learn", group: "tools", floating: true },
-];
+/**
+ * Opens the tool as an independent full-screen page (fora da
+ * sidebar e da janela flutuante) — results always visible.
+ * @returns {HTMLElement} the page element
+ */
+export function openLearnPage() {
+	return openToolPage({
+		id: "learn-page",
+		titleKey: "learn",
+		title: "Learn",
+		className: "lrn-app",
+		build: initApp,
+		onHide: destroyNative,
+	});
+}

@@ -1,7 +1,7 @@
 /**
  * Web Scraper + reverse engineering toolkit (pure, unit-tested helpers).
  *
- * The scraping UI (sidebarApps/scrape) fetches a page either through the
+ * The scraping UI (pages/tools/scrape) fetches a page either through the
  * native http client (raw source) or a hidden webview (rendered DOM —
  * see lib/webInspector.fetchRenderedHtml), then this module does the
  * analysis:

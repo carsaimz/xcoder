@@ -405,7 +405,7 @@ describe("replImports — collectSpecs", () => {
 describe("repl app wiring", () => {
 	const { readFileSync } = require("node:fs");
 	const source = readFileSync(
-		new URL("../../src/sidebarApps/repl/index.js", import.meta.url),
+		new URL("../../src/pages/tools/repl/index.js", import.meta.url),
 		"utf8",
 	);
 

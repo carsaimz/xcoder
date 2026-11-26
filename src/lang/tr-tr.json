@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Arka uç ve API'ler",
 	"learn cat practice": "Alıştırma ve zorluklar",
 	"learn cat data": "Veritabanları ve SQL",
-	"learn cat devops": "DevOps ve güvenlik"
+	"learn cat devops": "DevOps ve güvenlik",
+	"tools": "Aletler",
+	"tools hub intro": "Bağımsız web araçları — her biri kendi tam ekran sayfasında açılır.",
+	"tools hub analyzer desc": "Herhangi bir sitenin arkasındaki teknolojiyi keşfedin: çerçeveler, diller, sunucular, CDN'ler.",
+	"tools hub inspector desc": "Herhangi bir sayfayı inceleyin: canlı DOM ağacı, konsol ve ağ istekleri.",
+	"tools hub scraper desc": "Herhangi bir sitenin kaynağını yakalayın ve resimlerini ve varlıklarını indirin.",
+	"tools hub learn desc": "Dahili bir Web Görünümünde seçilmiş çalışma siteleri - MDN, freeCodeCamp ve daha fazlası.",
+	"tools hub libs desc": "Çevrimdışı kitaplıklar (htmx, Bootstrap, simge yazı tipleri) dahil edilmeye hazır.",
+	"tools hub repl desc": "Parçacıklar ve geçmiş içeren korumalı alanlı JavaScript konsolu.",
+	"tools hub website desc": "Uygulamaya gömülü resmi XCoder sitesi."
 }

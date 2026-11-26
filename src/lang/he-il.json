@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Backend & APIs",
 	"learn cat practice": "תרגול ואתגרים",
 	"learn cat data": "מסדי נתונים ו-SQL",
-	"learn cat devops": "DevOps ואבטחה"
+	"learn cat devops": "DevOps ואבטחה",
+	"tools": "כְּלֵי עֲבוֹדָה",
+	"tools hub intro": "כלי אינטרנט עצמאיים - כל אחד מהם נפתח בדף משלו במסך מלא.",
+	"tools hub analyzer desc": "גלה את הטכנולוגיה מאחורי כל אתר: מסגרות, שפות, שרתים, CDNs.",
+	"tools hub inspector desc": "בדוק כל עמוד: עץ DOM חי, מסוף ובקשות רשת.",
+	"tools hub scraper desc": "ללכוד את המקור של כל אתר והורד את התמונות והנכסים שלו.",
+	"tools hub learn desc": "אתרי לימוד שנאספו - MDN, freeCodeCamp ועוד - ב-WebView פנימי.",
+	"tools hub libs desc": "ספריות לא מקוונות (htmx, Bootstrap, גופני אייקונים) מוכנות לכלול.",
+	"tools hub repl desc": "קונסולת JavaScript בארגז חול עם קטעים והיסטוריה.",
+	"tools hub website desc": "האתר הרשמי של XCoder המוטמע באפליקציה."
 }

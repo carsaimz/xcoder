@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Phần phụ trợ & API",
 	"learn cat practice": "Thực hành & thử thách",
 	"learn cat data": "Cơ sở dữ liệu & SQL",
-	"learn cat devops": "DevOps và bảo mật"
+	"learn cat devops": "DevOps và bảo mật",
+	"tools": "Công cụ",
+	"tools hub intro": "Các công cụ web độc lập — mỗi công cụ sẽ mở trên trang toàn màn hình của riêng nó.",
+	"tools hub analyzer desc": "Khám phá công nghệ đằng sau bất kỳ trang web nào: khung, ngôn ngữ, máy chủ, CDN.",
+	"tools hub inspector desc": "Kiểm tra bất kỳ trang nào: cây DOM trực tiếp, bảng điều khiển và yêu cầu mạng.",
+	"tools hub scraper desc": "Ghi lại nguồn của bất kỳ trang web nào và tải xuống hình ảnh cũng như nội dung của nó.",
+	"tools hub learn desc": "Các trang web nghiên cứu được tuyển chọn — MDN, freeCodeCamp và hơn thế nữa — trong WebView nội bộ.",
+	"tools hub libs desc": "Thư viện ngoại tuyến (htmx, Bootstrap, phông chữ biểu tượng) đã sẵn sàng để đưa vào.",
+	"tools hub repl desc": "Bảng điều khiển JavaScript được đóng hộp cát với các đoạn mã và lịch sử.",
+	"tools hub website desc": "Trang web XCoder chính thức được nhúng trong ứng dụng."
 }

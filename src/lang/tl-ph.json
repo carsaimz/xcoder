@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Backend at mga API",
 	"learn cat practice": "Pagsasanay at mga hamon",
 	"learn cat data": "Mga Database at SQL",
-	"learn cat devops": "DevOps at seguridad"
+	"learn cat devops": "DevOps at seguridad",
+	"tools": "Mga gamit",
+	"tools hub intro": "Mga independiyenteng tool sa web — nagbubukas ang bawat isa sa sarili nitong full-screen na pahina.",
+	"tools hub analyzer desc": "Tuklasin ang teknolohiya sa likod ng anumang site: mga framework, wika, server, CDN.",
+	"tools hub inspector desc": "Siyasatin ang anumang page: live na DOM tree, console at mga kahilingan sa network.",
+	"tools hub scraper desc": "Kunin ang pinagmulan ng anumang site at i-download ang mga larawan at asset nito.",
+	"tools hub learn desc": "Mga na-curate na site ng pag-aaral — MDN, freeCodeCamp at higit pa — sa isang panloob na WebView.",
+	"tools hub libs desc": "Ang mga offline na aklatan (htmx, Bootstrap, mga font ng icon) ay handa nang isama.",
+	"tools hub repl desc": "Sandboxed JavaScript console na may mga snippet at kasaysayan.",
+	"tools hub website desc": "Ang opisyal na site ng XCoder na naka-embed sa app."
 }

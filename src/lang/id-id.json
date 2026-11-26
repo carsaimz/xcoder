@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Backend & API",
 	"learn cat practice": "Latihan & tantangan",
 	"learn cat data": "Database & SQL",
-	"learn cat devops": "DevOps & keamanan"
+	"learn cat devops": "DevOps & keamanan",
+	"tools": "Peralatan",
+	"tools hub intro": "Alat web independen — masing-masing alat terbuka di halaman layar penuhnya sendiri.",
+	"tools hub analyzer desc": "Temukan teknologi di balik situs apa pun: kerangka kerja, bahasa, server, CDN.",
+	"tools hub inspector desc": "Periksa halaman mana pun: pohon DOM langsung, konsol, dan permintaan jaringan.",
+	"tools hub scraper desc": "Tangkap sumber situs mana pun dan unduh gambar serta asetnya.",
+	"tools hub learn desc": "Situs studi yang dikurasi — MDN, freeCodeCamp, dan lainnya — dalam WebView internal.",
+	"tools hub libs desc": "Perpustakaan offline (htmx, Bootstrap, font ikon) siap disertakan.",
+	"tools hub repl desc": "Konsol JavaScript kotak pasir dengan cuplikan dan riwayat.",
+	"tools hub website desc": "Situs resmi XCoder tertanam di aplikasi."
 }

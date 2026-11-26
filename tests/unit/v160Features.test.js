@@ -84,9 +84,9 @@ describe("v1.6.0 wiring guards", () => {
                 
         });
 
-        it("the repl sidebar app is registered in the loaders", () => {
-                expect(read("src/sidebarApps/index.js")).toMatch(
-                        /\["repl", \(\) => import\("\.\/repl"\)\]/,
+        it("the repl tool page is registered outside the sidebar", () => {
+                expect(read("src/pages/tools/repl/index.js")).toMatch(
+                        /export function openReplPage\(\)/,
                 );
         });
 

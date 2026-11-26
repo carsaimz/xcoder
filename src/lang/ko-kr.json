@@ -1959,5 +1959,14 @@
 	"learn cat backend": "백엔드 및 API",
 	"learn cat practice": "연습과 도전",
 	"learn cat data": "데이터베이스 및 SQL",
-	"learn cat devops": "DevOps 및 보안"
+	"learn cat devops": "DevOps 및 보안",
+	"tools": "도구",
+	"tools hub intro": "독립적인 웹 도구 — 각 도구는 자체 전체 화면 페이지에서 열립니다.",
+	"tools hub analyzer desc": "프레임워크, 언어, 서버, CDN 등 모든 사이트의 이면에 있는 기술을 알아보세요.",
+	"tools hub inspector desc": "실시간 DOM 트리, 콘솔, 네트워크 요청 등 모든 페이지를 검사하세요.",
+	"tools hub scraper desc": "모든 사이트의 소스를 캡처하고 해당 이미지와 자산을 다운로드하세요.",
+	"tools hub learn desc": "내부 WebView에 선별된 연구 사이트(MDN, freeCodeCamp 등)가 있습니다.",
+	"tools hub libs desc": "포함할 준비가 된 오프라인 라이브러리(htmx, Bootstrap, 아이콘 글꼴)",
+	"tools hub repl desc": "스니펫과 기록이 포함된 샌드박스 JavaScript 콘솔입니다.",
+	"tools hub website desc": "앱에 포함된 공식 XCoder 사이트입니다."
 }

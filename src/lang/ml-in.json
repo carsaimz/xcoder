@@ -1959,5 +1959,14 @@
 	"learn cat backend": "ബാക്കെൻഡ് & API-കൾ",
 	"learn cat practice": "പരിശീലനവും വെല്ലുവിളികളും",
 	"learn cat data": "ഡാറ്റാബേസുകളും SQL",
-	"learn cat devops": "DevOps & സുരക്ഷ"
+	"learn cat devops": "DevOps & സുരക്ഷ",
+	"tools": "ഉപകരണങ്ങൾ",
+	"tools hub intro": "സ്വതന്ത്ര വെബ് ടൂളുകൾ - ഓരോന്നും അതിൻ്റേതായ പൂർണ്ണ സ്‌ക്രീൻ പേജിൽ തുറക്കുന്നു.",
+	"tools hub analyzer desc": "ഏത് സൈറ്റിനും പിന്നിലെ സാങ്കേതികവിദ്യ കണ്ടെത്തുക: ചട്ടക്കൂടുകൾ, ഭാഷകൾ, സെർവറുകൾ, CDN-കൾ.",
+	"tools hub inspector desc": "ഏത് പേജും പരിശോധിക്കുക: തത്സമയ DOM ട്രീ, കൺസോൾ, നെറ്റ്‌വർക്ക് അഭ്യർത്ഥനകൾ.",
+	"tools hub scraper desc": "ഏതെങ്കിലും സൈറ്റിൻ്റെ ഉറവിടം ക്യാപ്‌ചർ ചെയ്‌ത് അതിൻ്റെ ചിത്രങ്ങളും അസറ്റുകളും ഡൗൺലോഡ് ചെയ്യുക.",
+	"tools hub learn desc": "ക്യൂറേറ്റ് ചെയ്ത പഠന സൈറ്റുകൾ - MDN, freeCodeCamp എന്നിവയും അതിലേറെയും - ഒരു ആന്തരിക WebView-ൽ.",
+	"tools hub libs desc": "ഓഫ്‌ലൈൻ ലൈബ്രറികൾ (htmx, Bootstrap, ഐക്കൺ ഫോണ്ടുകൾ) ഉൾപ്പെടുത്താൻ തയ്യാറാണ്.",
+	"tools hub repl desc": "സ്‌നിപ്പെറ്റുകളും ചരിത്രവും ഉള്ള Sandboxed JavaScript കൺസോൾ.",
+	"tools hub website desc": "ആപ്പിൽ ഉൾച്ചേർത്ത ഔദ്യോഗിക XCoder സൈറ്റ്."
 }

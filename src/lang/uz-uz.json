@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Backend va API",
 	"learn cat practice": "Amaliyot va qiyinchiliklar",
 	"learn cat data": "Ma'lumotlar bazalari va SQL",
-	"learn cat devops": "DevOps va xavfsizlik"
+	"learn cat devops": "DevOps va xavfsizlik",
+	"tools": "Asboblar",
+	"tools hub intro": "Mustaqil veb-vositalar - har biri o'zining to'liq ekranli sahifasida ochiladi.",
+	"tools hub analyzer desc": "Har qanday sayt ortidagi texnologiyani kashf eting: ramkalar, tillar, serverlar, CDN.",
+	"tools hub inspector desc": "Har qanday sahifani tekshiring: jonli DOM daraxti, konsol va tarmoq so'rovlari.",
+	"tools hub scraper desc": "Har qanday sayt manbasini yozib oling va uning rasmlari va aktivlarini yuklab oling.",
+	"tools hub learn desc": "Tanlangan oʻquv saytlari — MDN, freeCodeCamp va boshqalar — ichki WebViewda.",
+	"tools hub libs desc": "Oflayn kutubxonalar (htmx, Bootstrap, ikon shriftlari) kiritishga tayyor.",
+	"tools hub repl desc": "Snippetlar va tarixga ega sinov muhitiga o'rnatilgan JavaScript konsoli.",
+	"tools hub website desc": "Ilovaga o'rnatilgan rasmiy XCoder sayti."
 }

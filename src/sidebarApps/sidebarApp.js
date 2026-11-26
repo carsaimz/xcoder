@@ -338,6 +338,25 @@ export default class SidebarApp {
 	}
 
 	/**
+	 * Guarantees the app's host is actually visible. An app can end up
+	 * "active" without a window: the boot restore marks the last section
+	 * active while bootHold still blocks floating windows, and the
+	 * active-setter early-returns on re-activation. Every later tap then
+	 * rendered into a detached container («retorna 200 mas nada
+	 * aparece»). Called after every activation.
+	 * @returns {void}
+	 */
+	ensureWindowVisible() {
+		if (!this.#active || this.#tabbed || this.#launcher) return;
+		if (!this.#floating || !floatingWindow.floatingEnabled()) return;
+		if (this.#dock && rightDock.prefEnabled(this.#id)) {
+			if (!rightDock.isOpenFor(this.#id)) this.#showInDock();
+			return;
+		}
+		if (!floatingWindow.isOpenFor(this.#id)) this.#showInFloat();
+	}
+
+	/**
 	 * Re-triggers the onselect callback for tabbed apps (opens/focuses
 	 * their editor tab) without touching the sidebar panel.
 	 * @returns {void}

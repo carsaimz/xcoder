@@ -54,6 +54,10 @@ function add(
 	) {
 		setActiveApp(id);
 	}
+	// floating apps are NEVER auto-activated during boot: the floating
+	// window refuses to open while bootHold is set, and an app marked
+	// active without a window renders every later fetch into a detached
+	// container («retorna 200 mas nada aparece»). First tap opens it.
 }
 
 /**
@@ -171,22 +175,11 @@ async function loadApps() {
 		["git", () => import("./git")],
 		["ai", () => import("./ai")],
 		["extensions", () => import("./extensions")],
-		// sandboxed JS console (Web Worker)
-		["repl", () => import("./repl")],
 		// webdev utilities (shadow/gradient/card/placeholder generators)
+		// — the ONLY tool kept in the sidebar: everything else lives in
+		// independent full-screen pages (pages/tools, v1.8.40) reachable
+		// from the main menu «Ferramentas» and from the preview screen
 		["devtools", () => import("./devtools")],
-		// page inspector (elements/console/network via native webview)
-		["inspector", () => import("./inspector")],
-		// web scraper + reverse engineering tools
-		["scrape", () => import("./scrape")],
-		// site analyzer — tech stack fingerprints (framework, server, CDN…)
-		["analyzer", () => import("./analyzer")],
-		// offline web libraries (htmx, bootstrap, icon fonts…) shipped in the app
-		["libs", () => import("./libs")],
-		// curated learning sites opened in the internal WebView
-		["learn", () => import("./learn")],
-		// embedded webview of the official site (docs/marketplace/sponsor)
-		["websiteApp", () => import("./website")],
 		["notification", () => import("./notification")],
 		["profileApp", () => import("./profile")],
 		["settingsApp", () => import("./settings")],
@@ -221,17 +214,23 @@ function ensureActiveApp() {
 	const activeApps = apps.filter((app) => app.active);
 	if (activeApps.length === 1) return;
 
+	// only DOCKED apps may own the boot activation: floating tools would
+	// be marked active while their window cannot open yet (bootHold),
+	// leaving a highlighted icon that renders nothing
+	const docked = (app) => !app.tabbed && !usesFloat(app);
+
 	if (activeApps.length > 1) {
 		const preferredActiveApp = activeApps.find(
-			(app) => app.id === currentSection && !app.tabbed,
+			(app) => app.id === currentSection && docked(app),
 		);
-		setActiveApp(preferredActiveApp?.id || activeApps[0].id);
+		setActiveApp(preferredActiveApp?.id || activeApps.find(docked)?.id);
 		return;
 	}
 
 	if (apps.length > 0) {
 		const preferredApp =
-			apps.find((app) => app.id === currentSection && !app.tabbed) ||
+			apps.find((app) => app.id === currentSection && docked(app)) ||
+			apps.find(docked) ||
 			apps.find((app) => !app.tabbed);
 		setActiveApp(preferredApp?.id || apps[0].id);
 	}
@@ -359,6 +358,11 @@ function pulseApp(id) {
 			return;
 		}
 		setActiveApp(id);
+		// an app can sit "active" without a visible host (boot restore
+		// marked it while bootHold blocked the window, and the active-
+		// setter early-returned above) — the tap MUST still surface it,
+		// otherwise the option is highlighted yet dead
+		app.ensureWindowVisible?.();
 		if (activatesFloat) hideSidebar();
 	} catch (error) {
 		logger.log(

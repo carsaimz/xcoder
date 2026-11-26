@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Backend و APIها",
 	"learn cat practice": "تمرین و چالش ها",
 	"learn cat data": "پایگاه های داده و SQL",
-	"learn cat devops": "DevOps و امنیت"
+	"learn cat devops": "DevOps و امنیت",
+	"tools": "ابزار",
+	"tools hub intro": "ابزارهای وب مستقل - هر کدام در صفحه تمام صفحه خود باز می شوند.",
+	"tools hub analyzer desc": "فناوری پشت هر سایت را کشف کنید: چارچوب ها، زبان ها، سرورها، CDN ها.",
+	"tools hub inspector desc": "هر صفحه ای را بررسی کنید: درخت DOM زنده، کنسول و درخواست های شبکه.",
+	"tools hub scraper desc": "منبع هر سایت را بگیرید و تصاویر و دارایی های آن را دانلود کنید.",
+	"tools hub learn desc": "سایت‌های مطالعه انتخاب شده - MDN، freeCodeCamp و موارد دیگر - در یک WebView داخلی.",
+	"tools hub libs desc": "کتابخانه های آفلاین (htmx، بوت استرپ، فونت های نماد) آماده گنجاندن.",
+	"tools hub repl desc": "کنسول جاوا اسکریپت Sandboxed با قطعه و تاریخچه.",
+	"tools hub website desc": "سایت رسمی XCoder تعبیه شده در برنامه."
 }

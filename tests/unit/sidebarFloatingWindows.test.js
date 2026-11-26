@@ -47,7 +47,7 @@ if (!("getAll" in HTMLElement.prototype)) {
 window.tag = tag;
 window.app = document.createElement("div");
 document.body.append(window.app);
-window.strings = { "local libs": "Bibliotecas" };
+window.strings = { "dev tools": "Dev Tools" };
 globalThis.strings = window.strings;
 
 localStorage.setItem("sidebarAppsLastSection", "files");
@@ -67,40 +67,41 @@ beforeEach(() => {
 	floatingWindow.reset();
 	$sidebar.get(".container")?.remove?.();
 	$apps.textContent = "";
-	sidebarApps.remove("libs");
+	sidebarApps.remove("devtools");
+	sidebarApps.remove("git");
 });
 
-async function installLibs() {
-	const libs = (await import("sidebarApps/libs")).default;
-	sidebarApps.add(...libs);
-	return $apps.get('[data-id="libs"]');
+async function installDevtools() {
+	const devtools = (await import("sidebarApps/devtools")).default;
+	sidebarApps.add(...devtools);
+	return $apps.get('[data-id="devtools"]');
 }
 
 describe("floating sidebar windows", () => {
 	test("tapping an icon opens an independent window with the panel", async () => {
-		const $icon = await installLibs();
+		const $icon = await installDevtools();
 		$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
 		const $win = document.body.querySelector(".sidebar-float");
 		assert.ok($win, "floating window missing from the document");
 		assert.ok($win.classList.contains("show"), "window not shown");
-		assert.equal($win.dataset.app, "libs");
+		assert.equal($win.dataset.app, "devtools");
 		assert.equal(
 			$win.get(".sidebar-float-title").textContent,
-			"Bibliotecas",
+			"Dev Tools",
 			"window header lacks the app title",
 		);
 		// the panel content rendered inside the window body
 		assert.ok(
-			$win.get(".sidebar-float-body .libs-root"),
+			$win.get(".sidebar-float-body .devtools-root"),
 			"panel container not moved into the window",
 		);
 	});
 
 	test("tapping the same icon again closes the window", async () => {
-		const $icon = await installLibs();
+		const $icon = await installDevtools();
 		$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-		assert.ok(floatingWindow.isOpenFor("libs"));
+		assert.ok(floatingWindow.isOpenFor("devtools"));
 
 		$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 		assert.ok(
@@ -110,7 +111,7 @@ describe("floating sidebar windows", () => {
 	});
 
 	test("the close button deactivates the app and clears the section", async () => {
-		const $icon = await installLibs();
+		const $icon = await installDevtools();
 		$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 		const $close = document.body.querySelector(".sidebar-float-close");
 		assert.ok($close, "close button missing");
@@ -131,7 +132,7 @@ describe("floating sidebar windows", () => {
 
 	test("dock mode (setting off) keeps the classic panel", async () => {
 		localStorage.setItem("sidebarFloatingWindows", "0");
-		const $icon = await installLibs();
+		const $icon = await installDevtools();
 		$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
 		assert.ok(
@@ -139,14 +140,15 @@ describe("floating sidebar windows", () => {
 			"window opened in dock mode",
 		);
 		assert.ok(
-			$sidebar.get(".container .libs-root") || $sidebar.get(".libs-root"),
+			$sidebar.get(".container .devtools-root") ||
+			$sidebar.get(".devtools-root"),
 			"docked panel missing",
 		);
 	});
 
 	describe("minimize / restore", () => {
 		test("the minimize button collapses the window to its header", async () => {
-			const $icon = await installLibs();
+			const $icon = await installDevtools();
 			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 			const $win = document.body.querySelector(".sidebar-float");
 			assert.ok($win?.classList.contains("show"), "window not shown");
@@ -171,7 +173,7 @@ describe("floating sidebar windows", () => {
 		});
 
 		test("tapping the rail icon of a minimized app restores it", async () => {
-			const $icon = await installLibs();
+			const $icon = await installDevtools();
 			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 			floatingWindow.toggleMinimize();
 			assert.ok(floatingWindow.isMinimized(), "precondition failed");
@@ -179,15 +181,15 @@ describe("floating sidebar windows", () => {
 			// second tap would normally close - on a minimized window it restores
 			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 			assert.ok(!floatingWindow.isMinimized(), "not restored by icon tap");
-			assert.ok(floatingWindow.isOpenFor("libs"), "window lost");
+			assert.ok(floatingWindow.isOpenFor("devtools"), "window lost");
 
 			// a third tap closes (VS Code toggle again)
 			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-			assert.ok(!floatingWindow.isOpenFor("libs"), "toggle broken");
+			assert.ok(!floatingWindow.isOpenFor("devtools"), "toggle broken");
 		});
 
 		test("maximizing from minimized expands the window", async () => {
-			const $icon = await installLibs();
+			const $icon = await installDevtools();
 			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 			const $win = document.body.querySelector(".sidebar-float");
 			floatingWindow.toggleMinimize();
@@ -203,26 +205,26 @@ describe("floating sidebar windows", () => {
 		});
 
 		test("activating another app un-minimizes the window", async () => {
-			await installLibs();
-			const $icon = $apps.get('[data-id="libs"]');
+			await installDevtools();
+			const $icon = $apps.get('[data-id="devtools"]');
 			$icon.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 			floatingWindow.toggleMinimize();
 			assert.ok(floatingWindow.isMinimized(), "precondition failed");
 
-			const website = (await import("sidebarApps/website")).default;
-			sidebarApps.add(...website);
-			const $web = $apps.get('[data-id="websiteApp"]');
-			$web.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+			const git = (await import("sidebarApps/git")).default;
+			sidebarApps.add(...git);
+			const $git = $apps.get('[data-id="git"]');
+			$git.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
 			const $win = document.body.querySelector(".sidebar-float");
 			assert.ok(!$win.classList.contains("minimized"), "still minimized");
-			assert.equal($win.dataset.app, "websiteApp", "content not swapped");
-			sidebarApps.remove("websiteApp");
+			assert.equal($win.dataset.app, "git", "content not swapped");
+			sidebarApps.remove("git");
 		});
 	});
 
 	test("rail icons are glyph-only: no labels, no categories", async () => {
-		const $icon = await installLibs();
+		const $icon = await installDevtools();
 		assert.ok($icon, "icon missing");
 		assert.equal(
 			$icon.querySelector(":scope > .app-label"),

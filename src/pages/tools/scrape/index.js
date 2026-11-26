@@ -22,6 +22,7 @@ import {
 } from "lib/webScraper";
 import { copyText } from "utils/clipboard";
 import Url from "utils/Url";
+import { openToolPage } from "../toolPage";
 
 /**
  * Web Scraper sidebar app — baixa o código-fonte de qualquer site
@@ -1068,24 +1069,23 @@ function renderAnalysis() {
  * @param {"raw"|"rendered"} [mode]
  */
 export async function openScraperWith(url, mode = "raw") {
-	// the hand-off can arrive before the sidebar app rendered its input —
-	// wait for it instead of silently dropping the request («abrindo…» and
-	// nothing else ever happened for preview hand-offs)
-	for (let i = 0; i < 50 && !$url; i += 1) {
-		await new Promise((resolve) => setTimeout(resolve, 60));
-	}
+	openScraperPage();
 	if (!$url) return;
 	$url.value = url;
 	switchTab("source");
 	await fetchSource(mode);
 }
-
-export default [
-	"cod:cloud-download",
-	"scrapeApp",
-	strings["scraper"] || "Scraper",
-	initApp,
-	false,
-	() => {},
-	{ titleKey: "scraper", group: "tools", floating: true },
-];
+/**
+ * Opens the tool as an independent full-screen page (fora da
+ * sidebar e da janela flutuante) — results always visible.
+ * @returns {HTMLElement} the page element
+ */
+export function openScraperPage() {
+	return openToolPage({
+		id: "scraper-page",
+		titleKey: "scraper",
+		title: "Scraper",
+		className: "scr-app",
+		build: initApp,
+	});
+}

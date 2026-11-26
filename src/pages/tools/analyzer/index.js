@@ -1,13 +1,14 @@
 import "./style.scss";
 import toast from "components/toast";
-import { extractMeta, httpFetchDetailed } from "lib/webScraper";
 import {
 	buildAnalyzerReport,
 	detectTechnologies,
 	TECH_CATEGORY_ORDER,
 } from "lib/techDetect";
 import { fetchRenderedHtml } from "lib/webInspector";
+import { extractMeta, httpFetchDetailed } from "lib/webScraper";
 import { copyText } from "utils/clipboard";
+import { openToolPage } from "../toolPage";
 
 /**
  * Site Analyzer sidebar app — «descobrir o que foi usado para se basear»:
@@ -515,23 +516,24 @@ function copyReport() {
  * @param {string} url
  */
 export async function openAnalyzerWith(url) {
-	// the hand-off can arrive before the app rendered its input — wait for it
-	for (let i = 0; i < 50 && !$url; i += 1) {
-		await new Promise((resolve) => setTimeout(resolve, 60));
-	}
+	openAnalyzerPage();
 	if (!$url) return;
 	$url.value = url;
 	activeTab = "tech";
 	switchTab("tech");
 	await analyze();
 }
-
-export default [
-	"cod:telescope",
-	"analyzerApp",
-	strings["analyzer"] || "Site Analyzer",
-	initApp,
-	false,
-	() => {},
-	{ titleKey: "analyzer", group: "tools", floating: true },
-];
+/**
+ * Opens the tool as an independent full-screen page (fora da
+ * sidebar e da janela flutuante) — results always visible.
+ * @returns {HTMLElement} the page element
+ */
+export function openAnalyzerPage() {
+	return openToolPage({
+		id: "analyzer-page",
+		titleKey: "analyzer",
+		title: "Site Analyzer",
+		className: "ana-app",
+		build: initApp,
+	});
+}

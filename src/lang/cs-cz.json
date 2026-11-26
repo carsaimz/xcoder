@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Backend & API",
 	"learn cat practice": "Cvičení a výzvy",
 	"learn cat data": "Databáze a SQL",
-	"learn cat devops": "DevOps a zabezpečení"
+	"learn cat devops": "DevOps a zabezpečení",
+	"tools": "Nástroje",
+	"tools hub intro": "Nezávislé webové nástroje – každý z nich se otevře na vlastní celoobrazovkové stránce.",
+	"tools hub analyzer desc": "Objevte technologie za jakýmkoli webem: frameworky, jazyky, servery, CDN.",
+	"tools hub inspector desc": "Zkontrolujte libovolnou stránku: živý strom DOM, konzolu a síťové požadavky.",
+	"tools hub scraper desc": "Zachyťte zdroj jakéhokoli webu a stáhněte si jeho obrázky a aktiva.",
+	"tools hub learn desc": "Spravované studijní stránky – MDN, freeCodeCamp a další – v interním WebView.",
+	"tools hub libs desc": "Offline knihovny (htmx, Bootstrap, fonty ikon) připravené k zahrnutí.",
+	"tools hub repl desc": "Konzole JavaScriptu v izolovaném prostoru s úryvky a historií.",
+	"tools hub website desc": "Oficiální stránka XCoder vložená do aplikace."
 }

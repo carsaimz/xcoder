@@ -71,12 +71,22 @@ const SIDEBAR_APPS = [
         ["extensions", () => import("sidebarApps/extensions")],
         ["ai", () => import("sidebarApps/ai")],
         ["git", () => import("sidebarApps/git")],
-        ["repl", () => import("sidebarApps/repl")],
-        ["website", () => import("sidebarApps/website")],
+        ["devtools", () => import("sidebarApps/devtools")],
         ["notification", () => import("sidebarApps/notification")],
         ["profile", () => import("sidebarApps/profile")],
         ["settings", () => import("sidebarApps/settings")],
         ["about", () => import("sidebarApps/about")],
+];
+
+// v1.8.40: the web tools left the sidebar — they are independent pages now
+const TOOL_PAGES = [
+        ["analyzer", () => import("pages/tools/analyzer")],
+        ["scrape", () => import("pages/tools/scrape")],
+        ["inspector", () => import("pages/tools/inspector")],
+        ["libs", () => import("pages/tools/libs")],
+        ["learn", () => import("pages/tools/learn")],
+        ["website", () => import("pages/tools/website")],
+        ["repl", () => import("pages/tools/repl")],
 ];
 
 const stripComments = (src) =>
@@ -168,6 +178,36 @@ describe("sidebar app import guard (boot crash regression)", () => {
                         }
                         if (opts !== undefined) {
                                 assert.equal(typeof opts, "object", `${app}: opts is an object`);
+                        }
+                });
+        }
+
+        for (const [tool, load] of TOOL_PAGES) {
+                test(`tool page "${tool}" evaluates and exports page openers`, async () => {
+                        const mod = await load();
+                        const openers = Object.keys(mod).filter((key) =>
+                                /^open\w+Page$/.test(key),
+                        );
+                        assert.ok(
+                                openers.length >= 1,
+                                `${tool}: exports at least one open*Page function`,
+                        );
+                        for (const opener of openers) {
+                                assert.equal(
+                                        typeof mod[opener],
+                                        "function",
+                                        `${tool}: ${opener} is a function`,
+                                );
+                        }
+                        const withFn = Object.keys(mod).find((key) =>
+                                /^open\w+With$/.test(key),
+                        );
+                        if (withFn) {
+                                assert.equal(
+                                        typeof mod[withFn],
+                                        "function",
+                                        `${tool}: ${withFn} is a function`,
+                                );
                         }
                 });
         }

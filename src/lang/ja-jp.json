@@ -1959,5 +1959,14 @@
 	"learn cat backend": "バックエンドと API",
 	"learn cat practice": "練習と課題",
 	"learn cat data": "データベースと SQL",
-	"learn cat devops": "DevOpsとセキュリティ"
+	"learn cat devops": "DevOpsとセキュリティ",
+	"tools": "ツール",
+	"tools hub intro": "独立した Web ツール — それぞれが独自の全画面ページで開きます。",
+	"tools hub analyzer desc": "フレームワーク、言語、サーバー、CDN など、あらゆるサイトの背後にあるテクノロジーを発見します。",
+	"tools hub inspector desc": "ライブ DOM ツリー、コンソール、ネットワーク リクエストなど、あらゆるページを検査します。",
+	"tools hub scraper desc": "あらゆるサイトのソースをキャプチャし、その画像とアセットをダウンロードします。",
+	"tools hub learn desc": "内部 WebView で厳選された学習サイト (MDN、freeCodeCamp など)。",
+	"tools hub libs desc": "オフライン ライブラリ (htmx、ブートストラップ、アイコン フォント) をすぐに含めることができます。",
+	"tools hub repl desc": "スニペットと履歴を備えたサンドボックス化された JavaScript コンソール。",
+	"tools hub website desc": "アプリに埋め込まれた公式 XCoder サイト。"
 }

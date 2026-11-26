@@ -7,6 +7,66 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.40] - 2026-11-26
+
+### Fixed
+- **«Só analisa e retorna 200, mas nada aparece» — RESOLVIDO na raiz
+  estrutural**: um restauro de arranque podia marcar uma app flutuante
+  como «ativa» enquanto o `bootHold` impedia a abertura da sua janela —
+  e o setter `active` do SidebarApp early-returnava na re-ativação, por
+  isso o ícone ficava destacado mas **morto**: cada análise/scrape com
+  HTTP 200 corria para um contentor que nunca esteve no documento. Agora:
+  (1) o arranque nunca mais marca apps flutuantes como ativas;
+  (2) `SidebarApp.ensureWindowVisible()` reabre a janela/host após cada
+  ativação — toque em opção ativa SEMPRE abre a ferramenta;
+  (3) `ensureActiveApp()` só entrega o arranque a apps ancoradas.
+
+### Changed
+- **Ferramentas movidas para PÁGINAS independentes e individuais (fora
+  da Apps Sidebar e da janela flutuante)** — Analisador, Scraper,
+  Inspector, Bibliotecas, Aprender, Site oficial e Consola JS são agora
+  páginas de ecrã inteiro na mesma pilha fiável de Problemas/Definições
+  (`app.append()` é síncrono e incondicional — os resultados aparecem
+  sempre). A barra lateral fica apenas com **webdev (Dev Tools), chat IA
+  e Git** + as vistas base (Ficheiros, Pesquisa, Extensões). O contentor
+  de cada ferramenta é **cacheado**: fechar a página e reabrir mantém os
+  resultados (nada de ecrã vazio na 2.ª visita). Nova página **hub
+  «Ferramentas»** no menu principal (⋮) navega para todas; o menu do
+  preview nativo (Inspect/Scrape/Analyze) abre as páginas diretamente,
+  sem ativação de sidebar nem polling. A opção ativa da sidebar continua
+  destacada (barra de acento + wash estilo VS Code) e nunca mais fica
+  oculta/dead.
+
+### Analysis
+- **Plugin GitHub oficial do Acode (Acode-Foundation, pelo Ajit)
+  analisado**: espaço de trabalho de repositórios/gists por API (editar
+  remoto SEM clone), device-flow OAuth, sessão encriptada — complementa
+  em vez de substituir o painel Git do XCoder (que faz git real: clone,
+  stage, commit, push/pull, branches, diff e já usa o mesmo device-flow
+  RFC 8628 no ghAuth). Pode ser instalado pela ponte do marketplace
+  (.acode) para quem quiser editar ficheiros remotos sem clonar.
+
+### English summary
+- «Analyzes and returns 200 but nothing appears» fixed at the structural
+  root: boot restore could mark a floating sidebar app active while
+  bootHold blocked its window, and the SidebarApp active-setter
+  early-returned on re-activation — the icon looked selected yet dead,
+  and every 200-OK fetch rendered into a container never in the
+  document. Boot no longer auto-activates floating apps;
+  SidebarApp.ensureWindowVisible() re-opens the host after every
+  activation; ensureActiveApp() only hands boot to docked apps.
+- All web tools (Analyzer, Scraper, Inspector, Libs, Learn, Website, JS
+  Console) moved OUT of the sidebar/floating-window into independent
+  full-screen pages on the proven Problems/Settings page stack —
+  results always visible, state cached across reopen. Sidebar keeps
+  only webdev, AI chat and Git plus the core views. New «Tools» hub in
+  the main menu; preview menu opens the pages directly. Active sidebar
+  option stays highlighted (VS Code accent bar + wash) and never dead.
+- Official Acode GitHub plugin (by Ajit) analyzed: API-based
+  repo/gist workspace without cloning — complementary to our real-git
+  panel (same RFC 8628 device flow already in ghAuth); installable via
+  the marketplace bridge.
+
 ## [1.8.39] - 2026-11-26
 
 ### Added

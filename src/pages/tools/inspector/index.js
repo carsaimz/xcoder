@@ -15,6 +15,7 @@ import {
 } from "lib/webInspector";
 import { httpFetch } from "lib/webScraper";
 import { copyText } from "utils/clipboard";
+import { openToolPage } from "../toolPage";
 
 /**
  * Inspector sidebar app — DevTools-grade page inspection ("ferramentas de
@@ -1239,23 +1240,23 @@ function onSelected() {
  * @param {string} url
  */
 export async function openInspectorWith(url) {
-	// the hand-off can arrive before the sidebar app rendered its input —
-	// wait for it instead of silently dropping the request
-	for (let i = 0; i < 50 && !$url; i += 1) {
-		await new Promise((resolve) => setTimeout(resolve, 60));
-	}
+	openInspectorPage();
 	if (!$url) return;
 	$url.value = url;
 	switchTab("elements");
 	await go();
 }
-
-export default [
-	"cod:inspect",
-	"inspectorApp",
-	strings["inspector"] || "Inspector",
-	initApp,
-	false,
-	onSelected,
-	{ titleKey: "inspector", group: "tools", floating: true },
-];
+/**
+ * Opens the tool as an independent full-screen page (fora da
+ * sidebar e da janela flutuante) — results always visible.
+ * @returns {HTMLElement} the page element
+ */
+export function openInspectorPage() {
+	return openToolPage({
+		id: "inspector-page",
+		titleKey: "inspector",
+		title: "Inspector",
+		className: "ins-app",
+		build: initApp,
+	});
+}

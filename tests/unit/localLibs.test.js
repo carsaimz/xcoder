@@ -137,12 +137,12 @@ describe("sizes and copy plans", () => {
 });
 
 describe("bundled libs are wired into the app", () => {
-        it("the sidebar app registers the libs loader", () => {
+        it("the tools page module exposes the libs page opener", () => {
                 const source = readFileSync(
-                        path.resolve(__dirname, "../../src/sidebarApps/index.js"),
+                        path.resolve(__dirname, "../../src/pages/tools/libs/index.js"),
                         "utf-8",
                 );
-                expect(source).toContain('["libs", () => import("./libs")]');
+                expect(source).toContain("export function openLibsPage()");
         });
 
         it("the build copies src/res/libs into www/res/libs", () => {

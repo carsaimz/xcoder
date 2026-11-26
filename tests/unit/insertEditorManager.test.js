@@ -33,8 +33,8 @@ describe("insert uses the live editor manager", () => {
 		);
 	});
 
-	test("libs does not import the editorManager factory", () => {
-		const source = sourceOf("src", "sidebarApps", "libs", "index.js");
+	test("libs page does not import the editorManager factory", () => {
+		const source = sourceOf("src", "pages", "tools", "libs", "index.js");
 		assert.ok(
 			!source.includes('from "lib/editorManager"'),
 			"libs must not import lib/editorManager — same factory trap as devtools",

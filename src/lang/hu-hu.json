@@ -1959,5 +1959,14 @@
 	"learn cat backend": "Háttér és API-k",
 	"learn cat practice": "Gyakorlat és kihívások",
 	"learn cat data": "Adatbázisok és SQL",
-	"learn cat devops": "DevOps és biztonság"
+	"learn cat devops": "DevOps és biztonság",
+	"tools": "Eszközök",
+	"tools hub intro": "Független webes eszközök – mindegyik a saját teljes képernyős oldalán nyílik meg.",
+	"tools hub analyzer desc": "Fedezze fel a webhely mögött rejlő technológiát: keretrendszerek, nyelvek, szerverek, CDN-ek.",
+	"tools hub inspector desc": "Tekintse meg bármelyik oldalt: élő DOM-fát, konzolt és hálózati kéréseket.",
+	"tools hub scraper desc": "Rögzítse bármely webhely forrását, és töltse le annak képeit és elemeit.",
+	"tools hub learn desc": "Felügyelt tanulmányi webhelyek – MDN, freeCodeCamp és egyebek – egy belső WebView-ban.",
+	"tools hub libs desc": "Offline könyvtárak (htmx, Bootstrap, ikon-betűtípusok) készen állnak a felvételre.",
+	"tools hub repl desc": "Sandbox JavaScript-konzol kivonatokkal és előzményekkel.",
+	"tools hub website desc": "Az alkalmazásba ágyazott hivatalos XCoder webhely."
 }

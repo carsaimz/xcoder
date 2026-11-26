@@ -1942,5 +1942,14 @@
 	"learn cat backend": "Backend & APIs",
 	"learn cat practice": "Practice & challenges",
 	"learn cat data": "Databases & SQL",
-	"learn cat devops": "DevOps & security"
+	"learn cat devops": "DevOps & security",
+	"tools": "Tools",
+	"tools hub intro": "Independent web tools — each one opens on its own full-screen page.",
+	"tools hub analyzer desc": "Discover the tech behind any site: frameworks, languages, servers, CDNs.",
+	"tools hub inspector desc": "Inspect any page: live DOM tree, console and network requests.",
+	"tools hub scraper desc": "Capture any site's source and download its images and assets.",
+	"tools hub learn desc": "Curated study sites — MDN, freeCodeCamp and more — in an internal WebView.",
+	"tools hub libs desc": "Offline libraries (htmx, Bootstrap, icon fonts) ready to include.",
+	"tools hub repl desc": "Sandboxed JavaScript console with snippets and history.",
+	"tools hub website desc": "The official XCoder site embedded in the app."
 }

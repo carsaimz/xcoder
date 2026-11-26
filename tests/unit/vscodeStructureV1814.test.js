@@ -199,7 +199,7 @@ describe("sidebar expansion (90% da tela)", () => {
 
 describe("search in libraries and web tools", () => {
         it("libs list has a live search box with a stable focus", () => {
-                const libs = read("src/sidebarApps/libs/index.js");
+                const libs = read("src/pages/tools/libs/index.js");
                 expect(libs).toContain('className="libs-search"');
                 expect(libs).toContain("renderList()");
                 expect(libs).toContain("filterLibs(ALL_LIBS, libQuery)");

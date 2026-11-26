@@ -20,6 +20,7 @@ import {
 	saveReplSnippets,
 	upsertSnippet,
 } from "lib/replSnippets";
+import { openToolPage } from "../toolPage";
 
 /**
  * JS Console sidebar app (roadmap v1.6.x item 2) — a sandboxed REPL.
@@ -55,16 +56,23 @@ function safeStorage() {
 	}
 }
 
-export default [
-	"cod:terminal",
-	"repl",
-	strings["js console"] || "JS Console",
-	initApp,
-	false,
-	onSelected,
-	{ titleKey: "js console", group: "tools", floating: true },
-];
-
+/**
+ * Opens the tool as an independent full-screen page (fora da
+ * sidebar e da janela flutuante) — results always visible.
+ * @returns {HTMLElement} the page element
+ */
+export function openReplPage() {
+	return openToolPage({
+		id: "repl-page",
+		titleKey: "js console",
+		title: "JS Console",
+		className: "repl-app",
+		build: initApp,
+		onShow: () => {
+			$input?.focus?.();
+		},
+	});
+}
 function onSelected(el) {
 	// live in the sidebar panel; focus the editor when opened
 	el?.querySelector("textarea.repl-input")?.focus?.();

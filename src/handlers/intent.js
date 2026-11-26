@@ -16,18 +16,18 @@ const pendingIntents = [];
  */
 const pendingTools = [];
 
-/** Sidebar app + static module loader per native preview tool. */
+/** Static module loader per native preview tool — each opens its own
+ * independent full-screen page (pages/tools, v1.8.40). */
 const TOOL_APPS = {
-	inspector: {
-		app: "inspectorApp",
-		load: () => import("sidebarApps/inspector"),
-	},
-	scrape: { app: "scrapeApp", load: () => import("sidebarApps/scrape") },
-	analyzer: { app: "analyzerApp", load: () => import("sidebarApps/analyzer") },
+	inspector: { load: () => import("pages/tools/inspector") },
+	scrape: { load: () => import("pages/tools/scrape") },
+	analyzer: { load: () => import("pages/tools/analyzer") },
 };
 
 /**
- * Activates the tool's sidebar app and hands it the URL.
+ * Opens the tool's independent page and hands it the URL. The page is
+ * built synchronously by openToolPage — no sidebar activation, no
+ * polling for the app input, results always visible.
  * @param {keyof typeof TOOL_APPS} tool
  * @param {string} [url]
  */
@@ -35,17 +35,17 @@ async function openToolApp(tool, url) {
 	const entry = TOOL_APPS[tool];
 	if (!entry) return;
 	try {
-		const { default: sidebarApps } = await import("sidebarApps");
-		// the real SidebarApp instance is activated via setActiveApp() —
-		// sidebarApps.get() returns the container element and `.active`
-		// was a silent no-op on it
-		sidebarApps.setActiveApp(entry.app);
-		if (url) {
-			const mod = await entry.load();
-			if (tool === "inspector") await mod.openInspectorWith(url);
-			else if (tool === "scrape") await mod.openScraperWith(url, "rendered");
-			else if (tool === "analyzer") await mod.openAnalyzerWith(url);
+		const mod = await entry.load();
+		if (!url) {
+			// no URL handed over — just open the tool's page
+			if (tool === "inspector") mod.openInspectorPage();
+			else if (tool === "scrape") mod.openScraperPage();
+			else if (tool === "analyzer") mod.openAnalyzerPage();
+			return;
 		}
+		if (tool === "inspector") await mod.openInspectorWith(url);
+		else if (tool === "scrape") await mod.openScraperWith(url, "rendered");
+		else if (tool === "analyzer") await mod.openAnalyzerWith(url);
 	} catch (error) {
 		console.error(error);
 		helpers.error(error);
@@ -53,7 +53,7 @@ async function openToolApp(tool, url) {
 }
 
 /**
- * Opens an editor tool (Inspector / Scraper / Analyzer sidebar app) with a
+ * Opens an editor tool (Inspector / Scraper / Analyzer page) with a
  * URL handed over from the native preview screen.
  * @param {keyof typeof TOOL_APPS} tool
  * @param {string} [url]

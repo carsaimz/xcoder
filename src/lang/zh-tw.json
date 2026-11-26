@@ -1959,5 +1959,14 @@
 	"learn cat backend": "後端和 API",
 	"learn cat practice": "實踐與挑戰",
 	"learn cat data": "資料庫和 SQL",
-	"learn cat devops": "開發營運和安全"
+	"learn cat devops": "開發營運和安全",
+	"tools": "工具",
+	"tools hub intro": "獨立的網路工具－每個工具都在自己的全螢幕頁面上開啟。",
+	"tools hub analyzer desc": "發現任何網站背後的技術：框架、語言、伺服器、CDN。",
+	"tools hub inspector desc": "檢查任何頁面：即時 DOM 樹、控制台和網路請求。",
+	"tools hub scraper desc": "捕獲任何網站的來源並下載其圖像和資產。",
+	"tools hub learn desc": "內部 WebView 中精選的學習網站（MDN、freeCodeCamp 等）。",
+	"tools hub libs desc": "離線庫（htmx、Bootstrap、圖示字體）已準備好包含。",
+	"tools hub repl desc": "沙盒 JavaScript 控制台，包含片段和歷史記錄。",
+	"tools hub website desc": "應用程式中嵌入了 XCoder 官方網站。"
 }
