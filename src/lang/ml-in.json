@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "ക്യൂറേറ്റ് ചെയ്ത പഠന സൈറ്റുകൾ - MDN, freeCodeCamp എന്നിവയും അതിലേറെയും - ഒരു ആന്തരിക WebView-ൽ.",
 	"tools hub libs desc": "ഓഫ്‌ലൈൻ ലൈബ്രറികൾ (htmx, Bootstrap, ഐക്കൺ ഫോണ്ടുകൾ) ഉൾപ്പെടുത്താൻ തയ്യാറാണ്.",
 	"tools hub repl desc": "സ്‌നിപ്പെറ്റുകളും ചരിത്രവും ഉള്ള Sandboxed JavaScript കൺസോൾ.",
-	"tools hub website desc": "ആപ്പിൽ ഉൾച്ചേർത്ത ഔദ്യോഗിക XCoder സൈറ്റ്."
+	"tools hub website desc": "ആപ്പിൽ ഉൾച്ചേർത്ത ഔദ്യോഗിക XCoder സൈറ്റ്.",
+	"learn recent": "അടുത്തിടെ",
+	"learn clear history": "ക്ലിയർ",
+	"learn history cleared": "ചരിത്രം മായ്ച്ചു",
+	"learn visited": "സന്ദർശിച്ചു",
+	"open in scraper": "സ്ക്രാപ്പറിൽ തുറക്കുക",
+	"chat open site": "തുറക്കുക",
+	"consent allow": "അനുവദിക്കുക",
+	"consent always": "എപ്പോഴും അനുവദിക്കുക",
+	"consent deny": "നിഷേധിക്കുക",
+	"consent allowed": "അനുവദിച്ചു",
+	"consent allowed always": "എപ്പോഴും അനുവദിച്ചിരിക്കുന്നു",
+	"consent denied": "നിഷേധിച്ചു",
+	"consent danger read": "വായിച്ചു",
+	"consent danger exec": "എക്സി",
+	"consent danger write": "എഴുതുക",
+	"consent danger destructive": "വിനാശകരമായ"
 }

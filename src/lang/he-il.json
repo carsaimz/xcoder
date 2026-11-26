@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "אתרי לימוד שנאספו - MDN, freeCodeCamp ועוד - ב-WebView פנימי.",
 	"tools hub libs desc": "ספריות לא מקוונות (htmx, Bootstrap, גופני אייקונים) מוכנות לכלול.",
 	"tools hub repl desc": "קונסולת JavaScript בארגז חול עם קטעים והיסטוריה.",
-	"tools hub website desc": "האתר הרשמי של XCoder המוטמע באפליקציה."
+	"tools hub website desc": "האתר הרשמי של XCoder המוטמע באפליקציה.",
+	"learn recent": "לאחרונה",
+	"learn clear history": "בָּרוּר",
+	"learn history cleared": "ההיסטוריה נוקה",
+	"learn visited": "ביקר",
+	"open in scraper": "פתח ב-Scraper",
+	"chat open site": "לִפְתוֹחַ",
+	"consent allow": "לְהַתִיר",
+	"consent always": "אפשר תמיד",
+	"consent deny": "לְהַכּחִישׁ",
+	"consent allowed": "מוּתָר",
+	"consent allowed always": "תמיד מותר",
+	"consent denied": "נדחתה",
+	"consent danger read": "לִקְרוֹא",
+	"consent danger exec": "exec",
+	"consent danger write": "לִכתוֹב",
+	"consent danger destructive": "הַרסָנִי"
 }

@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Кураторські навчальні сайти — MDN, freeCodeCamp тощо — у внутрішньому WebView.",
 	"tools hub libs desc": "Офлайн-бібліотеки (htmx, Bootstrap, шрифти значків), готові до включення.",
 	"tools hub repl desc": "Консоль JavaScript ізольованого програмного середовища з фрагментами та історією.",
-	"tools hub website desc": "Офіційний сайт XCoder, вбудований у додаток."
+	"tools hub website desc": "Офіційний сайт XCoder, вбудований у додаток.",
+	"learn recent": "Останні",
+	"learn clear history": "ясно",
+	"learn history cleared": "Історія очищена",
+	"learn visited": "Відвідали",
+	"open in scraper": "Відкрити в Scraper",
+	"chat open site": "ВІДЧИНЕНО",
+	"consent allow": "Дозволити",
+	"consent always": "Дозволяти завжди",
+	"consent deny": "Заперечувати",
+	"consent allowed": "Дозволено",
+	"consent allowed always": "Завжди дозволено",
+	"consent denied": "Відмовлено",
+	"consent danger read": "читати",
+	"consent danger exec": "викон",
+	"consent danger write": "писати",
+	"consent danger destructive": "руйнівний"
 }

@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Các trang web nghiên cứu được tuyển chọn — MDN, freeCodeCamp và hơn thế nữa — trong WebView nội bộ.",
 	"tools hub libs desc": "Thư viện ngoại tuyến (htmx, Bootstrap, phông chữ biểu tượng) đã sẵn sàng để đưa vào.",
 	"tools hub repl desc": "Bảng điều khiển JavaScript được đóng hộp cát với các đoạn mã và lịch sử.",
-	"tools hub website desc": "Trang web XCoder chính thức được nhúng trong ứng dụng."
+	"tools hub website desc": "Trang web XCoder chính thức được nhúng trong ứng dụng.",
+	"learn recent": "Gần đây",
+	"learn clear history": "Thông thoáng",
+	"learn history cleared": "Đã xóa lịch sử",
+	"learn visited": "Đã ghé thăm",
+	"open in scraper": "Mở trong Scraper",
+	"chat open site": "Mở",
+	"consent allow": "Cho phép",
+	"consent always": "Cho phép luôn",
+	"consent deny": "Từ chối",
+	"consent allowed": "Cho phép",
+	"consent allowed always": "Luôn được phép",
+	"consent denied": "Từ chối",
+	"consent danger read": "đọc",
+	"consent danger exec": "người điều hành",
+	"consent danger write": "viết",
+	"consent danger destructive": "phá hoại"
 }

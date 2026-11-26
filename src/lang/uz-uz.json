@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Tanlangan oʻquv saytlari — MDN, freeCodeCamp va boshqalar — ichki WebViewda.",
 	"tools hub libs desc": "Oflayn kutubxonalar (htmx, Bootstrap, ikon shriftlari) kiritishga tayyor.",
 	"tools hub repl desc": "Snippetlar va tarixga ega sinov muhitiga o'rnatilgan JavaScript konsoli.",
-	"tools hub website desc": "Ilovaga o'rnatilgan rasmiy XCoder sayti."
+	"tools hub website desc": "Ilovaga o'rnatilgan rasmiy XCoder sayti.",
+	"learn recent": "Yaqinda",
+	"learn clear history": "Toza",
+	"learn history cleared": "Tarix tozalandi",
+	"learn visited": "tashrif buyurdi",
+	"open in scraper": "Scraper-da oching",
+	"chat open site": "Ochiq",
+	"consent allow": "Ruxsat bering",
+	"consent always": "Har doim ruxsat bering",
+	"consent deny": "Rad etish",
+	"consent allowed": "Ruxsat berilgan",
+	"consent allowed always": "Har doim ruxsat berilgan",
+	"consent denied": "Rad etilgan",
+	"consent danger read": "o'qing",
+	"consent danger exec": "exec",
+	"consent danger write": "yozish",
+	"consent danger destructive": "halokatli"
 }

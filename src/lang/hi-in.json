@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "क्यूरेटेड अध्ययन साइटें - एमडीएन, फ्रीकोडकैंप और बहुत कुछ - एक आंतरिक वेबव्यू में।",
 	"tools hub libs desc": "ऑफ़लाइन लाइब्रेरी (एचटीएमएक्स, बूटस्ट्रैप, आइकन फ़ॉन्ट) शामिल करने के लिए तैयार हैं।",
 	"tools hub repl desc": "स्निपेट्स और इतिहास के साथ सैंडबॉक्स्ड जावास्क्रिप्ट कंसोल।",
-	"tools hub website desc": "आधिकारिक XCoder साइट ऐप में एम्बेडेड है।"
+	"tools hub website desc": "आधिकारिक XCoder साइट ऐप में एम्बेडेड है।",
+	"learn recent": "हाल ही का",
+	"learn clear history": "स्पष्ट",
+	"learn history cleared": "इतिहास साफ हो गया",
+	"learn visited": "दौरा किया",
+	"open in scraper": "स्क्रेपर में खोलें",
+	"chat open site": "खुला",
+	"consent allow": "अनुमति दें",
+	"consent always": "हमेशा की अनुमति",
+	"consent deny": "अस्वीकार करना",
+	"consent allowed": "अनुमत",
+	"consent allowed always": "हमेशा अनुमति है",
+	"consent denied": "अस्वीकृत",
+	"consent danger read": "पढ़ना",
+	"consent danger exec": "कार्यकारी",
+	"consent danger write": "लिखना",
+	"consent danger destructive": "विनाशकारी"
 }

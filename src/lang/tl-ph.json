@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Mga na-curate na site ng pag-aaral — MDN, freeCodeCamp at higit pa — sa isang panloob na WebView.",
 	"tools hub libs desc": "Ang mga offline na aklatan (htmx, Bootstrap, mga font ng icon) ay handa nang isama.",
 	"tools hub repl desc": "Sandboxed JavaScript console na may mga snippet at kasaysayan.",
-	"tools hub website desc": "Ang opisyal na site ng XCoder na naka-embed sa app."
+	"tools hub website desc": "Ang opisyal na site ng XCoder na naka-embed sa app.",
+	"learn recent": "Kamakailan",
+	"learn clear history": "Maaliwalas",
+	"learn history cleared": "Nabura ang kasaysayan",
+	"learn visited": "Binisita",
+	"open in scraper": "Buksan sa Scraper",
+	"chat open site": "Bukas",
+	"consent allow": "Payagan",
+	"consent always": "Payagan palagi",
+	"consent deny": "Tanggihan",
+	"consent allowed": "Pinayagan",
+	"consent allowed always": "Laging pinapayagan",
+	"consent denied": "Tinanggihan",
+	"consent danger read": "basahin",
+	"consent danger exec": "exec",
+	"consent danger write": "sumulat",
+	"consent danger destructive": "mapanira"
 }

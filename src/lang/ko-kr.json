@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "내부 WebView에 선별된 연구 사이트(MDN, freeCodeCamp 등)가 있습니다.",
 	"tools hub libs desc": "포함할 준비가 된 오프라인 라이브러리(htmx, Bootstrap, 아이콘 글꼴)",
 	"tools hub repl desc": "스니펫과 기록이 포함된 샌드박스 JavaScript 콘솔입니다.",
-	"tools hub website desc": "앱에 포함된 공식 XCoder 사이트입니다."
+	"tools hub website desc": "앱에 포함된 공식 XCoder 사이트입니다.",
+	"learn recent": "최근의",
+	"learn clear history": "분명한",
+	"learn history cleared": "기록이 삭제되었습니다.",
+	"learn visited": "방문함",
+	"open in scraper": "스크레이퍼에서 열기",
+	"chat open site": "열려 있는",
+	"consent allow": "허용하다",
+	"consent always": "항상 허용",
+	"consent deny": "부인하다",
+	"consent allowed": "허용된",
+	"consent allowed always": "항상 허용됨",
+	"consent denied": "거부됨",
+	"consent danger read": "읽다",
+	"consent danger exec": "간부",
+	"consent danger write": "쓰다",
+	"consent danger destructive": "파괴적인"
 }

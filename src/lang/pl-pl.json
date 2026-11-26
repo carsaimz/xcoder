@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Wyselekcjonowane witryny badawcze — MDN, freeCodeCamp i inne — w wewnętrznym widoku WebView.",
 	"tools hub libs desc": "Biblioteki offline (htmx, Bootstrap, czcionki ikon) gotowe do dołączenia.",
 	"tools hub repl desc": "Konsola JavaScript w trybie piaskownicy z fragmentami i historią.",
-	"tools hub website desc": "Oficjalna strona XCoder osadzona w aplikacji."
+	"tools hub website desc": "Oficjalna strona XCoder osadzona w aplikacji.",
+	"learn recent": "Ostatni",
+	"learn clear history": "Jasne",
+	"learn history cleared": "Historia wyczyszczona",
+	"learn visited": "Odwiedziłem",
+	"open in scraper": "Otwórz w Scraperze",
+	"chat open site": "Otwarte",
+	"consent allow": "Umożliwić",
+	"consent always": "Pozwól zawsze",
+	"consent deny": "Zaprzeczyć",
+	"consent allowed": "Dozwolony",
+	"consent allowed always": "Zawsze dozwolone",
+	"consent denied": "Zaprzeczony",
+	"consent danger read": "Czytać",
+	"consent danger exec": "wykonawczy",
+	"consent danger write": "pisać",
+	"consent danger destructive": "destrukcyjny"
 }

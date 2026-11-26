@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "內部 WebView 中精選的學習網站（MDN、freeCodeCamp 等）。",
 	"tools hub libs desc": "離線庫（htmx、Bootstrap、圖示字體）已準備好包含。",
 	"tools hub repl desc": "沙盒 JavaScript 控制台，包含片段和歷史記錄。",
-	"tools hub website desc": "應用程式中嵌入了 XCoder 官方網站。"
+	"tools hub website desc": "應用程式中嵌入了 XCoder 官方網站。",
+	"learn recent": "最近的",
+	"learn clear history": "清除",
+	"learn history cleared": "歷史記錄已清除",
+	"learn visited": "訪問過",
+	"open in scraper": "在刮刀中打開",
+	"chat open site": "打開",
+	"consent allow": "允許",
+	"consent always": "始終允許",
+	"consent deny": "否定",
+	"consent allowed": "允許",
+	"consent allowed always": "始終允許",
+	"consent denied": "被拒絕",
+	"consent danger read": "讀",
+	"consent danger exec": "執行",
+	"consent danger write": "寫",
+	"consent danger destructive": "破壞性的"
 }

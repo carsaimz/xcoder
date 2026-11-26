@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Spravované studijní stránky – MDN, freeCodeCamp a další – v interním WebView.",
 	"tools hub libs desc": "Offline knihovny (htmx, Bootstrap, fonty ikon) připravené k zahrnutí.",
 	"tools hub repl desc": "Konzole JavaScriptu v izolovaném prostoru s úryvky a historií.",
-	"tools hub website desc": "Oficiální stránka XCoder vložená do aplikace."
+	"tools hub website desc": "Oficiální stránka XCoder vložená do aplikace.",
+	"learn recent": "Nedávné",
+	"learn clear history": "Jasný",
+	"learn history cleared": "Historie vymazána",
+	"learn visited": "Navštíveno",
+	"open in scraper": "Otevřít ve Scraperu",
+	"chat open site": "OTEVŘENO",
+	"consent allow": "Povolit",
+	"consent always": "Vždy povolit",
+	"consent deny": "Odmítnout",
+	"consent allowed": "Povoleno",
+	"consent allowed always": "Vždy povoleno",
+	"consent denied": "zamítnuto",
+	"consent danger read": "číst",
+	"consent danger exec": "exec",
+	"consent danger write": "napsat",
+	"consent danger destructive": "destruktivní"
 }

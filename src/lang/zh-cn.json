@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "内部 WebView 中精选的学习网站（MDN、freeCodeCamp 等）。",
 	"tools hub libs desc": "离线库（htmx、Bootstrap、图标字体）已准备好包含。",
 	"tools hub repl desc": "沙盒 JavaScript 控制台，包含片段和历史记录。",
-	"tools hub website desc": "应用程序中嵌入了 XCoder 官方网站。"
+	"tools hub website desc": "应用程序中嵌入了 XCoder 官方网站。",
+	"learn recent": "最近的",
+	"learn clear history": "清除",
+	"learn history cleared": "历史记录已清除",
+	"learn visited": "访问过",
+	"open in scraper": "在刮刀中打开",
+	"chat open site": "打开",
+	"consent allow": "允许",
+	"consent always": "始终允许",
+	"consent deny": "否定",
+	"consent allowed": "允许",
+	"consent allowed always": "始终允许",
+	"consent denied": "被拒绝",
+	"consent danger read": "读",
+	"consent danger exec": "执行",
+	"consent danger write": "写",
+	"consent danger destructive": "破坏性的"
 }

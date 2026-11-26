@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "ရွေးချယ်ထားသော လေ့လာမှုဆိုက်များ — MDN၊ freeCodeCamp နှင့် အခြားအရာများ — အတွင်းပိုင်း WebView တွင်။",
 	"tools hub libs desc": "အော့ဖ်လိုင်းစာကြည့်တိုက်များ (htmx၊ Bootstrap၊ အိုင်ကွန်ဖောင့်များ) ပါဝင်ရန် အသင့်ဖြစ်ပါပြီ။",
 	"tools hub repl desc": "အတိုအထွာများနှင့် မှတ်တမ်းပါရှိသော Sandboxed JavaScript console",
-	"tools hub website desc": "အက်ပ်တွင် ထည့်သွင်းထားသော တရားဝင် XCoder ဆိုက်။"
+	"tools hub website desc": "အက်ပ်တွင် ထည့်သွင်းထားသော တရားဝင် XCoder ဆိုက်။",
+	"learn recent": "မကြာမှီ",
+	"learn clear history": "ရှင်းပါတယ်။",
+	"learn history cleared": "သမိုင်းကို ရှင်းလင်းခဲ့သည်။",
+	"learn visited": "သွားရောက်ခဲ့သည်။",
+	"open in scraper": "Scraper တွင်ဖွင့်ပါ။",
+	"chat open site": "ဖွင့်သည်။",
+	"consent allow": "ခွင့်ပြုပါ။",
+	"consent always": "အမြဲခွင့်ပြုပါ။",
+	"consent deny": "ငြင်းတယ်။",
+	"consent allowed": "ခွင့်မပြု",
+	"consent allowed always": "အမြဲတမ်းခွင့်ပြုတယ်။",
+	"consent denied": "ငြင်းတယ်။",
+	"consent danger read": "ဖတ်ပါ။",
+	"consent danger exec": "exec",
+	"consent danger write": "ရေးပါ။",
+	"consent danger destructive": "ပျက်စီးစေသော"
 }

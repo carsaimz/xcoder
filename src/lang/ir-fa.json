@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "سایت‌های مطالعه انتخاب شده - MDN، freeCodeCamp و موارد دیگر - در یک WebView داخلی.",
 	"tools hub libs desc": "کتابخانه های آفلاین (htmx، بوت استرپ، فونت های نماد) آماده گنجاندن.",
 	"tools hub repl desc": "کنسول جاوا اسکریپت Sandboxed با قطعه و تاریخچه.",
-	"tools hub website desc": "سایت رسمی XCoder تعبیه شده در برنامه."
+	"tools hub website desc": "سایت رسمی XCoder تعبیه شده در برنامه.",
+	"learn recent": "اخیر",
+	"learn clear history": "پاک کردن",
+	"learn history cleared": "تاریخچه پاک شد",
+	"learn visited": "بازدید کرد",
+	"open in scraper": "در Scraper باز کنید",
+	"chat open site": "باز کنید",
+	"consent allow": "اجازه دهید",
+	"consent always": "همیشه اجازه بده",
+	"consent deny": "تکذیب کنید",
+	"consent allowed": "مجاز است",
+	"consent allowed always": "همیشه مجاز است",
+	"consent denied": "تکذیب شد",
+	"consent danger read": "خواندن",
+	"consent danger exec": "اجرایی",
+	"consent danger write": "نوشتن",
+	"consent danger destructive": "مخرب"
 }

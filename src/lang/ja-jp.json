@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "内部 WebView で厳選された学習サイト (MDN、freeCodeCamp など)。",
 	"tools hub libs desc": "オフライン ライブラリ (htmx、ブートストラップ、アイコン フォント) をすぐに含めることができます。",
 	"tools hub repl desc": "スニペットと履歴を備えたサンドボックス化された JavaScript コンソール。",
-	"tools hub website desc": "アプリに埋め込まれた公式 XCoder サイト。"
+	"tools hub website desc": "アプリに埋め込まれた公式 XCoder サイト。",
+	"learn recent": "最近の",
+	"learn clear history": "クリア",
+	"learn history cleared": "履歴がクリアされました",
+	"learn visited": "訪問しました",
+	"open in scraper": "スクレーパーで開く",
+	"chat open site": "開ける",
+	"consent allow": "許可する",
+	"consent always": "常に許可する",
+	"consent deny": "拒否",
+	"consent allowed": "許可された",
+	"consent allowed always": "常に許可される",
+	"consent denied": "拒否されました",
+	"consent danger read": "読む",
+	"consent danger exec": "実行する",
+	"consent danger write": "書く",
+	"consent danger destructive": "破壊的な"
 }

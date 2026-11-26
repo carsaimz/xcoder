@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Siti di studio selezionati - MDN, freeCodeCamp e altro - in una WebView interna.",
 	"tools hub libs desc": "Librerie offline (htmx, Bootstrap, caratteri icona) pronte per essere incluse.",
 	"tools hub repl desc": "Console JavaScript sandbox con snippet e cronologia.",
-	"tools hub website desc": "Il sito ufficiale di XCoder incorporato nell'app."
+	"tools hub website desc": "Il sito ufficiale di XCoder incorporato nell'app.",
+	"learn recent": "Recente",
+	"learn clear history": "Chiaro",
+	"learn history cleared": "La cronologia è stata cancellata",
+	"learn visited": "Visitato",
+	"open in scraper": "Apri in Raschietto",
+	"chat open site": "Aprire",
+	"consent allow": "Permettere",
+	"consent always": "Consenti sempre",
+	"consent deny": "Negare",
+	"consent allowed": "Consentito",
+	"consent allowed always": "Sempre consentito",
+	"consent denied": "Negato",
+	"consent danger read": "Leggere",
+	"consent danger exec": "esecutivo",
+	"consent danger write": "scrivere",
+	"consent danger destructive": "distruttivo"
 }

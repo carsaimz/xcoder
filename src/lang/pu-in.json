@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "ਕਿਉਰੇਟਿਡ ਸਟੱਡੀ ਸਾਈਟਾਂ — MDN, freeCodeCamp ਅਤੇ ਹੋਰ — ਇੱਕ ਅੰਦਰੂਨੀ WebView ਵਿੱਚ।",
 	"tools hub libs desc": "ਔਫਲਾਈਨ ਲਾਇਬ੍ਰੇਰੀਆਂ (htmx, ਬੂਟਸਟਰੈਪ, ਆਈਕਨ ਫੌਂਟ) ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਤਿਆਰ ਹਨ।",
 	"tools hub repl desc": "ਸਨਿੱਪਟਾਂ ਅਤੇ ਇਤਿਹਾਸ ਦੇ ਨਾਲ ਸੈਂਡਬੌਕਸਡ JavaScript ਕੰਸੋਲ।",
-	"tools hub website desc": "ਐਪ ਵਿੱਚ ਏਮਬੇਡ ਕੀਤੀ ਅਧਿਕਾਰਤ XCoder ਸਾਈਟ।"
+	"tools hub website desc": "ਐਪ ਵਿੱਚ ਏਮਬੇਡ ਕੀਤੀ ਅਧਿਕਾਰਤ XCoder ਸਾਈਟ।",
+	"learn recent": "ਹਾਲੀਆ",
+	"learn clear history": "ਸਾਫ਼",
+	"learn history cleared": "ਇਤਿਹਾਸ ਸਾਫ਼ ਕੀਤਾ ਗਿਆ",
+	"learn visited": "ਦਾ ਦੌਰਾ ਕੀਤਾ",
+	"open in scraper": "ਸਕ੍ਰੈਪਰ ਵਿੱਚ ਖੋਲ੍ਹੋ",
+	"chat open site": "ਖੋਲ੍ਹੋ",
+	"consent allow": "ਇਜਾਜ਼ਤ ਦਿਓ",
+	"consent always": "ਹਮੇਸ਼ਾ ਇਜਾਜ਼ਤ ਦਿਓ",
+	"consent deny": "ਇਨਕਾਰ",
+	"consent allowed": "ਦੀ ਇਜਾਜ਼ਤ ਹੈ",
+	"consent allowed always": "ਹਮੇਸ਼ਾ ਇਜਾਜ਼ਤ ਹੈ",
+	"consent denied": "ਇਨਕਾਰ ਕੀਤਾ",
+	"consent danger read": "ਪੜ੍ਹੋ",
+	"consent danger exec": "exec",
+	"consent danger write": "ਲਿਖੋ",
+	"consent danger destructive": "ਵਿਨਾਸ਼ਕਾਰੀ"
 }

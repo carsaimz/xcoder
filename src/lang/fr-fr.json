@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Sites d'étude sélectionnés - MDN, freeCodeCamp et plus - dans une WebView interne.",
 	"tools hub libs desc": "Bibliothèques hors ligne (htmx, Bootstrap, polices d'icônes) prêtes à être incluses.",
 	"tools hub repl desc": "Console JavaScript en bac à sable avec extraits de code et historique.",
-	"tools hub website desc": "Le site officiel XCoder intégré à l'application."
+	"tools hub website desc": "Le site officiel XCoder intégré à l'application.",
+	"learn recent": "Récent",
+	"learn clear history": "Clair",
+	"learn history cleared": "Historique effacé",
+	"learn visited": "Visité",
+	"open in scraper": "Ouvrir dans Scraper",
+	"chat open site": "Ouvrir",
+	"consent allow": "Permettre",
+	"consent always": "Autoriser toujours",
+	"consent deny": "Refuser",
+	"consent allowed": "Autorisé",
+	"consent allowed always": "Toujours autorisé",
+	"consent denied": "Refusé",
+	"consent danger read": "lire",
+	"consent danger exec": "exécutif",
+	"consent danger write": "écrire",
+	"consent danger destructive": "destructeur"
 }

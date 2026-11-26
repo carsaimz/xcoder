@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Dahili bir Web Görünümünde seçilmiş çalışma siteleri - MDN, freeCodeCamp ve daha fazlası.",
 	"tools hub libs desc": "Çevrimdışı kitaplıklar (htmx, Bootstrap, simge yazı tipleri) dahil edilmeye hazır.",
 	"tools hub repl desc": "Parçacıklar ve geçmiş içeren korumalı alanlı JavaScript konsolu.",
-	"tools hub website desc": "Uygulamaya gömülü resmi XCoder sitesi."
+	"tools hub website desc": "Uygulamaya gömülü resmi XCoder sitesi.",
+	"learn recent": "Son",
+	"learn clear history": "Temizlemek",
+	"learn history cleared": "Geçmiş temizlendi",
+	"learn visited": "Ziyaret edildi",
+	"open in scraper": "Kazıyıcıda aç",
+	"chat open site": "Açık",
+	"consent allow": "İzin vermek",
+	"consent always": "Her zaman izin ver",
+	"consent deny": "Reddetmek",
+	"consent allowed": "İzin verilmiş",
+	"consent allowed always": "Her zaman izin verilir",
+	"consent denied": "Reddedildi",
+	"consent danger read": "Okumak",
+	"consent danger exec": "yönetici",
+	"consent danger write": "yazmak",
+	"consent danger destructive": "yıkıcı"
 }

@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "مواقع الدراسة المنسقة — MDN، وfreeCodeCamp، والمزيد — في WebView داخلي.",
 	"tools hub libs desc": "المكتبات غير المتصلة بالإنترنت (htmx، Bootstrap، خطوط الأيقونات) جاهزة للتضمين.",
 	"tools hub repl desc": "وحدة تحكم JavaScript في Sandboxed مع المقتطفات والسجل.",
-	"tools hub website desc": "موقع XCoder الرسمي المضمن في التطبيق."
+	"tools hub website desc": "موقع XCoder الرسمي المضمن في التطبيق.",
+	"learn recent": "مؤخرًا",
+	"learn clear history": "واضح",
+	"learn history cleared": "تم مسح التاريخ",
+	"learn visited": "تمت زيارتها",
+	"open in scraper": "فتح في مكشطة",
+	"chat open site": "يفتح",
+	"consent allow": "يسمح",
+	"consent always": "السماح دائما",
+	"consent deny": "ينكر",
+	"consent allowed": "مسموح",
+	"consent allowed always": "مسموح به دائمًا",
+	"consent denied": "رفض",
+	"consent danger read": "يقرأ",
+	"consent danger exec": "com.exec",
+	"consent danger write": "يكتب",
+	"consent danger destructive": "مدمر"
 }

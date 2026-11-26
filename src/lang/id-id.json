@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Situs studi yang dikurasi — MDN, freeCodeCamp, dan lainnya — dalam WebView internal.",
 	"tools hub libs desc": "Perpustakaan offline (htmx, Bootstrap, font ikon) siap disertakan.",
 	"tools hub repl desc": "Konsol JavaScript kotak pasir dengan cuplikan dan riwayat.",
-	"tools hub website desc": "Situs resmi XCoder tertanam di aplikasi."
+	"tools hub website desc": "Situs resmi XCoder tertanam di aplikasi.",
+	"learn recent": "Terkini",
+	"learn clear history": "Jernih",
+	"learn history cleared": "Sejarah dihapus",
+	"learn visited": "Dikunjungi",
+	"open in scraper": "Buka di Scraper",
+	"chat open site": "Membuka",
+	"consent allow": "Mengizinkan",
+	"consent always": "Izinkan selalu",
+	"consent deny": "Membantah",
+	"consent allowed": "Diizinkan",
+	"consent allowed always": "Selalu diperbolehkan",
+	"consent denied": "Ditolak",
+	"consent danger read": "membaca",
+	"consent danger exec": "eksekutif",
+	"consent danger write": "menulis",
+	"consent danger destructive": "destruktif"
 }

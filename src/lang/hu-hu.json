@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "Felügyelt tanulmányi webhelyek – MDN, freeCodeCamp és egyebek – egy belső WebView-ban.",
 	"tools hub libs desc": "Offline könyvtárak (htmx, Bootstrap, ikon-betűtípusok) készen állnak a felvételre.",
 	"tools hub repl desc": "Sandbox JavaScript-konzol kivonatokkal és előzményekkel.",
-	"tools hub website desc": "Az alkalmazásba ágyazott hivatalos XCoder webhely."
+	"tools hub website desc": "Az alkalmazásba ágyazott hivatalos XCoder webhely.",
+	"learn recent": "Legutóbbi",
+	"learn clear history": "Világos",
+	"learn history cleared": "Az előzmények törölve",
+	"learn visited": "Látogatott",
+	"open in scraper": "Nyissa meg a Scraperben",
+	"chat open site": "Nyitott",
+	"consent allow": "Engedélyezze",
+	"consent always": "Mindig engedje meg",
+	"consent deny": "Megtagadás",
+	"consent allowed": "Engedélyezett",
+	"consent allowed always": "Mindig megengedett",
+	"consent denied": "Megtagadva",
+	"consent danger read": "olvas",
+	"consent danger exec": "végrehajtó",
+	"consent danger write": "írj",
+	"consent danger destructive": "pusztító"
 }

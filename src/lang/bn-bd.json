@@ -1968,5 +1968,21 @@
 	"tools hub learn desc": "একটি অভ্যন্তরীণ ওয়েবভিউতে কিউরেট করা স্টাডি সাইটগুলি — MDN, freeCodeCamp এবং আরও অনেক কিছু৷",
 	"tools hub libs desc": "অফলাইন লাইব্রেরি (htmx, বুটস্ট্র্যাপ, আইকন ফন্ট) অন্তর্ভুক্ত করার জন্য প্রস্তুত।",
 	"tools hub repl desc": "স্নিপেট এবং ইতিহাস সহ স্যান্ডবক্সযুক্ত জাভাস্ক্রিপ্ট কনসোল।",
-	"tools hub website desc": "অ্যাপটিতে এমবেড করা অফিসিয়াল এক্সকোডার সাইট।"
+	"tools hub website desc": "অ্যাপটিতে এমবেড করা অফিসিয়াল এক্সকোডার সাইট।",
+	"learn recent": "সাম্প্রতিক",
+	"learn clear history": "পরিষ্কার",
+	"learn history cleared": "ইতিহাস সাফ",
+	"learn visited": "পরিদর্শন করেছেন",
+	"open in scraper": "স্ক্র্যাপারে খুলুন",
+	"chat open site": "খোলা",
+	"consent allow": "অনুমতি দিন",
+	"consent always": "সর্বদা অনুমতি দিন",
+	"consent deny": "অস্বীকার করুন",
+	"consent allowed": "অনুমোদিত",
+	"consent allowed always": "সর্বদা অনুমোদিত",
+	"consent denied": "অস্বীকার করেছে",
+	"consent danger read": "পড়া",
+	"consent danger exec": "exec",
+	"consent danger write": "লিখুন",
+	"consent danger destructive": "ধ্বংসাত্মক"
 }
