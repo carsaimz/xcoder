@@ -265,9 +265,6 @@ public class Browser extends LinearLayout {
               updateDefaultItems(checked);
               if (checked) {
                 setDesktopMode(true);
-                setConsoleVisible(false);
-                menu.setChecked("Console", false);
-                menu.setVisible("Console", false);
                 addView(deviceEmulator);
                 fitWebViewTo(
                   deviceEmulator.getWidthProgress(),
@@ -275,7 +272,6 @@ public class Browser extends LinearLayout {
                   deviceEmulator.getScaleProgress()
                 );
               } else {
-                menu.setVisible("Console", true);
                 removeView(deviceEmulator);
                 fitWebViewTo(0, 0, 1);
                 webView
@@ -402,10 +398,10 @@ public class Browser extends LinearLayout {
             emulator = true;
             menu.setChecked("Devices", true);
             updateDefaultItems(true);
-            setConsoleVisible(false);
-            menu.setChecked("Console", false);
-            menu.setVisible("Console", false);
-            addView(deviceEmulator);
+            // The Console item stays available in device mode: eruda is
+            // injected in the page itself, so inspection keeps working
+            // (a saved device default used to hide the item ~1s after
+            // opening, which read as «the console option disappeared»).
             // The emulator sets up its sliders on a later layout pass and then
             // applies the saved size itself, so the webview is not resized here.
           }
