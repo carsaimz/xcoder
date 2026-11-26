@@ -1,7 +1,6 @@
 name: Release (signed APK + AAB)
 
-# Stable release on tags like v1.2.3 (only when the tag is a higher
-# version than every previous tag), or triggered manually:
+# Stable release — MANUAL ONLY, dispatched from the Actions UI.
 #
 # Manual run with a version (e.g. 1.4.0):
 #   1. bumps package.json + config.xml (versionCode) to that version
@@ -10,6 +9,12 @@ name: Release (signed APK + AAB)
 #   4. publishes the GitHub release with a categorized changelog
 #      (feat/fix/perf/refactor sections) plus GitHub's auto notes
 #
+# A version is NEVER released twice: re-dispatching an existing tag
+# fails unless «force» is ticked (re-points the tag to the current HEAD
+# and rebuilds). Leaving the version empty auto-increments from the
+# latest tag (1.8.45 -> 1.8.46). Beta versions are rejected here — the
+# stable channel is this workflow, pre-releases run prerelease.yml.
+#
 # Required secrets:
 #   KEYSTORE_BASE64    - base64 of the release keystore (.jks)
 #   KEYSTORE_PASSWORD  - keystore password
@@ -17,17 +22,17 @@ name: Release (signed APK + AAB)
 #   KEY_PASSWORD       - key password
 
 on:
-  push:
-    tags:
-      - "v*"
-      - "!v*-beta*"
-      - "!v*-rc*"
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to release (e.g. 1.4.0)"
-        required: true
+        description: "Stable version to release (e.g. 1.8.46). Empty = auto-increment"
+        required: false
         type: string
+      force:
+        description: "Re-point an existing tag to current HEAD and rebuild"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -59,61 +64,62 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" >/dev/null
 
-      - name: Prepare version (manual runs bump + tag, tag push validates)
+      - name: Prepare version (dispatch only; a tag is never reused silently)
         id: version
         env:
-          EVENT: ${{ github.event_name }}
           INPUT_VERSION: ${{ inputs.version }}
-          REF: ${{ github.ref_name }}
+          FORCE: ${{ inputs.force }}
         run: |
           set -e
+          LATEST=$(git tag --sort=-v:refname | head -n 1 || true)
+          if [ -z "$INPUT_VERSION" ]; then
+            # empty input = auto-increment from the latest tag (1.8.44 ->
+            # 1.8.45; a pending beta base is promoted first)
+            OUT=$(node utils/scripts/bump-version.mjs --next-stable ${LATEST:+--latest "$LATEST"})
+            VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
+          else
+            VERSION=$(printf '%s' "$INPUT_VERSION" | tr -d '[:space:]' | sed 's/^v//')
+          fi
           # pre-releases NEVER go through the stable pipeline — they would
           # ship stable-looking APK names (XCoder-vX.Y.Z-beta.apk) over the
           # beta package and flip the release's prerelease flag off. The
           # beta channel is prerelease.yml (XCoder-Beta-*.apk, side-by-side
           # package id com.carsaimz.xcoder.beta).
-          CHECK_VERSION="${INPUT_VERSION:-$REF}"
-          case "$CHECK_VERSION" in
+          case "$VERSION" in
             *-beta*|*-rc*)
-              echo "::error::'$CHECK_VERSION' is a pre-release — dispatch .github/workflows/prerelease.yml instead (or push the v$CHECK_VERSION tag)"
+              echo "::error::'$VERSION' is a pre-release — dispatch .github/workflows/prerelease.yml instead"
               exit 1
               ;;
           esac
-          # latest existing tag (version-sorted); empty for the first release
-          PREV=$(git tag --sort=-v:refname | grep -vx "$REF" | head -n 1 || true)
-          if [ "$EVENT" = "workflow_dispatch" ]; then
-            # refuse to release a version that does not move forward —
-            # EXCEPT an identical re-run of the current version (the
-            # dispatch path already tolerates existing tags/commits)
-            CUR=$(node -p "require('./package.json').version")
-            if [ -n "$PREV" ] && [ "$INPUT_VERSION" != "$CUR" ]; then
-              node utils/scripts/bump-version.mjs "$INPUT_VERSION" --check-only --greater-than "$PREV"
+          if [ -n "$LATEST" ] && [ "v${VERSION}" != "$LATEST" ]; then
+            node utils/scripts/bump-version.mjs "$VERSION" --check-only --greater-than "$LATEST"
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            if [ "$FORCE" != "true" ]; then
+              echo "::error::Tag v${VERSION} already exists — a version is never released twice. Dispatch with a HIGHER version (latest tag: ${LATEST}; empty input auto-increments), or tick «force» to re-point the tag to the current HEAD and rebuild."
+              exit 1
             fi
-            OUT=$(node utils/scripts/bump-version.mjs "$INPUT_VERSION")
-            VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            # keep CHANGELOG.md in sync (section for this version, from commits)
-            node utils/scripts/update-changelog.mjs "$VERSION" || true
-            git add package.json config.xml CHANGELOG.md
-            # tolerant re-run: files may already carry the target version
-            git diff --cached --quiet || git commit -m "chore(release): v${VERSION}"
-            # the branch may have moved since dispatch (parallel fixes) —
-            # rebase so the push never races, then only create the tag when
-            # the remote does not have it yet (Auto release may have made it)
-            git pull --rebase origin "${GITHUB_REF_NAME}" || true
-            if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
-              git push origin "HEAD:${GITHUB_REF_NAME}"
-            else
-              git tag -a "v${VERSION}" -m "XCoder v${VERSION}"
-              git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
-            fi
+          fi
+          OUT=$(node utils/scripts/bump-version.mjs "$VERSION")
+          VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # keep CHANGELOG.md in sync (section for this version, from commits)
+          node utils/scripts/update-changelog.mjs "$VERSION" || true
+          git add package.json config.xml CHANGELOG.md
+          git diff --cached --quiet || git commit -m "chore(release): v${VERSION}"
+          # the branch may have moved since dispatch (parallel fixes) —
+          # rebase so the branch push stays a fast-forward
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          # -f on the tag only ever applies in the force path (a re-point);
+          # the branch push itself never needs -f after the rebase
+          if [ "$FORCE" = "true" ] && git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            git tag -fa "v${VERSION}" -m "XCoder v${VERSION}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+            git push -f origin "v${VERSION}"
           else
-            # tag push: the new tag must compare greater than previous tags
-            if [ -n "$PREV" ]; then
-              node utils/scripts/bump-version.mjs "$REF" --check-only --greater-than "$PREV"
-            fi
-            VERSION=$(node -p "require('./package.json').version")
+            git tag -fa "v${VERSION}" -m "XCoder v${VERSION}"
+            git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"

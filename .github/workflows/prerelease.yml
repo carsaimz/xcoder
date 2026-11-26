@@ -1,8 +1,15 @@
 name: Pre-release (debug APK)
 
 # Signed beta APK published as a GitHub pre-release for -beta/-rc
-# versions (v1.2.3-beta.1, v2.0.0-rc.1, ...) — dispatched manually with a
-# version or pushed as a tag.
+# versions (v1.2.3-beta.1, v2.0.0-rc.1, ...).
+#
+# MANUAL ONLY: triggered exclusively through workflow_dispatch (the user
+# writes the version in the Actions UI; leaving it empty auto-increments
+# to the next beta, e.g. 1.8.45-beta -> 1.8.45-beta.2). No tag/push
+# triggers — a version is NEVER released twice: re-dispatching an
+# existing tag fails unless «force» is ticked, which re-points the tag
+# to the current HEAD and rebuilds (that is how tags used to drift and
+# ship the wrong commits under an old version).
 #
 # Betas install SIDE BY SIDE with the stable app (never overwrite it):
 #   application id  com.carsaimz.xcoder  ->  com.carsaimz.xcoder.beta
@@ -13,16 +20,17 @@ name: Pre-release (debug APK)
 # Stable releases keep flowing through release.yml (promotion only).
 
 on:
-  push:
-    tags:
-      - "v*-beta*"
-      - "v*-rc*"
   workflow_dispatch:
     inputs:
       version:
-        description: "Pre-release version (e.g. 1.4.0-beta.1)"
-        required: true
+        description: "Pre-release version (e.g. 1.8.46-beta). Empty = auto-increment (beta.N+1)"
+        required: false
         type: string
+      force:
+        description: "Re-point an existing tag to current HEAD and rebuild"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -54,44 +62,57 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" >/dev/null
 
-      - name: Prepare version (manual runs bump + tag, tag push reads it)
+      - name: Prepare version (dispatch only; a tag is never reused silently)
         id: version
         env:
-          EVENT: ${{ github.event_name }}
           INPUT_VERSION: ${{ inputs.version }}
-          REF: ${{ github.ref_name }}
+          FORCE: ${{ inputs.force }}
         run: |
           set -e
-          if [ "$EVENT" = "workflow_dispatch" ]; then
+          LATEST=$(git tag --sort=-v:refname | head -n 1 || true)
+          if [ -z "$INPUT_VERSION" ]; then
+            # empty input = auto-increment (1.8.45-beta -> 1.8.45-beta.2,
+            # always strictly above the latest tag)
+            OUT=$(node utils/scripts/bump-version.mjs --next-beta ${LATEST:+--latest "$LATEST"})
+            VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
+          else
             case "$INPUT_VERSION" in
               *-beta*|*-rc*) ;;
               *) echo "::error::Pre-release version must contain -beta or -rc (e.g. 1.4.0-beta.1)"; exit 1 ;;
             esac
-            OUT=$(node utils/scripts/bump-version.mjs "$INPUT_VERSION")
-            VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
-            # side-by-side beta identity: id/name/versionCode (never
-            # overwrites the installed stable app)
-            OUT=$(node utils/scripts/apply-beta-package.mjs "$VERSION")
-            VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package.json config.xml
-            # tolerant re-run: files may already carry the beta identity
-            git diff --cached --quiet || git commit -m "chore(pre-release): v${VERSION}"
-            # the branch may have moved since dispatch — rebase, and only
-            # create the tag when it does not exist yet
-            git pull --rebase origin "${GITHUB_REF_NAME}" || true
-            if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
-              git push origin "HEAD:${GITHUB_REF_NAME}"
-            else
-              git tag -a "v${VERSION}" -m "XCoder Beta v${VERSION}"
-              git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
+            VERSION=$(printf '%s' "$INPUT_VERSION" | tr -d '[:space:]' | sed 's/^v//')
+          fi
+          if [ -n "$LATEST" ] && [ "v${VERSION}" != "$LATEST" ]; then
+            node utils/scripts/bump-version.mjs "$VERSION" --check-only --greater-than "$LATEST"
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            if [ "$FORCE" != "true" ]; then
+              echo "::error::Tag v${VERSION} already exists — a version is never released twice. Dispatch with a HIGHER version (latest tag: ${LATEST}; empty input auto-increments), or tick «force» to re-point the tag to the current HEAD and rebuild."
+              exit 1
             fi
+          fi
+          OUT=$(node utils/scripts/bump-version.mjs "$VERSION")
+          VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
+          # side-by-side beta identity: id/name/versionCode (never
+          # overwrites the installed stable app)
+          OUT=$(node utils/scripts/apply-beta-package.mjs "$VERSION")
+          VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json config.xml
+          git diff --cached --quiet || git commit -m "chore(pre-release): v${VERSION}"
+          # the branch may have moved since dispatch — rebase before pushing
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          # -f on the tag only ever applies in the force path (a re-point),
+          # where the tag moves to the new HEAD; the branch push stays a
+          # fast-forward because of the rebase
+          if [ "$FORCE" = "true" ] && git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            git tag -fa "v${VERSION}" -m "XCoder Beta v${VERSION}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+            git push -f origin "v${VERSION}"
           else
-            VERSION=$(node -p "require('./package.json').version")
-            # tag push: the committed config.xml already carries the beta
-            # identity (apply-beta-package ran on the dispatch that made
-            # the tag); nothing to rewrite here
+            git tag -fa "v${VERSION}" -m "XCoder Beta v${VERSION}"
+            git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"

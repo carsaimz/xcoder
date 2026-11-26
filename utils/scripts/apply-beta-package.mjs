@@ -8,11 +8,14 @@
  *   application id : com.carsaimz.xcoder  ->  com.carsaimz.xcoder.beta
  *   app name       : XCoder               ->  XCoder Beta
  *   versionName    : 1.8.45               ->  1.8.45-beta
- *   versionCode    : 10845                ->  1010845  (stable + 1,000,000)
+ *   versionCode    : 10845                ->  2084501  (base * 100 + 1,000,000 + beta number)
  *
  * The +1,000,000 offset keeps the beta series above the stable series
  * (stable grows in the 10xxx range), so Android always treats a newer
  * beta as an upgrade WITHIN the beta app, never touching the stable one.
+ * The beta NUMBER gets its own units digit (base * 100), so beta.1 ->
+ * beta.2 -> beta.3 and 1.8.46-beta all produce strictly increasing
+ * versionCodes — Android refuses same-code upgrades.
  *
  * Usage:
  *   node utils/scripts/apply-beta-package.mjs 1.8.45-beta
@@ -47,7 +50,10 @@ if (!/^\d+\.\d+\.\d+-beta/.test(version)) {
 const baseMatch = version.match(/^(\d+)\.(\d+)\.(\d+)/);
 const baseCode =
 	Number(baseMatch[1]) * 10000 + Number(baseMatch[2]) * 100 + Number(baseMatch[3]);
-const betaCode = baseCode + BETA_OFFSET;
+// "-beta" counts as 1, "-beta.2" as 2, ... (stable promotion never sees this)
+const betaNumberMatch = version.match(/-beta\.?(\d+)?$/);
+const betaNumber = betaNumberMatch ? Number(betaNumberMatch[1] || 1) : 1;
+const betaCode = baseCode * 100 + BETA_OFFSET + betaNumber;
 
 // ---- config.xml: id, name, version, android-versionCode ----
 let xml = fs.readFileSync(CONFIG_XML, "utf8");

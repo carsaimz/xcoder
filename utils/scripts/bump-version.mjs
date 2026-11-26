@@ -111,6 +111,44 @@ export function computeVersionCode(version) {
 }
 
 /**
+ * Smallest strictly-increasing beta successor of `version`:
+ *   1.8.45-beta.3 -> 1.8.45-beta.4
+ *   1.8.45-beta   -> 1.8.45-beta.2
+ *   1.8.45        -> 1.8.46-beta
+ * @param {string} version current version (may carry -beta[.N])
+ * @returns {string}
+ */
+export function nextBetaVersion(version) {
+	const parsed = parseSemver(version);
+	if (!parsed) throw new Error(`Invalid version: ${version}`);
+	if (parsed.prerelease && /^beta(\.\d+)?$/.test(parsed.prerelease)) {
+		const n = parsed.prerelease === "beta" ? 1 : Number(parsed.prerelease.split(".")[1]);
+		return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta.${n + 1}`;
+	}
+	if (parsed.prerelease) {
+		throw new Error(
+			`Unsupported pre-release suffix "-${parsed.prerelease}" (expected -beta or -beta.N)`,
+		);
+	}
+	return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-beta`;
+}
+
+/**
+ * Next stable version: promotes the base (drops any pre-release suffix;
+ * identity for already-stable input — the CLI --latest loop adds patch
+ * bumps when the base is already tagged).
+ *   1.8.45-beta.2 -> 1.8.45
+ *   1.8.45        -> 1.8.45
+ * @param {string} version current version
+ * @returns {string}
+ */
+export function nextStableVersion(version) {
+	const parsed = parseSemver(version);
+	if (!parsed) throw new Error(`Invalid version: ${version}`);
+	return `${parsed.major}.${parsed.minor}.${parsed.patch}`;
+}
+
+/**
  * Builds the debug/pre-release app version, e.g. "1.3.0" + "debug".
  * @param {string} version
  * @param {string} suffix
@@ -206,6 +244,27 @@ function main() {
 		return;
 	}
 
+	// Auto-increment modes: print the next version without writing files.
+	// The caller feeds the output back into the normal bump command.
+	const nextBeta = args.includes("--next-beta");
+	const nextStable = args.includes("--next-stable");
+	if (nextBeta || nextStable) {
+		const latestIndex = args.indexOf("--latest");
+		const latest = latestIndex !== -1 ? normalizeVersion(args[latestIndex + 1]) : null;
+		if (latest !== null && !latest) fail("--latest requires a version (e.g. v1.8.45-beta)");
+		if (latest && !parseSemver(latest)) fail(`Invalid --latest version: "${latest}"`);
+		const current = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8")).version;
+		let candidate = nextBeta ? nextBetaVersion(current) : nextStableVersion(current);
+		while (latest && compareSemver(candidate, latest) <= 0) {
+			const base = parseSemver(candidate);
+			candidate = nextBeta
+				? `${base.major}.${base.minor}.${base.patch + 1}-beta`
+				: `${base.major}.${base.minor}.${base.patch + 1}`;
+		}
+		console.log(`version=${candidate}`);
+		return;
+	}
+
 	const version = args.find((arg, index) => arg && !arg.startsWith("--") && args[index - 1] !== "--greater-than" && args[index - 1] !== "--suffix");
 	const greaterIndex = args.indexOf("--greater-than");
 	const greaterThan = greaterIndex !== -1 ? args[greaterIndex + 1] : null;
@@ -214,7 +273,8 @@ function main() {
 	if (!version) {
 		fail(
 			"Usage: node utils/scripts/bump-version.mjs <version> [--greater-than <version>] [--check-only]\n" +
-				"       node utils/scripts/bump-version.mjs --suffix debug",
+				"       node utils/scripts/bump-version.mjs --suffix debug\n" +
+				"       node utils/scripts/bump-version.mjs --next-beta|--next-stable [--latest <tag>]",
 		);
 	}
 	const normalized = normalizeVersion(version);

@@ -4,6 +4,8 @@ import {
 	applyVersionToPackageJson,
 	compareSemver,
 	computeVersionCode,
+	nextBetaVersion,
+	nextStableVersion,
 	normalizeVersion,
 	parseSemver,
 	suffixVersion,
@@ -166,5 +168,32 @@ describe("applyVersionToConfigXml", () => {
 		expect(() => applyVersionToConfigXml("<root />", "1.4.0")).toThrow(
 			/<widget> tag not found/,
 		);
+	});
+});
+
+describe("nextBetaVersion", () => {
+	it("increments the beta number", () => {
+		expect(nextBetaVersion("1.8.45-beta")).toBe("1.8.45-beta.2");
+		expect(nextBetaVersion("1.8.45-beta.2")).toBe("1.8.45-beta.3");
+	});
+
+	it("starts a beta series from a stable version", () => {
+		expect(nextBetaVersion("1.8.45")).toBe("1.8.46-beta");
+	});
+
+	it("rejects non-beta pre-release suffixes", () => {
+		expect(() => nextBetaVersion("1.8.45-rc.1")).toThrow(/expected -beta/i);
+		expect(() => nextBetaVersion("nope")).toThrow(/Invalid version/);
+	});
+});
+
+describe("nextStableVersion", () => {
+	it("promotes the base by dropping the pre-release suffix", () => {
+		expect(nextStableVersion("1.8.45-beta")).toBe("1.8.45");
+		expect(nextStableVersion("1.8.45-beta.2")).toBe("1.8.45");
+	});
+
+	it("is identity for already-stable input (CLI loop handles bumps)", () => {
+		expect(nextStableVersion("1.8.45")).toBe("1.8.45");
 	});
 });
