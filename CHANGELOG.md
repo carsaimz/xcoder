@@ -7,6 +7,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.43] - 2026-11-26
+
+### Added
+- **Analisador, Inspector e Scraper voltam — agora como PLUGINS do marketplace** (`xcoder.site-analyzer`, `xcoder.inspector`, `xcoder.scraper` no repositório carsaimz/xcoder-plugins): pacotes independentes com ícone na barra lateral + comando na paleta, instaláveis/removíveis pela página de Extensões, que reusam os motores testados do app (webScraper, techDetect, webInspector, downloadManager, clipboard — agora expostos na API de plugins) e cada um traz o seu ícone/readme/zip
+- Entrada direta de **Estudos (Aprender)** no menu principal e o catálogo de estudo de volta como **ícone próprio na barra lateral** (launcher — abre a página fiável de ecrã inteiro no toque)
+
+### Fixed
+- **Opção «Console» da pré-visualização que aparecia ~1 segundo e desaparecia**: com um tamanho de dispositivo guardado como predefinido, o restauro do emulador escondia o item Console logo após o primeiro layout — agora o item Console fica SEMPRE visível (também no modo dispositivo), e a inspecção Eruda continua a funcionar
+
+### Removed
+- As imagens ilustrativas (mockups SVG) do README — o espaço fica pronto para as capturas reais de dispositivo (docs/screenshots/)
+- i18n: 19 chaves novas nas 31 línguas (100%)
+
 ## [1.8.42] - 2026-11-26
 
 ### Removed
@@ -2741,6 +2754,19 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.43] - 2026-11-26
+
+### Added
+- **Site Analyzer, Inspector and Scraper are back — now as MARKETPLACE plugins** (`xcoder.site-analyzer`, `xcoder.inspector`, `xcoder.scraper` in the carsaimz/xcoder-plugins repository): standalone packages with a sidebar icon + palette command, installable/removable from the Extensions page, reusing the app's tested engines (webScraper, techDetect, webInspector, downloadManager, clipboard — now exposed on the plugin API)
+- Direct **Learn** entry in the main menu and the study catalog back as its **own sidebar icon** (launcher — opens the reliable full-screen page on tap)
+
+### Fixed
+- **Preview "Console" option that appeared for ~1 second and vanished**: with a saved device size as default, the emulator restore hid the Console item right after the first layout — the Console item is now ALWAYS visible (device mode included) and Eruda inspection keeps working
+
+### Removed
+- The illustrative SVG mockups from the README — the slot is ready for real device captures (docs/screenshots/)
+- i18n: 19 new keys across 31 languages (100%)
 
 ## [1.8.39] - 2026-11-26
 
