@@ -112,3 +112,12 @@ wc-page.tool-page-shell {
 		}
 	}
 }
+
+.tools-hub-badge {
+	font-size: 10px;
+	padding: 2px 6px;
+	border-radius: 8px;
+	background: var(--button-background-color, #2ea04326);
+	color: var(--accent-color, #4493f8);
+	white-space: nowrap;
+}

@@ -1,3 +1,4 @@
+import { executeCommand, getRegisteredCommands } from "cm/commandRegistry";
 import Page from "components/page";
 import actionStack from "lib/actionStack";
 import "./toolPage.scss";
@@ -10,9 +11,19 @@ import "./toolPage.scss";
  * The Scraper, Inspector and Site Analyzer are BACK as internal tools
  * (v1.8.45: restored from v1.8.41 at the user's request — plugins stay
  * in the marketplace as an optional alternative, not a replacement).
+ * Since v1.8.47 the hub tiles PREFER the marketplace plugin when it is
+ * installed and enabled: plugins update through the marketplace without
+ * a new app release, so their implementation is always the most recent.
  */
 
 const t = (key, fallback) => strings[key] || fallback;
+
+/** Marketplace plugin command per tool — set when the plugin UI wins. */
+const PLUGIN_COMMANDS = {
+	analyzer: "site-analyzer:open",
+	inspector: "inspector:open",
+	scraper: "scraper:open",
+};
 
 /** Tool registry: icon spec, title key, description key, opener. */
 const TOOLS = [
@@ -20,18 +31,21 @@ const TOOLS = [
 		icon: "cod:telescope",
 		nameKey: "analyzer",
 		descKey: "tools hub analyzer desc",
+		pluginCommand: PLUGIN_COMMANDS.analyzer,
 		open: () => import("./analyzer").then((m) => m.openAnalyzerPage()),
 	},
 	{
 		icon: "cod:inspect",
 		nameKey: "inspector",
 		descKey: "tools hub inspector desc",
+		pluginCommand: PLUGIN_COMMANDS.inspector,
 		open: () => import("./inspector").then((m) => m.openInspectorPage()),
 	},
 	{
 		icon: "cod:cloud-download",
 		nameKey: "scraper",
 		descKey: "tools hub scraper desc",
+		pluginCommand: PLUGIN_COMMANDS.scraper,
 		open: () => import("./scrape").then((m) => m.openScraperPage()),
 	},
 	{
@@ -78,29 +92,60 @@ export async function openToolsHub() {
 
 const PAGE_ID = "tools-hub";
 
+/**
+ * The marketplace plugin overrides the internal page only when its
+ * command is actually registered (installed AND enabled at boot).
+ * @param {object} tool entry from TOOLS
+ * @returns {boolean}
+ */
+function pluginActive(tool) {
+	if (!tool.pluginCommand) return false;
+	return getRegisteredCommands().some(
+		(command) => command.name === tool.pluginCommand,
+	);
+}
+
 /** Renders the hub entries into `$list` (also used on langchange). */
 function renderList($list) {
 	$list.replaceChildren(
-		...TOOLS.map((tool) => (
-			<button
-				type="button"
-				className="tools-hub-item"
-				onclick={() => {
-					tool.open().catch((error) => console.error(error));
-				}}
-			>
-				{String(tool.icon).startsWith("cod:") ? (
-					<span className={`icon ${tool.icon.replace("cod:", "codicon-")}`} />
-				) : null}
-				<span className="tools-hub-text">
-					<span className="tools-hub-name">
-						{t(tool.nameKey, tool.nameKey)}
+		...TOOLS.map((tool) => {
+			const usePlugin = pluginActive(tool);
+			return (
+				<button
+					type="button"
+					className="tools-hub-item"
+					onclick={() => {
+						if (usePlugin) {
+							executeCommand(tool.pluginCommand);
+						} else {
+							tool.open().catch((error) => console.error(error));
+						}
+					}}
+				>
+					{String(tool.icon).startsWith("cod:") ? (
+						<span className={`icon ${tool.icon.replace("cod:", "codicon-")}`} />
+					) : null}
+					<span className="tools-hub-text">
+						<span className="tools-hub-name">
+							{t(tool.nameKey, tool.nameKey)}
+						</span>
+						<span className="tools-hub-desc">{t(tool.descKey, "")}</span>
 					</span>
-					<span className="tools-hub-desc">{t(tool.descKey, "")}</span>
-				</span>
-				<span className="icon codicon-chevron-right chevron" />
-			</button>
-		)),
+					{usePlugin ? (
+						<span
+							className="tools-hub-badge"
+							title={t(
+								"tools hub via plugin",
+								"via plugin — sempre atualizado",
+							)}
+						>
+							plugin
+						</span>
+					) : null}
+					<span className="icon codicon-chevron-right chevron" />
+				</button>
+			);
+		}),
 	);
 }
 

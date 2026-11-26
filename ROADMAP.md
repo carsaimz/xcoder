@@ -16,7 +16,7 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Resumo v1.8.24 → v1.8.45
+## ✅ Resumo v1.8.24 → v1.8.47
 
 - **v1.8.45 — ferramentas internas de volta + canal beta:** Inspector
   corrigido (`node.getBoundingClientRect` na raiz da árvore —
@@ -29,8 +29,7 @@
   de imagens; avatar do bot no chat corrigido; **canal de pre-releases
   beta** (pacote `xcoder.beta` lado a lado com o estável, versão
   `-beta`) — atualizações do dia a dia chegam primeiro como beta.
-- **v1.8.43 — skills importadas + 10 plugins novos:** (resumo anterior)
-
+- **v1.8.46/47 — releases manuais + hub plugin-first + zen mode:** releases só via Actions manual (versão escrita à mão, tag nunca reutilizada, build estável recusa `-beta`); canal beta `xcoder.beta` com versionCode `beta.N` que cresce de verdade; o hub «Ferramentas» abre o PLUGIN do marketplace quando instalado (badge «plugin» — o canal que recebe correções sem APK novo), mantendo a ferramenta interna como alternativa; **modo zen** (porte do Zen Mode do VS Code) na paleta de comandos; notas de release passaram a listar todos os commits.
 - **v1.8.43 — skills importadas + 10 plugins novos:** o agente aceita
   skills importadas de ficheiro, URL/GitHub (conversão blob→raw
   automática) ou coladas (guardadas em `<DATA_STORAGE>/skills`,
@@ -48,8 +47,48 @@
   Ferramentas), Estudos (catálogo de aprendizagem), REPL de JS,
   bibliotecas locais, análise de sites.
 
+## 🧩 Porte VS Code — feito e planeado (v1.8.47)
+
+Estado do porte das ferramentas do VS Code para o XCoder — atualizado a
+cada sessão, com o que já está no APK e o que vem a seguir.
+
+**Já portado e no APK:**
+
+- **Paleta de comandos** (menu ⋮ / botão no cabeçalho) — todos os comandos
+  do app e do editor com pesquisa difusa e «usados recentemente».
+- **Quick Open (ir para ficheiro)**, **minimapa**, **breadcrumbs**,
+  **painel de símbolos (outline)**, **painel de problemas** e
+  **referências/definições** via LSP.
+- **Pesquisa em ficheiros + substituição em lote**, barra de estado estilo
+  VS Code (linha/coluna, indentação, codificação, modo), temas Dark+/Light+
+  e `vscodeDark`/`vscodeLight`, **ícones vscode-icons por defeito**.
+- **Git integrado** (Source Control real com isomorphic-git), **terminal
+  integrado**, multi-cursor e seleção múltipla do CodeMirror, dobragem por
+  indentação, guias de indentação, rainbow brackets, markdown GFM, timeline
+  do ficheiro, formatação Prettier, **modo zen (novo na v1.8.47)**.
+
+**A portar a seguir (ordem de valor):**
+
+1. **Diff editor visual** (`@codemirror/merge`) — diferenças lado a lado/
+   inline antes do commit e comparação entre abas.
+2. **Sticky scroll** — a assinatura da função fixa no topo ao rolar.
+3. **Editor de atalhos** — ver/editar keybindings na UI (o motor já existe).
+4. **Emmet completo** + **snippets no formato VS Code** (importar
+   `.vscode/snippets`).
+5. **Task runner / npm scripts UI** — scripts do `package.json` com painel
+   de saída.
+6. **Multi-root workspaces** — mais de uma pasta aberta.
+7. **Timeline com diff** — comparar versões guardadas do ficheiro.
+
+**Limitações mobile (marcação clara):** atalhos compostos (Ctrl+K Z),
+seleção de coluna por alt+drag, extensões de desktop e depuração remota
+ficam no build Electron/desktop; na app aparecem desativados com a nota
+«apenas desktop», e o site documenta a diferença na secção
+«Desktop vs mobile».
+
 ## 🎯 Próximo — v1.8.44+
 
+- **Porte VS Code:** estado e plano na secção 🧩 acima — diff editor, sticky scroll e editor de atalhos são os próximos.
 - **Paridade com o PC (objetivo estratégico):** o APK pode passar de
   100 MB — o alvo é um editor completo para quem não tem PC. Portar
   do VS Code: formatter (Prettier/JS beautify), ESLint + Prettier on
@@ -842,8 +881,10 @@ referência.
 > with upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (their CHANGELOG fully read up to v1.13.5).
 
-## ✅ Summary v1.8.24 → v1.8.43
+## ✅ Summary v1.8.24 → v1.8.47
 
+- **v1.8.45 — internal tools back + beta channel:** Inspector fixed (`node.getBoundingClientRect` at the tree root); analyzer, inspector and scraper restored as INTERNAL tools (plugins remain optional); «Ferramentas» hub in the sidebar with Dev Tools inside; scraper image selection and download; bot avatar fix; **beta pre-release channel** (`xcoder.beta` package side by side with stable, `-beta` versions).
+- **v1.8.46/47 — manual releases + plugin-first hub + zen mode:** releases only via manual Actions dispatch (hand-written version, tag never reused, stable build rejects `-beta`); beta channel versionCode `beta.N` grows for real; the Tools hub opens the marketplace PLUGIN when installed («plugin» badge — the channel that gets fixes without a new APK), keeping the internal tool as fallback; **zen mode** (VS Code Zen Mode port) in the command palette; release notes list all commits.
 - **v1.8.43 — imported skills + 10 new plugins:** the agent accepts
   skills imported from a file, URL/GitHub (blob→raw conversion
   included) or pasted text (stored in `<DATA_STORAGE>/skills`, with
@@ -860,8 +901,47 @@ referência.
 - **v1.8.40/41:** tools moved to standalone pages (Tools hub),
   Estudos (learning catalog), JS REPL, local libs, website analysis.
 
+## 🧩 VS Code port — done and planned (v1.8.47)
+
+State of the VS Code tooling port into XCoder — refreshed every session,
+with what already ships in the APK and what comes next.
+
+**Already ported and in the APK:**
+
+- **Command palette** (⋮ menu / header button) — every app and editor
+  command with fuzzy search and recently-used list.
+- **Quick Open (go to file)**, **minimap**, **breadcrumbs**, **symbols
+  panel (outline)**, **problems panel** and **references/definitions**
+  through LSP.
+- **Search in files + batch replace**, VS Code-style status bar
+  (line/col, indentation, encoding, mode), Dark+/Light+ themes and
+  `vscodeDark`/`vscodeLight`, **vscode-icons by default**.
+- **Git integration** (real Source Control with isomorphic-git),
+  **integrated terminal**, CodeMirror multi-cursor and multi-selection,
+  indentation folding, indent guides, rainbow brackets, GFM markdown,
+  file timeline, Prettier formatting, **zen mode (new in v1.8.47)**.
+
+**Next in the port (by value):**
+
+1. **Visual diff editor** (`@codemirror/merge`) — side-by-side/inline
+   diffs before committing and tab-to-tab comparison.
+2. **Sticky scroll** — function signature pinned while scrolling.
+3. **Keybindings editor** — view/edit shortcuts in the UI (engine ready).
+4. **Full Emmet** + **VS Code-format snippets** (import `.vscode/snippets`).
+5. **Task runner / npm scripts UI** — run `package.json` scripts with an
+   output panel.
+6. **Multi-root workspaces** — more than one open folder.
+7. **Timeline with diff** — compare saved file versions.
+
+**Mobile limitations (clearly marked):** keyboard chords (Ctrl+K Z),
+alt+drag column selection, desktop extensions and remote debugging stay on
+the Electron/desktop build; in the app they show as disabled with a
+«desktop only» note, and the site documents the difference in its
+«Desktop vs mobile» section.
+
 ## 🎯 Next — v1.8.44+
 
+- **VS Code port:** see the 🧩 section above — diff editor, sticky scroll and a keybindings editor come first.
 - **PC parity (strategic goal):** the APK may exceed 100 MB — the
   target is a full editor for people without a PC. Port from VS Code:
   formatter (Prettier/JS beautify), ESLint + Prettier on save, full
