@@ -920,6 +920,256 @@
 			"downloads": 52,
 			"supported_editor": "all",
 			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.jwt-decoder",
+			"name": "JWT Decoder",
+			"version": "1.0.0",
+			"description": "Decode JWT tokens: header, payload, expiry status and copyable claims.\n\n**JWT Decoder** runs on the selection (or the whole document) — it detects a `Bearer`-prefixed token, decodes the base64url segments, shows header + payload as JSON and computes whether the token is still valid from its `exp` claim.\n\n## Usage\nRun **JWT decoder** (`Ctrl-Alt-1`) on a token, then choose *Show decoded token* or *Copy claims as JSON*.\n\n## Português\n**Decodificador de JWT**: decodifica tokens na seleção — header, payload, algoritmo e validade (verifica `exp`). Permite copiar os claims como JSON. Atalho `Ctrl-Alt-1`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/jwt-decoder/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/jwt-decoder/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/jwt-decoder/icon.png",
+			"keywords": [
+				"jwt",
+				"token",
+				"decode",
+				"auth",
+				"claims"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.timestamp",
+			"name": "Timestamp Tools",
+			"version": "1.0.0",
+			"description": "Convert epoch ⇄ ISO ⇄ human dates and insert the current timestamp.\n\n**Timestamp Tools** offers two commands: *Insert timestamp* (epoch seconds, epoch ms, ISO 8601 or localized date at the cursor) and *Convert* (accepts `1737936000`, `1737936000000` or any ISO string and shows ISO, local, relative time and both epochs).\n\n## Português\n**Ferramentas de timestamp**: insere o instante atual (epoch s/ms, ISO, local) e converte entre epoch, ISO e datas humanas com tempo relativo.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/timestamp/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/timestamp/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/timestamp/icon.png",
+			"keywords": [
+				"timestamp",
+				"epoch",
+				"iso",
+				"date",
+				"time"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.base-converter",
+			"name": "Base Converter",
+			"version": "1.0.0",
+			"description": "Convert integers between decimal, hex, binary, octal and base36.\n\n**Base Converter** accepts `42`, `0x2A`, `0b101010` and `0o52` inputs (prompt or selection) and shows all representations at once, including negative values.\n\n## Português\n**Conversor de bases**: converte inteiros entre decimal, hex, binário, octal e base36 — aceita entrada nos formatos `42`, `0x2A`, `0b101010`, `0o52`. Atalho `Ctrl-Alt-2`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/base-converter/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base-converter/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/base-converter/icon.png",
+			"keywords": [
+				"base",
+				"hex",
+				"binary",
+				"octal",
+				"number"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.password-generator",
+			"name": "Password Generator",
+			"version": "1.0.0",
+			"description": "Generate cryptographically random passwords directly into the editor.\n\n**Password Generator** uses the Web Crypto API (`crypto.getRandomValues`) — no pseudo-random Math.random. Choose length and character sets (lowercase, uppercase, digits, symbols); the generator guarantees at least one character of every selected set and inserts the result at the cursor. A quick command copies a 20-char password straight to the clipboard.\n\n## Português\n**Gerador de passwords**: passwords aleatórias criptográficas (Web Crypto) — comprimento e conjuntos configuráveis, garantindo um carácter de cada conjunto. Inserção no cursor ou cópia rápida de 20 caracteres. Atalho `Ctrl-Alt-3`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/password-generator/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/password-generator/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/password-generator/icon.png",
+			"keywords": [
+				"password",
+				"generator",
+				"crypto",
+				"random",
+				"security"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.csv-json",
+			"name": "CSV ⇄ JSON",
+			"version": "1.0.0",
+			"description": "Convert CSV to JSON and back, with proper RFC4180 quoting.\n\n**CSV ⇄ JSON** parses quoted fields, escaped quotes, commas inside quotes and `;` delimited files. JSON arrays of objects are serialized back to CSV with automatic column union and escaping. Works on the selection, the document or pasted input (result to the clipboard).\n\n## Português\n**CSV ⇄ JSON**: converte tabelas CSV em JSON e vice-versa — aspas, vírgulas dentro de aspas e ficheiros `;` suportados; JSON volta para CSV com colunas unidas automaticamente.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/csv-json/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/csv-json/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/csv-json/icon.png",
+			"keywords": [
+				"csv",
+				"json",
+				"convert",
+				"table",
+				"spreadsheet"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.diff-tool",
+			"name": "Diff Tool",
+			"version": "1.0.0",
+			"description": "Compare two texts or the selection against the clipboard with a real LCS line diff.\n\n**Diff Tool** computes a line-by-line longest-common-subsequence diff entirely offline. Paste both texts (or start from the current selection), see `+ / −` lines, view with context, or copy a patch-style diff. The second command diffs the editor against the clipboard — perfect to check what changed between two versions of a file.\n\n## Português\n**Diff Tool**: diff linha a linha (LCS) entre dois textos ou entre a seleção e a área de transferência — mostra `+ / −`, contexto completo e cópia em estilo patch. Atalho `Ctrl-Alt-9`.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/diff-tool/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/diff-tool/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/diff-tool/icon.png",
+			"keywords": [
+				"diff",
+				"compare",
+				"lcs",
+				"changes",
+				"merge"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.http-status",
+			"name": "HTTP Status",
+			"version": "1.0.0",
+			"description": "Browse, lookup and insert HTTP status codes.\n\n**HTTP Status** lists the common 1xx–5xx codes with their official names, looks up the code under the cursor/selection and inserts a chosen code at the cursor — handy when writing handlers, docs or tests.\n\n## Português\n**HTTP Status**: consulta os códigos 1xx–5xx com os nomes oficiais, procura o código sob o cursor e insere no editor.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/http-status/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/http-status/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/http-status/icon.png",
+			"keywords": [
+				"http",
+				"status",
+				"codes",
+				"rest",
+				"api"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.color-contrast",
+			"name": "Color Contrast",
+			"version": "1.0.0",
+			"description": "WCAG 2.1 contrast checker with accessible suggestions.\n\n**Color Contrast** computes the contrast ratio between a foreground and a background color (hex or rgb) and reports AA/AAA pass/fail for normal text, large text and UI components — plus instant suggestions (black/white text on your background, your color on black/white).\n\n## Português\n**Contraste de cores**: rácio WCAG entre texto e fundo (hex/rgb) com veredicto AA/AAA para texto normal, grande e componentes UI, e sugestões imediatas de combinações acessíveis.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/color-contrast/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-contrast/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/color-contrast/icon.png",
+			"keywords": [
+				"color",
+				"contrast",
+				"wcag",
+				"accessibility",
+				"a11y"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.query-string",
+			"name": "Query String Tools",
+			"version": "1.0.0",
+			"description": "Parse and build URL query strings as JSON.\n\n**Query String Tools** converts `?a=1&b=2` into pretty JSON and back, decoding `+` and percent-escapes. Works on the selection or the whole document; a show-only mode parses without touching the editor.\n\n## Português\n**Query string ⇄ JSON**: converte parâmetros de URL em JSON (e volta), decodificando `+` e escapes percentuais.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/query-string/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/query-string/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/query-string/icon.png",
+			"keywords": [
+				"query",
+				"url",
+				"params",
+				"json",
+				"encode"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
+		},
+		{
+			"id": "xcoder.unit-converter",
+			"name": "Unit Converter",
+			"version": "1.0.0",
+			"description": "Convert length, mass, data size, speed and temperature units.\n\n**Unit Converter** covers mm→mi, mg→lb, B→TB, m/s→knot and °C⇄°F⇄K, with a clean insert-result dialog. Numbers are formatted sensibly (rounding at 6 decimals, exponentials for extremes).\n\n## Português\n**Conversor de unidades**: comprimento, massa, tamanho de dados, velocidade e temperatura — do mm ao mi, do B ao TB, °C⇄°F⇄K, com inserção do resultado no editor.",
+			"changelogs": "### 1.0.0\n- Initial release on the Xcoder Marketplace.",
+			"author": {
+				"name": "Xcoder Team",
+				"github": "carsaimz"
+			},
+			"author_verified": true,
+			"source": "https://raw.githubusercontent.com/carsaimz/xcoder-plugins/main/plugins/unit-converter/plugin.zip",
+			"source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/unit-converter/plugin.zip",
+			"icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/unit-converter/icon.png",
+			"keywords": [
+				"units",
+				"convert",
+				"temperature",
+				"length",
+				"data"
+			],
+			"downloads": 0,
+			"supported_editor": "all",
+			"repository": "https://github.com/carsaimz/xcoder-plugins"
 		}
 	]
 }
