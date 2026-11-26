@@ -1984,5 +1984,10 @@
 	"consent danger read": "読む",
 	"consent danger exec": "実行する",
 	"consent danger write": "書く",
-	"consent danger destructive": "破壊的な"
+	"consent danger destructive": "破壊的な",
+	"ai todo title": "タスク",
+	"ai ask picked": "選択済み",
+	"ai ask dismissed": "答えはありません",
+	"ai status ask": "ユーザーに聞いてみると…",
+	"ai status todo": "タスクリストを更新しています..."
 }

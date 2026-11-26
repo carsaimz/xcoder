@@ -1984,5 +1984,10 @@
 	"consent danger read": "ਪੜ੍ਹੋ",
 	"consent danger exec": "exec",
 	"consent danger write": "ਲਿਖੋ",
-	"consent danger destructive": "ਵਿਨਾਸ਼ਕਾਰੀ"
+	"consent danger destructive": "ਵਿਨਾਸ਼ਕਾਰੀ",
+	"ai todo title": "ਕਾਰਜ",
+	"ai ask picked": "ਚੁਣਿਆ ਗਿਆ",
+	"ai ask dismissed": "ਕੋਈ ਜਵਾਬ ਨਹੀਂ",
+	"ai status ask": "ਉਪਭੋਗਤਾ ਨੂੰ ਪੁੱਛਣਾ ...",
+	"ai status todo": "ਕਾਰਜ ਸੂਚੀ ਅੱਪਡੇਟ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
 }

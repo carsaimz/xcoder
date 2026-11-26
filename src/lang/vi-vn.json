@@ -1984,5 +1984,10 @@
 	"consent danger read": "đọc",
 	"consent danger exec": "người điều hành",
 	"consent danger write": "viết",
-	"consent danger destructive": "phá hoại"
+	"consent danger destructive": "phá hoại",
+	"ai todo title": "Nhiệm vụ",
+	"ai ask picked": "Đã chọn",
+	"ai ask dismissed": "Không có câu trả lời",
+	"ai status ask": "Hỏi người dùng...",
+	"ai status todo": "Đang cập nhật danh sách nhiệm vụ..."
 }

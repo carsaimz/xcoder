@@ -1984,5 +1984,10 @@
 	"consent danger read": "Czytać",
 	"consent danger exec": "wykonawczy",
 	"consent danger write": "pisać",
-	"consent danger destructive": "destrukcyjny"
+	"consent danger destructive": "destrukcyjny",
+	"ai todo title": "Zadania",
+	"ai ask picked": "Wybrany",
+	"ai ask dismissed": "Brak odpowiedzi",
+	"ai status ask": "Pytanie użytkownika...",
+	"ai status todo": "Aktualizowanie listy zadań..."
 }

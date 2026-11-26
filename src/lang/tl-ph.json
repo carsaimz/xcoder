@@ -1984,5 +1984,10 @@
 	"consent danger read": "basahin",
 	"consent danger exec": "exec",
 	"consent danger write": "sumulat",
-	"consent danger destructive": "mapanira"
+	"consent danger destructive": "mapanira",
+	"ai todo title": "Mga gawain",
+	"ai ask picked": "Napili",
+	"ai ask dismissed": "Walang sagot",
+	"ai status ask": "Tinatanong ang gumagamit...",
+	"ai status todo": "Ina-update ang listahan ng gawain..."
 }

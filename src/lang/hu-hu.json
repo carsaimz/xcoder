@@ -1984,5 +1984,10 @@
 	"consent danger read": "olvas",
 	"consent danger exec": "végrehajtó",
 	"consent danger write": "írj",
-	"consent danger destructive": "pusztító"
+	"consent danger destructive": "pusztító",
+	"ai todo title": "Feladatok",
+	"ai ask picked": "Kiválasztott",
+	"ai ask dismissed": "Nincs válasz",
+	"ai status ask": "A felhasználó megkérdezése...",
+	"ai status todo": "Feladatlista frissítése..."
 }

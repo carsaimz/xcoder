@@ -1984,5 +1984,10 @@
 	"consent danger read": "خواندن",
 	"consent danger exec": "اجرایی",
 	"consent danger write": "نوشتن",
-	"consent danger destructive": "مخرب"
+	"consent danger destructive": "مخرب",
+	"ai todo title": "وظایف",
+	"ai ask picked": "انتخاب شده است",
+	"ai ask dismissed": "بدون پاسخ",
+	"ai status ask": "سوال از کاربر...",
+	"ai status todo": "در حال به روز رسانی لیست وظایف..."
 }

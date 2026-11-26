@@ -1967,5 +1967,10 @@
 	"consent danger read": "read",
 	"consent danger exec": "exec",
 	"consent danger write": "write",
-	"consent danger destructive": "destructive"
+	"consent danger destructive": "destructive",
+	"ai todo title": "Tasks",
+	"ai ask picked": "Selected",
+	"ai ask dismissed": "No answer",
+	"ai status ask": "Asking the user...",
+	"ai status todo": "Updating task list..."
 }

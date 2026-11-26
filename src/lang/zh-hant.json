@@ -1984,5 +1984,10 @@
 	"consent danger read": "讀",
 	"consent danger exec": "執行",
 	"consent danger write": "寫",
-	"consent danger destructive": "破壞性的"
+	"consent danger destructive": "破壞性的",
+	"ai todo title": "任務",
+	"ai ask picked": "已選擇",
+	"ai ask dismissed": "無人接聽",
+	"ai status ask": "詢問用戶...",
+	"ai status todo": "正在更新任務清單..."
 }

@@ -1971,6 +1971,11 @@ declare type LangStrings = {
   "consent danger exec": string;
   "consent danger write": string;
   "consent danger destructive": string;
+  "ai todo title": string;
+  "ai ask picked": string;
+  "ai ask dismissed": string;
+  "ai status ask": string;
+  "ai status todo": string;
 };
 
 declare var strings: LangStrings;

@@ -1984,5 +1984,10 @@
 	"consent danger read": "membaca",
 	"consent danger exec": "eksekutif",
 	"consent danger write": "menulis",
-	"consent danger destructive": "destruktif"
+	"consent danger destructive": "destruktif",
+	"ai todo title": "Tugas",
+	"ai ask picked": "Terpilih",
+	"ai ask dismissed": "Tidak ada jawaban",
+	"ai status ask": "Menanyakan pengguna...",
+	"ai status todo": "Memperbarui daftar tugas..."
 }

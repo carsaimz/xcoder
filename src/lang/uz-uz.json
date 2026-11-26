@@ -1984,5 +1984,10 @@
 	"consent danger read": "o'qing",
 	"consent danger exec": "exec",
 	"consent danger write": "yozish",
-	"consent danger destructive": "halokatli"
+	"consent danger destructive": "halokatli",
+	"ai todo title": "Vazifalar",
+	"ai ask picked": "Tanlangan",
+	"ai ask dismissed": "Javob yo'q",
+	"ai status ask": "Foydalanuvchidan so'ralmoqda...",
+	"ai status todo": "Vazifalar roʻyxati yangilanmoqda..."
 }

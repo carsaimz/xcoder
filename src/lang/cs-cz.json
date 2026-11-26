@@ -1984,5 +1984,10 @@
 	"consent danger read": "číst",
 	"consent danger exec": "exec",
 	"consent danger write": "napsat",
-	"consent danger destructive": "destruktivní"
+	"consent danger destructive": "destruktivní",
+	"ai todo title": "Úkoly",
+	"ai ask picked": "Vybraný",
+	"ai ask dismissed": "Žádná odpověď",
+	"ai status ask": "Dotaz uživatele...",
+	"ai status todo": "Aktualizace seznamu úkolů..."
 }

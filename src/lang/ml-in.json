@@ -1984,5 +1984,10 @@
 	"consent danger read": "വായിച്ചു",
 	"consent danger exec": "എക്സി",
 	"consent danger write": "എഴുതുക",
-	"consent danger destructive": "വിനാശകരമായ"
+	"consent danger destructive": "വിനാശകരമായ",
+	"ai todo title": "ചുമതലകൾ",
+	"ai ask picked": "തിരഞ്ഞെടുത്തു",
+	"ai ask dismissed": "ഉത്തരമില്ല",
+	"ai status ask": "ഉപയോക്താവിനോട് ചോദിക്കുന്നു...",
+	"ai status todo": "ടാസ്‌ക് ലിസ്റ്റ് അപ്‌ഡേറ്റ് ചെയ്യുന്നു..."
 }

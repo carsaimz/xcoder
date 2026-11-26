@@ -1984,5 +1984,10 @@
 	"consent danger read": "Okumak",
 	"consent danger exec": "yönetici",
 	"consent danger write": "yazmak",
-	"consent danger destructive": "yıkıcı"
+	"consent danger destructive": "yıkıcı",
+	"ai todo title": "Görevler",
+	"ai ask picked": "Seçildi",
+	"ai ask dismissed": "Cevap yok",
+	"ai status ask": "Kullanıcıya soruyorum...",
+	"ai status todo": "Görev listesi güncelleniyor..."
 }

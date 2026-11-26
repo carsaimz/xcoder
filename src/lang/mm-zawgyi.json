@@ -1984,5 +1984,10 @@
 	"consent danger read": "ဖတ်ပါ။",
 	"consent danger exec": "exec",
 	"consent danger write": "ရေးပါ။",
-	"consent danger destructive": "ပျက်စီးစေသော"
+	"consent danger destructive": "ပျက်စီးစေသော",
+	"ai todo title": "အလုပ်များ",
+	"ai ask picked": "ရွေးချယ်ခဲ့သည်။",
+	"ai ask dismissed": "အဖြေမရှိပါ။",
+	"ai status ask": "အသုံးပြုသူကိုမေးနေသည်...",
+	"ai status todo": "လုပ်ဆောင်စရာစာရင်းကို အပ်ဒိတ်လုပ်နေသည်..."
 }
