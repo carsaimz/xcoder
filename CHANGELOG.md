@@ -9,10 +9,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [1.8.44] - 2026-11-26
 
-- Agente aceita skills importadas: ficheiro, URL/GitHub ou coladas (geridas em Definições → IA → Skills)
-- 10 novos plugins no marketplace: JWT Decoder, Timestamp, Base Converter, Password Generator, CSV⇄JSON, Diff Tool, HTTP Status, Color Contrast, Query String e Unit Converter (46 no total)
-- Fallbacks de `color-mix()` para WebViews antigos (port do upstream Acode #3025)
-- Roadmap atualizado com os próximos passos (paridade com o PC, canvas renderer, marketplace de skills)
+### Maintenance
+- V1.8.44
+
 ## [1.8.43] - 2026-11-26
 
 ### Added
