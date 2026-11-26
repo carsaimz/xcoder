@@ -158,6 +158,8 @@ seletor = "seletor"
 ser = "ser"
 tema = "tema"
 unparseable = "unparseable"
+# "transforme em plugins" — citação do utilizador em pt-br (v1.8.45, tests)
+"transforme" = "transforme"
 # transformers.js API name (real, cannot rename)
 Interruptable = "Interruptable"
 # mais palavras pt-br legítimas (bots.js, models page, testes)
