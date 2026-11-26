@@ -10,13 +10,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 ## [1.8.41] - 2026-11-26
 
 ### Added
-- Widgets de consentimento no chat: o pedido de permissão do agente virou um cartão dentro da conversa (Negar / Permitir / Permitir sempre) com selo de risco e resumo dos argumentos — o diálogo de sistema segue como fallback
-- «Permitir sempre» por conversa: a ferramenta aprovada não pergunta de novo até o fim da conversa
-- Cartões de URL nas respostas da IA: cada site mencionado ganha ações «Abrir» (navegador) e «Abrir no Scraper»
-- Catálogo Aprender com 18 sites novos em português (61 no total): Curso em Vídeo, freeCodeCamp pt, MDN pt-BR, W3Schools pt, Stack Overflow pt, Khan Academy pt, Escola Virtual, Rocketseat, TabNews, Origamid, DIO, JavaScript.info pt, React pt, Python pt-br, Python Brasil, Pro Git pt-br, Learn Git Branching pt, Microsoft Learn pt
-- Memória dos sites visitados: contagem de visitas, selo «Visitado» nos cartões, secção «Recentes» e «Limpar» persistidas no aparelho
-- Botão «Abrir no Scraper» em cada site do catálogo e no leitor
-- i18n: 16 chaves novas nas 31 línguas (100%, 0 ausentes/0 vazias)
+- Widgets de consentimento e cartões de URL no chat
+- 18 sites pt no catálogo + memória dos visitados
+
+### Maintenance
+- V1.8.41
+- Tawk.to é um produto real (assinatura do Analisador), «individuais» é português legítimo (toolPage.js) e src/res/learn-sites.json tem descrições pt-br legítimas («Cursos») — exclusões/excetos no _typos.toml
 
 ## [1.8.40] - 2026-11-26
 
