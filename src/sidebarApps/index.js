@@ -180,6 +180,9 @@ async function loadApps() {
 		// independent full-screen pages (pages/tools, v1.8.40) reachable
 		// from the main menu «Ferramentas» and from the preview screen
 		["devtools", () => import("./devtools")],
+		// study catalog back as its own icon (v1.8.43) — a launcher
+		// that opens the full-screen Learn page on tap
+		["learn", () => import("./learn")],
 		["notification", () => import("./notification")],
 		["profileApp", () => import("./profile")],
 		["settingsApp", () => import("./settings")],

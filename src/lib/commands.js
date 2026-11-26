@@ -388,6 +388,12 @@ export default {
 				).default();
 				break;
 
+			case "learn":
+				(
+					await import(/* webpackChunkName: "learnPage" */ "pages/tools/learn")
+				).openLearnPage();
+				break;
+
 			case "file_browser":
 				(await loadFileBrowser())();
 				break;
