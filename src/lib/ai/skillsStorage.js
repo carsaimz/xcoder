@@ -79,6 +79,8 @@ export async function deleteImportedSkill(name) {
 	await fsOperation(target).delete();
 }
 
+export { githubToRaw };
+
 export default {
 	importedSkillsDir,
 	getSkillsIo,

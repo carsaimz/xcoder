@@ -125,7 +125,7 @@
                 &.active {
                         border-color: var(--seg-tone, var(--active-color));
                         box-shadow: inset 0 0 0 2px var(--seg-tone, var(--active-color));
-                        background: var(--seg-tone, var(--active-color);
+                        background: var(--seg-tone, var(--active-color));
                         background: color-mix(in srgb, var(--seg-tone, var(--active-color)) 16%, transparent);
                         color: var(--popup-text-color);
                         color: color-mix(in srgb, var(--popup-text-color), var(--seg-tone, var(--active-color)) 45%);
