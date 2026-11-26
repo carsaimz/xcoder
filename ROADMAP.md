@@ -16,7 +16,20 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Resumo v1.8.24 → v1.8.43
+## ✅ Resumo v1.8.24 → v1.8.45
+
+- **v1.8.45 — ferramentas internas de volta + canal beta:** Inspector
+  corrigido (`node.getBoundingClientRect` na raiz da árvore —
+  Elementos/Consola/Procura funcionam de novo); Analisador, Inspector
+  e Scraper restaurados como FERRAMENTAS INTERNAS (páginas próprias)
+  com os plugins do marketplace como alternativa opcional; ícone
+  «Ferramentas» na barra lateral (hub completo) e Dev Tools movidos
+  para dentro do hub; menu da pré-visualização voltou a ter
+  Inspecionar/Scrape/Analyze; Scraper com seleção e descarregamento
+  de imagens; avatar do bot no chat corrigido; **canal de pre-releases
+  beta** (pacote `xcoder.beta` lado a lado com o estável, versão
+  `-beta`) — atualizações do dia a dia chegam primeiro como beta.
+- **v1.8.43 — skills importadas + 10 plugins novos:** (resumo anterior)
 
 - **v1.8.43 — skills importadas + 10 plugins novos:** o agente aceita
   skills importadas de ficheiro, URL/GitHub (conversão blob→raw
