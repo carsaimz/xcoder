@@ -83,6 +83,14 @@ export class Agent {
 		 * @type {((request: {name: string, args: object, danger: string}) => Promise<{approved: boolean, always?: boolean}>|{approved: boolean, always?: boolean})|undefined}
 		 */
 		this.consentHandler = opts.consentHandler;
+		/**
+		 * Chat UI handler for interactive tools (Acode AI Agent port):
+		 * askUserQuestion renders the options widget in the conversation.
+		 * @type {{askUserQuestion?: (request: {question: string, options: string[]}) => Promise<string|null>}|undefined}
+		 */
+		this.uiHandler = opts.uiHandler;
+		/** current task checklist (todo_write tool), shown in the chat */
+		this.todos = [];
 		/** tools the user approved with «permitir sempre» in this conversation */
 		this.allowedAlways = new Set();
 		/** cumulative token usage for the chat UI (usage chip) */
@@ -108,6 +116,17 @@ export class Agent {
 		}
 		const root = vshell.getRoot();
 		const context = await workspaceContext();
+		// Acode AI Agent / Pi convention: AGENTS.md > .agents.md > CLAUDE.md
+		let instructionsSection = "";
+		try {
+			const { readProjectInstructions, formatProjectInstructions } =
+				await import("./projectInstructions");
+			instructionsSection = formatProjectInstructions(
+				await readProjectInstructions(root),
+			);
+		} catch {
+			/* instructions are best-effort */
+		}
 		const skills = await listSkills();
 		const skillsSection = buildSkillsSection(
 			skills,
@@ -125,6 +144,9 @@ export class Agent {
 			"- run_command executes the sandboxed virtual shell and waits for the result. If a tool/dependency is missing, INSTALL it (pip install / npm install / apt-get via run_command or terminal 'apk add'), then retry.",
 			"- SUBAGENTS: use spawn_subagent for one research task; use spawn_subagents to run 2-5 INDEPENDENT subtasks in PARALLEL, optionally on different providers/models (pass provider/model per subtask) — merge their reports in your answer.",
 			"- Editor tools let you see and edit the file the user has open right now: editor_context, read_active_file (live buffer incl. unsaved edits), list_open_files and apply_to_editor (insert / replace_selection / replace_all, stays unsaved for review).",
+			"- active_file_errors returns the LSP/linter diagnostics of the file open in the editor — call it FIRST whenever the user mentions errors, red squiggles or 'it does not work', and fix exactly what it reports.",
+			"- TODO LIST: for multi-step work call todo_write when you start and whenever a step finishes — the checklist is shown live in the chat.",
+			"- ask_user_question renders option buttons in the chat when the task is ambiguous or an action needs confirmation — prefer it over guessing.",
 			'- When the user asks about "the file", "this code", explain or fix without naming a path, READ the active file first with read_active_file (or read_file with the path) — do not assume you already have its content.',
 			"- Paths are relative to the workspace root ('.').",
 			"- Before editing, always read the target region with read_file and use edit_file with an exact unique old_text.",
@@ -136,6 +158,15 @@ export class Agent {
 			skillsSection,
 			"- If a task is ambiguous, ask the user.",
 		];
+		if (instructionsSection) {
+			parts.push("", instructionsSection);
+		}
+		if (this.todos?.length) {
+			const list = this.todos
+				.map((todo) => `- [${todo.status}] ${todo.content}`)
+				.join("\n");
+			parts.push("", `CURRENT TASK LIST:\n${list}`);
+		}
 		const ghContext = ghToolsContext();
 		if (ghContext) {
 			parts.push("", ghContext);
@@ -879,7 +910,15 @@ function toolStatus(name, args) {
 		case "read_active_file":
 		case "editor_context":
 		case "list_open_files":
+		case "active_file_errors":
 			return { action: "reading", detail };
+		case "ask_user_question":
+			return {
+				action: "ask",
+				detail: String(args?.question || "").slice(0, 60),
+			};
+		case "todo_write":
+			return { action: "todo", detail: "" };
 		case "search_files":
 			return { action: "searching", detail };
 		case "create_file":

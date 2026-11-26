@@ -616,6 +616,113 @@ export const TOOLS = [
 			return skill.body;
 		},
 	},
+	{
+		name: "active_file_errors",
+		description:
+			"Read the diagnostics (LSP + syntax linter errors and warnings) of the file currently open in the editor. Use it when the user mentions errors, red squiggles, 'does not work' or problems in the open file — ALWAYS before proposing a fix.",
+		danger: "read",
+		parameters: { type: "object", properties: {} },
+		async run() {
+			const { readActiveFileErrors } = await import("./editorBridge");
+			return readActiveFileErrors(window.editorManager);
+		},
+	},
+	{
+		name: "ask_user_question",
+		description:
+			"Ask the user to choose between options instead of guessing (Acode AI Agent convention). Use when the task is ambiguous, several valid approaches exist, or a destructive action needs confirmation. Show a short question and 2-6 concrete options; the user's pick is returned.",
+		danger: "read",
+		parameters: {
+			type: "object",
+			properties: {
+				question: { type: "string", description: "what you need to know" },
+				options: {
+					type: "array",
+					items: { type: "string" },
+					description: "2-6 concrete, self-explanatory options",
+				},
+			},
+			required: ["question", "options"],
+		},
+		async run(args, agent) {
+			const question = String(args?.question || "").trim();
+			const options = (Array.isArray(args?.options) ? args.options : [])
+				.map((option) => String(option).trim())
+				.filter(Boolean)
+				.slice(0, 6);
+			if (!question || options.length < 2) {
+				return "ERROR: ask_user_question needs a question and at least 2 options.";
+			}
+			if (agent?.isSubagent) {
+				return "ERROR: subagents cannot ask the user — pick the most reasonable option yourself.";
+			}
+			if (typeof agent?.uiHandler?.askUserQuestion !== "function") {
+				// headless context: present the options as plain text
+				return `${question}\n${options.map((option, index) => `${index + 1}. ${option}`).join("\n")}\nThe user answers in the next message.`;
+			}
+			const choice = await agent.uiHandler.askUserQuestion({
+				question,
+				options,
+			});
+			return choice
+				? `User selected: ${choice}`
+				: "User dismissed the question — pick the most reasonable option yourself and say so.";
+		},
+	},
+	{
+		name: "todo_write",
+		description:
+			"Maintain a visible task checklist for multi-step work (Acode AI Agent convention). Call once when you start a multi-step task and again whenever the plan or statuses change — the list is rendered in the chat for the user to follow along.",
+		danger: "read",
+		parameters: {
+			type: "object",
+			properties: {
+				todos: {
+					type: "array",
+					description: "full list replacing the previous one",
+					items: {
+						type: "object",
+						properties: {
+							content: { type: "string" },
+							status: {
+								type: "string",
+								enum: ["pending", "in_progress", "completed"],
+							},
+						},
+						required: ["content", "status"],
+					},
+				},
+			},
+			required: ["todos"],
+		},
+		async run(args, agent) {
+			const todos = (Array.isArray(args?.todos) ? args.todos : [])
+				.map((todo) => ({
+					content: String(todo?.content || "")
+						.trim()
+						.slice(0, 120),
+					status: ["pending", "in_progress", "completed"].includes(todo?.status)
+						? todo.status
+						: "pending",
+				}))
+				.filter((todo) => todo.content)
+				.slice(0, 20);
+			if (!todos.length) {
+				return "ERROR: todo_write needs at least one item.";
+			}
+			if (agent) {
+				agent.todos = todos;
+				try {
+					agent.onEvent({ type: "todo", payload: todos });
+				} catch {
+					/* chat UI absent — the list still lives on the agent */
+				}
+			}
+			const count = (status) =>
+				todos.filter((todo) => todo.status === status).length;
+			return `Task list updated: ${todos.length} item(s) — ${count("completed")} completed, ${count("in_progress")} in progress, ${count("pending")} pending.`;
+		},
+	},
 ];
 
 export const TOOL_MAP = Object.fromEntries(

@@ -388,3 +388,127 @@ function truncate(text, max) {
 	if (text.length <= max) return text;
 	return `${text.slice(0, max)}\n... (truncated)`;
 }
+
+/** Max diagnostics returned to the model in one call. */
+const MAX_FILE_ERRORS = 60;
+
+/** Max characters of a single diagnostic message. */
+const MAX_ERROR_MESSAGE_CHARS = 200;
+
+/**
+ * Normalizes CodeMirror diagnostics into compact records for the model.
+ * @param {object} state CodeMirror EditorState
+ * @param {Array<object>} diagnostics raw diagnostics (from/to/message)
+ * @returns {Array<{row: number, column: number, severity: string, message: string, source: string}>}
+ */
+function normalizeDiagnostics(state, diagnostics) {
+	const doc = state.doc;
+	if (!doc || typeof doc.lineAt !== "function") return [];
+	const out = [];
+	for (const diagnostic of diagnostics || []) {
+		if (!diagnostic || !diagnostic.message) continue;
+		try {
+			const start = Math.min(
+				Math.max(Number(diagnostic.from) || 0, 0),
+				doc.length,
+			);
+			const line = doc.lineAt(start);
+			out.push({
+				row: Math.max(0, line.number - 1),
+				column: Math.max(0, start - line.from),
+				severity: String(diagnostic.severity || "error"),
+				message: String(diagnostic.message).slice(0, MAX_ERROR_MESSAGE_CHARS),
+				source: String(diagnostic.source || ""),
+			});
+		} catch {
+			/* position outside the document — skip */
+		}
+	}
+	return out;
+}
+
+/**
+ * Formats a diagnostics list as a compact report for the model.
+ * @param {string} path active file path
+ * @param {Array<{row: number, column: number, severity: string, message: string, source: string}>} diagnostics
+ * @returns {string}
+ */
+export function formatFileErrors(path, diagnostics) {
+	const list = (diagnostics || []).slice(0, MAX_FILE_ERRORS);
+	if (!list.length) {
+		return `No diagnostics reported for the active file (${path}) — the linter/LSP found no errors or warnings.`;
+	}
+	const lines = list.map((diagnostic) => {
+		const source = diagnostic.source ? ` (${diagnostic.source})` : "";
+		return `linha ${diagnostic.row + 1}:${diagnostic.column + 1} [${diagnostic.severity}] ${diagnostic.message}${source}`;
+	});
+	const errors = list.filter(
+		(diagnostic) => diagnostic.severity === "error",
+	).length;
+	const warnings = list.filter(
+		(diagnostic) => diagnostic.severity === "warning",
+	).length;
+	const others = list.length - errors - warnings;
+	const total = [
+		`${errors} error(s)`,
+		`${warnings} warning(s)`,
+		others > 0 ? `${others} info` : "",
+	]
+		.filter(Boolean)
+		.join(", ");
+	const truncated =
+		(diagnostics || []).length > MAX_FILE_ERRORS
+			? `\n... (only the first ${MAX_FILE_ERRORS} shown)`
+			: "";
+	return `Diagnostics for the active file (${path}): ${total}\n${lines.join("\n")}${truncated}`;
+}
+
+/**
+ * Reads the diagnostics (LSP + syntax linter) of the file open in the
+ * editor — "o chat deve ser capaz de ler erros do arquivo aberto".
+ * Collectors can be injected for tests; by default the real ones are
+ * imported on demand.
+ * @param {object} manager editorManager-like
+ * @param {{lsp?: (state: object) => Array<object>, lint?: (state: object) => Array<object>}} [collectors]
+ * @returns {Promise<string>}
+ */
+export async function readActiveFileErrors(manager, collectors = null) {
+	const file = manager?.activeFile;
+	if (!file || file.type !== "editor") {
+		return "No editor file is open — there is nothing to diagnose.";
+	}
+	const view = manager.editor;
+	if (!isReadyView(view)) {
+		return "No live editor is available for the active file.";
+	}
+	const state = view.state;
+	const path = file.filename || file.uri || "(unsaved)";
+
+	let source = collectors;
+	if (!source) {
+		try {
+			const [{ getLspDiagnostics }, { getLinterDiagnostics }] =
+				await Promise.all([
+					import("cm/lsp/diagnostics"),
+					import("lib/linterRegistry"),
+				]);
+			source = { lsp: getLspDiagnostics, lint: getLinterDiagnostics };
+		} catch (error) {
+			return `ERROR: diagnostics unavailable (${error?.message || error})`;
+		}
+	}
+
+	const seen = new Set();
+	const merged = [];
+	for (const diagnostic of [
+		...normalizeDiagnostics(state, source.lsp?.(state)),
+		...normalizeDiagnostics(state, source.lint?.(state)),
+	]) {
+		const key = `${diagnostic.row}:${diagnostic.column}:${diagnostic.message}`;
+		if (seen.has(key)) continue;
+		seen.add(key);
+		merged.push(diagnostic);
+	}
+	merged.sort((a, b) => a.row - b.row || a.column - b.column);
+	return formatFileErrors(path, merged);
+}
