@@ -183,6 +183,7 @@ a {
 
     &:not(.active):hover {
       background-color: rgba(0, 0, 0, 0.2);
+      background-color: var(--secondary-color);
       background-color: color-mix(in srgb, var(--secondary-color) 22%, transparent);
     }
 

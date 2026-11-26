@@ -32,6 +32,7 @@ body.file-dragging {
   .list.collapsible.drop-target {
     border-radius: 8px;
     background-color: rgba(127, 127, 127, 0.1);
+    background-color: var(--active-color);
     background-color: color-mix(in srgb, var(--active-color) 10%, transparent);
     box-shadow: inset 0 0 0 1px rgba(127, 127, 127, 0.35);
     box-shadow: inset 0 0 0 1px
@@ -166,6 +167,7 @@ body.file-dragging {
 @keyframes file-drop-flash {
   from {
     background-color: rgba(127, 127, 127, 0.3);
+    background-color: var(--active-color);
     background-color: color-mix(in srgb, var(--active-color) 35%, transparent);
   }
 }

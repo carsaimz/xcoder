@@ -61,6 +61,7 @@
   }
 
   .xcoder-swal-cancel {
+    background: var(--secondary-color, #8888);
     background: color-mix(in srgb, var(--secondary-color, #8888) 55%, transparent);
     color: var(--popup-text-color);
     border-color: var(--border-color);

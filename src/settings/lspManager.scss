@@ -170,6 +170,7 @@
 	}
 
 	&.missing {
+		background: var(--primary-text-color);
 		background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
 		color: var(--primary-text-color);
 		opacity: 0.7;
@@ -186,6 +187,7 @@
 	}
 
 	&.checking {
+		background: var(--primary-text-color);
 		background: color-mix(in srgb, var(--primary-text-color) 8%, transparent);
 		color: var(--primary-text-color);
 		opacity: 0.6;

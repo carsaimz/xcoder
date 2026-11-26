@@ -95,6 +95,7 @@
         color: var(--danger-color);
 
         &:hover {
+            background-color: var(--danger-color);
             background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
         }
     }
@@ -237,6 +238,7 @@
         color: var(--danger-color);
 
         &:hover {
+            background-color: var(--danger-color);
             background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
         }
     }
@@ -288,6 +290,7 @@
     &.ext {
         font-family: monospace;
         font-weight: 600;
+        background: var(--active-color);
         background: color-mix(in srgb, var(--active-color) 15%, transparent);
         color: var(--active-color);
     }

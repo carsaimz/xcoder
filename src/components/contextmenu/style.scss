@@ -72,6 +72,7 @@ body.no-animation {
     // selectionBackground), not a gray wash
     &:active,
     &.focused {
+      background-color: var(--active-color);
       background-color: color-mix(in srgb, var(--active-color) 30%, transparent);
     }
 

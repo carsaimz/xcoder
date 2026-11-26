@@ -75,6 +75,7 @@
     max-width: 100%;
     height: auto;
     border-radius: 3px;
+    background: var(--primary-color);
     background: color-mix(in srgb, var(--primary-color) 8%, transparent);
     box-shadow: 0 0 0 1px
       color-mix(in srgb, var(--primary-color) 12%, transparent);
@@ -116,6 +117,7 @@
     border: 1px solid var(--danger-color);
     border-radius: 3px;
     padding: 12px;
+    background: var(--danger-color);
     background: color-mix(in srgb, var(--danger-color) 10%, transparent);
   }
 

@@ -180,6 +180,7 @@ body.resizing-editor-pane {
   }
 
   .editor-crumbs-seg {
+    color: var(--primary-text-color);
     color: color-mix(in srgb, var(--primary-text-color) 62%, transparent);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -192,6 +193,7 @@ body.resizing-editor-pane {
   }
 
   .editor-crumbs-sep {
+    color: var(--primary-text-color);
     color: color-mix(in srgb, var(--primary-text-color) 38%, transparent);
     flex-shrink: 0;
   }

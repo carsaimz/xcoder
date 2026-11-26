@@ -59,11 +59,13 @@
       padding: 1px 6px;
       border-radius: 4px;
       font-size: 0.6rem;
+      background-color: var(--active-color);
       background-color: color-mix(in srgb, var(--active-color) 12%, transparent);
     }
 
     &.active {
       background-color: rgb(51, 153, 255);
+      background-color: var(--active-color);
       background-color: color-mix(in srgb, var(--active-color) 15%, transparent);
       color: rgb(27, 26, 26);
       color: var(--secondary-text-color);
@@ -76,6 +78,7 @@
 
     &:hover {
       background-color: rgb(107, 168, 229);
+      background-color: var(--active-color);
       background-color: color-mix(in srgb, var(--active-color) 8%, transparent);
       color: rgb(27, 26, 26);
       color: var(--secondary-text-color);

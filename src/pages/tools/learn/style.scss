@@ -283,6 +283,7 @@
 	}
 
 	&.visited .lrn-site {
+		border-color: var(--active-color);
 		border-color: color-mix(in srgb, var(--active-color) 45%, transparent);
 	}
 }
@@ -292,6 +293,7 @@
 	font-weight: 700;
 	padding: 1px 7px;
 	border-radius: 8px;
+	background: var(--active-color);
 	background: color-mix(in srgb, var(--active-color) 18%, transparent);
 	color: var(--active-color);
 	white-space: nowrap;

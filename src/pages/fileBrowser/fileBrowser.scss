@@ -70,6 +70,7 @@
         &::after {
           content: " (symlink)";
           font-size: 0.8em;
+          color: var(--primary-text-color);
           color: color-mix(in srgb, var(--primary-text-color) 60%, transparent);
         }
       }

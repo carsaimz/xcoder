@@ -55,6 +55,7 @@
 
       &.active {
         opacity: 1;
+        background: var(--popup-active-color);
         background: color-mix(in srgb, var(--popup-active-color) 18%, transparent);
         border-color: var(--popup-active-color);
         color: var(--popup-text-color);

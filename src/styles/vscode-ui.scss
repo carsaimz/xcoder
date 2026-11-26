@@ -58,6 +58,7 @@ body {
 	}
 
 	&::-webkit-scrollbar-thumb {
+		background: var(--primary-text-color);
 		background: color-mix(in srgb, var(--primary-text-color) 20%, transparent);
 		border-radius: 0;
 		border: 2px solid transparent;
@@ -77,6 +78,7 @@ body {
 
 .open-file-list {
 	height: var(--vsc-tab-height);
+	background: var(--secondary-color);
 	background: color-mix(in srgb, var(--secondary-color) 45%, transparent);
 	border-bottom: 1px solid var(--border-color);
 
@@ -85,6 +87,7 @@ body {
 		font-size: 13px;
 		border-radius: 0;
 		background: transparent;
+		color: var(--primary-text-color);
 		color: color-mix(in srgb, var(--primary-text-color) 72%, transparent);
 		border-right: 1px solid var(--hairline, var(--border-color));
 		border-top: none;
@@ -282,6 +285,7 @@ input[type="radio"] {
 /* ------------------------------------------------- selection & focus ring */
 
 ::selection {
+	background: var(--active-color);
 	background: color-mix(in srgb, var(--active-color) 32%, transparent);
 }
 

@@ -169,6 +169,7 @@
 	}
 
 	&.selected {
+		background: var(--active-color);
 		background: color-mix(in srgb, var(--active-color) 18%, transparent);
 	}
 
@@ -203,6 +204,7 @@
 	text-transform: uppercase;
 	border-radius: 4px;
 	padding: 2px 0;
+	background: var(--primary-text-color);
 	background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
 	opacity: 0.85;
 
@@ -259,6 +261,7 @@
 	border-radius: 10px;
 	padding: 10px;
 	margin-bottom: 10px;
+	background: var(--secondary-color);
 	background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
 }
 
@@ -485,6 +488,7 @@
 	display: flex;
 	flex-direction: column;
 	border-bottom: 1px solid var(--border-color);
+	background: var(--secondary-color);
 	background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
 
 	&.hidden {

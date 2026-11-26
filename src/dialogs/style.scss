@@ -97,6 +97,7 @@
       font-size: 0.75em;
       line-height: 1;
       color: var(--active-color);
+      background-color: var(--active-color);
       background-color: color-mix(in srgb, var(--active-color) 14%, transparent);
     }
   }
@@ -551,6 +552,7 @@
     margin-top: 12px;
     padding: 12px;
     border-top: solid 1px var(--border-color);
+    background-color: var(--border-color);
     background-color: color-mix(in srgb, var(--border-color) 35%, transparent);
 
     button {

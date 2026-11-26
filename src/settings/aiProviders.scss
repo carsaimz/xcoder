@@ -29,6 +29,7 @@
                 margin: 2px 0 4px;
                 border-radius: 12px;
                 border: 1px solid var(--border-color);
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 60%, transparent);
 
                 &:focus-within {
@@ -100,6 +101,7 @@
 
         // ------------------------------------------------------------- card
         .ai-pcard {
+                background: var(--secondary-color);
                 background: color-mix(in srgb, var(--secondary-color) 72%, transparent);
                 border: 1px solid var(--border-color);
                 border-radius: 14px;
@@ -279,6 +281,7 @@
                 text-transform: uppercase;
                 padding: 3px 9px;
                 border-radius: 999px;
+                background: var(--primary-text-color);
                 background: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
                 color: var(--secondary-text-color, #999);
 
@@ -293,11 +296,13 @@
                 }
 
                 &.is-testing {
+                        background: var(--active-color);
                         background: color-mix(in srgb, var(--active-color) 22%, transparent);
                         color: var(--active-color);
                 }
 
                 &.is-off {
+                        background: var(--primary-text-color);
                         background: color-mix(in srgb, var(--primary-text-color) 14%, transparent);
                         color: var(--secondary-text-color, #999);
                 }
@@ -316,6 +321,7 @@
                 height: 32px;
                 border-radius: 50%;
                 border: 1px solid var(--border-color);
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 60%, transparent);
                 color: var(--primary-text-color);
                 display: flex;
@@ -339,11 +345,13 @@
                 }
 
                 &:hover {
+                        background: var(--active-color);
                         background: color-mix(in srgb, var(--active-color) 14%, transparent);
                 }
 
                 &:active {
                         transform: scale(0.92);
+                        background: var(--active-color);
                         background: color-mix(in srgb, var(--active-color) 24%, transparent);
                 }
 
@@ -353,6 +361,7 @@
 
                 // own key configured — highlight the pencil
                 &.ownkey {
+                        border-color: var(--active-color);
                         border-color: color-mix(in srgb, var(--active-color) 55%, transparent);
                         color: var(--active-color);
                 }
@@ -471,6 +480,7 @@
                 height: 38px;
                 border-radius: 10px;
                 border: 1px solid var(--border-color);
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 70%, transparent);
                 color: var(--primary-text-color);
                 text-align: center;
@@ -494,6 +504,7 @@
                 margin: 0 -6px;
 
                 &:active {
+                        background: var(--active-color);
                         background: color-mix(in srgb, var(--active-color) 10%, transparent);
                 }
         }

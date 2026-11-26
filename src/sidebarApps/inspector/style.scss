@@ -165,6 +165,7 @@
 	white-space: nowrap;
 
 	&.selected {
+		background: var(--active-color);
 		background: color-mix(in srgb, var(--active-color) 25%, transparent);
 
 		.ins-node-tag {
@@ -224,6 +225,7 @@
 	max-height: 45%;
 	overflow: auto;
 	border-top: 1px solid var(--border-color);
+	background: var(--secondary-color);
 	background: color-mix(in srgb, var(--secondary-color) 60%, transparent);
 
 	&.hidden {

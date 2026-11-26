@@ -437,6 +437,7 @@ wc-page {
         font-size: 0.9em;
         box-sizing: border-box;
         align-items: center;
+        color: var(--primary-text-color);
         color: color-mix(in srgb, var(--primary-text-color) 60%, transparent);
         transition: color 0.2s;
 

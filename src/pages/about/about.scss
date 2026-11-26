@@ -17,6 +17,7 @@
     }
 
     .version-number {
+      color: var(--primary-text-color);
       color: color-mix(in srgb, var(--primary-text-color) 60%, transparent);
       font-size: 14px;
       cursor: pointer;
@@ -42,6 +43,7 @@
     .about-description {
       margin-top: 8px;
       padding: 0 12px;
+      color: var(--primary-text-color);
       color: color-mix(in srgb, var(--primary-text-color) 70%, transparent);
       font-size: 13px;
       line-height: 1.6;
@@ -57,6 +59,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      color: var(--primary-text-color);
       color: color-mix(in srgb, var(--primary-text-color) 55%, transparent);
       margin: 0 4px 10px;
       display: flex;
@@ -117,6 +120,7 @@
         font-size: 15px;
 
         .info-item-subtext {
+          color: var(--primary-text-color);
           color: color-mix(in srgb, var(--primary-text-color) 60%, transparent);
           font-size: 13px;
           margin-top: 2px;

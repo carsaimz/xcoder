@@ -80,6 +80,7 @@ wc-page.tool-page-shell {
 			justify-content: center;
 			flex-shrink: 0;
 			border-radius: 10px;
+			background: var(--active-color);
 			background: color-mix(in srgb, var(--active-color) 14%, transparent);
 			color: var(--active-color);
 		}

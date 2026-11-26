@@ -61,6 +61,7 @@
 
     .info-label {
       font-size: 0.875rem;
+      color: var(--popup-text-color);
       color: color-mix(in srgb, var(--popup-text-color) 60%, transparent);
       text-transform: uppercase;
       letter-spacing: 0.5px;

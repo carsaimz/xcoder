@@ -43,6 +43,7 @@
                 font-size: 0.84rem;
                 font-weight: 600;
                 line-height: 1.3;
+                color: var(--active-color);
                 color: color-mix(in srgb, var(--active-color), transparent 18%);
         }
 
@@ -96,6 +97,7 @@
                 border: 1px solid var(--border-color);
                 border: 1px solid color-mix(in srgb, var(--border-color), transparent 24%);
                 border-radius: 0.65rem;
+                background: var(--secondary-color);
                 background: color-mix(in srgb, var(--secondary-color), var(--popup-background-color) 35%);
                 color: var(--secondary-text-color);
                 font-size: 0.88rem;
@@ -123,7 +125,9 @@
                 &.active {
                         border-color: var(--seg-tone, var(--active-color));
                         box-shadow: inset 0 0 0 2px var(--seg-tone, var(--active-color));
+                        background: var(--seg-tone, var(--active-color);
                         background: color-mix(in srgb, var(--seg-tone, var(--active-color)) 16%, transparent);
+                        color: var(--popup-text-color);
                         color: color-mix(in srgb, var(--popup-text-color), var(--seg-tone, var(--active-color)) 45%);
                 }
         }
@@ -147,6 +151,7 @@
                         &::-webkit-slider-runnable-track {
                                 height: 0.4rem;
                                 border-radius: 999px;
+                                background: var(--secondary-color);
                                 background: color-mix(in srgb, var(--secondary-color), var(--popup-text-color) 22%);
                         }
 
@@ -172,6 +177,7 @@
                         border: 1px solid color-mix(in srgb, var(--border-color), transparent 20%);
                         border-radius: 0.55rem;
                         background: var(--popup-background-color);
+                        background: var(--secondary-color);
                         background: color-mix(in srgb, var(--secondary-color), var(--popup-background-color) 42%);
                         color: var(--popup-text-color);
                         font-size: 0.9rem;
@@ -240,6 +246,7 @@
                 border: none;
                 border-radius: 999px;
                 background: transparent;
+                color: var(--secondary-text-color);
                 color: color-mix(in srgb, var(--secondary-text-color), transparent 30%);
                 font-size: 1.05rem;
                 cursor: pointer;
@@ -251,6 +258,7 @@
                 pointer-events: all;
 
                 &:active {
+                        background: var(--secondary-text-color);
                         background: color-mix(in srgb, var(--secondary-text-color) 12%, transparent);
                 }
         }
@@ -431,6 +439,7 @@ wc-page.main-settings-page {
                 &:focus,
                 &:active {
                         background: var(--popup-background-color);
+                        background: var(--secondary-color);
                         background: color-mix(in srgb, var(--secondary-color), var(--popup-text-color) 4%);
                 }
 
@@ -602,6 +611,7 @@ wc-page.main-settings-page {
                         font-size: 0.94rem;
                         font-weight: 500;
                         letter-spacing: -0.01em;
+                        color: var(--popup-text-color);
                         color: color-mix(in srgb, var(--popup-text-color), transparent 14%);
                 }
         }
@@ -625,6 +635,7 @@ wc-page.main-settings-page {
                         min-width: 0.95rem;
                         height: 0.95rem;
                         font-size: 1rem;
+                        color: var(--secondary-text-color);
                         color: color-mix(in srgb, var(--secondary-text-color), transparent 22%);
                 }
         }
@@ -678,6 +689,7 @@ wc-page.main-settings-page {
 
                 input:checked+.box {
                         background: var(--button-background-color);
+                        border-color: var(--button-background-color);
                         border-color: color-mix(in srgb, var(--button-background-color), transparent 10%);
                         box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--button-background-color), transparent 12%);
                 }
@@ -695,6 +707,7 @@ wc-page.main-settings-page {
 
         .settings-search-section .list-item.has-tail-select:focus .setting-value-display.is-select,
         .settings-search-section .list-item.has-tail-select:active .setting-value-display.is-select {
+                border-color: var(--active-color);
                 border-color: color-mix(in srgb, var(--active-color), transparent 48%);
                 background: color-mix(in srgb,
                                 var(--popup-background-color),
@@ -764,6 +777,7 @@ wc-page.detail-settings-page {
                 &:focus,
                 &:active {
                         background: var(--popup-background-color);
+                        background: var(--secondary-color);
                         background: color-mix(in srgb, var(--secondary-color), var(--popup-text-color) 4%);
                 }
 
@@ -924,6 +938,7 @@ wc-page.detail-settings-page {
                         font-size: 0.94rem;
                         font-weight: 500;
                         letter-spacing: -0.01em;
+                        color: var(--popup-text-color);
                         color: color-mix(in srgb, var(--popup-text-color), transparent 14%);
                 }
         }
@@ -947,6 +962,7 @@ wc-page.detail-settings-page {
                         min-width: 0.95rem;
                         height: 0.95rem;
                         font-size: 1rem;
+                        color: var(--secondary-text-color);
                         color: color-mix(in srgb, var(--secondary-text-color), transparent 22%);
                 }
         }
@@ -1028,6 +1044,7 @@ wc-page.detail-settings-page {
         .detail-settings-list>.list-item.has-tail-select:active .setting-value-display.is-select,
         .settings-section-card>.list-item.has-tail-select:focus .setting-value-display.is-select,
         .settings-section-card>.list-item.has-tail-select:active .setting-value-display.is-select {
+                border-color: var(--active-color);
                 border-color: color-mix(in srgb, var(--active-color), transparent 48%);
                 background: color-mix(in srgb,
                                 var(--popup-background-color),

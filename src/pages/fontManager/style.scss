@@ -48,6 +48,7 @@ wc-page.font-manager-page {
 			min-width: 1.4rem;
 			height: 1.4rem;
 			font-size: 1.15rem;
+			color: var(--secondary-text-color);
 			color: color-mix(in srgb, var(--secondary-text-color), transparent 18%);
 		}
 
@@ -74,6 +75,7 @@ wc-page.font-manager-page {
 				display: block;
 				font-size: 0.82rem;
 				line-height: 1.35;
+				color: var(--secondary-text-color);
 				color: color-mix(in srgb, var(--secondary-text-color), transparent 30%);
 				text-transform: none;
 				white-space: normal;
@@ -96,15 +98,18 @@ wc-page.font-manager-page {
 	}
 
 	.font-manager-list > .list-item.current-font {
+		background: var(--secondary-color);
 		background: color-mix(in srgb, var(--secondary-color), var(--active-color) 8%);
 	}
 
 	.font-manager-list > .list-item.current-font:focus,
 	.font-manager-list > .list-item.current-font:active {
+		background: var(--secondary-color);
 		background: color-mix(in srgb, var(--secondary-color), var(--active-color) 12%);
 	}
 
 	.font-manager-list > .list-item.current-font > .icon:first-child {
+		color: var(--active-color);
 		color: color-mix(in srgb, var(--active-color), transparent 10%);
 	}
 
@@ -136,22 +141,28 @@ wc-page.font-manager-page {
 		font-size: 0.82rem;
 		font-weight: 600;
 		line-height: 1.2;
+		background: var(--secondary-color);
 		background: color-mix(in srgb, var(--secondary-color), var(--active-color) 10%);
+		color: var(--active-color);
 		color: color-mix(in srgb, var(--active-color), transparent 12%);
 	}
 
 	.font-manager-badge-editor {
+		background: var(--secondary-color);
 		background: color-mix(in srgb, var(--secondary-color), #4ca3ff 14%);
 		color: color-mix(in srgb, #4ca3ff, white 4%);
 	}
 
 	.font-manager-badge-terminal {
+		background: var(--secondary-color);
 		background: color-mix(in srgb, var(--secondary-color), #21b36b 14%);
 		color: color-mix(in srgb, #21b36b, white 4%);
 	}
 
 	.font-manager-badge-app {
+		background: var(--secondary-color);
 		background: color-mix(in srgb, var(--secondary-color), var(--active-color) 12%);
+		color: var(--active-color);
 		color: color-mix(in srgb, var(--active-color), transparent 14%);
 	}
 
@@ -164,6 +175,7 @@ wc-page.font-manager-page {
 		height: 1.2rem;
 		font-size: 1.1rem;
 		line-height: 1;
+		color: var(--secondary-text-color);
 		color: color-mix(in srgb, var(--secondary-text-color), transparent 28%);
 		cursor: pointer;
 		transition: color 140ms ease;

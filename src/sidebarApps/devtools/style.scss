@@ -28,6 +28,7 @@
                 padding: 8px 12px;
                 border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
                 border-radius: 10px;
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 10%, transparent);
                 color: inherit;
                 cursor: pointer;
@@ -81,6 +82,7 @@
                 padding: 4px;
                 border: 1px solid color-mix(in srgb, var(--primary-color) 18%, transparent);
                 border-radius: 10px;
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 4%, transparent);
 
                 &.open {
@@ -104,13 +106,16 @@
                 cursor: pointer;
 
                 &:hover {
+                        background: var(--primary-color);
                         background: color-mix(in srgb, var(--primary-color) 10%, transparent);
                 }
 
                 &.active {
+                        background: var(--primary-color);
                         background: color-mix(in srgb, var(--primary-color) 22%, transparent);
 
                         .devtools-tool-item-title {
+                                color: var(--primary-color);
                                 color: color-mix(in srgb, var(--primary-color) 80%, var(--primary-text-color, #fff));
                         }
                 }
@@ -142,6 +147,7 @@
                 font-family: monospace;
                 border-radius: 8px;
                 border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 6%, transparent);
                 color: inherit;
                 box-sizing: border-box;
@@ -182,6 +188,7 @@
                         font-size: 0.85em;
                         border-radius: 8px;
                         border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+                        background: var(--primary-color);
                         background: color-mix(in srgb, var(--primary-color) 6%, transparent);
                         color: inherit;
                 }
@@ -235,6 +242,7 @@
                 min-height: 110px;
                 padding: 12px;
                 border-radius: 10px;
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 8%, transparent);
                 overflow: auto;
         }
@@ -378,6 +386,7 @@
                 white-space: pre-wrap;
                 word-break: break-word;
                 border-radius: 10px;
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 8%, transparent);
         }
 
@@ -392,11 +401,13 @@
                         font-weight: 600;
                         border: none;
                         border-radius: 8px;
+                        background: var(--primary-color);
                         background: color-mix(in srgb, var(--primary-color) 14%, transparent);
                         color: inherit;
                         cursor: pointer;
 
                         &.primary {
+                                background: var(--primary-color);
                                 background: color-mix(in srgb, var(--primary-color) 40%, transparent);
                         }
 
@@ -483,6 +494,7 @@
                 border-radius: 8px;
                 font: inherit;
                 font-weight: 600;
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 40%, transparent);
                 color: inherit;
                 cursor: pointer;
@@ -509,6 +521,7 @@
 
         thead th {
                 font-weight: 600;
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 10%, transparent);
         }
 }
@@ -520,6 +533,7 @@
         padding: 12px 14px;
         border-radius: 10px;
         font-size: 0.85em;
+        background: var(--primary-color);
         background: color-mix(in srgb, var(--primary-color) 8%, transparent);
 
         .devtools-doc-icon {
@@ -527,6 +541,7 @@
                 font-weight: 700;
                 padding: 6px 8px;
                 border-radius: 6px;
+                background: var(--primary-color);
                 background: color-mix(in srgb, var(--primary-color) 20%, transparent);
         }
 }
@@ -546,6 +561,7 @@
 	position: relative;
 	height: 48px;
 	border-radius: 999px;
+	background: var(--primary-color);
 	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
 
 	.devtools-easing-dot {

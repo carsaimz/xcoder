@@ -208,6 +208,7 @@
   padding: 0 16px;
   cursor: pointer;
   user-select: none;
+  background-color: var(--secondary-color);
   background-color: color-mix(in srgb, var(--secondary-color) 50%, var(--primary-color));
 
   &:active {
@@ -291,6 +292,7 @@
     }
 
     .symbol-match {
+      background-color: var(--active-color);
       background-color: color-mix(in srgb, var(--active-color) 30%, transparent);
       border-radius: 2px;
       padding: 0 2px;

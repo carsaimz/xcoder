@@ -32,6 +32,7 @@
     }
 
     &:hover {
+      background: var(--secondary-color);
       background: color-mix(in srgb, var(--secondary-color) 30%, transparent);
     }
   }
@@ -39,6 +40,7 @@
   .timeline {
     flex: 1;
     height: 4px;
+    background: var(--secondary-color);
     background: color-mix(in srgb, var(--secondary-color) 60%, transparent);
     border-radius: 2px;
     position: relative;

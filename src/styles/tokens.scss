@@ -31,11 +31,14 @@
   /* level 2: inset field / input well */
   --surface-2: color-mix(in srgb, var(--primary-color) 72%, transparent);
   /* level 3: hover wash over any surface */
+  --surface-hover: var(--active-color);
   --surface-hover: color-mix(in srgb, var(--active-color) 8%, transparent);
   /* level 4: pressed wash */
+  --surface-active: var(--active-color);
   --surface-active: color-mix(in srgb, var(--active-color) 16%, transparent);
 
   /* --- hairlines --------------------------------------------------------- */
+  --hairline: var(--border-color);
   --hairline: color-mix(in srgb, var(--border-color) 70%, transparent);
   --hairline-strong: var(--border-color);
 
