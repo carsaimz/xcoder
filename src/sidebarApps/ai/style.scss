@@ -489,10 +489,10 @@
                         }
 
                         &::after {
-                                content: "expand_more";
-                                font-family: "icon";
-                                margin-left: auto;
-                                transition: transform 0.15s ease;
+	content: "\eab4";
+	font-family: "xcodicon";
+	margin-left: auto;
+	transition: transform 0.15s ease;
                         }
                 }
 
@@ -1581,5 +1581,155 @@
 	&:active {
 		background: rgba(128, 128, 128, 0.2);
 		opacity: 1;
+	}
+}
+
+// ask_user_question widget (Acode AI Agent port)
+.ai-chat .ai-msg.ask {
+	margin: 6px 0 0 6px;
+}
+
+.ai-chat .ai-ask-card {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px 12px;
+	border-radius: 12px;
+	border: 1px solid color-mix(in srgb, var(--active-color, #7b61ff) 45%, transparent);
+	background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+	max-width: 100%;
+
+	&.answered {
+		border-color: var(--border-color);
+	}
+}
+
+.ai-chat .ai-ask-head {
+	display: flex;
+	align-items: flex-start;
+	gap: 7px;
+	min-width: 0;
+
+	.icon {
+		font-size: 14px;
+		flex-shrink: 0;
+		color: var(--active-color, #7b61ff);
+	}
+}
+
+.ai-chat .ai-ask-question {
+	font-size: 0.82rem;
+	font-weight: 600;
+	line-height: 1.4;
+	word-break: break-word;
+}
+
+.ai-chat .ai-ask-options {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.ai-chat .ai-ask-options button {
+	padding: 8px 12px;
+	border-radius: 9px;
+	border: 1px solid var(--border-color);
+	background: transparent;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+	word-break: break-word;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+}
+
+.ai-chat .ai-msg.ask:not(.answered) .ai-ask-options button {
+	border-color: color-mix(in srgb, var(--active-color, #7b61ff) 45%, transparent);
+	color: var(--active-color, #7b61ff);
+}
+
+.ai-chat .ai-ask-state {
+	font-size: 0.72rem;
+	font-weight: 600;
+	opacity: 0.85;
+}
+
+// todo_write checklist widget (Acode AI Agent port)
+.ai-chat .ai-msg.todo {
+	margin: 6px 0 0 6px;
+}
+
+.ai-chat .ai-todo-card {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 10px 12px;
+	border-radius: 12px;
+	border: 1px solid var(--border-color);
+	background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+	max-width: 100%;
+}
+
+.ai-chat .ai-todo-head {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	opacity: 0.6;
+
+	.icon {
+		font-size: 13px;
+	}
+}
+
+.ai-chat .ai-todo-list {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.ai-chat .ai-todo-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 7px;
+	font-size: 0.8rem;
+	line-height: 1.4;
+
+	.icon {
+		font-size: 13px;
+		margin-top: 1px;
+		flex-shrink: 0;
+	}
+
+	.ai-todo-text {
+		word-break: break-word;
+	}
+
+	&.completed {
+		opacity: 0.55;
+
+		.icon {
+			color: var(--success-text-color, #7ed07e);
+		}
+
+		.ai-todo-text {
+			text-decoration: line-through;
+		}
+	}
+
+	&.in_progress .icon {
+		color: var(--active-color, #7b61ff);
+	}
+
+	&.pending .icon {
+		opacity: 0.6;
 	}
 }
