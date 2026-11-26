@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Hech qanday aktiv yo'q - avval saytni oling",
 	"scraper secrets found": "Ochilgan sirlar",
 	"scraper open": "ochiq",
-	"scraper hint": "Mahalliy HTTP orqali xom manba → olib → renderlangan WebView; mahalliy obodonlashtirish."
+	"scraper hint": "Mahalliy HTTP orqali xom manba → olib → renderlangan WebView; mahalliy obodonlashtirish.",
+	"ai skills import file": "＋ Fayldan malaka import qilish…",
+	"ai skills import url": "＋ URL/GitHub dan mahoratni import qilish…",
+	"ai skills import paste": "＋ Yangi mahoratni joylashtirish…",
+	"ai skill empty": "Bo'sh mahorat fayli",
+	"select skill file": "Malaka faylini tanlang",
+	"ai skill imported": "Import qilingan mahorat",
+	"ai skill url prompt": "Skill URL (GitHub qabul qilinadi)",
+	"ai skill paste prompt": "Ko'nikma tarkibini belgilash",
+	"ai skill name prompt": "Malaka nomi",
+	"ai skill enable": "Yoqish",
+	"ai skill disable": "Oʻchirish",
+	"ai skill view": "Kontentni ko'rish",
+	"ai skill delete": "Oʻchirish",
+	"ai skill delete confirm": "Ushbu import qilingan mahorat oʻchirilsinmi?",
+	"ai skill deleted": "Ko'nikma o'chirildi"
 }

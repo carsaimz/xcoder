@@ -2008,5 +2008,20 @@
 	"scraper no assets": "بدون دارایی - ابتدا یک سایت واکشی کنید",
 	"scraper secrets found": "اسرار فاش شده",
 	"scraper open": "باز کردن",
-	"scraper hint": "منبع خام از طریق HTTP بومی → واکشی → WebView ارائه شده. زیباسازی محلی"
+	"scraper hint": "منبع خام از طریق HTTP بومی → واکشی → WebView ارائه شده. زیباسازی محلی",
+	"ai skills import file": "＋ مهارت وارد کردن از فایل…",
+	"ai skills import url": "＋ مهارت وارد کردن از URL / GitHub…",
+	"ai skills import paste": "＋ چسباندن مهارت جدید…",
+	"ai skill empty": "فایل مهارت خالی",
+	"select skill file": "فایل مهارت را انتخاب کنید",
+	"ai skill imported": "مهارت وارد شده است",
+	"ai skill url prompt": "URL مهارت (GitHub پذیرفته شده است)",
+	"ai skill paste prompt": "محتوای مهارت را مشخص کنید",
+	"ai skill name prompt": "نام مهارت",
+	"ai skill enable": "فعال کردن",
+	"ai skill disable": "غیر فعال کردن",
+	"ai skill view": "مشاهده مطالب",
+	"ai skill delete": "حذف کنید",
+	"ai skill delete confirm": "این مهارت وارد شده حذف شود؟",
+	"ai skill deleted": "مهارت حذف شد"
 }

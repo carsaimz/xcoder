@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Nincsenek eszközök – először töltsön le egy webhelyet",
 	"scraper secrets found": "Felfedezett titkok",
 	"scraper open": "nyitott",
-	"scraper hint": "Nyers forrás natív HTTP-n keresztül → lekérés → renderelt WebView; helyi szépítés."
+	"scraper hint": "Nyers forrás natív HTTP-n keresztül → lekérés → renderelt WebView; helyi szépítés.",
+	"ai skills import file": "＋ Képesség importálása fájlból…",
+	"ai skills import url": "＋ Képesség importálása az URL-ből / GitHubból…",
+	"ai skills import paste": "＋ Új készség beillesztése…",
+	"ai skill empty": "Üres készségfájl",
+	"select skill file": "Válassza ki a készségfájlt",
+	"ai skill imported": "Képesség importált",
+	"ai skill url prompt": "Skill URL (GitHub elfogadott)",
+	"ai skill paste prompt": "A készség leértékelésének tartalma",
+	"ai skill name prompt": "Képesség neve",
+	"ai skill enable": "Engedélyezés",
+	"ai skill disable": "Letiltás",
+	"ai skill view": "Tartalom megtekintése",
+	"ai skill delete": "Töröl",
+	"ai skill delete confirm": "Törli ezt az importált készségeket?",
+	"ai skill deleted": "Képesség törölve"
 }

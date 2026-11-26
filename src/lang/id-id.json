@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Tidak ada aset — ambil situsnya terlebih dahulu",
 	"scraper secrets found": "Rahasia yang terungkap",
 	"scraper open": "membuka",
-	"scraper hint": "Sumber mentah melalui HTTP asli → ambil → dirender WebView; kecantikan lokal."
+	"scraper hint": "Sumber mentah melalui HTTP asli → ambil → dirender WebView; kecantikan lokal.",
+	"ai skills import file": "＋ Impor keterampilan dari file…",
+	"ai skills import url": "＋ Impor keterampilan dari URL / GitHub…",
+	"ai skills import paste": "＋ Tempelkan keterampilan baru…",
+	"ai skill empty": "File keterampilan kosong",
+	"select skill file": "Pilih file keterampilan",
+	"ai skill imported": "Keterampilan diimpor",
+	"ai skill url prompt": "URL Keterampilan (diterima GitHub)",
+	"ai skill paste prompt": "Konten penurunan harga dari keterampilan",
+	"ai skill name prompt": "Nama keterampilan",
+	"ai skill enable": "Memungkinkan",
+	"ai skill disable": "Cacat",
+	"ai skill view": "Lihat konten",
+	"ai skill delete": "Menghapus",
+	"ai skill delete confirm": "Hapus keterampilan yang diimpor ini?",
+	"ai skill deleted": "Keterampilan dihapus"
 }

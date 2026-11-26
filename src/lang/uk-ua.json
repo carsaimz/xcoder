@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Немає активів — спочатку виберіть сайт",
 	"scraper secrets found": "Розкриті секрети",
 	"scraper open": "ВІДЧИНЕНО",
-	"scraper hint": "Необроблений вихідний код через рідний HTTP → вибірка → візуалізований WebView; місцеве благоустрій."
+	"scraper hint": "Необроблений вихідний код через рідний HTTP → вибірка → візуалізований WebView; місцеве благоустрій.",
+	"ai skills import file": "＋ Імпорт навичок із файлу…",
+	"ai skills import url": "＋ Імпорт навичок із URL/GitHub…",
+	"ai skills import paste": "＋ Вставити новий навик…",
+	"ai skill empty": "Порожній файл навичок",
+	"select skill file": "Виберіть файл навичок",
+	"ai skill imported": "Навички імпортовані",
+	"ai skill url prompt": "URL-адреса навичок (приймається GitHub)",
+	"ai skill paste prompt": "Уцінка змісту навички",
+	"ai skill name prompt": "Назва навички",
+	"ai skill enable": "Увімкнути",
+	"ai skill disable": "Вимкнути",
+	"ai skill view": "Переглянути вміст",
+	"ai skill delete": "Видалити",
+	"ai skill delete confirm": "Видалити цей імпортований навик?",
+	"ai skill deleted": "Навички видалено"
 }

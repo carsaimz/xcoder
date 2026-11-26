@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Aucun élément – récupérez d'abord un site",
 	"scraper secrets found": "Secrets dévoilés",
 	"scraper open": "ouvrir",
-	"scraper hint": "Source brute via HTTP natif → récupérer → WebView rendu ; embellissement local."
+	"scraper hint": "Source brute via HTTP natif → récupérer → WebView rendu ; embellissement local.",
+	"ai skills import file": "＋ Importer la compétence à partir du fichier…",
+	"ai skills import url": "＋ Importer la compétence depuis l'URL / GitHub…",
+	"ai skills import paste": "＋ Coller une nouvelle compétence…",
+	"ai skill empty": "Fichier de compétences vide",
+	"select skill file": "Sélectionnez le fichier de compétences",
+	"ai skill imported": "Compétence importée",
+	"ai skill url prompt": "URL de la compétence (GitHub accepté)",
+	"ai skill paste prompt": "Contenu Markdown de la compétence",
+	"ai skill name prompt": "Nom de la compétence",
+	"ai skill enable": "Activer",
+	"ai skill disable": "Désactiver",
+	"ai skill view": "Afficher le contenu",
+	"ai skill delete": "Supprimer",
+	"ai skill delete confirm": "Supprimer cette compétence importée ?",
+	"ai skill deleted": "Compétence supprimée"
 }

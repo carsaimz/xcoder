@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Brak zasobów — najpierw pobierz witrynę",
 	"scraper secrets found": "Odkryte tajemnice",
 	"scraper open": "Otwarte",
-	"scraper hint": "Surowe źródło poprzez natywny protokół HTTP → pobierz → renderowany WebView; lokalne upiększanie."
+	"scraper hint": "Surowe źródło poprzez natywny protokół HTTP → pobierz → renderowany WebView; lokalne upiększanie.",
+	"ai skills import file": "+ Importuj umiejętności z pliku…",
+	"ai skills import url": "+ Importuj umiejętności z adresu URL / GitHub…",
+	"ai skills import paste": "+ Wklej nową umiejętność…",
+	"ai skill empty": "Pusty plik umiejętności",
+	"select skill file": "Wybierz plik umiejętności",
+	"ai skill imported": "Zaimportowano umiejętność",
+	"ai skill url prompt": "Adres URL umiejętności (akceptowany GitHub)",
+	"ai skill paste prompt": "Treść Markdown umiejętności",
+	"ai skill name prompt": "Nazwa umiejętności",
+	"ai skill enable": "Włączać",
+	"ai skill disable": "Wyłączyć",
+	"ai skill view": "Zobacz zawartość",
+	"ai skill delete": "Usuwać",
+	"ai skill delete confirm": "Usunąć tę zaimportowaną umiejętność?",
+	"ai skill deleted": "Umiejętność usunięta"
 }

@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Žádné podklady – nejprve načtěte web",
 	"scraper secrets found": "Odhalená tajemství",
 	"scraper open": "OTEVŘENO",
-	"scraper hint": "Nezpracovaný zdroj přes nativní HTTP → načtení → vykreslený WebView; místní zkrášlování."
+	"scraper hint": "Nezpracovaný zdroj přes nativní HTTP → načtení → vykreslený WebView; místní zkrášlování.",
+	"ai skills import file": "＋ Import dovedností ze souboru…",
+	"ai skills import url": "＋ Import dovedností z URL / GitHub…",
+	"ai skills import paste": "＋ Vložte novou dovednost…",
+	"ai skill empty": "Prázdný soubor dovedností",
+	"select skill file": "Vyberte soubor dovedností",
+	"ai skill imported": "Dovednost importována",
+	"ai skill url prompt": "Adresa URL dovednosti (akceptován GitHub)",
+	"ai skill paste prompt": "Označení obsahu dovednosti",
+	"ai skill name prompt": "Název dovednosti",
+	"ai skill enable": "Umožnit",
+	"ai skill disable": "Zakázat",
+	"ai skill view": "Zobrazit obsah",
+	"ai skill delete": "Vymazat",
+	"ai skill delete confirm": "Smazat tuto importovanou dovednost?",
+	"ai skill deleted": "Dovednost odstraněna"
 }

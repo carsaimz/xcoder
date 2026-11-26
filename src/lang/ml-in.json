@@ -2008,5 +2008,20 @@
 	"scraper no assets": "അസറ്റുകൾ ഇല്ല - ആദ്യം ഒരു സൈറ്റ് ലഭ്യമാക്കുക",
 	"scraper secrets found": "വെളിപ്പെടുത്തിയ രഹസ്യങ്ങൾ",
 	"scraper open": "തുറക്കുക",
-	"scraper hint": "നേറ്റീവ് HTTP വഴിയുള്ള അസംസ്കൃത ഉറവിടം → നേടുക → റെൻഡർ ചെയ്ത WebView; പ്രാദേശിക സൗന്ദര്യവത്കരണം."
+	"scraper hint": "നേറ്റീവ് HTTP വഴിയുള്ള അസംസ്കൃത ഉറവിടം → നേടുക → റെൻഡർ ചെയ്ത WebView; പ്രാദേശിക സൗന്ദര്യവത്കരണം.",
+	"ai skills import file": "＋ ഫയലിൽ നിന്ന് വൈദഗ്ദ്ധ്യം ഇറക്കുമതി ചെയ്യുക...",
+	"ai skills import url": "＋ URL / GitHub-ൽ നിന്ന് വൈദഗ്ദ്ധ്യം ഇറക്കുമതി ചെയ്യുക...",
+	"ai skills import paste": "＋ പുതിയ വൈദഗ്ദ്ധ്യം ഒട്ടിക്കുക...",
+	"ai skill empty": "ശൂന്യമായ നൈപുണ്യ ഫയൽ",
+	"select skill file": "നൈപുണ്യ ഫയൽ തിരഞ്ഞെടുക്കുക",
+	"ai skill imported": "വൈദഗ്ധ്യം ഇറക്കുമതി ചെയ്തു",
+	"ai skill url prompt": "നൈപുണ്യ URL (GitHub അംഗീകരിച്ചു)",
+	"ai skill paste prompt": "നൈപുണ്യത്തിൻ്റെ മാർക്ക്ഡൗൺ ഉള്ളടക്കം",
+	"ai skill name prompt": "കഴിവിൻ്റെ പേര്",
+	"ai skill enable": "പ്രവർത്തനക്ഷമമാക്കുക",
+	"ai skill disable": "പ്രവർത്തനരഹിതമാക്കുക",
+	"ai skill view": "ഉള്ളടക്കം കാണുക",
+	"ai skill delete": "ഇല്ലാതാക്കുക",
+	"ai skill delete confirm": "ഈ ഇറക്കുമതി ചെയ്ത വൈദഗ്ദ്ധ്യം ഇല്ലാതാക്കണോ?",
+	"ai skill deleted": "കഴിവ് ഇല്ലാതാക്കി"
 }

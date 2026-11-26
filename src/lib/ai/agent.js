@@ -26,6 +26,7 @@ import {
 	resolveModel,
 } from "./providers";
 import { buildSkillsSection, listSkills } from "./skills";
+import { getSkillsIo } from "./skillsStorage";
 import { executeTool, TOOL_MAP, toolSchemas } from "./tools";
 import { applyWebToolsToggle } from "./toolToggle";
 import vshell from "./vshell";
@@ -127,7 +128,7 @@ export class Agent {
 		} catch {
 			/* instructions are best-effort */
 		}
-		const skills = await listSkills();
+		const skills = await listSkills(getSkillsIo() || {});
 		const skillsSection = buildSkillsSection(
 			skills,
 			settings.value.aiDisabledSkills,

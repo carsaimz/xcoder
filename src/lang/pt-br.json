@@ -2108,5 +2108,20 @@
 	"scraper no assets": "Sem recursos — obtenha um site primeiro",
 	"scraper secrets found": "Segredos expostos",
 	"scraper open": "abrir",
-	"scraper hint": "Fonte bruta via HTTP nativo → fetch → WebView renderizada; embelezamento local."
+	"scraper hint": "Fonte bruta via HTTP nativo → fetch → WebView renderizada; embelezamento local.",
+	"ai skills import file": "＋ Importar skill do ficheiro…",
+	"ai skills import url": "＋ Importar skill de URL / GitHub…",
+	"ai skills import paste": "＋ Colar nova skill…",
+	"ai skill empty": "Ficheiro de skill vazio",
+	"select skill file": "Selecionar ficheiro de skill",
+	"ai skill imported": "Skill importada",
+	"ai skill url prompt": "URL da skill (GitHub aceita)",
+	"ai skill paste prompt": "Conteúdo markdown da skill",
+	"ai skill name prompt": "Nome da skill",
+	"ai skill enable": "Ativar",
+	"ai skill disable": "Desativar",
+	"ai skill view": "Ver conteúdo",
+	"ai skill delete": "Excluir",
+	"ai skill delete confirm": "Excluir esta skill importada?",
+	"ai skill deleted": "Skill excluída"
 }

@@ -2008,5 +2008,20 @@
 	"scraper no assets": "ਕੋਈ ਸੰਪਤੀ ਨਹੀਂ — ਪਹਿਲਾਂ ਇੱਕ ਸਾਈਟ ਪ੍ਰਾਪਤ ਕਰੋ",
 	"scraper secrets found": "ਭੇਦ ਖੋਲ੍ਹੇ",
 	"scraper open": "ਖੁੱਲਾ",
-	"scraper hint": "ਮੂਲ HTTP → ਪ੍ਰਾਪਤ ਕਰੋ → ਰੈਂਡਰਡ WebView ਰਾਹੀਂ ਕੱਚਾ ਸਰੋਤ; ਸਥਾਨਕ ਸੁੰਦਰਤਾ."
+	"scraper hint": "ਮੂਲ HTTP → ਪ੍ਰਾਪਤ ਕਰੋ → ਰੈਂਡਰਡ WebView ਰਾਹੀਂ ਕੱਚਾ ਸਰੋਤ; ਸਥਾਨਕ ਸੁੰਦਰਤਾ.",
+	"ai skills import file": "＋ ਫਾਈਲ ਤੋਂ ਹੁਨਰ ਆਯਾਤ ਕਰੋ...",
+	"ai skills import url": "＋ URL / GitHub ਤੋਂ ਹੁਨਰ ਆਯਾਤ ਕਰੋ...",
+	"ai skills import paste": "＋ ਨਵਾਂ ਹੁਨਰ ਪੇਸਟ ਕਰੋ...",
+	"ai skill empty": "ਖਾਲੀ ਹੁਨਰ ਫਾਈਲ",
+	"select skill file": "ਹੁਨਰ ਫਾਈਲ ਦੀ ਚੋਣ ਕਰੋ",
+	"ai skill imported": "ਹੁਨਰ ਆਯਾਤ ਕੀਤਾ",
+	"ai skill url prompt": "ਹੁਨਰ URL (GitHub ਸਵੀਕਾਰ ਕੀਤਾ ਗਿਆ)",
+	"ai skill paste prompt": "ਹੁਨਰ ਦੀ ਮਾਰਕਡਾਊਨ ਸਮੱਗਰੀ",
+	"ai skill name prompt": "ਹੁਨਰ ਦਾ ਨਾਮ",
+	"ai skill enable": "ਯੋਗ ਕਰੋ",
+	"ai skill disable": "ਅਸਮਰੱਥ",
+	"ai skill view": "ਸਮੱਗਰੀ ਦੇਖੋ",
+	"ai skill delete": "ਮਿਟਾਓ",
+	"ai skill delete confirm": "ਕੀ ਇਸ ਆਯਾਤ ਹੁਨਰ ਨੂੰ ਮਿਟਾਉਣਾ ਹੈ?",
+	"ai skill deleted": "ਹੁਨਰ ਨੂੰ ਮਿਟਾਇਆ ਗਿਆ"
 }

@@ -2008,5 +2008,20 @@
 	"scraper no assets": "कोई संपत्ति नहीं - पहले एक साइट लाएँ",
 	"scraper secrets found": "उजागर हुए राज़",
 	"scraper open": "खुला",
-	"scraper hint": "मूल HTTP के माध्यम से कच्चा स्रोत → फ़ेच → प्रस्तुत वेबव्यू; स्थानीय सौंदर्यीकरण."
+	"scraper hint": "मूल HTTP के माध्यम से कच्चा स्रोत → फ़ेच → प्रस्तुत वेबव्यू; स्थानीय सौंदर्यीकरण.",
+	"ai skills import file": "फ़ाइल से कौशल आयात करें...",
+	"ai skills import url": "＋ URL / GitHub से कौशल आयात करें...",
+	"ai skills import paste": "＋ नया कौशल चिपकाएँ...",
+	"ai skill empty": "खाली कौशल फ़ाइल",
+	"select skill file": "कौशल फ़ाइल का चयन करें",
+	"ai skill imported": "कौशल आयातित",
+	"ai skill url prompt": "कौशल URL (GitHub स्वीकृत)",
+	"ai skill paste prompt": "कौशल की मार्कडाउन सामग्री",
+	"ai skill name prompt": "कौशल का नाम",
+	"ai skill enable": "सक्षम",
+	"ai skill disable": "अक्षम करना",
+	"ai skill view": "सामग्री देखें",
+	"ai skill delete": "मिटाना",
+	"ai skill delete confirm": "इस आयातित कौशल को हटाएँ?",
+	"ai skill deleted": "कौशल हटा दिया गया"
 }

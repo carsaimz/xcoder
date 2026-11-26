@@ -2008,5 +2008,20 @@
 	"scraper no assets": "ပိုင်ဆိုင်မှုမရှိပါ - ဆိုက်တစ်ခုကို ဦးစွာရယူပါ။",
 	"scraper secrets found": "လျှို့ဝှက်ချက်များကို ဖော်ထုတ်ခဲ့သည်။",
 	"scraper open": "ဖွင့်သည်။",
-	"scraper hint": "မူရင်း HTTP → fetch → WebView မှ ပြန်ဆိုထားသော မူရင်းအရင်းအမြစ် ပြည်တွင်း အလှပြုပြင်ရေး။"
+	"scraper hint": "မူရင်း HTTP → fetch → WebView မှ ပြန်ဆိုထားသော မူရင်းအရင်းအမြစ် ပြည်တွင်း အလှပြုပြင်ရေး။",
+	"ai skills import file": "ဖိုင်မှကျွမ်းကျင်မှုကိုတင်သွင်းပါ...",
+	"ai skills import url": "＋ URL / GitHub မှကျွမ်းကျင်မှုကို တင်သွင်းပါ...",
+	"ai skills import paste": "ကျွမ်းကျင်မှုအသစ်ကို ကူးထည့်ပါ...",
+	"ai skill empty": "ကျွမ်းကျင်မှုဖိုင်အလွတ်",
+	"select skill file": "ကျွမ်းကျင်မှုဖိုင်ကို ရွေးပါ။",
+	"ai skill imported": "ကျွမ်းကျင်မှု တင်သွင်းခဲ့သည်။",
+	"ai skill url prompt": "ကျွမ်းကျင်မှု URL (GitHub လက်ခံထားသည်)",
+	"ai skill paste prompt": "ကျွမ်းကျင်မှု၏ အမှတ်အသားပါ အကြောင်းအရာ",
+	"ai skill name prompt": "အရည်အချင်းနာမည်",
+	"ai skill enable": "ဖွင့်ပါ။",
+	"ai skill disable": "ပိတ်ပါ။",
+	"ai skill view": "အကြောင်းအရာကို ကြည့်ပါ။",
+	"ai skill delete": "ဖျက်ပါ။",
+	"ai skill delete confirm": "ဤတင်သွင်းလာသောကျွမ်းကျင်မှုကို ဖျက်မလား။",
+	"ai skill deleted": "ကျွမ်းကျင်မှုကို ဖျက်လိုက်ပါပြီ။"
 }

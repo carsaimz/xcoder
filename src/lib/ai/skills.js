@@ -61,6 +61,25 @@ export function slugify(value) {
 }
 
 /**
+ * Converts GitHub web URLs to raw download URLs. Any other URL is passed
+ * through unchanged (gists, CDN mirrors, self-hosted markdown…).
+ * Pure so it can be unit-tested.
+ * @param {string} url
+ * @returns {string} raw URL
+ */
+export function githubToRaw(url) {
+	const value = String(url || "").trim();
+	const blob =
+		/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/.exec(
+			value,
+		);
+	if (blob) {
+		return `https://raw.githubusercontent.com/${blob[1]}/${blob[2]}/${blob[3]}/${blob[4]}`;
+	}
+	return value;
+}
+
+/**
  * The bundled skills, available offline. Content is terse and actionable —
  * the agent reads it like a checklist.
  * @type {Array<{name: string, description: string, body: string}>}
@@ -116,46 +135,74 @@ export const BUILTIN_SKILLS = [
 ];
 
 /**
- * Lists every available skill (bundled + workspace `.xcoder/skills`).
- * Workspace reads are best-effort and never throw.
- * @param {{workspaceUrl?: string, readFile?: (url: string)=>Promise<string>, listDir?: (url: string)=>Promise<string[]>}} [io]
+ * Lists every available skill: bundled, imported (`io.dirs`, e.g. the
+ * app-level imported-skills folder) and workspace `.xcoder/skills`.
+ * Folder reads are best-effort and never throw; duplicate names keep the
+ * first occurrence (builtin > imported > workspace).
+ * @param {{workspaceUrl?: string, dirs?: Array<{url: string, source?: string}>, readFile?: (url: string)=>Promise<string>, listDir?: (url: string)=>Promise<Array<string|{name?: string, url?: string}>>}} [io]
  *        injectable fs bindings (unit tests); defaults to real fs
- * @returns {Promise<Array<{name: string, description: string, body: string, source: "builtin"|"workspace"}>>}
+ * @returns {Promise<Array<{name: string, description: string, body: string, source: string}>>}
  */
 export async function listSkills(io = {}) {
 	const results = BUILTIN_SKILLS.map((skill) => ({
 		...skill,
 		source: "builtin",
 	}));
+	const seen = new Set(results.map((skill) => skill.name));
 
 	const listDir = io.listDir;
 	const readFile = io.readFile;
-	if (!listDir || !readFile || !io.workspaceUrl) return results;
+	if (!listDir || !readFile) return results;
 
-	try {
-		const dir = io.workspaceUrl.endsWith("/")
-			? `${io.workspaceUrl}.xcoder/skills`
-			: `${io.workspaceUrl}/.xcoder/skills`;
-		const entries = (await listDir(dir)) || [];
+	/** @type {Array<{url: string, source: string}>} extra skill folders */
+	const dirs = [];
+	if (io.workspaceUrl) {
+		dirs.push({
+			url: io.workspaceUrl.endsWith("/")
+				? `${io.workspaceUrl}.xcoder/skills`
+				: `${io.workspaceUrl}/.xcoder/skills`,
+			source: "workspace",
+		});
+	}
+	for (const dir of Array.isArray(io.dirs) ? io.dirs : []) {
+		if (dir?.url) {
+			dirs.push({
+				url: String(dir.url),
+				source: String(dir.source || "imported"),
+			});
+		}
+	}
+
+	for (const { url: dirUrl, source } of dirs) {
+		let entries;
+		try {
+			entries = (await listDir(dirUrl)) || [];
+		} catch {
+			continue;
+		}
 		for (const entry of entries) {
-			if (!String(entry).toLowerCase().endsWith(".md")) continue;
+			const name =
+				typeof entry === "string" ? entry : entry?.name || entry?.filename;
+			if (!name || !String(name).toLowerCase().endsWith(".md")) continue;
+			const fileUrl =
+				typeof entry === "object" && entry?.url
+					? String(entry.url)
+					: dirUrl.endsWith("/")
+						? `${dirUrl}${name}`
+						: `${dirUrl}/${name}`;
 			try {
-				const raw = await readFile(
-					dir.endsWith("/") ? `${dir}${entry}` : `${dir}/${entry}`,
-				);
+				const raw = await readFile(fileUrl);
 				const parsed = parseSkillMarkdown(
 					raw,
-					String(entry).replace(/\.md$/i, ""),
+					String(name).replace(/\.md$/i, ""),
 				);
-				if (parsed?.body) {
-					results.push({ ...parsed, source: "workspace" });
-				}
+				if (!parsed?.body || seen.has(parsed.name)) continue;
+				seen.add(parsed.name);
+				results.push({ ...parsed, source });
 			} catch {
 				/* unreadable file — skip */
 			}
 		}
-	} catch {
-		/* no workspace skills — fine */
 	}
 	return results;
 }
@@ -203,6 +250,7 @@ export function findSkill(skills, name) {
 }
 
 export default {
+	githubToRaw,
 	BUILTIN_SKILLS,
 	parseSkillMarkdown,
 	listSkills,

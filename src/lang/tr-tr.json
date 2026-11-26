@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Varlık yok — önce bir siteyi getirin",
 	"scraper secrets found": "Açığa çıkan sırlar",
 	"scraper open": "açık",
-	"scraper hint": "Yerel HTTP aracılığıyla ham kaynak → getir → işlenmiş Web Görünümü; yerel güzelleştirme"
+	"scraper hint": "Yerel HTTP aracılığıyla ham kaynak → getir → işlenmiş Web Görünümü; yerel güzelleştirme",
+	"ai skills import file": "＋ Beceriyi dosyadan içe aktar…",
+	"ai skills import url": "＋ URL / GitHub'dan beceriyi içe aktarın…",
+	"ai skills import paste": "＋ Yeni beceriyi yapıştırın…",
+	"ai skill empty": "Beceri dosyasını boşalt",
+	"select skill file": "Beceri dosyasını seçin",
+	"ai skill imported": "Beceri içe aktarıldı",
+	"ai skill url prompt": "Beceri URL'si (GitHub kabul edilir)",
+	"ai skill paste prompt": "Becerinin işaretleme içeriği",
+	"ai skill name prompt": "Beceri adı",
+	"ai skill enable": "Olanak vermek",
+	"ai skill disable": "Devre dışı bırakmak",
+	"ai skill view": "İçeriği görüntüle",
+	"ai skill delete": "Silmek",
+	"ai skill delete confirm": "İçe aktarılan bu beceri silinsin mi?",
+	"ai skill deleted": "Beceri silindi"
 }

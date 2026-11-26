@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Walang asset — kumuha muna ng site",
 	"scraper secrets found": "Nakalantad na mga lihim",
 	"scraper open": "bukas",
-	"scraper hint": "Raw source sa pamamagitan ng native HTTP → fetch → rendered WebView; lokal na pagpapaganda."
+	"scraper hint": "Raw source sa pamamagitan ng native HTTP → fetch → rendered WebView; lokal na pagpapaganda.",
+	"ai skills import file": "＋ Mag-import ng kasanayan mula sa file…",
+	"ai skills import url": "＋ Mag-import ng kasanayan mula sa URL / GitHub…",
+	"ai skills import paste": "＋ I-paste ang bagong kasanayan...",
+	"ai skill empty": "Walang laman ang file ng kasanayan",
+	"select skill file": "Pumili ng skill file",
+	"ai skill imported": "Na-import ang kasanayan",
+	"ai skill url prompt": "URL ng Kasanayan (tinanggap ang GitHub)",
+	"ai skill paste prompt": "Markdown na nilalaman ng kasanayan",
+	"ai skill name prompt": "Pangalan ng kasanayan",
+	"ai skill enable": "Paganahin",
+	"ai skill disable": "Huwag paganahin",
+	"ai skill view": "Tingnan ang nilalaman",
+	"ai skill delete": "Tanggalin",
+	"ai skill delete confirm": "Tanggalin ang na-import na kasanayang ito?",
+	"ai skill deleted": "Na-delete ang kasanayan"
 }

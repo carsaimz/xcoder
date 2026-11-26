@@ -606,7 +606,8 @@ export const TOOLS = [
 		},
 		async run(args) {
 			const { findSkill, listSkills, enabledSkills } = await import("./skills");
-			const skills = await listSkills();
+			const { getSkillsIo } = await import("./skillsStorage");
+			const skills = await listSkills(getSkillsIo() || {});
 			const usable = enabledSkills(skills);
 			const skill = findSkill(usable, String(args?.name || ""));
 			if (!skill) {

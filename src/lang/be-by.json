@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Няма актываў - спачатку абярыце сайт",
 	"scraper secrets found": "Выкрытыя сакрэты",
 	"scraper open": "адкрыты",
-	"scraper hint": "Неапрацаваны крыніца праз уласны HTTP → выбарка → аказаны WebView; мясцовае добраўпарадкаванне."
+	"scraper hint": "Неапрацаваны крыніца праз уласны HTTP → выбарка → аказаны WebView; мясцовае добраўпарадкаванне.",
+	"ai skills import file": "＋ Імпартаваць навыкі з файла…",
+	"ai skills import url": "＋ Імпарт навыкаў з URL / GitHub…",
+	"ai skills import paste": "＋ Уставіць новы навык...",
+	"ai skill empty": "Пусты файл навыкаў",
+	"select skill file": "Выберыце файл навыкаў",
+	"ai skill imported": "Навык імпартаваны",
+	"ai skill url prompt": "URL навыкаў (прымаецца GitHub)",
+	"ai skill paste prompt": "Уцэнка зместу навыку",
+	"ai skill name prompt": "Назва навыку",
+	"ai skill enable": "Уключыць",
+	"ai skill disable": "Адключыць",
+	"ai skill view": "Прагляд кантэнту",
+	"ai skill delete": "Выдаліць",
+	"ai skill delete confirm": "Выдаліць гэты імпартаваны навык?",
+	"ai skill deleted": "Навык выдалены"
 }

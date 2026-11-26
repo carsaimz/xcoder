@@ -2008,5 +2008,20 @@
 	"scraper no assets": "アセットなし - 最初にサイトを取得します",
 	"scraper secrets found": "暴露された秘密",
 	"scraper open": "開ける",
-	"scraper hint": "ネイティブ HTTP → フェッチ → レンダリングされた WebView 経由の生のソース。地域の美化。"
+	"scraper hint": "ネイティブ HTTP → フェッチ → レンダリングされた WebView 経由の生のソース。地域の美化。",
+	"ai skills import file": "＋ ファイルからスキルをインポート…",
+	"ai skills import url": "＋ URL / GitHubからスキルをインポート…",
+	"ai skills import paste": "＋ 新しいスキルを貼り付け…",
+	"ai skill empty": "空のスキルファイル",
+	"select skill file": "スキルファイルを選択",
+	"ai skill imported": "インポートされたスキル",
+	"ai skill url prompt": "スキルURL（GitHub可）",
+	"ai skill paste prompt": "スキルのマークダウン内容",
+	"ai skill name prompt": "スキル名",
+	"ai skill enable": "有効にする",
+	"ai skill disable": "無効にする",
+	"ai skill view": "コンテンツを見る",
+	"ai skill delete": "消去",
+	"ai skill delete confirm": "このインポートされたスキルを削除しますか?",
+	"ai skill deleted": "スキルが削除されました"
 }

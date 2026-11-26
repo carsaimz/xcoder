@@ -2008,5 +2008,20 @@
 	"scraper no assets": "אין נכסים - תחילה אחזר אתר",
 	"scraper secrets found": "סודות חשופים",
 	"scraper open": "לִפְתוֹחַ",
-	"scraper hint": "מקור גולמי באמצעות HTTP מקורי ← אחזור ← WebView שניתנו; ייפוי מקומי."
+	"scraper hint": "מקור גולמי באמצעות HTTP מקורי ← אחזור ← WebView שניתנו; ייפוי מקומי.",
+	"ai skills import file": "＋ ייבוא ​​מיומנות מקובץ...",
+	"ai skills import url": "＋ ייבוא ​​מיומנות מ-URL / GitHub...",
+	"ai skills import paste": "＋ הדבק מיומנות חדשה...",
+	"ai skill empty": "קובץ מיומנות ריק",
+	"select skill file": "בחר קובץ מיומנות",
+	"ai skill imported": "מיומנות מיובאת",
+	"ai skill url prompt": "כתובת אתר מיומנות (GitHub מקובל)",
+	"ai skill paste prompt": "סימון תוכן של המיומנות",
+	"ai skill name prompt": "שם מיומנות",
+	"ai skill enable": "לְאַפשֵׁר",
+	"ai skill disable": "השבת",
+	"ai skill view": "הצג תוכן",
+	"ai skill delete": "לִמְחוֹק",
+	"ai skill delete confirm": "למחוק את המיומנות המיובאת הזו?",
+	"ai skill deleted": "מיומנות נמחקה"
 }

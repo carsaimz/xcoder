@@ -2008,5 +2008,20 @@
 	"scraper no assets": "자산 없음 - 먼저 사이트를 가져오세요",
 	"scraper secrets found": "노출된 비밀",
 	"scraper open": "열려 있는",
-	"scraper hint": "기본 HTTP를 통한 원시 소스 → 가져오기 → 렌더링된 WebView; 지역 미화."
+	"scraper hint": "기본 HTTP를 통한 원시 소스 → 가져오기 → 렌더링된 WebView; 지역 미화.",
+	"ai skills import file": "＋ 파일에서 스킬 가져오기…",
+	"ai skills import url": "++ URL/GitHub에서 스킬 가져오기...",
+	"ai skills import paste": "＋ 새 스킬 붙여넣기…",
+	"ai skill empty": "빈 스킬 파일",
+	"select skill file": "스킬 파일 선택",
+	"ai skill imported": "가져온 스킬",
+	"ai skill url prompt": "스킬 URL(GitHub 허용)",
+	"ai skill paste prompt": "스킬의 마크다운 콘텐츠",
+	"ai skill name prompt": "스킬명",
+	"ai skill enable": "할 수 있게 하다",
+	"ai skill disable": "장애를 입히다",
+	"ai skill view": "콘텐츠 보기",
+	"ai skill delete": "삭제",
+	"ai skill delete confirm": "가져온 기술을 삭제하시겠습니까?",
+	"ai skill deleted": "스킬이 삭제되었습니다."
 }

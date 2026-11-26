@@ -1991,5 +1991,20 @@
 	"scraper no assets": "No assets — fetch a site first",
 	"scraper secrets found": "Exposed secrets",
 	"scraper open": "open",
-	"scraper hint": "Raw source via native HTTP → fetch → rendered WebView; local beautification."
+	"scraper hint": "Raw source via native HTTP → fetch → rendered WebView; local beautification.",
+	"ai skills import file": "＋ Import skill from file…",
+	"ai skills import url": "＋ Import skill from URL / GitHub…",
+	"ai skills import paste": "＋ Paste new skill…",
+	"ai skill empty": "Empty skill file",
+	"select skill file": "Select skill file",
+	"ai skill imported": "Skill imported",
+	"ai skill url prompt": "Skill URL (GitHub accepted)",
+	"ai skill paste prompt": "Markdown content of the skill",
+	"ai skill name prompt": "Skill name",
+	"ai skill enable": "Enable",
+	"ai skill disable": "Disable",
+	"ai skill view": "View content",
+	"ai skill delete": "Delete",
+	"ai skill delete confirm": "Delete this imported skill?",
+	"ai skill deleted": "Skill deleted"
 }

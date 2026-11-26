@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Không có nội dung - trước tiên hãy tìm nạp trang web",
 	"scraper secrets found": "Bí mật bị lộ",
 	"scraper open": "mở",
-	"scraper hint": "Nguồn thô thông qua HTTP gốc → tìm nạp → WebView được hiển thị; làm đẹp địa phương."
+	"scraper hint": "Nguồn thô thông qua HTTP gốc → tìm nạp → WebView được hiển thị; làm đẹp địa phương.",
+	"ai skills import file": "＋ Nhập kỹ năng từ file…",
+	"ai skills import url": "＋ Nhập kỹ năng từ URL/GitHub…",
+	"ai skills import paste": "＋ Dán kỹ năng mới…",
+	"ai skill empty": "Tệp kỹ năng trống",
+	"select skill file": "Chọn tập tin kỹ năng",
+	"ai skill imported": "Kỹ năng được nhập khẩu",
+	"ai skill url prompt": "URL kỹ năng (GitHub được chấp nhận)",
+	"ai skill paste prompt": "Nội dung đánh dấu của kỹ năng",
+	"ai skill name prompt": "Tên kỹ năng",
+	"ai skill enable": "Cho phép",
+	"ai skill disable": "Vô hiệu hóa",
+	"ai skill view": "Xem nội dung",
+	"ai skill delete": "Xóa bỏ",
+	"ai skill delete confirm": "Xóa kỹ năng đã nhập này?",
+	"ai skill deleted": "Đã xóa kỹ năng"
 }

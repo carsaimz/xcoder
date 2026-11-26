@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Sin activos: busque un sitio primero",
 	"scraper secrets found": "Secretos expuestos",
 	"scraper open": "abierto",
-	"scraper hint": "Fuente sin procesar a través de HTTP nativo → buscar → WebView renderizado; embellecimiento local."
+	"scraper hint": "Fuente sin procesar a través de HTTP nativo → buscar → WebView renderizado; embellecimiento local.",
+	"ai skills import file": "＋ Importar habilidad desde archivo…",
+	"ai skills import url": "＋ Importar habilidad desde URL/GitHub…",
+	"ai skills import paste": "＋ Pegar nueva habilidad…",
+	"ai skill empty": "Archivo de habilidades vacío",
+	"select skill file": "Seleccionar archivo de habilidad",
+	"ai skill imported": "Habilidad importada",
+	"ai skill url prompt": "URL de habilidad (se acepta GitHub)",
+	"ai skill paste prompt": "Contenido de rebajas de la habilidad.",
+	"ai skill name prompt": "Nombre de la habilidad",
+	"ai skill enable": "Permitir",
+	"ai skill disable": "Desactivar",
+	"ai skill view": "Ver contenido",
+	"ai skill delete": "Borrar",
+	"ai skill delete confirm": "¿Eliminar esta habilidad importada?",
+	"ai skill deleted": "Habilidad eliminada"
 }

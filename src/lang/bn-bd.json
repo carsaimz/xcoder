@@ -2008,5 +2008,20 @@
 	"scraper no assets": "কোনো সম্পদ নেই — প্রথমে একটি সাইট আনুন",
 	"scraper secrets found": "উন্মোচিত রহস্য",
 	"scraper open": "খোলা",
-	"scraper hint": "নেটিভ HTTP → ফেচ → রেন্ডার করা WebView এর মাধ্যমে কাঁচা উৎস; স্থানীয় সৌন্দর্যায়ন।"
+	"scraper hint": "নেটিভ HTTP → ফেচ → রেন্ডার করা WebView এর মাধ্যমে কাঁচা উৎস; স্থানীয় সৌন্দর্যায়ন।",
+	"ai skills import file": "＋ ফাইল থেকে দক্ষতা আমদানি করুন...",
+	"ai skills import url": "＋ URL/GitHub থেকে দক্ষতা আমদানি করুন...",
+	"ai skills import paste": "＋ নতুন দক্ষতা পেস্ট করুন...",
+	"ai skill empty": "খালি দক্ষতা ফাইল",
+	"select skill file": "দক্ষতা ফাইল নির্বাচন করুন",
+	"ai skill imported": "দক্ষতা আমদানি করা হয়েছে",
+	"ai skill url prompt": "দক্ষতা URL (GitHub গৃহীত)",
+	"ai skill paste prompt": "দক্ষতার মার্কডাউন বিষয়বস্তু",
+	"ai skill name prompt": "দক্ষতার নাম",
+	"ai skill enable": "সক্ষম করুন",
+	"ai skill disable": "নিষ্ক্রিয় করুন",
+	"ai skill view": "বিষয়বস্তু দেখুন",
+	"ai skill delete": "মুছে দিন",
+	"ai skill delete confirm": "এই আমদানি করা দক্ষতা মুছে ফেলবেন?",
+	"ai skill deleted": "দক্ষতা মুছে ফেলা হয়েছে"
 }

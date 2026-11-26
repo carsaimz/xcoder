@@ -2008,5 +2008,20 @@
 	"scraper no assets": "لا توجد أصول - قم بإحضار موقع أولاً",
 	"scraper secrets found": "أسرار مكشوفة",
 	"scraper open": "يفتح",
-	"scraper hint": "مصدر أولي عبر HTTP الأصلي → جلب → عرض WebView؛ التجميل المحلي."
+	"scraper hint": "مصدر أولي عبر HTTP الأصلي → جلب → عرض WebView؛ التجميل المحلي.",
+	"ai skills import file": "＋ استيراد المهارة من الملف ...",
+	"ai skills import url": "＋ استيراد المهارات من URL / GitHub...",
+	"ai skills import paste": "＋ لصق مهارة جديدة ...",
+	"ai skill empty": "ملف مهارات فارغ",
+	"select skill file": "حدد ملف المهارة",
+	"ai skill imported": "المهارة مستوردة",
+	"ai skill url prompt": "عنوان URL للمهارة (يتم قبول GitHub)",
+	"ai skill paste prompt": "محتوى تخفيض المهارة",
+	"ai skill name prompt": "اسم المهارة",
+	"ai skill enable": "يُمكَِن",
+	"ai skill disable": "إبطال",
+	"ai skill view": "عرض المحتوى",
+	"ai skill delete": "يمسح",
+	"ai skill delete confirm": "هل تريد حذف هذه المهارة المستوردة؟",
+	"ai skill deleted": "تم حذف المهارة"
 }

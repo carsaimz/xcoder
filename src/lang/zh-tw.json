@@ -2008,5 +2008,20 @@
 	"scraper no assets": "沒有資產 - 首先取得網站",
 	"scraper secrets found": "暴露的秘密",
 	"scraper open": "打開",
-	"scraper hint": "透過本機 HTTP → 取得 → 渲染的 WebView 的原始來源；局部美化。"
+	"scraper hint": "透過本機 HTTP → 取得 → 渲染的 WebView 的原始來源；局部美化。",
+	"ai skills import file": "＋ 從檔案匯入技能...",
+	"ai skills import url": "＋ 從 URL / GitHub 導入技能...",
+	"ai skills import paste": "＋ 貼上新技能…",
+	"ai skill empty": "技能文件為空",
+	"select skill file": "選擇技能文件",
+	"ai skill imported": "技能導入",
+	"ai skill url prompt": "技能 URL（GitHub 接受）",
+	"ai skill paste prompt": "技能的 Markdown 內容",
+	"ai skill name prompt": "技能名稱",
+	"ai skill enable": "使能夠",
+	"ai skill disable": "停用",
+	"ai skill view": "查看內容",
+	"ai skill delete": "刪除",
+	"ai skill delete confirm": "刪除這個匯入的技能嗎？",
+	"ai skill deleted": "技能已刪除"
 }

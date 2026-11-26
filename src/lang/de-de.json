@@ -2008,5 +2008,20 @@
 	"scraper no assets": "Keine Assets – rufen Sie zuerst eine Website ab",
 	"scraper secrets found": "Aufgedeckte Geheimnisse",
 	"scraper open": "offen",
-	"scraper hint": "Rohquelle über natives HTTP → Abrufen → gerendertes WebView; lokale Verschönerung."
+	"scraper hint": "Rohquelle über natives HTTP → Abrufen → gerendertes WebView; lokale Verschönerung.",
+	"ai skills import file": "＋ Fertigkeit aus Datei importieren…",
+	"ai skills import url": "＋ Skill von URL / GitHub importieren…",
+	"ai skills import paste": "＋ Neue Fertigkeit einfügen…",
+	"ai skill empty": "Leere Skilldatei",
+	"select skill file": "Wählen Sie die Skill-Datei aus",
+	"ai skill imported": "Fertigkeit importiert",
+	"ai skill url prompt": "Skill-URL (GitHub akzeptiert)",
+	"ai skill paste prompt": "Markdown-Inhalt des Skills",
+	"ai skill name prompt": "Fähigkeitsname",
+	"ai skill enable": "Aktivieren",
+	"ai skill disable": "Deaktivieren",
+	"ai skill view": "Inhalte ansehen",
+	"ai skill delete": "Löschen",
+	"ai skill delete confirm": "Diesen importierten Skill löschen?",
+	"ai skill deleted": "Fertigkeit gelöscht"
 }
