@@ -189,7 +189,7 @@ jobs:
           if [ -n "$PREV" ]; then
             BODY=$(GITHUB_TOKEN="$GITHUB_TOKEN" node utils/scripts/generate-release-notes.js \
               "${GITHUB_REPOSITORY%%/*}" "${GITHUB_REPOSITORY##*/}" "$TAG" \
-              --from-tag "$PREV" --important-only --quiet || true)
+              --from-tag "$PREV" --quiet || true)
           fi
           if [ -z "$BODY" ]; then
             BODY="Initial stable release."
