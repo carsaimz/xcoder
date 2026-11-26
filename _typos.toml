@@ -47,6 +47,8 @@ extend-exclude = [
     "src/res/plugin-registry.json",
     # --- catalogo CDN de bibliotecas (descricoes pt+en geradas) ---
     "src/lib/catalogLibs.js",
+    # --- catalogo Aprender (descricoes pt-br legitimas: Cursos...) ---
+    "src/res/learn-sites.json",
     # --- vscode-icons gerado (ids/keys de icones upstream legitimas:
     #     paket, cmo, wll, abl...) ---
     "src/lib/fileIconsVscodeData.ts",
@@ -73,6 +75,11 @@ extend-exclude = [
 ]
 
 [default.extend-words]
+# Tawk.to — produto real de chat embutido (assinatura do Analisador)
+tawk = "tawk"
+Tawk = "Tawk"
+# pt: "individuais" (independentes e individuais) é português legítimo
+individuais = "individuais"
 # pt: "calcular" (to compute) is a real word in the devtools UI
 calcular = "calcular"
 progressivo = "progressivo"
