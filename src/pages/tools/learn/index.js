@@ -172,20 +172,6 @@ function buildUi() {
 					onclick={() => reloadSite()}
 				/>
 				<span
-					className="icon codicon-cloud-download lrn-act"
-					role="button"
-					aria-label={t("open in scraper", "Abrir no Scraper")}
-					title={t("open in scraper", "Abrir no Scraper")}
-					onclick={() => currentSite && openInScraper(currentSite)}
-				/>
-				<span
-					className="icon codicon-cloud-download lrn-act"
-					role="button"
-					aria-label={t("open in scraper", "Abrir no Scraper")}
-					title={t("open in scraper", "Abrir no Scraper")}
-					onclick={() => currentSite && openInScraper(currentSite)}
-				/>
-				<span
 					className="icon codicon-screen-full lrn-act"
 					role="button"
 					aria-label={t("learn native", "Abrir na WebView interna")}
@@ -275,18 +261,6 @@ function renderCatalog() {
 							<span className="lrn-site-desc">{site.desc}</span>
 						</span>
 						<span className="icon codicon-chevron-right" />
-					</button>
-					<button
-						type="button"
-						className="lrn-site-scraper"
-						title={t("open in scraper", "Abrir no Scraper")}
-						aria-label={t("open in scraper", "Abrir no Scraper")}
-						onclick={(e) => {
-							e.stopPropagation();
-							openInScraper(site);
-						}}
-					>
-						<span className="icon codicon-cloud-download" />
 					</button>
 				</div>
 			))}
@@ -478,17 +452,6 @@ function clearHistory() {
 	clearVisited();
 	renderCatalog();
 	toast(t("learn history cleared", "Histórico limpo"), 2000);
-}
-
-/** Hands the site to the Scraper page (independent, always visible). */
-async function openInScraper(site) {
-	try {
-		recordVisit(site.url);
-		const mod = await import("../scrape");
-		await mod.openScraperWith(site.url, "rendered");
-	} catch (error) {
-		toast(String(error?.message || error), 3000);
-	}
 }
 
 /**

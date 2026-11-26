@@ -80,9 +80,6 @@ const SIDEBAR_APPS = [
 
 // v1.8.40: the web tools left the sidebar — they are independent pages now
 const TOOL_PAGES = [
-        ["analyzer", () => import("pages/tools/analyzer")],
-        ["scrape", () => import("pages/tools/scrape")],
-        ["inspector", () => import("pages/tools/inspector")],
         ["libs", () => import("pages/tools/libs")],
         ["learn", () => import("pages/tools/learn")],
         ["website", () => import("pages/tools/website")],

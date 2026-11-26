@@ -244,14 +244,6 @@ public class Browser extends LinearLayout {
     menu.setVisible("Set as Default", false);
     menu.setVisible("Clear Default", false);
     if (!onlyConsole) {
-      // DevTools-grade follow-ups on the previewed page: Inspect opens the
-      // Inspector, Scrape downloads the source — both hand the URL to the
-      // editor tools (the sidebar apps stay available as well).
-      menu.addItem(Ui.Icons.CODE, "Inspect");
-      menu.addItem(Ui.Icons.DESKTOP, "Scrape");
-      // Tech stack analyzer: sends the URL to the editor's Site Analyzer
-      // (frameworks, languages, servers, CDNs… with the evidence listed).
-      menu.addItem(Ui.Icons.SEARCH, "Analyze");
       // SEO audit of the previewed page — opens a detailed, scored report
       // as an overlay inside the page (nothing leaves the preview screen).
       menu.addItem(Ui.Icons.GLOBE, "SEO");
@@ -331,15 +323,6 @@ public class Browser extends LinearLayout {
                 .setCacheMode(
                   checked ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_DEFAULT
                 );
-              break;
-            case "Inspect":
-              sendToApp("inspector");
-              break;
-            case "Scrape":
-              sendToApp("scrape");
-              break;
-            case "Analyze":
-              sendToApp("analyzer");
               break;
             case "SEO":
               runSeoAudit();

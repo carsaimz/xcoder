@@ -862,7 +862,7 @@ function updateArtifactsBar() {
 				{formatTokenCount(data.tokens.total)} tk
 			</span>
 		) : null,
-		<span className="icon expand_more ai-artifacts-arrow" />,
+		<span className="icon codicon-chevron-down ai-artifacts-arrow" />,
 	];
 	$artifactsBar.style.display = "flex";
 }
@@ -1027,6 +1027,10 @@ function ensureTitle(rawText) {
  * @param {{type: string, payload?: any, name?: string, toolCallId?: string, toolCalls?: any[]}} event
  */
 function handleEvent(event) {
+	if (event.type === "todo") {
+		renderTodoCard(event.payload);
+		return;
+	}
 	if (event.type === "tool") {
 		updateToolRow(event);
 		updateArtifactsBar();
@@ -1130,6 +1134,8 @@ function renderStatus(payload) {
 		fetch: "ai status fetch",
 		image: "ai status image",
 		tool: "ai status tool",
+		ask: "ai status ask",
+		todo: "ai status todo",
 	};
 	const fallbacks = {
 		thinking: "Thinking...",
@@ -1146,6 +1152,8 @@ function renderStatus(payload) {
 		fetch: "Fetching page...",
 		image: "Generating image...",
 		tool: "Running tool...",
+		ask: "Asking the user...",
+		todo: "Updating task list...",
 	};
 	const label = strings[LABELS[action]] || fallbacks[action] || `${action}...`;
 	const detail = String(payload?.detail || "");
@@ -1275,8 +1283,8 @@ function buildConsentCard({ name, args, danger }, resolve) {
 }
 
 // ---------------------------------------------------------------------------
-// URL cards — assistant answers that mention sites get an «Abrir» /
-// «Abrir no Scraper» action card per unique host (max 3).
+// URL cards — assistant answers that mention sites get an «Abrir» action
+// card per unique host (max 3).
 
 /**
  * @param {HTMLElement|null} $body .ai-body that hosts the cards
@@ -1315,11 +1323,6 @@ function appendUrlCards($body, $bubble) {
 					title={strings["chat open site"] || "Abrir"}
 					onclick={() => openChatUrlExternal(target.href)}
 				/>
-				<span
-					className="icon codicon-cloud-download ai-url-act"
-					title={strings["open in scraper"] || "Abrir no Scraper"}
-					onclick={() => openChatUrlInScraper(target.href)}
-				/>
 			</div>,
 		);
 	}
@@ -1335,15 +1338,97 @@ function openChatUrlExternal(href) {
 	}
 }
 
-/** Hands the URL to the Scraper page (independent, always visible). */
-async function openChatUrlInScraper(href) {
-	try {
-		const mod = await import("pages/tools/scrape");
-		await mod.openScraperWith(href, "rendered");
-	} catch (error) {
-		toast(String(error?.message || error), 3000);
+// ---------------------------------------------------------------------------
+// Interactive widgets for the agent's UI tools (Acode AI Agent port):
+// ask_user_question renders option buttons; todo_write a live checklist.
+
+/** Live task-checklist card (single instance, updated in place). */
+let $todoCard = null;
+
+/**
+ * Renders (or updates) the task checklist card.
+ * @param {Array<{content: string, status: string}>} todos
+ */
+function renderTodoCard(todos) {
+	if (!Array.isArray(todos) || !todos.length) return;
+	const ICONS = {
+		completed: "codicon-check",
+		in_progress: "codicon-circle-large-filled",
+		pending: "codicon-circle-large",
+	};
+	if (!$todoCard?.isConnected) {
+		$todoCard = (
+			<div className="ai-msg todo">
+				<div className="ai-todo-card">
+					<div className="ai-todo-head">
+						<span className="icon codicon-checklist" />
+						{strings["ai todo title"] || "Tarefas"}
+					</div>
+					<div className="ai-todo-list" />
+				</div>
+			</div>
+		);
+		$messages.append($todoCard);
 	}
+	const $list = $todoCard.querySelector(".ai-todo-list");
+	if ($list) {
+		$list.replaceChildren(
+			...todos.map((todo) => (
+				<div className={`ai-todo-item ${todo.status}`}>
+					<span className={`icon ${ICONS[todo.status] || ICONS.pending}`} />
+					<span className="ai-todo-text">{todo.content}</span>
+				</div>
+			)),
+		);
+	}
+	scrollToEnd();
 }
+
+/** Chat UI handed to the agent for interactive tools. */
+const chatUi = {
+	/**
+	 * Renders the question + option buttons and resolves with the pick.
+	 * @param {{question: string, options: string[]}} request
+	 * @returns {Promise<string|null>}
+	 */
+	askUserQuestion({ question, options }) {
+		return new Promise((resolve) => {
+			const finish = (choice) => {
+				$card.classList.add("answered");
+				const $state = $card.querySelector(".ai-ask-state");
+				if ($state) {
+					$state.textContent = choice
+						? `${strings["ai ask picked"] || "Escolhido"}: ${choice}`
+						: strings["ai ask dismissed"] || "Sem resposta";
+				}
+				$card
+					.querySelectorAll("button")
+					.forEach(($button) => ($button.disabled = true));
+				resolve(choice || null);
+			};
+			const $card = (
+				<div className="ai-msg ask">
+					<div className="ai-ask-card">
+						<div className="ai-ask-head">
+							<span className="icon codicon-comment-discussion" />
+							<span className="ai-ask-question">{question}</span>
+						</div>
+						<div className="ai-ask-options">
+							{options.map((option) => (
+								<button type="button" onclick={() => finish(option)}>
+									{option}
+								</button>
+							))}
+						</div>
+						<span className="ai-ask-state" />
+					</div>
+				</div>
+			);
+			$messages.append($card);
+			scrollToEnd();
+		});
+	},
+};
 
 /** Creates an Agent wired to the chat events + consent widget. */
 function createAgent(opts = {}) {
@@ -1351,6 +1436,7 @@ function createAgent(opts = {}) {
 		...opts,
 		onEvent: handleEvent,
 		consentHandler: opts.consentHandler || requestConsent,
+		uiHandler: opts.uiHandler || chatUi,
 	});
 }
 

@@ -1,20 +1,13 @@
 // @vitest-environment happy-dom
 /**
- * v1.8.40 — tools are INDEPENDENT FULL-SCREEN PAGES.
+ * v1.8.42 — Scraper / Inspector / Analyzer REMOVED (user: "não funcionam,
+ * não importa o que faça, nunca funcionaram").
  *
- * Root cause of «só analisa e retorna 200, mas nada aparece»: the tools
- * lived behind the sidebar rail → floating window → bootHold chain. A
- * boot restore could mark a floating app active while its window was
- * never opened, and the SidebarApp active-setter early-returned on
- * re-activation — so fetches ran with HTTP 200 into a container that
- * was never in the document. Pages remove that entire class of failure.
- *
- * These tests pin the new contract:
- *   1. openAnalyzerWith builds and connects the page SYNCHRONOUSLY (no
- *      polling loop), the input exists immediately
- *   2. the page + actionStack entry + cached container behave like the
- *      Problems page (back button, reopen keeps state)
- *   3. the sidebar registry no longer registers the tool apps
+ * Pins the removal contract:
+ *   1. the three tool pages, their hub entries, the intent hand-off and
+ *      the native preview menu items are all gone
+ *   2. openToolPage still guarantees the page-caching contract (the
+ *      bullet-proof shell the remaining pages share)
  */
 import assert from "node:assert/strict";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -23,187 +16,179 @@ vi.mock("fileSystem", () => ({ default: vi.fn(() => ({})) }));
 vi.mock("components/toast", () => ({ default: vi.fn() }));
 vi.mock("lib/lang", () => ({ default: { code: "pt-br" } }));
 vi.mock("lib/logger", () => ({
-	default: { log: vi.fn(), error: vi.fn(), warn: vi.fn(), info: vi.fn() },
+        default: { log: vi.fn(), error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 vi.mock("lib/settings", () => ({
-	default: { value: {}, on: vi.fn(), off: vi.fn() },
+        default: { value: {}, on: vi.fn(), off: vi.fn() },
 }));
 
 import tag from "html-tag-js";
 
 if (!("get" in HTMLElement.prototype)) {
-	Object.defineProperty(HTMLElement.prototype, "get", {
-		value(selector) {
-			return this.querySelector(selector);
-		},
-		configurable: true,
-		writable: true,
-	});
+        Object.defineProperty(HTMLElement.prototype, "get", {
+                value(selector) {
+                        return this.querySelector(selector);
+                },
+                configurable: true,
+                writable: true,
+        });
 }
 if (!("getAll" in HTMLElement.prototype)) {
-	Object.defineProperty(HTMLElement.prototype, "getAll", {
-		value(selector) {
-			return [...this.querySelectorAll(selector)];
-		},
-		configurable: true,
-		writable: true,
-	});
+        Object.defineProperty(HTMLElement.prototype, "getAll", {
+                value(selector) {
+                        return [...this.querySelectorAll(selector)];
+                },
+                configurable: true,
+                writable: true,
+        });
 }
-
-window.tag = tag;
-// html-tag-js polyfill replica: `el.content = x` REPLACES the element's
-// children (the tool apps build their UI through it)
 if (!Object.getOwnPropertyDescriptor(HTMLElement.prototype, "content")) {
-	Object.defineProperty(HTMLElement.prototype, "content", {
-		set(value) {
-			this.innerHTML = "";
-			if (!Array.isArray(value)) value = [value];
-			for (const child of value) {
-				if (child) this.append(child);
-			}
-		},
-		get() {
-			const children = [...this.children];
-			return children.length === 0
-				? null
-				: children.length === 1
-					? children[0]
-					: children;
-		},
-		configurable: true,
-	});
+        Object.defineProperty(HTMLElement.prototype, "content", {
+                set(value) {
+                        this.innerHTML = "";
+                        if (!Array.isArray(value)) value = [value];
+                        for (const child of value) {
+                                if (child) this.append(child);
+                        }
+                },
+                get() {
+                        const children = [...this.children];
+                        return children.length === 0
+                                ? null
+                                : children.length === 1
+                                        ? children[0]
+                                        : children;
+                },
+                configurable: true,
+        });
 }
+window.tag = tag;
 window.app = document.createElement("div");
 window.app.id = "app";
 document.body.append(window.app);
-window.strings = { analyzer: "Analisador de Sites" };
+window.strings = {};
 globalThis.strings = window.strings;
 
 const pushed = [];
 vi.mock("lib/actionStack", () => ({
-	default: {
-		push: (entry) => pushed.push(entry),
-		remove: (id) => {
-			const i = pushed.findIndex((e) => e.id === id);
-			if (i >= 0) pushed.splice(i, 1);
-		},
-	},
+        default: {
+                push: (entry) => pushed.push(entry),
+                remove: (id) => {
+                        const i = pushed.findIndex((e) => e.id === id);
+                        if (i >= 0) pushed.splice(i, 1);
+                },
+        },
 }));
 
 const makePage = (title) => {
-	const $page = tag("div", { className: "wc-page-fake" });
-	const $main = tag("div", { className: "main" });
-	$page.append($main);
-	const appendBody = (...$els) => {
-		for (const $el of $els) $main.append($el);
-	};
-	$page.appendBody = appendBody;
-	$page.append = appendBody;
-	$page.hide = () => {
-		if (typeof $page.onhide === "function") $page.onhide();
-		$page.remove();
-	};
-	return $page;
+        const $page = tag("div", { className: "wc-page-fake" });
+        const $main = tag("div", { className: "main" });
+        $page.append($main);
+        const appendBody = (...$els) => {
+                for (const $el of $els) $main.append($el);
+        };
+        $page.appendBody = appendBody;
+        $page.append = appendBody;
+        $page.hide = () => {
+                if (typeof $page.onhide === "function") $page.onhide();
+                $page.remove();
+        };
+        return $page;
 };
 vi.mock("components/page", () => ({ default: makePage }));
 
 beforeEach(() => {
-	window.app.textContent = "";
-	pushed.length = 0;
+        window.app.textContent = "";
+        pushed.length = 0;
 });
 
-describe("independent tool pages", () => {
-	test("openAnalyzerWith connects the page synchronously (input ready)", async () => {
-		const analyzer = await import("pages/tools/analyzer");
+describe("openToolPage caching contract", () => {
+        test("builds and connects synchronously, caches the container", async () => {
+                const { openToolPage } = await import("pages/tools/toolPage");
 
-		// hand-off with an unreachable URL: the fetch will fail, but the
-		// PAGE MUST BE IN THE DOCUMENT before any await happens
-		let pageConnectedBeforeFetch = false;
-		await analyzer.openAnalyzerWith("https://exemplo.invalid");
-		pageConnectedBeforeFetch = Boolean(
-			window.app.querySelector(".wc-page-fake .ana-app"),
-		);
+                let built = 0;
+                const open = () =>
+                        openToolPage({
+                                id: "fake-page",
+                                titleKey: "fake",
+                                title: "Fake",
+                                build($container) {
+                                        built += 1;
+                                        $container.append(tag("div", { className: "fake-tool" }));
+                                },
+                        });
 
-		assert.ok(
-			pageConnectedBeforeFetch,
-			"analyzer container not connected after openAnalyzerWith",
-		);
-		assert.ok(
-			pushed.some((entry) => entry.id === "analyzer-page"),
-			"actionStack back-button entry missing",
-		);
-	});
+                const $page = open();
+                assert.ok(window.app.querySelector(".fake-tool"), "not connected");
+                assert.ok(built === 1, "built more than once");
+                assert.ok(
+                        pushed.some((entry) => entry.id === "fake-page"),
+                        "actionStack entry missing",
+                );
 
-	test("the analyzer page renders the input, tabs and panels", async () => {
-		const analyzer = await import("pages/tools/analyzer");
-		analyzer.openAnalyzerPage();
+                // reopening while open never stacks a second page
+                open();
+                assert.ok(built === 1, "second build while open");
+                assert.ok(window.app.querySelectorAll(".wc-page-fake").length === 1);
 
-		const $root = window.app.querySelector(".ana-app");
-		assert.ok($root, "analyzer root missing");
-		assert.ok($root.querySelector(".scr-url.ana-url"), "url input missing");
-		assert.ok($root.querySelector(".scr-tabs"), "tabs missing");
-		assert.ok(
-			$root.querySelector('[data-panel="tech"]:not(.hidden)'),
-			"tech panel should start visible",
-		);
-	});
+                // closing keeps the cached container for the next open
+                $page.hide();
+                assert.ok(!window.app.querySelector(".fake-tool"));
+                assert.ok(!pushed.some((entry) => entry.id === "fake-page"));
 
-	test("closing the page keeps the cached state for the next open", async () => {
-		const { openAnalyzerPage } = await import("pages/tools/analyzer");
+                open();
+                assert.ok(built === 1, "container rebuilt instead of reused");
+                assert.ok(window.app.querySelector(".fake-tool"), "state lost on reopen");
+        });
+});
 
-		const $fresh = await import("pages/tools/analyzer");
-		$fresh.openAnalyzerPage();
-		const $page = window.app.querySelector(".wc-page-fake");
-		assert.ok($page, "page not in the document before hide");
-		$page.hide();
+describe("structural removal contract", () => {
+        test("no scraper/inspector/analyzer imports or hand-offs remain", async () => {
+                const fs = await import("node:fs");
+                const intent = fs.readFileSync("src/handlers/intent.js", "utf8");
+                expect(intent).not.toContain("pages/tools/scrape");
+                expect(intent).not.toContain("pages/tools/inspector");
+                expect(intent).not.toContain("pages/tools/analyzer");
+                expect(intent).not.toContain("TOOL_APPS");
+                expect(intent).not.toContain("xcoder_tool");
 
-		assert.ok(
-			!window.app.querySelector(".ana-app"),
-			"container still connected after hide",
-		);
-		assert.ok(
-			!pushed.some((entry) => entry.id === "analyzer-page"),
-			"actionStack entry not removed on hide",
-		);
+                const chat = fs.readFileSync("src/sidebarApps/ai/index.js", "utf8");
+                expect(chat).not.toContain("openChatUrlInScraper");
+                expect(chat).not.toContain("pages/tools/scrape");
 
-		// reopen — same container comes back with its UI intact
-		openAnalyzerPage();
-		const $root = window.app.querySelector(".ana-app");
-		assert.ok($root, "cached container not reattached");
-		assert.ok($root.querySelector(".scr-url.ana-url"), "state lost on reopen");
-	});
+                const learn = fs.readFileSync("src/pages/tools/learn/index.js", "utf8");
+                expect(learn).not.toContain("openInScraper");
+                expect(learn).not.toContain("openScraperWith");
+                expect(learn).not.toContain("lrn-site-scraper");
 
-	test("sidebar registry no longer registers the tool apps", async () => {
-		const fs = await import("node:fs");
-		const source = fs.readFileSync("src/sidebarApps/index.js", "utf8");
-		for (const tool of [
-			"repl",
-			"inspector",
-			"scrape",
-			"analyzer",
-			"libs",
-			"learn",
-			"websiteApp",
-		]) {
-			expect(source).not.toContain(`["${tool}", () => import("./${tool.replace("App", "")})"]`);
-		}
-		// the ONLY tool left in the sidebar is webdev (devtools)
-		expect(source).toContain('["devtools", () => import("./devtools")]');
-	});
+                const browser = fs.readFileSync(
+                        "src/plugins/browser/android/com/xcoder/browser/Browser.java",
+                        "utf8",
+                );
+                expect(browser).not.toContain('"Inspect"');
+                expect(browser).not.toContain('"Scrape"');
+                expect(browser).not.toContain('"Analyze"');
+                // SEO audit stays
+                expect(browser).toContain('"SEO"');
+        });
 
-	test("tools hub exposes every independent tool", async () => {
-		const fs = await import("node:fs");
-		const hub = fs.readFileSync("src/pages/tools/hub.js", "utf8");
-		for (const opener of [
-			"openAnalyzerPage",
-			"openInspectorPage",
-			"openScraperPage",
-			"openLearnPage",
-			"openLibsPage",
-			"openReplPage",
-			"openWebsitePage",
-		]) {
-			expect(hub).toContain(opener);
-		}
-	});
+        test("tools hub lists only the remaining tools", async () => {
+                const fs = await import("node:fs");
+                const hub = fs.readFileSync("src/pages/tools/hub.js", "utf8");
+                for (const opener of [
+                        "openLearnPage",
+                        "openLibsPage",
+                        "openReplPage",
+                        "openWebsitePage",
+                ]) {
+                        expect(hub).toContain(opener);
+                }
+                for (const gone of [
+                        "openAnalyzerPage",
+                        "openInspectorPage",
+                        "openScraperPage",
+                ]) {
+                        expect(hub).not.toContain(gone);
+                }
+        });
 });

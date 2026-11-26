@@ -9,62 +9,6 @@ const handlers = [];
  * @type {Array<{url: string, options: object}>}
  */
 const pendingIntents = [];
-/**
- * Tool hand-offs from the native preview ("Inspect" / "Scrape" / "Analyze"
- * menu) that arrive before files are restored.
- * @type {Array<{tool: "inspector"|"scrape"|"analyzer", url: string}>}
- */
-const pendingTools = [];
-
-/** Static module loader per native preview tool — each opens its own
- * independent full-screen page (pages/tools, v1.8.40). */
-const TOOL_APPS = {
-	inspector: { load: () => import("pages/tools/inspector") },
-	scrape: { load: () => import("pages/tools/scrape") },
-	analyzer: { load: () => import("pages/tools/analyzer") },
-};
-
-/**
- * Opens the tool's independent page and hands it the URL. The page is
- * built synchronously by openToolPage — no sidebar activation, no
- * polling for the app input, results always visible.
- * @param {keyof typeof TOOL_APPS} tool
- * @param {string} [url]
- */
-async function openToolApp(tool, url) {
-	const entry = TOOL_APPS[tool];
-	if (!entry) return;
-	try {
-		const mod = await entry.load();
-		if (!url) {
-			// no URL handed over — just open the tool's page
-			if (tool === "inspector") mod.openInspectorPage();
-			else if (tool === "scrape") mod.openScraperPage();
-			else if (tool === "analyzer") mod.openAnalyzerPage();
-			return;
-		}
-		if (tool === "inspector") await mod.openInspectorWith(url);
-		else if (tool === "scrape") await mod.openScraperWith(url, "rendered");
-		else if (tool === "analyzer") await mod.openAnalyzerWith(url);
-	} catch (error) {
-		console.error(error);
-		helpers.error(error);
-	}
-}
-
-/**
- * Opens an editor tool (Inspector / Scraper / Analyzer page) with a
- * URL handed over from the native preview screen.
- * @param {keyof typeof TOOL_APPS} tool
- * @param {string} [url]
- */
-async function openTool(tool, url) {
-	if (sessionStorage.getItem("isfilesRestored") !== "true") {
-		pendingTools.push({ tool, url });
-		return;
-	}
-	await openToolApp(tool, url);
-}
 
 /**
  *
@@ -76,18 +20,6 @@ export default async function HandleIntent(intent) {
 	// explicitly (a null intent must be a no-op, never a TypeError).
 	intent = intent || {};
 	const type = intent.action?.split(".").slice(-1)[0];
-
-	// Tool hand-off from the native preview screen (Browser "Inspect" /
-	// "Scrape" / "Analyze" menu items) — MAIN action with xcoder_tool extras.
-	const tool = intent.extras?.xcoder_tool;
-	if (TOOL_APPS[tool]) {
-		const toolUrl =
-			typeof intent.extras?.xcoder_url === "string"
-				? intent.extras.xcoder_url
-				: "";
-		await openTool(tool, toolUrl);
-		return;
-	}
 
 	if (["SEND", "SEND_MULTIPLE", "VIEW", "EDIT"].includes(type)) {
 		/**@type {string} */
@@ -185,28 +117,6 @@ export function removeIntentHandler(handler) {
  */
 export async function processPendingIntents() {
 	if (sessionStorage.getItem("isfilesRestored") !== "true") return;
-
-	// Tool hand-offs queued before restoration
-	while (pendingTools.length > 0) {
-		const { tool, url } = pendingTools.shift();
-		try {
-			// same fix as openTool(): activate the real SidebarApp instance
-			// (get() returns the container element — `.active` on it was a
-			// silent no-op and the tool panel never opened)
-			const entry = TOOL_APPS[tool];
-			if (!entry) continue;
-			const { default: sidebarApps } = await import("sidebarApps");
-			sidebarApps.setActiveApp(entry.app);
-			if (url) {
-				const mod = await entry.load();
-				if (tool === "inspector") await mod.openInspectorWith(url);
-				else if (tool === "scrape") await mod.openScraperWith(url, "rendered");
-				else if (tool === "analyzer") await mod.openAnalyzerWith(url);
-			}
-		} catch (error) {
-			helpers.error(error);
-		}
-	}
 
 	// Process all pending intents
 	while (pendingIntents.length > 0) {

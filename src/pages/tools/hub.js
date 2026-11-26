@@ -4,33 +4,16 @@ import "./toolPage.scss";
 
 /**
  * Tools hub — the navigation page for the independent tool pages
- * (v1.8.40 moved Inspector/Scraper/Analyzer/Libs/Learn/Website/JS
- * Console out of the sidebar into individual full-screen pages; this
- * hub is their shared entry point from the main menu).
+ * (v1.8.40 moved tools out of the sidebar into individual full-screen
+ * pages; this hub is their shared entry point from the main menu).
+ * The Scraper, Inspector and Site Analyzer were REMOVED in v1.8.42
+ * (user: "não funcionam, não importa o que faça").
  */
 
 const t = (key, fallback) => strings[key] || fallback;
 
 /** Tool registry: icon spec, title key, description key, opener. */
 const TOOLS = [
-	{
-		icon: "cod:telescope",
-		nameKey: "analyzer",
-		descKey: "tools hub analyzer desc",
-		open: () => import("./analyzer").then((m) => m.openAnalyzerPage()),
-	},
-	{
-		icon: "cod:inspect",
-		nameKey: "inspector",
-		descKey: "tools hub inspector desc",
-		open: () => import("./inspector").then((m) => m.openInspectorPage()),
-	},
-	{
-		icon: "cod:cloud-download",
-		nameKey: "scraper",
-		descKey: "tools hub scraper desc",
-		open: () => import("./scrape").then((m) => m.openScraperPage()),
-	},
 	{
 		icon: "cod:mortar-board",
 		nameKey: "learn",

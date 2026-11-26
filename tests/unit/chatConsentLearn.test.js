@@ -3,7 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * v1.8.41 — chat consent widgets + URL cards + learn visited memory:
+ * v1.8.41/42 — chat consent widgets + URL cards + learn visited memory:
  *  - agent: consent handler hook, «permitir sempre» set, dialog fallback
  *  - chat: in-chat consent card replaces the blocking confirm
  *  - chat: URL cards with «Abrir» / «Abrir no Scraper»
@@ -93,10 +93,10 @@ describe("chat URL cards", () => {
 		expect(chat).toContain("appendUrlCards(live.body, $bubble);");
 	});
 
-	it("hands URLs to the Scraper page", () => {
-		expect(chat).toContain("openChatUrlInScraper");
-		expect(chat).toContain('await import("pages/tools/scrape")');
-		expect(chat).toContain('openScraperWith(href, "rendered")');
+	it("URL cards only open in the browser (Scraper removed in v1.8.42)", () => {
+		expect(chat).not.toContain("openChatUrlInScraper");
+		expect(chat).not.toContain("pages/tools/scrape");
+		expect(chat).toContain("openChatUrlExternal");
 	});
 });
 
@@ -122,12 +122,10 @@ describe("learn page: visited memory + scraper button", () => {
 		expect(page).toContain('t("learn visited", "Visitado")');
 	});
 
-	it("hands sites to the Scraper page (row + toolbar)", () => {
-		expect(page).toContain("function openInScraper(site)");
-		expect(page).toContain('await import("../scrape")');
-		expect(page).toContain('openScraperWith(site.url, "rendered")');
-		expect(page).toContain("lrn-site-scraper");
-		expect(page).toContain('t("open in scraper", "Abrir no Scraper")');
+	it("has no Scraper hand-off (tools removed in v1.8.42)", () => {
+		expect(page).not.toContain("openInScraper");
+		expect(page).not.toContain("openScraperWith");
+		expect(page).not.toContain("lrn-site-scraper");
 	});
 
 	it("i18n keys exist in en-us and pt-br", () => {
