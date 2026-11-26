@@ -163,13 +163,8 @@ npx electron-builder --linux AppImage deb   # Linux
 
 ## 📸 Capturas de tela
 
-> Renderizações ilustrativas da interface (tema Dark+). Capturas reais de
-> dispositivo são bem-vindas via PR — adicione em
+> Em breve. Capturas reais de dispositivo são bem-vindas via PR — adicione em
 > [`docs/screenshots/`](docs/screenshots).
-
-| Editor + agente IA | Terminal Alpine | Chat IA (ações) |
-| :---: | :---: | :---: |
-| ![Editor com painel IA](docs/screenshots/editor-ai.svg) | ![Terminal Alpine](docs/screenshots/terminal.svg) | ![Chat IA com menu de ações](docs/screenshots/chat-ia.svg) |
 
 ## 🛠️ Build
 
@@ -403,12 +398,8 @@ npx electron-builder --linux AppImage deb   # Linux
 
 ## 📸 Screenshots
 
-> Illustrative renders of the UI (Dark+ theme). Real device captures are
-> welcome via PR — add them in [`docs/screenshots/`](docs/screenshots).
-
-| Editor + AI agent | Alpine terminal | AI chat (actions) |
-| :---: | :---: | :---: |
-| ![Editor with AI panel](docs/screenshots/editor-ai.svg) | ![Alpine terminal](docs/screenshots/terminal.svg) | ![AI chat with actions](docs/screenshots/chat-ia.svg) |
+> Coming soon. Real device captures are welcome via PR — add them in
+> [`docs/screenshots/`](docs/screenshots).
 
 ## 🛠️ Build
 
