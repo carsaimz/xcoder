@@ -7,6 +7,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.42] - 2026-11-26
+
+
 ## [1.8.41] - 2026-11-26
 
 ### Added
