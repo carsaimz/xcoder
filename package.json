@@ -1,7 +1,7 @@
 {
 	"name": "com.carsaimz.xcoder",
 	"displayName": "XCoder",
-	"version": "1.8.44",
+	"version": "1.8.45-beta",
 	"description": "XCoder is a fast, offline-first code editor and web IDE for Android",
 	"scripts": {
 		"lang": "node ./utils/lang.js",
@@ -87,7 +87,6 @@
 		"com.carsaimz.xcoder.rk.customtabs": "file:src/plugins/custom-tabs",
 		"com.carsaimz.xcoder.rk.exec.proot": "file:src/plugins/proot",
 		"com.carsaimz.xcoder.rk.exec.terminal": "file:src/plugins/terminal",
-		"com.carsaimz.xcoder.downloader": "file:src/plugins/downloader",
 		"com.carsaimz.xcoder.downloader": "file:src/plugins/downloader",
 		"com.carsaimz.xcoder.rk.plugin.plugincontext": "file:src/plugins/pluginContext",
 		"cordova-android": "^15.1.0",

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.carsaimz.xcoder" android-versionCode="10844" version="1.8.44"
+<widget id="com.carsaimz.xcoder.beta" android-versionCode="1010845" version="1.8.45-beta"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>XCoder</name>
+    <name>XCoder Beta</name>
     <description>
         Fast, offline-first code editor and web IDE for Android.
     </description>
