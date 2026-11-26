@@ -1,0 +1,42 @@
+/* Zen mode — VS Code "Zen Mode" port. `html.zen-mode` hides the app
+   chrome so only the editor pane remains; the floating exit chip is the
+   single tap target to leave (no keyboard required on mobile). */
+
+html.zen-mode {
+	header.tile,
+	#sidebar,
+	#sidebar-toggler,
+	#header-toggler,
+	#status-bar,
+	#quick-tools,
+	.editor-pane-tabs,
+	.editor-crumbs {
+		display: none !important;
+	}
+}
+
+.zen-exit-chip {
+	position: fixed;
+	right: 12px;
+	bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 12px;
+	border-radius: 20px;
+	border: 1px solid var(--border-color, #3c3c3c);
+	background: var(--secondary-color, #252526);
+	color: var(--primary-text-color, #cccccc);
+	font-size: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+	opacity: 0.85;
+
+	.icon {
+		font-size: 14px;
+	}
+
+	&:active {
+		opacity: 1;
+	}
+}

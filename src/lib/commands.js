@@ -221,6 +221,12 @@ export default {
 		);
 		commandPalette();
 	},
+	async "toggle-zen-mode"() {
+		const { toggleZenMode } = await import(
+			/* webpackChunkName: "zenMode" */ "lib/zenMode"
+		);
+		toggleZenMode();
+	},
 	"disable-fullscreen"() {
 		app.classList.remove("fullscreen-mode");
 		this["resize-editor"]();

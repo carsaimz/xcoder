@@ -37,6 +37,12 @@ const APP_BINDING_CONFIG = [
 		action: "find-file",
 	},
 	{
+		name: "toggleZenMode",
+		description: "Toggle zen mode",
+		action: "toggle-zen-mode",
+		readOnly: false,
+	},
+	{
 		name: "closeCurrentTab",
 		description: "Close current tab.",
 		key: "Ctrl-Q",
