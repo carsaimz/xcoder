@@ -1,4 +1,3 @@
-import { executeCommand, getRegisteredCommands } from "cm/commandRegistry";
 import Page from "components/page";
 import actionStack from "lib/actionStack";
 import "./toolPage.scss";
@@ -6,48 +5,19 @@ import "./toolPage.scss";
 /**
  * Tools hub — the navigation page for the independent tool pages
  * (v1.8.40 moved tools out of the sidebar into individual full-screen
- * pages; this hub is their shared entry point from the ⋮ menu and,
- * since v1.8.45, from its own sidebar launcher icon).
- * The Scraper, Inspector and Site Analyzer are BACK as internal tools
- * (v1.8.45: restored from v1.8.41 at the user's request — plugins stay
- * in the marketplace as an optional alternative, not a replacement).
- * Since v1.8.47 the hub tiles PREFER the marketplace plugin when it is
- * installed and enabled: plugins update through the marketplace without
- * a new app release, so their implementation is always the most recent.
+ * pages; this hub is their shared entry point from the ⋮ menu and
+ * its own sidebar launcher icon).
+ * The internal Inspector / Site Analyzer / Scraper pages are GONE for
+ * good (v1.8.48: removed again at the user's request — the marketplace
+ * plugins Inspector, Site Analyzer and Scraper are their replacement
+ * and update without a new app release). This hub now lists only the
+ * tools that genuinely live in the app.
  */
 
 const t = (key, fallback) => strings[key] || fallback;
 
-/** Marketplace plugin command per tool — set when the plugin UI wins. */
-const PLUGIN_COMMANDS = {
-	analyzer: "site-analyzer:open",
-	inspector: "inspector:open",
-	scraper: "scraper:open",
-};
-
 /** Tool registry: icon spec, title key, description key, opener. */
 const TOOLS = [
-	{
-		icon: "cod:telescope",
-		nameKey: "analyzer",
-		descKey: "tools hub analyzer desc",
-		pluginCommand: PLUGIN_COMMANDS.analyzer,
-		open: () => import("./analyzer").then((m) => m.openAnalyzerPage()),
-	},
-	{
-		icon: "cod:inspect",
-		nameKey: "inspector",
-		descKey: "tools hub inspector desc",
-		pluginCommand: PLUGIN_COMMANDS.inspector,
-		open: () => import("./inspector").then((m) => m.openInspectorPage()),
-	},
-	{
-		icon: "cod:cloud-download",
-		nameKey: "scraper",
-		descKey: "tools hub scraper desc",
-		pluginCommand: PLUGIN_COMMANDS.scraper,
-		open: () => import("./scrape").then((m) => m.openScraperPage()),
-	},
 	{
 		icon: "cod:mortar-board",
 		nameKey: "learn",
@@ -98,34 +68,16 @@ export async function openToolsHub() {
 
 const PAGE_ID = "tools-hub";
 
-/**
- * The marketplace plugin overrides the internal page only when its
- * command is actually registered (installed AND enabled at boot).
- * @param {object} tool entry from TOOLS
- * @returns {boolean}
- */
-function pluginActive(tool) {
-	if (!tool.pluginCommand) return false;
-	return getRegisteredCommands().some(
-		(command) => command.name === tool.pluginCommand,
-	);
-}
-
 /** Renders the hub entries into `$list` (also used on langchange). */
 function renderList($list) {
 	$list.replaceChildren(
 		...TOOLS.map((tool) => {
-			const usePlugin = pluginActive(tool);
 			return (
 				<button
 					type="button"
 					className="tools-hub-item"
 					onclick={() => {
-						if (usePlugin) {
-							executeCommand(tool.pluginCommand);
-						} else {
-							tool.open().catch((error) => console.error(error));
-						}
+						tool.open().catch((error) => console.error(error));
 					}}
 				>
 					{String(tool.icon).startsWith("cod:") ? (
@@ -137,17 +89,6 @@ function renderList($list) {
 						</span>
 						<span className="tools-hub-desc">{t(tool.descKey, "")}</span>
 					</span>
-					{usePlugin ? (
-						<span
-							className="tools-hub-badge"
-							title={t(
-								"tools hub via plugin",
-								"via plugin — sempre atualizado",
-							)}
-						>
-							plugin
-						</span>
-					) : null}
 					<span className="icon codicon-chevron-right chevron" />
 				</button>
 			);

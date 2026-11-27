@@ -244,13 +244,10 @@ public class Browser extends LinearLayout {
     menu.setVisible("Set as Default", false);
     menu.setVisible("Clear Default", false);
     if (!onlyConsole) {
-      // hand the previewed URL to the editor's tools (v1.8.45: internal
-      // Inspector/Scraper/Analyzer pages are back — plugins stay optional)
-      menu.addItem(Ui.Icons.CODE, "Inspect");
-      menu.addItem(Ui.Icons.GLOBE, "Scrape");
-      menu.addItem(Ui.Icons.SEARCH, "Analyze");
       // SEO audit of the previewed page — opens a detailed, scored report
       // as an overlay inside the page (nothing leaves the preview screen).
+      // (The Inspect/Scrape/Analyze hand-off was removed with the internal
+      // tool pages in v1.8.48 — marketplace plugins are the replacement.)
       menu.addItem(Ui.Icons.GLOBE, "SEO");
     }
     menu.addItem(Ui.Icons.OPEN_IN_BROWSER, "Open in Browser");
@@ -324,15 +321,6 @@ public class Browser extends LinearLayout {
                 .setCacheMode(
                   checked ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_DEFAULT
                 );
-              break;
-            case "Inspect":
-              browser.sendToApp("inspector");
-              break;
-            case "Scrape":
-              browser.sendToApp("scrape");
-              break;
-            case "Analyze":
-              browser.sendToApp("analyzer");
               break;
             case "SEO":
               runSeoAudit();
@@ -714,24 +702,6 @@ public class Browser extends LinearLayout {
 
     webView.destroy();
     ((Activity) context).finish();
-  }
-
-  /**
-   * Hands the previewed URL to the editor's Inspector/Scraper tool: brings
-   * MainActivity forward with extras; the JS intent handler opens the tool
-   * with the address preloaded. The preview stays in the back stack.
-   */
-  private void sendToApp(String tool) {
-    Intent launch = context
-      .getPackageManager()
-      .getLaunchIntentForPackage(context.getPackageName());
-    if (launch == null) return;
-    launch.addFlags(
-      Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
-    );
-    launch.putExtra("xcoder_tool", tool);
-    launch.putExtra("xcoder_url", url);
-    context.startActivity(launch);
   }
 
   /**

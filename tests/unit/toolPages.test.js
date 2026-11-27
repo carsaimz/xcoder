@@ -1,7 +1,8 @@
 // @vitest-environment happy-dom
 /**
- * v1.8.42 — Scraper / Inspector / Analyzer REMOVED (user: "não funcionam,
- * não importa o que faça, nunca funcionaram").
+ * v1.8.48 — Scraper / Inspector / Analyzer internal pages REMOVED again
+ * (user: "não se resolveu nada nas ferramentas"). The marketplace plugins
+ * Inspector / Site Analyzer / Scraper are their replacement.
  *
  * Pins the removal contract:
  *   1. the three tool pages, their hub entries, the intent hand-off and
@@ -142,26 +143,36 @@ describe("openToolPage caching contract", () => {
         });
 });
 
-describe("structural restoration contract (v1.8.45)", () => {
-        test("internal tools are back: pages, hub, hand-off and preview menu", async () => {
+describe("removal contract (v1.8.48)", () => {
+        test("internal Inspector/Scraper/Analyzer pages and hand-off are gone", async () => {
                 const fs = await import("node:fs");
-                // the intent hand-off carries the native preview URL to the tool pages
-                const intent = fs.readFileSync("src/handlers/intent.js", "utf8");
-                expect(intent).toContain("pages/tools/scrape");
-                expect(intent).toContain("pages/tools/inspector");
-                expect(intent).toContain("pages/tools/analyzer");
-                expect(intent).toContain("TOOL_APPS");
-                expect(intent).toContain("xcoder_tool");
-                expect(intent).toContain("pendingTools");
+                const exists = (path) => fs.existsSync(path);
+                expect(exists("src/pages/tools/inspector")).toBe(false);
+                expect(exists("src/pages/tools/scrape")).toBe(false);
+                expect(exists("src/pages/tools/analyzer")).toBe(false);
+                expect(exists("src/sidebarApps/inspector")).toBe(false);
+                expect(exists("src/sidebarApps/scrape")).toBe(false);
+                expect(exists("src/sidebarApps/analyzer")).toBe(false);
 
-                // the native preview menu hands the URL over
+                // the intent hand-off is gone (file sharing still works)
+                const intent = fs.readFileSync("src/handlers/intent.js", "utf8");
+                expect(intent).not.toContain("pages/tools/scrape");
+                expect(intent).not.toContain("pages/tools/inspector");
+                expect(intent).not.toContain("pages/tools/analyzer");
+                expect(intent).not.toContain("TOOL_APPS");
+                expect(intent).not.toContain("xcoder_tool");
+                expect(intent).not.toContain("pendingTools");
+                expect(intent).toContain("SEND_MULTIPLE");
+
+                // the native preview menu no longer hands the URL over
                 const browser = fs.readFileSync(
                         "src/plugins/browser/android/com/xcoder/browser/Browser.java",
                         "utf8",
                 );
-                expect(browser).toContain('"Inspect"');
-                expect(browser).toContain('"Scrape"');
-                expect(browser).toContain('"Analyze"');
+                expect(browser).not.toContain('"Inspect"');
+                expect(browser).not.toContain('"Scrape"');
+                expect(browser).not.toContain('"Analyze"');
+                expect(browser).not.toContain("sendToApp");
                 // SEO audit stays
                 expect(browser).toContain('"SEO"');
 
@@ -174,20 +185,27 @@ describe("structural restoration contract (v1.8.45)", () => {
                 expect(learn).not.toContain("openInScraper");
         });
 
-        test("tools hub lists every restored tool plus the webdev page", async () => {
+        test("tools hub lists the in-app tools only (no analyzer/inspector/scraper)", async () => {
                 const fs = await import("node:fs");
                 const hub = fs.readFileSync("src/pages/tools/hub.js", "utf8");
                 for (const opener of [
-                        "openAnalyzerPage",
-                        "openInspectorPage",
-                        "openScraperPage",
                         "openLearnPage",
                         "openLibsPage",
                         "openReplPage",
                         "openWebsitePage",
                         "openWebdevPage",
+                        "openDiffPage",
                 ]) {
                         expect(hub).toContain(opener);
+                }
+                for (const gone of [
+                        "openAnalyzerPage",
+                        "openInspectorPage",
+                        "openScraperPage",
+                        "PLUGIN_COMMANDS",
+                        "pluginActive",
+                ]) {
+                        expect(hub).not.toContain(gone);
                 }
         });
 });

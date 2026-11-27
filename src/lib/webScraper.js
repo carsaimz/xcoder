@@ -1,7 +1,8 @@
 /**
  * Web Scraper + reverse engineering toolkit (pure, unit-tested helpers).
  *
- * The scraping UI (pages/tools/scrape) fetches a page either through the
+ * Consumers (the marketplace Scraper plugin via the `webScraper` plugin
+ * API, the Learn catalog) fetch a page either through the
  * native http client (raw source) or a hidden webview (rendered DOM —
  * see lib/webInspector.fetchRenderedHtml), then this module does the
  * analysis:
