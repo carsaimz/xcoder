@@ -1,5 +1,6 @@
 import fsOperation from "fileSystem";
 import { snippetCompletion } from "@codemirror/autocomplete";
+import { EditorState } from "@codemirror/state";
 import { matchLanguage, parseSnippetFile } from "cm/snippetParser";
 import settings from "lib/settings";
 import Url from "utils/Url";
@@ -81,33 +82,45 @@ async function snippetsForCached(mode) {
  * offered when the word before the cursor is a prefix of one of its
  * prefixes (case-insensitive).
  */
-export function snippetsCompletions() {
-	return async function (context) {
-		if (settings.value.snippetCompletion === false) return null;
-		const word = context.matchBefore(/[\w$-]+/);
-		if (!word || word.from === word.to) return null;
-		const mode = window.editorManager?.activeFile?.currentMode || "";
-		if (!mode) return null;
-		const snippets = await snippetsForCached(mode);
-		const typed = word.text.toLowerCase();
-		const options = [];
-		for (const snippet of snippets) {
-			for (const prefix of snippet.prefixes) {
-				if (!prefix.toLowerCase().startsWith(typed)) continue;
-				options.push(
-					snippetCompletion(snippet.body, {
-						label: prefix,
-						detail: snippet.description || snippet.name,
-						type: "snippet",
-						boost: 90,
-					}),
-				);
-				break;
-			}
+export const snippetsCompletionSource = async function (context) {
+	if (settings.value.snippetCompletion === false) return null;
+	const word = context.matchBefore(/[\w$-]+/);
+	if (!word || word.from === word.to) return null;
+	const mode = window.editorManager?.activeFile?.currentMode || "";
+	if (!mode) return null;
+	const snippets = await snippetsForCached(mode);
+	const typed = word.text.toLowerCase();
+	const options = [];
+	for (const snippet of snippets) {
+		for (const prefix of snippet.prefixes) {
+			if (!prefix.toLowerCase().startsWith(typed)) continue;
+			options.push(
+				snippetCompletion(snippet.body, {
+					label: prefix,
+					detail: snippet.description || snippet.name,
+					type: "snippet",
+					boost: 90,
+				}),
+			);
+			break;
 		}
-		if (!options.length) return null;
-		return { from: word.from, options, validFor: /^[\w$-]*$/ };
-	};
+	}
+	if (!options.length) return null;
+	return { from: word.from, options, validFor: /^[\w$-]*$/ };
+};
+
+/**
+ * Editor extension attaching the snippet completion source to every
+ * language. A completion source is a plain function — it must reach
+ * CodeMirror through the autocomplete language-data facet; a raw function
+ * in the extension list throws «Unrecognized extension value in extension
+ * set» the moment an editor opens.
+ * @returns {import("@codemirror/state").Extension}
+ */
+export function snippetsCompletions() {
+	return EditorState.languageData.of(() => [
+		{ autocomplete: snippetsCompletionSource },
+	]);
 }
 
 /**

@@ -68,7 +68,7 @@ import {
 	getModesByName,
 	initModes,
 } from "cm/modelist";
-import { snippetsCompletions } from "cm/snippets";
+import { snippetsCompletionSource, snippetsCompletions } from "cm/snippets";
 import createTouchSelectionMenu from "cm/touchSelectionMenu";
 import "cm/supportedModes";
 import { autocompletion } from "@codemirror/autocomplete";
@@ -1021,6 +1021,10 @@ async function EditorManager($header, $body) {
 
 			if (appSettings?.value?.iconCompletion !== false) {
 				config.override.push(iconCompletionSource);
+			}
+
+			if (appSettings?.value?.snippetCompletion !== false) {
+				config.override.push(snippetsCompletionSource);
 			}
 
 			if (appSettings?.value?.useEmmet !== false) {
