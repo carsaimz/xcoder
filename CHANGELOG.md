@@ -7,6 +7,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.47] - 2026-11-27
+
+### Maintenance
+- Organizar imports do emmet/task runner (biome)
+
+
 ## [1.8.46] - 2026-11-27
 
 ### Fixed
