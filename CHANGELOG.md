@@ -7,6 +7,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.46] - 2026-11-27
+
+### Fixed
+- Config.xml/package.json de volta ao estável 1.8.46/10846 pacote com.carsaimz.xcoder — resolução do rebase tinha ficado no lado antigo (1.8.45/id beta)
+
+### Maintenance
+- Lockfile sincronizado + npm ci --legacy-peer-deps no Desktop (a CI falhava em npm ci com terser fora do lock)
+
+
 ## [1.8.45] - 2026-11-27
 
 ### Maintenance
