@@ -2371,5 +2371,12 @@
 	"scraper report save": "Salva report",
 	"scraper report saved": "Report salvato",
 	"sticky scroll": "Scorrimento fisso",
-	"settings-info-editor-sticky-scroll": "Fissa le righe di apertura dei blocchi (funzione/classe) in cima all'editor durante lo scorrimento, come VS Code. Tocca una riga fissa per andare a quella riga."
+	"settings-info-editor-sticky-scroll": "Fissa le righe di apertura dei blocchi (funzione/classe) in cima all'editor durante lo scorrimento, come VS Code. Tocca una riga fissa per andare a quella riga.",
+	"inspector console all": "Tutti",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Avvisi",
+	"inspector console error": "Errori",
+	"inspector tree retry": "Riprova",
+	"inspector net no body": "Nessun corpo catturato (media o risposta vuota)"
 }

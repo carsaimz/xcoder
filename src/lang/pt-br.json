@@ -2354,5 +2354,12 @@
 	"scraper report save": "Salvar relatório",
 	"scraper report saved": "Relatório salvo",
 	"sticky scroll": "Rolagem fixa",
-	"settings-info-editor-sticky-scroll": "Fixa as linhas de abertura dos escopos (função/classe) no topo do editor ao rolar, como no VS Code. Toque numa linha fixa para ir até ela."
+	"settings-info-editor-sticky-scroll": "Fixa as linhas de abertura dos escopos (função/classe) no topo do editor ao rolar, como no VS Code. Toque numa linha fixa para ir até ela.",
+	"inspector console all": "Todas",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Avisos",
+	"inspector console error": "Erros",
+	"inspector tree retry": "Tentar de novo",
+	"inspector net no body": "Sem corpo capturado (mídia ou resposta vazia)"
 }

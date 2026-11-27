@@ -2371,5 +2371,12 @@
 	"scraper report save": "റിപ്പോർട്ട് സംരക്ഷിക്കുക",
 	"scraper report saved": "റിപ്പോർട്ട് സംരക്ഷിച്ചു",
 	"sticky scroll": "സ്റ്റിക്കി സ്ക്രോൾ",
-	"settings-info-editor-sticky-scroll": "സ്ക്രോൾ ചെയ്യുമ്പോൾ ചുറ്റുമുള്ള ബ്ലോക്കുകളുടെ (ഫങ്ഷൻ/ക്ലാസ്) ആദ്യ വരികൾ എഡിറ്ററിന്റെ മുകളിൽ ഉറപ്പിക്കുന്നു (VS Code പോലെ). അതിലേക്ക് പോകാൻ ഉറപ്പിച്ച വരിയിൽ ടാപ്പ് ചെയ്യുക."
+	"settings-info-editor-sticky-scroll": "സ്ക്രോൾ ചെയ്യുമ്പോൾ ചുറ്റുമുള്ള ബ്ലോക്കുകളുടെ (ഫങ്ഷൻ/ക്ലാസ്) ആദ്യ വരികൾ എഡിറ്ററിന്റെ മുകളിൽ ഉറപ്പിക്കുന്നു (VS Code പോലെ). അതിലേക്ക് പോകാൻ ഉറപ്പിച്ച വരിയിൽ ടാപ്പ് ചെയ്യുക.",
+	"inspector console all": "എല്ലാം",
+	"inspector console log": "ലോഗ്",
+	"inspector console info": "വിവരം",
+	"inspector console warn": "മുന്നറിയിപ്പുകൾ",
+	"inspector console error": "പിശകുകൾ",
+	"inspector tree retry": "വീണ്ടും ശ്രമിക്കുക",
+	"inspector net no body": "ബോഡി പിടിച്ചിട്ടില്ല (മീഡിയ അല്ലെങ്കിൽ ശൂന്യമായ പ്രതികരണം)"
 }

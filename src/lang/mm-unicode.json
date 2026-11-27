@@ -2371,5 +2371,12 @@
 	"scraper report save": "အစီရင်ခံစာ သိမ်းဆည်းပါ",
 	"scraper report saved": "အစီရင်ခံစာ သိမ်းဆည်းပြီး",
 	"sticky scroll": "တွယ်ကပ် scroll",
-	"settings-info-editor-sticky-scroll": "Scroll လုပ်စဉ် အပြင်ဘက် scope (function/class) ၏ စတင်လိုင်းများကို editor အပေါ်ပိုင်းတွင် ကပ်တွယ်ထားပေးသည် (VS Code ကဲ့သို့)။ ကပ်တွယ်ထားသော လိုင်းကို နှိပ်၍ ထိုလိုင်းသို့ ခုန်ပါ။"
+	"settings-info-editor-sticky-scroll": "Scroll လုပ်စဉ် အပြင်ဘက် scope (function/class) ၏ စတင်လိုင်းများကို editor အပေါ်ပိုင်းတွင် ကပ်တွယ်ထားပေးသည် (VS Code ကဲ့သို့)။ ကပ်တွယ်ထားသော လိုင်းကို နှိပ်၍ ထိုလိုင်းသို့ ခုန်ပါ။",
+	"inspector console all": "အားလုံး",
+	"inspector console log": "မှတ်တမ်း",
+	"inspector console info": "အချက်အလက်",
+	"inspector console warn": "သတိပေးချက်များ",
+	"inspector console error": "အမှားများ",
+	"inspector tree retry": "ထပ်စမ်းကြည့်ပါ",
+	"inspector net no body": "ခန္ဓာကိုယ် မဖမ်းရ (မီဒီယာ သို့မဟုတ် အလွတ်တုံ့ပြန်မှု)"
 }

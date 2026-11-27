@@ -2371,5 +2371,12 @@
 	"scraper report save": "儲存報告",
 	"scraper report saved": "報告已儲存",
 	"sticky scroll": "固定捲動",
-	"settings-info-editor-sticky-scroll": "捲動時把外層範圍（函式/類別）的起始行固定在編輯器頂部，與 VS Code 一致。點擊固定行可跳至該行。"
+	"settings-info-editor-sticky-scroll": "捲動時把外層範圍（函式/類別）的起始行固定在編輯器頂部，與 VS Code 一致。點擊固定行可跳至該行。",
+	"inspector console all": "全部",
+	"inspector console log": "日誌",
+	"inspector console info": "資訊",
+	"inspector console warn": "警告",
+	"inspector console error": "錯誤",
+	"inspector tree retry": "重試",
+	"inspector net no body": "未擷取內文（媒體或空回應）"
 }

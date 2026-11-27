@@ -2371,5 +2371,12 @@
 	"scraper report save": "Jelentés mentése",
 	"scraper report saved": "Jelentés mentve",
 	"sticky scroll": "Ragadós görgetés",
-	"settings-info-editor-sticky-scroll": "Görgetéskor a befoglaló blokkok (függvény/osztály) kezdő sorait az szerkesztő tetejére rögzíti, mint a VS Code. Ugráshoz koppintson a rögzített sorra."
+	"settings-info-editor-sticky-scroll": "Görgetéskor a befoglaló blokkok (függvény/osztály) kezdő sorait az szerkesztő tetejére rögzíti, mint a VS Code. Ugráshoz koppintson a rögzített sorra.",
+	"inspector console all": "Mind",
+	"inspector console log": "Napló",
+	"inspector console info": "Infó",
+	"inspector console warn": "Figyelmeztetések",
+	"inspector console error": "Hibák",
+	"inspector tree retry": "Próbálja újra",
+	"inspector net no body": "Nincs rögzített törzs (média vagy üres válasz)"
 }

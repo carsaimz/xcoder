@@ -2371,5 +2371,12 @@
 	"scraper report save": "Lưu báo cáo",
 	"scraper report saved": "Đã lưu báo cáo",
 	"sticky scroll": "Cuộn dính",
-	"settings-info-editor-sticky-scroll": "Ghim các dòng mở đầu của khối bao ngoài (hàm/lớp) ở đầu trình soạn thảo khi cuộn, giống VS Code. Chạm vào dòng được ghim để nhảy tới đó."
+	"settings-info-editor-sticky-scroll": "Ghim các dòng mở đầu của khối bao ngoài (hàm/lớp) ở đầu trình soạn thảo khi cuộn, giống VS Code. Chạm vào dòng được ghim để nhảy tới đó.",
+	"inspector console all": "Tất cả",
+	"inspector console log": "Nhật ký",
+	"inspector console info": "Thông tin",
+	"inspector console warn": "Cảnh báo",
+	"inspector console error": "Lỗi",
+	"inspector tree retry": "Thử lại",
+	"inspector net no body": "Không có nội dung (phương tiện hoặc phản hồi trống)"
 }

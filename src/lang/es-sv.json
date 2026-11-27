@@ -2371,5 +2371,12 @@
 	"scraper report save": "Guardar informe",
 	"scraper report saved": "Informe guardado",
 	"sticky scroll": "Desplazamiento fijo",
-	"settings-info-editor-sticky-scroll": "Fija las líneas de apertura de los ámbitos (función/clase) en la parte superior del editor al desplazarse, como en VS Code. Toca una línea fija para saltar a ella."
+	"settings-info-editor-sticky-scroll": "Fija las líneas de apertura de los ámbitos (función/clase) en la parte superior del editor al desplazarse, como en VS Code. Toca una línea fija para saltar a ella.",
+	"inspector console all": "Todos",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Avisos",
+	"inspector console error": "Errores",
+	"inspector tree retry": "Intentar de nuevo",
+	"inspector net no body": "Sin cuerpo capturado (medio o respuesta vacía)"
 }

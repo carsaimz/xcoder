@@ -2371,5 +2371,12 @@
 	"scraper report save": "Raporu kaydet",
 	"scraper report saved": "Rapor kaydedildi",
 	"sticky scroll": "Yapışkan kaydırma",
-	"settings-info-editor-sticky-scroll": "Kaydırma sırasında kapsayan blokların (fonksiyon/sınıf) açılış satırlarını düzenleyicinin üstünde sabitler, VS Code gibi. Atlamak için sabit satıra dokunun."
+	"settings-info-editor-sticky-scroll": "Kaydırma sırasında kapsayan blokların (fonksiyon/sınıf) açılış satırlarını düzenleyicinin üstünde sabitler, VS Code gibi. Atlamak için sabit satıra dokunun.",
+	"inspector console all": "Tümü",
+	"inspector console log": "Günlük",
+	"inspector console info": "Bilgi",
+	"inspector console warn": "Uyarılar",
+	"inspector console error": "Hatalar",
+	"inspector tree retry": "Tekrar dene",
+	"inspector net no body": "Yakalanan gövde yok (medya veya boş yanıt)"
 }

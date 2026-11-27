@@ -2371,5 +2371,12 @@
 	"scraper report save": "レポートを保存",
 	"scraper report saved": "レポートを保存しました",
 	"sticky scroll": "固定スクロール",
-	"settings-info-editor-sticky-scroll": "スクロール中に外側のスコープ（関数/クラス）の開始行をエディターの上部に固定します（VS Code と同様）。固定された行をタップするとそこにジャンプします。"
+	"settings-info-editor-sticky-scroll": "スクロール中に外側のスコープ（関数/クラス）の開始行をエディターの上部に固定します（VS Code と同様）。固定された行をタップするとそこにジャンプします。",
+	"inspector console all": "すべて",
+	"inspector console log": "ログ",
+	"inspector console info": "情報",
+	"inspector console warn": "警告",
+	"inspector console error": "エラー",
+	"inspector tree retry": "再試行",
+	"inspector net no body": "本文なし（メディアまたは空のレスポンス）"
 }

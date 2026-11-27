@@ -2371,5 +2371,12 @@
 	"scraper report save": "Bericht speichern",
 	"scraper report saved": "Bericht gespeichert",
 	"sticky scroll": "Fixierter Bildlauf",
-	"settings-info-editor-sticky-scroll": "Hält die ersten Zeilen der umschließenden Blöcke (Funktion/Klasse) beim Scrollen am oberen Rand fest, wie in VS Code. Tippe auf eine Zeile, um dorthin zu springen."
+	"settings-info-editor-sticky-scroll": "Hält die ersten Zeilen der umschließenden Blöcke (Funktion/Klasse) beim Scrollen am oberen Rand fest, wie in VS Code. Tippe auf eine Zeile, um dorthin zu springen.",
+	"inspector console all": "Alle",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Warnungen",
+	"inspector console error": "Fehler",
+	"inspector tree retry": "Erneut versuchen",
+	"inspector net no body": "Kein erfasster Körper (Medium oder leere Antwort)"
 }

@@ -2371,5 +2371,12 @@
 	"scraper report save": "ذخیره گزارش",
 	"scraper report saved": "گزارش ذخیره شد",
 	"sticky scroll": "پیمایش چسبنده",
-	"settings-info-editor-sticky-scroll": "خطوط شروع بلوک‌ها (تابع/کلاس) را هنگام پیمایش در بالای ویرایشگر ثابت می‌کند، مانند VS Code. برای پرش روی خط ثابت ضربه بزنید."
+	"settings-info-editor-sticky-scroll": "خطوط شروع بلوک‌ها (تابع/کلاس) را هنگام پیمایش در بالای ویرایشگر ثابت می‌کند، مانند VS Code. برای پرش روی خط ثابت ضربه بزنید.",
+	"inspector console all": "همه",
+	"inspector console log": "گزارش",
+	"inspector console info": "اطلاعات",
+	"inspector console warn": "هشدارها",
+	"inspector console error": "خطاها",
+	"inspector tree retry": "دوباره تلاش کن",
+	"inspector net no body": "بدنه‌ای گرفته نشده (رسانه یا پاسخ خالی)"
 }

@@ -2371,5 +2371,12 @@
 	"scraper report save": "Enregistrer le rapport",
 	"scraper report saved": "Rapport enregistré",
 	"sticky scroll": "Défilement fixe",
-	"settings-info-editor-sticky-scroll": "Épingle les lignes d'ouverture des blocs englobants (fonction/classe) en haut de l'éditeur pendant le défilement, comme VS Code. Touchez une ligne épinglée pour y accéder."
+	"settings-info-editor-sticky-scroll": "Épingle les lignes d'ouverture des blocs englobants (fonction/classe) en haut de l'éditeur pendant le défilement, comme VS Code. Touchez une ligne épinglée pour y accéder.",
+	"inspector console all": "Tous",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Avertis",
+	"inspector console error": "Erreurs",
+	"inspector tree retry": "Réessayer",
+	"inspector net no body": "Aucun corps capturé (média ou réponse vide)"
 }

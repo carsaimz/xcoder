@@ -2354,5 +2354,12 @@
 	"scraper report save": "Save report",
 	"scraper report saved": "Report saved",
 	"sticky scroll": "Sticky scroll",
-	"settings-info-editor-sticky-scroll": "Pins the opening lines of the enclosing scopes (function/class) at the top of the editor while scrolling, like VS Code. Tap a pinned line to jump to it."
+	"settings-info-editor-sticky-scroll": "Pins the opening lines of the enclosing scopes (function/class) at the top of the editor while scrolling, like VS Code. Tap a pinned line to jump to it.",
+	"inspector console all": "All",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Warns",
+	"inspector console error": "Errors",
+	"inspector tree retry": "Try again",
+	"inspector net no body": "No captured body (media or empty response)"
 }

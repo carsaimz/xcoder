@@ -2371,5 +2371,12 @@
 	"scraper report save": "حفظ التقرير",
 	"scraper report saved": "تم حفظ التقرير",
 	"sticky scroll": "تمرير ثابت",
-	"settings-info-editor-sticky-scroll": "يثبّت أسطر بداية النطاقات (دالة/فئة) في أعلى المحرر أثناء التمرير، مثل VS Code. انقر على سطر مثبت للانتقال إليه."
+	"settings-info-editor-sticky-scroll": "يثبّت أسطر بداية النطاقات (دالة/فئة) في أعلى المحرر أثناء التمرير، مثل VS Code. انقر على سطر مثبت للانتقال إليه.",
+	"inspector console all": "الكل",
+	"inspector console log": "سجل",
+	"inspector console info": "معلومات",
+	"inspector console warn": "تحذيرات",
+	"inspector console error": "أخطاء",
+	"inspector tree retry": "حاول مجدداً",
+	"inspector net no body": "لا يوجد محتوى ملتقط (وسائط أو استجابة فارغة)"
 }

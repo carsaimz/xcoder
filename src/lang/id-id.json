@@ -2371,5 +2371,12 @@
 	"scraper report save": "Simpan laporan",
 	"scraper report saved": "Laporan disimpan",
 	"sticky scroll": "Gulir lengket",
-	"settings-info-editor-sticky-scroll": "Menyematkan baris pembuka blok (fungsi/kelas) di bagian atas editor saat menggulir, seperti VS Code. Ketuk baris yang disematkan untuk melompat ke sana."
+	"settings-info-editor-sticky-scroll": "Menyematkan baris pembuka blok (fungsi/kelas) di bagian atas editor saat menggulir, seperti VS Code. Ketuk baris yang disematkan untuk melompat ke sana.",
+	"inspector console all": "Semua",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Peringatan",
+	"inspector console error": "Kesalahan",
+	"inspector tree retry": "Coba lagi",
+	"inspector net no body": "Tidak ada body yang tertangkap (media atau respons kosong)"
 }

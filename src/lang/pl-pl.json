@@ -2371,5 +2371,12 @@
 	"scraper report save": "Zapisz raport",
 	"scraper report saved": "Raport zapisany",
 	"sticky scroll": "Przewijanie lepkie",
-	"settings-info-editor-sticky-scroll": "Przypina linie otwierające bloki (funkcja/klasa) u góry edytora podczas przewijania, jak w VS Code. Dotknij linii, aby do niej przejść."
+	"settings-info-editor-sticky-scroll": "Przypina linie otwierające bloki (funkcja/klasa) u góry edytora podczas przewijania, jak w VS Code. Dotknij linii, aby do niej przejść.",
+	"inspector console all": "Wszystko",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Ostrzeżenia",
+	"inspector console error": "Błędy",
+	"inspector tree retry": "Spróbuj ponownie",
+	"inspector net no body": "Brak przechwyconej treści (media lub pusta odpowiedź)"
 }

@@ -2371,5 +2371,12 @@
 	"scraper report save": "保存报告",
 	"scraper report saved": "报告已保存",
 	"sticky scroll": "固定滚动",
-	"settings-info-editor-sticky-scroll": "滚动时把外层作用域（函数/类）的起始行固定在编辑器顶部，与 VS Code 一致。点击固定行可跳转到该行。"
+	"settings-info-editor-sticky-scroll": "滚动时把外层作用域（函数/类）的起始行固定在编辑器顶部，与 VS Code 一致。点击固定行可跳转到该行。",
+	"inspector console all": "全部",
+	"inspector console log": "日志",
+	"inspector console info": "信息",
+	"inspector console warn": "警告",
+	"inspector console error": "错误",
+	"inspector tree retry": "重试",
+	"inspector net no body": "未捕获正文（媒体或空响应）"
 }

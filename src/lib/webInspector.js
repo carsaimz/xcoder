@@ -35,11 +35,10 @@ export const BODY_CAPTURE_LIMIT = 262144;
  */
 export const CAPTURE_SCRIPT = String.raw`
 (function(){
-  if (window.__xcoderInspector) { return; }
-  // mark NOW: the native side re-injects this script on every navigation
-  // AND again on pageFinished — without the flag each injection wrapped
-  // console/fetch/XHR a second time, posting every log twice.
-  window.__xcoderInspector = true;
+  // ---- one-shot page capture (console, errors, fetch, XHR) ---------------
+  // The guard keeps the hooks from double-wrapping when the native side
+  // re-injects this script on every navigation AND again on pageFinished
+  // (each wrap would post every log twice).
   var seq = 1;
   var highlighted = null;
   var highlightedPrev = null;
@@ -69,105 +68,117 @@ export const CAPTURE_SCRIPT = String.raw`
       }).slice(0, 4000);
     } catch (e) { return String(v); }
   }
-  // console capture
-  ["log", "warn", "error", "info", "debug"].forEach(function(level){
-    var orig = console[level] ? console[level].bind(console) : function(){};
-    console[level] = function(){
-      var parts = [];
-      for (var i = 0; i < arguments.length; i++) parts.push(fmt(arguments[i]));
-      send({ cmd: "console", data: { level: level, text: parts.join(" "), ts: Date.now() } });
-      try { orig.apply(console, arguments); } catch (e) {}
-    };
-  });
-  window.addEventListener("error", function(e){
-    var text = e.message || String(e.error || "Error");
-    if (e.filename) { text += " (" + String(e.filename).split("/").pop() + ":" + e.lineno + ")"; }
-    send({ cmd: "console", data: { level: "error", text: text, ts: Date.now() } });
-  });
-  window.addEventListener("unhandledrejection", function(e){
-    send({ cmd: "console", data: { level: "error", text: "Unhandled rejection: " + fmt(e.reason), ts: Date.now() } });
-  });
-  // network capture — fetch
-  var of = window.fetch;
-  var BODY_LIMIT = ${BODY_CAPTURE_LIMIT};
-  // Text-ish responses get their body captured (DevTools "Response" tab);
-  // media/binary payloads are skipped and huge bodies race a 1.5s budget
-  // so a slow download can never delay the network entry itself.
-  function captureBody(promise, ct){
-    try {
-      if (!promise) return Promise.resolve(null);
-      if (/^(image|video|audio|font)\//i.test(ct) || /octet-stream/i.test(ct)) return Promise.resolve(null);
-      return Promise.race([
-        promise.then(function(text){
-          text = String(text || "");
-          if (text.length > BODY_LIMIT) return { body: text.slice(0, BODY_LIMIT), truncated: true };
-          return { body: text };
-        }),
-        new Promise(function(resolve){ setTimeout(function(){ resolve(null); }, 1500); })
-      ]);
-    } catch (e) { return Promise.resolve(null); }
-  }
-  if (of) {
-    window.fetch = function(input, init){
-      var url = typeof input === "string" ? input : (input && input.url) || String(input);
-      var method = ((init && init.method) || (input && input.method) || "GET").toUpperCase();
-      var t0 = Date.now();
-      return of.apply(this, arguments).then(function(res){
-        var ct = "";
-        try { ct = (res.headers && res.headers.get("content-type")) || ""; } catch (e) {}
-        var finish = function(body){
-          send({ cmd: "network", data: { method: method, url: String(url), status: res.status, ok: res.ok, ms: Date.now() - t0, type: ct, body: body && body.body, bodyTruncated: body && body.truncated } });
-        };
-        captureBody(res.clone ? res.clone().text() : null, ct).then(finish, function(){ finish(null); });
-        return res;
-      }, function(err){
-        send({ cmd: "network", data: { method: method, url: String(url), status: 0, failed: 1, ms: Date.now() - t0, error: fmt(err && err.message || err) } });
-        throw err;
-      });
-    };
-  }
-  // network capture — XHR
-  var ox = XMLHttpRequest.prototype.open;
-  var os = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.open = function(m, u){
-    this.__xc = { method: String(m || "GET").toUpperCase(), url: String(u || "") };
-    return ox.apply(this, arguments);
-  };
-  XMLHttpRequest.prototype.send = function(){
-    var self = this;
-    var t0 = Date.now();
-    this.addEventListener("loadend", function(){
-      var size = 0;
-      try { size = Number(self.getResponseHeader("content-length")) || 0; } catch (e) {}
-      if (!size && self.response) {
-        try { size = self.response.length || JSON.stringify(self.response).length; } catch (e) {}
-      }
-      var ct = "";
-      try { ct = self.getResponseHeader("content-type") || ""; } catch (e) {}
-      // response body — text/json only, same limits as the fetch transport
-      var body = null;
-      var truncated = false;
-      try {
-        var raw = "";
-        if (self.responseType === "" || self.responseType === "text") raw = String(self.responseText || "");
-        else if (self.responseType === "json") raw = JSON.stringify(self.response);
-        if (raw && !/^(image|video|audio|font)\//i.test(ct) && !/octet-stream/i.test(ct)) {
-          if (raw.length > BODY_LIMIT) { raw = raw.slice(0, BODY_LIMIT); truncated = true; }
-          body = raw;
-        }
-      } catch (e) {}
-      send({ cmd: "network", data: { method: self.__xc ? self.__xc.method : "GET", url: self.__xc ? self.__xc.url : "", status: self.status, ms: Date.now() - t0, size: size, type: ct, body: body, bodyTruncated: truncated } });
+  if (!window.__xcoderInspector) {
+    window.__xcoderInspector = true;
+    // console capture
+    ["log", "warn", "error", "info", "debug"].forEach(function(level){
+      var orig = console[level] ? console[level].bind(console) : function(){};
+      console[level] = function(){
+        var parts = [];
+        for (var i = 0; i < arguments.length; i++) parts.push(fmt(arguments[i]));
+        send({ cmd: "console", data: { level: level, text: parts.join(" "), ts: Date.now() } });
+        try { orig.apply(console, arguments); } catch (e) {}
+      };
     });
-    return os.apply(this, arguments);
-  };
-  // DOM commands from the app
+    window.addEventListener("error", function(e){
+      var text = e.message || String(e.error || "Error");
+      if (e.filename) { text += " (" + String(e.filename).split("/").pop() + ":" + e.lineno + ")"; }
+      send({ cmd: "console", data: { level: "error", text: text, ts: Date.now() } });
+    });
+    window.addEventListener("unhandledrejection", function(e){
+      send({ cmd: "console", data: { level: "error", text: "Unhandled rejection: " + fmt(e.reason), ts: Date.now() } });
+    });
+    // network capture — fetch
+    var of = window.fetch;
+    var BODY_LIMIT = ${BODY_CAPTURE_LIMIT};
+    // Text-ish responses get their body captured (DevTools "Response" tab);
+    // media/binary payloads are skipped and huge bodies race a 1.5s budget
+    // so a slow download can never delay the network entry itself.
+    function captureBody(promise, ct){
+      try {
+        if (!promise) return Promise.resolve(null);
+        if (/^(image|video|audio|font)\//i.test(ct) || /octet-stream/i.test(ct)) return Promise.resolve(null);
+        return Promise.race([
+          promise.then(function(text){
+            text = String(text || "");
+            if (text.length > BODY_LIMIT) return { body: text.slice(0, BODY_LIMIT), truncated: true };
+            return { body: text };
+          }),
+          new Promise(function(resolve){ setTimeout(function(){ resolve(null); }, 1500); })
+        ]);
+      } catch (e) { return Promise.resolve(null); }
+    }
+    if (of) {
+      window.fetch = function(input, init){
+        var url = typeof input === "string" ? input : (input && input.url) || String(input);
+        var method = ((init && init.method) || (input && input.method) || "GET").toUpperCase();
+        var t0 = Date.now();
+        return of.apply(this, arguments).then(function(res){
+          var ct = "";
+          try { ct = (res.headers && res.headers.get("content-type")) || ""; } catch (e) {}
+          var finish = function(body){
+            send({ cmd: "network", data: { method: method, url: String(url), status: res.status, ok: res.ok, ms: Date.now() - t0, type: ct, body: body && body.body, bodyTruncated: body && body.truncated } });
+          };
+          captureBody(res.clone ? res.clone().text() : null, ct).then(finish, function(){ finish(null); });
+          return res;
+        }, function(err){
+          send({ cmd: "network", data: { method: method, url: String(url), status: 0, failed: 1, ms: Date.now() - t0, error: fmt(err && err.message || err) } });
+          throw err;
+        });
+      };
+    }
+    // network capture — XHR
+    var ox = XMLHttpRequest.prototype.open;
+    var os = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.open = function(m, u){
+      this.__xc = { method: String(m || "GET").toUpperCase(), url: String(u || "") };
+      return ox.apply(this, arguments);
+    };
+    XMLHttpRequest.prototype.send = function(){
+      var self = this;
+      var t0 = Date.now();
+      this.addEventListener("loadend", function(){
+        var size = 0;
+        try { size = Number(self.getResponseHeader("content-length")) || 0; } catch (e) {}
+        if (!size && self.response) {
+          try { size = self.response.length || JSON.stringify(self.response).length; } catch (e) {}
+        }
+        var ct = "";
+        try { ct = self.getResponseHeader("content-type") || ""; } catch (e) {}
+        // response body — text/json only, same limits as the fetch transport
+        var body = null;
+        var truncated = false;
+        try {
+          var raw = "";
+          if (self.responseType === "" || self.responseType === "text") raw = String(self.responseText || "");
+          else if (self.responseType === "json") raw = JSON.stringify(self.response);
+          if (raw && !/^(image|video|audio|font)\//i.test(ct) && !/octet-stream/i.test(ct)) {
+            if (raw.length > BODY_LIMIT) { raw = raw.slice(0, BODY_LIMIT); truncated = true; }
+            body = raw;
+          }
+        } catch (e) {}
+        send({ cmd: "network", data: { method: self.__xc ? self.__xc.method : "GET", url: self.__xc ? self.__xc.url : "", status: self.status, ms: Date.now() - t0, size: size, type: ct, body: body, bodyTruncated: truncated } });
+      });
+      return os.apply(this, arguments);
+    };
+  }
+  // ---- command channel: registered on EVERY injection --------------------
+  // Navigations (and some bridges) rebuild window.webview with empty
+  // callbacks while the one-shot guard above stays set — a handler
+  // registered only once would never hear commands again. Re-register on
+  // each injection; offMessage keeps a same-context re-injection from
+  // doubling the handler up.
   if (window.webview && webview.onMessage) {
-    webview.onMessage(function(msg){
+    if (window.__xcoderCmdHandler) {
+      try { webview.offMessage(window.__xcoderCmdHandler); } catch (e) {}
+    }
+    window.__xcoderCmdHandler = function(msg){
       if (!msg || msg.__inspectorCmd !== true) return;
       try { handle(msg); } catch (e) {
         send({ cmd: msg.cmd, id: msg.id, error: fmt(e && e.message || e) });
       }
-    });
+    };
+    webview.onMessage(window.__xcoderCmdHandler);
   }
   function nodeAt(path){
     var node = document;
@@ -310,8 +321,8 @@ export const CAPTURE_SCRIPT = String.raw`
       case "searchDom": {
         var selector = String(msg.selector || "").trim();
         var results = [];
+        var nodes = [];
         if (selector) {
-          var nodes = [];
           try { nodes = Array.prototype.slice.call(document.querySelectorAll(selector)); } catch (e) {}
           for (var i = 0; i < nodes.length && results.length < 100; i++) {
             var d = describe(nodes[i]);
@@ -560,10 +571,10 @@ export function onInspectorEvent(handler) {
  * @param {number} [timeoutMs]
  * @returns {Promise<any>}
  */
-export function sendInspectorCommand(cmd, payload = {}, timeoutMs = 15000) {
+export function sendInspectorCommand(cmd, payload = {}, timeoutMs = 8000) {
 	if (!session) return Promise.reject(new Error("No inspector session"));
 
-	return new Promise((resolve, reject) => {
+	const viaBridge = new Promise((resolve, reject) => {
 		const token = `cmd-${cmd}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 		const timer = setTimeout(() => {
 			pendingCommands.delete(token);
@@ -586,6 +597,87 @@ export function sendInspectorCommand(cmd, payload = {}, timeoutMs = 15000) {
 				reject(error);
 			});
 	});
+	// Belt and braces: when the message bridge cannot answer (rebuilt
+	// window.webview, mid-navigation dispatch), mirror the DOM commands
+	// through the independent evaluate channel so the tabs keep working.
+	return viaBridge.catch((bridgeError) =>
+		commandViaEval(cmd, payload).catch(() => {
+			throw bridgeError;
+		}),
+	);
+}
+
+/**
+ * Self-contained evaluate-channel twins of the capture-script commands.
+ * The postMessage bridge can silently die on a device (a mid-navigation
+ * dispatch, a rebuilt window.webview with empty callbacks) — the evaluate
+ * channel (Storage tab already uses it) is independent, so DOM commands
+ * mirror themselves through it instead of failing the tab.
+ * @type {Record<string, (payload: Record<string, any>) => string>}
+ */
+const EVAL_COMMANDS = {
+	getTree: (payload) => `(function(){
+var PATH=${JSON.stringify(String(payload.path ?? ""))};
+function nodeAt(p){var n=document;var parts=String(p||"").split(".").filter(function(x){return x!==""});for(var i=0;i<parts.length;i++){n=n.children[Number(parts[i])];if(!n)return null;}return n;}
+function attrsOf(n){var a={};if(n.attributes){for(var i=0;i<n.attributes.length;i++){var at=n.attributes[i];a[at.name]=at.value;}}return a;}
+function pathOf(node){if(!node||node===document)return "";if(node===document.documentElement)return "0";var parts=[];var cur=node;while(cur&&cur!==document){var parent=cur.parentElement||cur.parentNode;if(!parent)return null;var idx=Array.prototype.indexOf.call(parent.children,cur);if(idx<0)return null;parts.unshift(String(idx));cur=parent===document.documentElement?document:parent;}parts.unshift("0");return parts.join(".");}
+function describe(node){if(!node)return null;if(node.nodeType===9)node=node.documentElement||node;var tag=node.nodeType===3?"#text":node.tagName?node.tagName.toLowerCase():String(node.nodeName||"");var text=node.nodeType===3?String(node.textContent||"").trim().slice(0,120):"";var classes=node.classList&&node.classList.length?Array.prototype.join.call(node.classList," "):"";return{path:pathOf(node),tag:tag,id:node.id||"",classes:classes,childCount:node.children?node.children.length:0,text:text,attrs:attrsOf(node)};}
+var node=nodeAt(PATH);if(!node)return JSON.stringify({self:null,children:[],total:0});
+var children=[];var total=node.children?node.children.length:0;
+for(var i=0;i<total&&children.length<60;i++){var d=describe(node.children[i]);if(d)children.push(d);}
+return JSON.stringify({self:describe(node),children:children,total:total});})()`,
+	inspect: (payload) => `(function(){
+var PATH=${JSON.stringify(String(payload.path ?? ""))};
+function nodeAt(p){var n=document;var parts=String(p||"").split(".").filter(function(x){return x!==""});for(var i=0;i<parts.length;i++){n=n.children[Number(parts[i])];if(!n)return null;}return n;}
+function asElement(n){if(!n)return null;if(n.nodeType===9)return n.documentElement||n.body||null;if(n.nodeType===3||n.nodeType===8)return n.parentElement||null;return n.nodeType===1?n:null;}
+function attrsOf(n){var a={};if(n.attributes){for(var i=0;i<n.attributes.length;i++){var at=n.attributes[i];a[at.name]=at.value;}}return a;}
+function pathOf(node){if(!node||node===document)return "";if(node===document.documentElement)return "0";var parts=[];var cur=node;while(cur&&cur!==document){var parent=cur.parentElement||cur.parentNode;if(!parent)return null;var idx=Array.prototype.indexOf.call(parent.children,cur);if(idx<0)return null;parts.unshift(String(idx));cur=parent===document.documentElement?document:parent;}parts.unshift("0");return parts.join(".");}
+function describe(node){if(!node)return null;if(node.nodeType===9)node=node.documentElement||node;var tag=node.nodeType===3?"#text":node.tagName?node.tagName.toLowerCase():String(node.nodeName||"");var text=node.nodeType===3?String(node.textContent||"").trim().slice(0,120):"";var classes=node.classList&&node.classList.length?Array.prototype.join.call(node.classList," "):"";return{path:pathOf(node),tag:tag,id:node.id||"",classes:classes,childCount:node.children?node.children.length:0,text:text,attrs:attrsOf(node)};}
+var el=asElement(nodeAt(PATH));if(!el)return JSON.stringify(null);
+var box=el.getBoundingClientRect();var styles={};
+try{var cs=getComputedStyle(el);["display","position","width","height","margin","padding","color","background-color","font-size","font-family","font-weight","line-height","border","border-radius","z-index","opacity","overflow","flex-direction","justify-content","align-items","text-align","box-shadow","transform","visibility"].forEach(function(pr){styles[pr]=cs.getPropertyValue(pr);});}catch(e){}
+var html="";try{html=el.outerHTML||String(el.nodeValue||"");}catch(e){}
+return JSON.stringify({self:describe(el),html:String(html).slice(0,${OUTER_HTML_LIMIT}),htmlTruncated:html.length>${OUTER_HTML_LIMIT},box:{x:Math.round(box.x),y:Math.round(box.y),w:Math.round(box.width),h:Math.round(box.height)},styles:styles});})()`,
+	searchDom: (payload) => `(function(){
+var SEL=${JSON.stringify(String(payload.selector ?? ""))};
+function attrsOf(n){var a={};if(n.attributes){for(var i=0;i<n.attributes.length;i++){var at=n.attributes[i];a[at.name]=at.value;}}return a;}
+function pathOf(node){if(!node||node===document)return "";if(node===document.documentElement)return "0";var parts=[];var cur=node;while(cur&&cur!==document){var parent=cur.parentElement||cur.parentNode;if(!parent)return null;var idx=Array.prototype.indexOf.call(parent.children,cur);if(idx<0)return null;parts.unshift(String(idx));cur=parent===document.documentElement?document:parent;}parts.unshift("0");return parts.join(".");}
+function describe(node){if(!node)return null;if(node.nodeType===9)node=node.documentElement||node;var tag=node.nodeType===3?"#text":node.tagName?node.tagName.toLowerCase():String(node.nodeName||"");var text=node.nodeType===3?String(node.textContent||"").trim().slice(0,120):"";var classes=node.classList&&node.classList.length?Array.prototype.join.call(node.classList," "):"";return{path:pathOf(node),tag:tag,id:node.id||"",classes:classes,childCount:node.children?node.children.length:0,text:text,attrs:attrsOf(node)};}
+var nodes=[];try{nodes=Array.prototype.slice.call(document.querySelectorAll(SEL));}catch(e){}
+var matches=[];for(var i=0;i<nodes.length&&matches.length<100;i++){var d=describe(nodes[i]);if(d)matches.push(d);}
+return JSON.stringify({matches:matches,total:nodes.length});})()`,
+	searchText: (payload) => `(function(){
+var NEEDLE=${JSON.stringify(String(payload.text ?? "").toLowerCase())};
+function attrsOf(n){var a={};if(n.attributes){for(var i=0;i<n.attributes.length;i++){var at=n.attributes[i];a[at.name]=at.value;}}return a;}
+function pathOf(node){if(!node||node===document)return "";if(node===document.documentElement)return "0";var parts=[];var cur=node;while(cur&&cur!==document){var parent=cur.parentElement||cur.parentNode;if(!parent)return null;var idx=Array.prototype.indexOf.call(parent.children,cur);if(idx<0)return null;parts.unshift(String(idx));cur=parent===document.documentElement?document:parent;}parts.unshift("0");return parts.join(".");}
+function describe(node){if(!node)return null;if(node.nodeType===9)node=node.documentElement||node;var tag=node.nodeType===3?"#text":node.tagName?node.tagName.toLowerCase():String(node.nodeName||"");var text=node.nodeType===3?String(node.textContent||"").trim().slice(0,120):"";var classes=node.classList&&node.classList.length?Array.prototype.join.call(node.classList," "):"";return{path:pathOf(node),tag:tag,id:node.id||"",classes:classes,childCount:node.children?node.children.length:0,text:text,attrs:attrsOf(node)};}
+var matches=[];var seen={};var rootEl=document.body||document.documentElement;
+try{var walker=document.createTreeWalker(rootEl,NodeFilter.SHOW_TEXT,null,false);
+while(walker.nextNode()&&matches.length<100){var value=walker.currentNode.nodeValue||"";
+if(value.toLowerCase().indexOf(NEEDLE)<0)continue;var hit=walker.currentNode.parentElement;if(!hit)continue;
+var info=describe(hit);if(info&&!seen[info.path]){seen[info.path]=1;matches.push(info);}}}catch(e){}
+return JSON.stringify({matches:matches});})()`,
+};
+
+/**
+ * Runs an inspector command through the evaluate channel (fallback twin).
+ * @param {string} cmd
+ * @param {Record<string, any>} payload
+ * @returns {Promise<any>}
+ */
+async function commandViaEval(cmd, payload) {
+	const build = EVAL_COMMANDS[cmd];
+	if (!build)
+		throw new Error(`Inspector command not available via evaluate: ${cmd}`);
+	const result = await evaluateInPage(build(payload));
+	if (!result || !result.ok) {
+		throw new Error((result && result.error) || "Inspector eval failed");
+	}
+	try {
+		return JSON.parse(result.value);
+	} catch {
+		return result.value;
+	}
 }
 
 /**

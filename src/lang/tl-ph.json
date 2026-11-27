@@ -2371,5 +2371,12 @@
 	"scraper report save": "I-save ang report",
 	"scraper report saved": "Na-save ang report",
 	"sticky scroll": "Nakadikit na scroll",
-	"settings-info-editor-sticky-scroll": "Naka-pin ang mga unang linya ng mga sumasaklaw na bloke (function/class) sa itaas ng editor habang nag-si-scroll, tulad ng VS Code. I-tap ang naka-pin na linya para tumalon doon."
+	"settings-info-editor-sticky-scroll": "Naka-pin ang mga unang linya ng mga sumasaklaw na bloke (function/class) sa itaas ng editor habang nag-si-scroll, tulad ng VS Code. I-tap ang naka-pin na linya para tumalon doon.",
+	"inspector console all": "Lahat",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Mga Babala",
+	"inspector console error": "Mga Error",
+	"inspector tree retry": "Subukan muli",
+	"inspector net no body": "Walang nakuhang body (media o walang laman na tugon)"
 }

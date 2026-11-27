@@ -2371,5 +2371,12 @@
 	"scraper report save": "Uložit zprávu",
 	"scraper report saved": "Zpráva uložena",
 	"sticky scroll": "Přilepený posun",
-	"settings-info-editor-sticky-scroll": "Při posouvání přichytí úvodní řádky nadřazených bloků (funkce/třída) k hornímu okraji editoru, jako ve VS Code. Klepnutím na přilepený řádek na něj přeskočíte."
+	"settings-info-editor-sticky-scroll": "Při posouvání přichytí úvodní řádky nadřazených bloků (funkce/třída) k hornímu okraji editoru, jako ve VS Code. Klepnutím na přilepený řádek na něj přeskočíte.",
+	"inspector console all": "Vše",
+	"inspector console log": "Log",
+	"inspector console info": "Info",
+	"inspector console warn": "Varování",
+	"inspector console error": "Chyby",
+	"inspector tree retry": "Zkusit znovu",
+	"inspector net no body": "Bez zachyceného těla (média nebo prázdná odpověď)"
 }

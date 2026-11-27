@@ -2371,5 +2371,12 @@
 	"scraper report save": "Hisobotni saqlash",
 	"scraper report saved": "Hisobot saqlandi",
 	"sticky scroll": "Yopishqoq aylantirish",
-	"settings-info-editor-sticky-scroll": "Aylantirish vaqti tashqi bloklar (funksiya/klass) ochilish qatorlarini muharrir yuqorisida qadab qo'yadi (VS Code kabi). Sakrash uchun qadalgan qatorga bosing."
+	"settings-info-editor-sticky-scroll": "Aylantirish vaqti tashqi bloklar (funksiya/klass) ochilish qatorlarini muharrir yuqorisida qadab qo'yadi (VS Code kabi). Sakrash uchun qadalgan qatorga bosing.",
+	"inspector console all": "Hammasi",
+	"inspector console log": "Jurnal",
+	"inspector console info": "Ma'lumot",
+	"inspector console warn": "Ogohlantirishlar",
+	"inspector console error": "Xatolar",
+	"inspector tree retry": "Yana urinib ko'ring",
+	"inspector net no body": "Tana olinmagan (media yoki bo'sh javob)"
 }

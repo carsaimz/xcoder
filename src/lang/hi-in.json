@@ -2371,5 +2371,12 @@
 	"scraper report save": "रिपोर्ट सहेजें",
 	"scraper report saved": "रिपोर्ट सहेजी गई",
 	"sticky scroll": "स्टिकी स्क्रॉल",
-	"settings-info-editor-sticky-scroll": "स्क्रॉल करते समय संलग्न ब्लॉक (फ़ंक्शन/क्लास) की शुरुआती पंक्तियों को संपादक के शीर्ष पर स्थिर रखता है, VS Code की तरह। उस पर जाने के लिए स्थिर पंक्ति पर टैप करें।"
+	"settings-info-editor-sticky-scroll": "स्क्रॉल करते समय संलग्न ब्लॉक (फ़ंक्शन/क्लास) की शुरुआती पंक्तियों को संपादक के शीर्ष पर स्थिर रखता है, VS Code की तरह। उस पर जाने के लिए स्थिर पंक्ति पर टैप करें।",
+	"inspector console all": "सभी",
+	"inspector console log": "लॉग",
+	"inspector console info": "जानकारी",
+	"inspector console warn": "चेतावनियाँ",
+	"inspector console error": "त्रुटियाँ",
+	"inspector tree retry": "फिर से प्रयास करें",
+	"inspector net no body": "कोई मुख्य भाग कैप्चर नहीं हुआ (मीडिया या खाली प्रतिक्रिया)"
 }

@@ -2371,5 +2371,12 @@
 	"scraper report save": "ਰਿਪੋਰਟ ਸੰਭਾਲੋ",
 	"scraper report saved": "ਰਿਪੋਰਟ ਸੰਭਾਲਿਆ ਗਿਆ",
 	"sticky scroll": "ਸਟਿੱਕੀ ਸਕਰੋਲ",
-	"settings-info-editor-sticky-scroll": "ਸਕਰੋਲ ਕਰਦੇ ਸਮੇਂ ਘੇਰੇ ਹੋਏ ਬਲਾਕ (ਫੰਕਸ਼ਨ/ਕਲਾਸ) ਦੀਆਂ ਸ਼ੁਰੂਆਤੀ ਲਾਈਨਾਂ ਸੰਪਾਦਕ ਦੇ ਉੱਪਰ ਸਥਿਰ ਰੱਖਦਾ ਹੈ, VS Code ਵਾਂਗ। ਉੱਥੇ ਜਾਣ ਲਈ ਸਥਿਰ ਲਾਈਨ ਉੱਤੇ ਟੈਪ ਕਰੋ।"
+	"settings-info-editor-sticky-scroll": "ਸਕਰੋਲ ਕਰਦੇ ਸਮੇਂ ਘੇਰੇ ਹੋਏ ਬਲਾਕ (ਫੰਕਸ਼ਨ/ਕਲਾਸ) ਦੀਆਂ ਸ਼ੁਰੂਆਤੀ ਲਾਈਨਾਂ ਸੰਪਾਦਕ ਦੇ ਉੱਪਰ ਸਥਿਰ ਰੱਖਦਾ ਹੈ, VS Code ਵਾਂਗ। ਉੱਥੇ ਜਾਣ ਲਈ ਸਥਿਰ ਲਾਈਨ ਉੱਤੇ ਟੈਪ ਕਰੋ।",
+	"inspector console all": "ਸਭ",
+	"inspector console log": "ਲਾਗ",
+	"inspector console info": "ਜਾਣਕਾਰੀ",
+	"inspector console warn": "ਚੇਤਾਵਨੀਆਂ",
+	"inspector console error": "ਗਿਣਤੀਆਂ",
+	"inspector tree retry": "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼",
+	"inspector net no body": "ਕੋਈ ਬਾਡੀ ਕੈਪਚਰ ਨਹੀਂ (ਮੀਡੀਆ ਜਾਂ ਖਾਲੀ ਜਵਾਬ)"
 }

@@ -19,14 +19,21 @@
 ## ✅ Resumo v1.8.24 → v1.8.48
 
 - **v1.8.48 — beta removido + ferramentas internas saem de vez +
-  sticky scroll:** **canal beta ELIMINADO** (pacote/versão/nome únicos
-  `com.carsaimz.xcoder`, releases estáveis apenas; prerelease.yml e
-  apply-beta-package.mjs apagados) — as pre-releases complicavam
-  comparação de versões e builds; **Inspector, Site Analyzer e Scraper
-  internos REMOVIDOS de vez** (user: "não se resolveu nada nas
-  ferramentas") — os plugins do marketplace Inspector (v1.1.0, agora
-  com aba **Armazenamento**: localStorage/sessionStorage/cookies),
-  Site Analyzer e Scraper são a substituição e atualizam sem APK novo;
+  sticky scroll + Inspector 1.2.0:** **canal beta ELIMINADO**
+  (pacote/versão/nome únicos `com.carsaimz.xcoder`, releases estáveis
+  apenas; prerelease.yml e apply-beta-package.mjs apagados) — as
+  pre-releases complicavam comparação de versões e builds; **Inspector,
+  Site Analyzer e Scraper internos REMOVIDOS de vez** (user: "não se
+  resolveu nada nas ferramentas") — os plugins do marketplace são a
+  substituição e atualizam sem APK novo; **Inspector 1.2.0 corrige as
+  abas mortas** (Elementos/Consola não apareciam nada, só a Rede
+  mostrava pedidos): Consola com filtros por nível + hora + linha de
+  sistema (nunca vazia), Rede com corpo da resposta ao toque,
+  **abas com wrap** nos ecrãs estreitos, árvore com «Tentar de novo»,
+  linhas «?» corrigidas (`tag`/`classes` do capturador) e comandos de
+  árvore/procura com **segundo canal por evaluate** (a ponte de
+  mensagens morria em silêncio e órfã do handler — re-registo em toda
+  a injeção + fallback);
   menu da pré-visualização fica só com Console/SEO (sem handoff); paleta
   de comandos, diff, quick tools e outros portos VS Code continuam;
   **sticky scroll PORTADO** (assinaturas dos escopos fixas no topo ao

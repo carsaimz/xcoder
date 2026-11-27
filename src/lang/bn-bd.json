@@ -2371,5 +2371,12 @@
 	"scraper report save": "রিপোর্ট সংরক্ষণ করুন",
 	"scraper report saved": "রিপোর্ট সংরক্ষিত",
 	"sticky scroll": "স্টিকি স্ক্রল",
-	"settings-info-editor-sticky-scroll": "স্ক্রল করার সময় আশেপাশের ব্লকের (ফাংশন/ক্লাস) শুরুর লাইনগুলো সম্পাদকের উপরে স্থির রাখে, VS Code-এর মতো। সেখানে যেতে স্থির লাইনে ট্যাপ করুন।"
+	"settings-info-editor-sticky-scroll": "স্ক্রল করার সময় আশেপাশের ব্লকের (ফাংশন/ক্লাস) শুরুর লাইনগুলো সম্পাদকের উপরে স্থির রাখে, VS Code-এর মতো। সেখানে যেতে স্থির লাইনে ট্যাপ করুন।",
+	"inspector console all": "সব",
+	"inspector console log": "লগ",
+	"inspector console info": "তথ্য",
+	"inspector console warn": "সতর্কতা",
+	"inspector console error": "ত্রুটি",
+	"inspector tree retry": "আবার চেষ্টা করুন",
+	"inspector net no body": "কোনো বডি ধরা হয়নি (মিডিয়া বা খালি প্রতিক্রিয়া)"
 }

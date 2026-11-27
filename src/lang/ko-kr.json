@@ -2371,5 +2371,12 @@
 	"scraper report save": "보고서 저장",
 	"scraper report saved": "보고서 저장됨",
 	"sticky scroll": "고정 스크롤",
-	"settings-info-editor-sticky-scroll": "스크롤하는 동안 바깥 블록(함수/클래스)의 시작 줄을 편집기 상단에 고정합니다(VS Code와 동일). 고정된 줄을 탭하면 그곳으로 이동합니다."
+	"settings-info-editor-sticky-scroll": "스크롤하는 동안 바깥 블록(함수/클래스)의 시작 줄을 편집기 상단에 고정합니다(VS Code와 동일). 고정된 줄을 탭하면 그곳으로 이동합니다.",
+	"inspector console all": "전체",
+	"inspector console log": "로그",
+	"inspector console info": "정보",
+	"inspector console warn": "경고",
+	"inspector console error": "오류",
+	"inspector tree retry": "다시 시도",
+	"inspector net no body": "캡처된 본문 없음 (미디어 또는 빈 응답)"
 }

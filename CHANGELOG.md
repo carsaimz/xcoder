@@ -7,11 +7,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 <a id="português"></a>
 
+## [1.8.48] - 2026-11-27
+
+### Added
+- **Inspector (plugin) 1.2.0 — as abas que estavam mortas voltam a funcionar**: Elementos com estado de carregamento e «Tentar de novo», Consola com filtros por nível (Todas/Log/Info/Avisos/Erros), hora em cada linha e linha de sistema quando a página carrega (a aba nunca fica vazia), Rede com **corpo da resposta ao toque** (paridade «Response» do DevTools) e abas organizadas com **quebra de linha** em ecrãs estreitos (wrap)
+- **Robustez do Inspector**: os comandos de árvore/procura (getTree, inspect, searchDom, searchText) ganharam um segundo canal — espelho por `evaluate` na página — para quando a ponte de mensagens do WebView morre silenciosamente; timeout de comando reduzido de 15 s para 8 s com fallback automático
+- **Script de captura à prova de contexto**: o registo do canal de comandos acontece em TODA a injeção (a ponte reconstruída deixava o handler órfão — Elementos ficava eternamente vazio); i18n: 7 chaves novas nas 31 línguas
+
+### Fixed
+- Linhas da árvore do Inspector mostravam «?» em vez do nome da etiqueta (o plugin lia `node.label`/`node.class`, o capturador devolve `tag`/`classes`)
+- Trocar de aba no Inspector não re-renderizava o painel (Consola ficava presa em «Sem mensagens ainda» mesmo com registos capturados)
+
 ## [1.8.47] - 2026-11-27
 
 ### Maintenance
 - Organizar imports do emmet/task runner (biome)
-
 
 ## [1.8.46] - 2026-11-27
 
@@ -2791,6 +2801,17 @@ total).
   ordem das categorias
 
 <a id="english"></a>
+
+## [1.8.48] - 2026-11-27
+
+### Added
+- **Inspector plugin 1.2.0 — the dead tabs work again**: Elements with a loading state and «Try again», Console with level filters (All/Log/Info/Warns/Errors), per-line timestamps and a system line when the page loads (the tab is never empty), Network with **tap-to-preview response bodies** (DevTools «Response» parity) and a **wrapping tab bar** on narrow screens
+- **Inspector robustness**: tree/search commands (getTree, inspect, searchDom, searchText) gained a second channel — an `evaluate` mirror inside the page — for when the WebView message bridge dies silently; command timeout cut from 15 s to 8 s with automatic fallback
+- **Context-proof capture script**: the command channel re-registers on EVERY injection (a rebuilt window.webview orphaned the handler — Elements stayed empty forever); i18n: 7 new keys across 31 languages
+
+### Fixed
+- Inspector tree rows showed «?» instead of the tag name (the plugin read `node.label`/`node.class`, the capture reports `tag`/`classes`)
+- Switching tabs in the Inspector did not re-render the panel (Console stayed stuck on «No messages yet» even with captured entries)
 
 ## [1.8.43] - 2026-11-26
 

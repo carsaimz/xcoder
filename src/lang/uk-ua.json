@@ -2371,5 +2371,12 @@
 	"scraper report save": "Зберегти звіт",
 	"scraper report saved": "Звіт збережено",
 	"sticky scroll": "Закріплена прокрутка",
-	"settings-info-editor-sticky-scroll": "Закріплює рядки відкриття областей (функція/клас) вгорі редактора під час прокрутки, як у VS Code. Торкніться закріпленого рядка, щоб перейти до нього."
+	"settings-info-editor-sticky-scroll": "Закріплює рядки відкриття областей (функція/клас) вгорі редактора під час прокрутки, як у VS Code. Торкніться закріпленого рядка, щоб перейти до нього.",
+	"inspector console all": "Усі",
+	"inspector console log": "Журнал",
+	"inspector console info": "Інфо",
+	"inspector console warn": "Попередження",
+	"inspector console error": "Помилки",
+	"inspector tree retry": "Спробувати ще",
+	"inspector net no body": "Тіло не захоплено (медіа або порожня відповідь)"
 }

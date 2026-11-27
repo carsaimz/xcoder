@@ -2371,5 +2371,12 @@
 	"scraper report save": "Захаваць справаздачу",
 	"scraper report saved": "Справаздача захавана",
 	"sticky scroll": "Замацаваная пракрутка",
-	"settings-info-editor-sticky-scroll": "Замацоўвае радкі адкрыцця ахопліваючых блокаў (функцыя/клас) уверсе рэдактара падчас пракруткі, як у VS Code. Націсніце на замацаваны радок, каб перайсці да яго."
+	"settings-info-editor-sticky-scroll": "Замацоўвае радкі адкрыцця ахопліваючых блокаў (функцыя/клас) уверсе рэдактара падчас пракруткі, як у VS Code. Націсніце на замацаваны радок, каб перайсці да яго.",
+	"inspector console all": "Усе",
+	"inspector console log": "Журнал",
+	"inspector console info": "Інфа",
+	"inspector console warn": "Папярэджанні",
+	"inspector console error": "Памылкі",
+	"inspector tree retry": "Паспрабаваць яшчэ",
+	"inspector net no body": "Цела не захоплена (медыя або пусты адказ)"
 }
