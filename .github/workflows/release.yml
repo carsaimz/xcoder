@@ -15,6 +15,13 @@ name: Release (signed APK + AAB)
 # latest tag (1.8.45 -> 1.8.46). Beta versions are rejected here — the
 # stable channel is this workflow, pre-releases run prerelease.yml.
 #
+# CHANNELS ARE INDEPENDENT: the checks below only ever compare against
+# STABLE tags (utils/scripts/latest-channel-tag.mjs). Beta tags like
+# v1.8.46-beta never block a stable release of 1.8.45 — the two series
+# have separate version lines and separate apps (side-by-side package).
+# The changelog / release notes also range from the previous STABLE tag,
+# so beta-only commits never leak into stable notes.
+#
 # Required secrets:
 #   KEYSTORE_BASE64    - base64 of the release keystore (.jks)
 #   KEYSTORE_PASSWORD  - keystore password
@@ -71,7 +78,9 @@ jobs:
           FORCE: ${{ inputs.force }}
         run: |
           set -e
-          LATEST=$(git tag --sort=-v:refname | head -n 1 || true)
+          # latest STABLE tag only — beta tags (vX.Y.Z-beta.N) live in their
+          # own channel and never gate a stable release
+          LATEST=$(node utils/scripts/latest-channel-tag.mjs || true)
           if [ -z "$INPUT_VERSION" ]; then
             # empty input = auto-increment from the latest tag (1.8.44 ->
             # 1.8.45; a pending beta base is promoted first)
@@ -104,8 +113,13 @@ jobs:
           VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # keep CHANGELOG.md in sync (section for this version, from commits)
-          node utils/scripts/update-changelog.mjs "$VERSION" || true
+          # keep CHANGELOG.md in sync (section for this version, from
+          # commits since the previous STABLE tag — beta commits stay out)
+          if [ -n "$LATEST" ] && [ "$LATEST" != "v${VERSION}" ]; then
+            node utils/scripts/update-changelog.mjs "$VERSION" --from "$LATEST" || true
+          else
+            node utils/scripts/update-changelog.mjs "$VERSION" || true
+          fi
           git add package.json config.xml CHANGELOG.md
           git diff --cached --quiet || git commit -m "chore(release): v${VERSION}"
           # the branch may have moved since dispatch (parallel fixes) —
@@ -184,7 +198,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.version.outputs.tag }}
         run: |
-          PREV=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)
+          # previous STABLE tag — beta tags must not appear as the range
+          # start, otherwise beta-only commits leak into stable notes
+          PREV=$(node utils/scripts/latest-channel-tag.mjs --exclude "$TAG" || true)
           BODY=""
           if [ -n "$PREV" ]; then
             BODY=$(GITHUB_TOKEN="$GITHUB_TOKEN" node utils/scripts/generate-release-notes.js \

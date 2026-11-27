@@ -17,6 +17,12 @@ name: Pre-release (debug APK)
 #   versionName     1.8.45               ->  1.8.45-beta
 #   versionCode     10845                ->  1010845 (stable + 1,000,000)
 #
+# CHANNELS ARE INDEPENDENT (utils/scripts/latest-channel-tag.mjs): beta
+# versions are compared only against previous BETA tags, never against
+# stable tags — a stable release of a higher version cannot block or
+# reorder the beta series, and the beta notes range from the previous
+# beta tag so stable commits never leak into them.
+#
 # Stable releases keep flowing through release.yml (promotion only).
 
 on:
@@ -69,7 +75,9 @@ jobs:
           FORCE: ${{ inputs.force }}
         run: |
           set -e
-          LATEST=$(git tag --sort=-v:refname | head -n 1 || true)
+          # latest BETA tag only — the beta channel is independent from the
+          # stable channel (a stable v2.0.0 would never gate a 1.8.x beta)
+          LATEST=$(node utils/scripts/latest-channel-tag.mjs --beta || true)
           if [ -z "$INPUT_VERSION" ]; then
             # empty input = auto-increment (1.8.45-beta -> 1.8.45-beta.2,
             # always strictly above the latest tag)
@@ -188,7 +196,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.version.outputs.tag }}
         run: |
-          PREV=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)
+          # previous BETA tag — stable tags must not appear as the range
+          # start, otherwise stable commits leak into beta notes
+          PREV=$(node utils/scripts/latest-channel-tag.mjs --beta --exclude "$TAG" || true)
           BODY=""
           if [ -n "$PREV" ]; then
             BODY=$(GITHUB_TOKEN="$GITHUB_TOKEN" node utils/scripts/generate-release-notes.js \
