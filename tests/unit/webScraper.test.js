@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
         assetName,
         beautifyCode,
+        buildReport,
         classifyAsset,
         extractAssets,
+        extractLinks,
         extractMeta,
+        extractTables,
         findEndpoints,
         findSecrets,
         guessLanguage,
@@ -12,6 +15,7 @@ import {
         maskSecret,
         resolveUrl,
         seoAudit,
+        tableToCsv,
 } from "../../src/lib/webScraper";
 
 describe("webScraper", () => {
@@ -312,6 +316,62 @@ describe("webScraper", () => {
                                 0,
                         );
                         expect(result.overall).toBe(Math.round(weighted / 100));
+                });
+        });
+        describe("extractTables", () => {
+                it("extracts rows and decodes entities", () => {
+                        const html = "<table><tr><th>Nome</th><th>Idade</th></tr><tr><td>Ana &amp; Jo\u00e3o</td><td>30</td></tr></table>";
+                        const tables = extractTables(html);
+                        expect(tables).toHaveLength(1);
+                        expect(tables[0].header).toBe(true);
+                        expect(tables[0].rows[0]).toEqual(["Nome", "Idade"]);
+                        expect(tables[0].rows[1]).toEqual(["Ana & Jo\u00e3o", "30"]);
+                });
+
+                it("skips empty rows and respects the table cap", () => {
+                        const many = Array.from({ length: 60 }, (_, i) => `<table><tr><td>t${i}</td></tr></table>`).join("");
+                        expect(extractTables(many).length).toBe(40);
+                        expect(extractTables("<table><tr><td></td><td></td></tr></table>")).toHaveLength(0);
+                });
+        });
+
+        describe("tableToCsv", () => {
+                it("quotes fields with commas, quotes and newlines", () => {
+                        const csv = tableToCsv([["a", "b,c"], ['say "hi"'], ["line\nbreak"]]);
+                        expect(csv).toBe('a,"b,c"\r\n"say ""hi"""\r\n"line\nbreak"');
+                });
+        });
+
+        describe("extractLinks", () => {
+                it("resolves hrefs, classifies and deduplicates", () => {
+                        const html = '<a href="/sobre">Sobre</a><a href="https://ex.com/sobre">Sobre</a><a href="https://outro.ext/x">Ext</a><a href="#top">Topo</a>';
+                        const result = extractLinks(html, "https://ex.com/");
+                        expect(result.internal).toBe(1);
+                        expect(result.external).toBe(1);
+                        expect(result.links.map((l) => l.href)).toEqual([
+                                "https://ex.com/sobre",
+                                "https://outro.ext/x",
+                        ]);
+                        expect(result.links[0].text).toBe("Sobre");
+                });
+        });
+
+        describe("buildReport", () => {
+                it("builds a markdown report with url, seo and tables", () => {
+                        const report = buildReport({
+                                url: "https://ex.com/",
+                                seo: { overall: 75, categories: [{ name: "Meta", score: 90, checks: [{ status: "pass", title: "title ok", detail: "present", tip: "" }] }] },
+                                meta: { title: "Ex", openGraph: [] },
+                                secrets: [{ masked: "AKIA…abcd", kind: "aws", line: 3 }],
+                                endpoints: { apiPaths: [{ value: "/api/v1", line: 5 }] },
+                                tables: [{ rows: [["h1", "h2"], ["a", "b"]], header: true }],
+                                links: { links: [{ href: "https://ex.com/", text: "" }], internal: 1, external: 0, total: 1 },
+                        });
+                        expect(report).toContain("# Relat\u00f3rio de scraping");
+                        expect(report).toContain("https://ex.com/");
+                        expect(report).toContain("75/100");
+                        expect(report).toContain("/api/v1");
+                        expect(report).toContain("AKIA\u2026abcd");
                 });
         });
 });

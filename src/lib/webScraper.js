@@ -1029,3 +1029,249 @@ export function guessLanguage(url, code) {
 	if (/\bfunction\b|=>|\bconst\b|\bvar\b/.test(text)) return "js";
 	return "html";
 }
+
+// ------------------------------------------------------------- tables/links
+
+/** Caps for the table extractor — pathological pages must never freeze the UI. */
+export const TABLE_LIMITS = { tables: 40, rows: 500, cols: 60, cell: 400 };
+
+const ENTITIES = {
+	"&amp;": "&",
+	"&lt;": "<",
+	"&gt;": ">",
+	"&quot;": '"',
+	"&#39;": "'",
+	"&apos;": "'",
+	"&nbsp;": " ",
+};
+
+/**
+ * Decodes the common HTML entities and collapses whitespace — pure helper
+ * used by the table/link extractors.
+ * @param {string} text
+ * @returns {string}
+ */
+export function decodeEntities(text) {
+	let out = String(text || "");
+	for (const [entity, char] of Object.entries(ENTITIES)) {
+		out = out.split(entity).join(char);
+	}
+	out = out.replace(/&#(\d+);/g, (_, code) => {
+		try {
+			return String.fromCodePoint(Number(code));
+		} catch {
+			return "";
+		}
+	});
+	out = out.replace(/&#x([0-9a-fA-F]+);/g, (_, code) => {
+		try {
+			return String.fromCodePoint(Number.parseInt(code, 16));
+		} catch {
+			return "";
+		}
+	});
+	return out;
+}
+
+/** Strips tags and normalizes a cell value. @param {string} html */
+function cellText(html) {
+	return decodeEntities(String(html || "").replace(/<[^>]+>/g, " "))
+		.replace(/\s+/g, " ")
+		.trim()
+		.slice(0, TABLE_LIMITS.cell);
+}
+
+/**
+ * Extracts every <table> as a matrix of plain-text cells (scraping-grade:
+ * tolerant to attributes, colspans are treated as ordinary cells).
+ * @param {string} html
+ * @returns {Array<{rows: string[][], header: boolean}>}
+ */
+export function extractTables(html) {
+	const source = String(html || "");
+	const tables = [];
+	const tableRe = /<table\b[^>]*>([\s\S]*?)<\/table>/gi;
+	let match = tableRe.exec(source);
+	while (match && tables.length < TABLE_LIMITS.tables) {
+		const fragment = match[1];
+		// nested tables were already (or will be) matched separately —
+		// remove them so the outer row scan only sees real cells
+		const flat = fragment.replace(/<table\b[^>]*>[\s\S]*?<\/table>/gi, " ");
+		const rows = [];
+		let firstRowIsHeader = false;
+		const rowRe = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gi;
+		let rowMatch = rowRe.exec(flat);
+		while (rowMatch && rows.length < TABLE_LIMITS.rows) {
+			const cells = [];
+			let sawTh = false;
+			const cellRe = /<t([dh])\b[^>]*>([\s\S]*?)<\/t\1>/gi;
+			let cellMatch = cellRe.exec(rowMatch[1]);
+			while (cellMatch && cells.length < TABLE_LIMITS.cols) {
+				if (cellMatch[1].toLowerCase() === "h") sawTh = true;
+				cells.push(cellText(cellMatch[2]));
+				cellMatch = cellRe.exec(rowMatch[1]);
+			}
+			if (cells.some((cell) => cell !== "")) {
+				if (rows.length === 0) firstRowIsHeader = sawTh;
+				rows.push(cells);
+			}
+			rowMatch = rowRe.exec(flat);
+		}
+		if (rows.length) {
+			tables.push({ rows, header: firstRowIsHeader });
+		}
+		match = tableRe.exec(source);
+	}
+	return tables;
+}
+
+/**
+ * Serializes a table matrix as RFC-4180 CSV (quotes only when needed,
+ * doubles embedded quotes, \r\n row separator).
+ * @param {string[][]} rows
+ * @returns {string}
+ */
+export function tableToCsv(rows) {
+	const quote = (value) => {
+		const text = String(value ?? "");
+		if (/[",\r\n]/.test(text)) return `"${text.split('"').join('""')}"`;
+		return text;
+	};
+	return (rows || []).map((row) => row.map(quote).join(",")).join("\r\n");
+}
+
+/**
+ * Extracts every <a href> as an absolute URL, classified internal/external
+ * against the page host, deduplicated and capped.
+ * @param {string} html
+ * @param {string} baseUrl
+ * @returns {{links: Array<{href: string, text: string, external: boolean}>, internal: number, external: number}}
+ */
+export function extractLinks(html, baseUrl) {
+	const source = String(html || "");
+	const found = new Map();
+	const anchorRe =
+		/<a\b[^>]*\bhref\s*=\s*("([^"]*)"|'([^']*)')[^>]*>([\s\S]*?)<\/a>/gi;
+	let match = anchorRe.exec(source);
+	while (match && found.size < 600) {
+		const rawHref = match[2] ?? match[3] ?? "";
+		const href = resolveUrl(rawHref, baseUrl);
+		if (href && !found.has(href)) {
+			const text = cellText(match[4]).slice(0, 120);
+			let external = true;
+			try {
+				external = new URL(href).host !== new URL(baseUrl).host;
+			} catch {
+				/* keep external default */
+			}
+			found.set(href, { href, text, external });
+		}
+		match = anchorRe.exec(source);
+	}
+	const links = Array.from(found.values());
+	const internal = links.filter((link) => !link.external).length;
+	return {
+		links,
+		internal,
+		external: links.length - internal,
+	};
+}
+
+/**
+ * Builds a Markdown reverse-engineering report combining the SEO audit,
+ * metadata, secrets, endpoints, tables and links of a capture.
+ * @param {{url: string, seo: any, meta: any, secrets: any[], endpoints: any, tables: any[], links: any}} data
+ * @returns {string}
+ */
+export function buildReport(data) {
+	const lines = [];
+	const { url, seo, meta, secrets, endpoints, tables, links } = data;
+	lines.push(`# Relatório de scraping`);
+	lines.push("");
+	lines.push(`- **URL:** ${url || "—"}`);
+	lines.push(`- **Data:** ${new Date().toISOString()}`);
+	lines.push(`- **SEO:** ${seo?.overall ?? "—"}/100`);
+	if (tables?.length) lines.push(`- **Tabelas:** ${tables.length}`);
+	if (links?.total) {
+		lines.push(
+			`- **Links:** ${links.total} (${links.internal} internos / ${links.external} externos)`,
+		);
+	}
+	lines.push("");
+
+	if (seo?.categories?.length) {
+		lines.push("## Auditoria SEO");
+		lines.push("");
+		for (const category of seo.categories) {
+			lines.push(`### ${category.name} — ${category.score}`);
+			for (const check of category.checks || []) {
+				const mark =
+					check.status === "pass" ? "✅" : check.status === "warn" ? "⚠️" : "❌";
+				lines.push(`- ${mark} **${check.title}** — ${check.detail}`);
+				if (check.tip) lines.push(`  - 💡 ${check.tip}`);
+			}
+			lines.push("");
+		}
+	}
+
+	if (meta) {
+		lines.push("## Metadados");
+		lines.push("");
+		if (meta.title) lines.push(`- **title:** ${meta.title}`);
+		if (meta.description) lines.push(`- **description:** ${meta.description}`);
+		if (meta.generator) lines.push(`- **generator:** ${meta.generator}`);
+		if (meta.lang) lines.push(`- **lang:** ${meta.lang}`);
+		if (meta.canonical) lines.push(`- **canonical:** ${meta.canonical}`);
+		for (const [key, value] of meta.openGraph || []) {
+			lines.push(`- **og:${key}:** ${value}`);
+		}
+		lines.push("");
+	}
+
+	if (secrets?.length) {
+		lines.push(`## Segredos encontrados (${secrets.length})`);
+		lines.push("");
+		for (const secret of secrets.slice(0, 60)) {
+			lines.push(
+				`- \`${secret.masked}\` (${secret.kind}, linha ${secret.line})`,
+			);
+		}
+		lines.push("");
+	}
+
+	if (endpoints?.apiPaths?.length) {
+		lines.push(`## Endpoints de API (${endpoints.apiPaths.length})`);
+		lines.push("");
+		for (const endpoint of endpoints.apiPaths.slice(0, 100)) {
+			lines.push(`- \`${endpoint.value}\` (linha ${endpoint.line})`);
+		}
+		lines.push("");
+	}
+
+	if (tables?.length) {
+		lines.push(`## Tabelas (${tables.length})`);
+		lines.push("");
+		tables.forEach((table, index) => {
+			lines.push(`### Tabela ${index + 1} — ${table.rows.length} linhas`);
+			lines.push("");
+			const preview = table.rows.slice(0, 5);
+			for (const row of preview) {
+				lines.push(
+					`| ${row.map((cell) => String(cell).replace(/\|/g, "\\|")).join(" | ")} |`,
+				);
+			}
+			lines.push("");
+		});
+	}
+
+	if (links?.links?.length) {
+		lines.push(`## Links (${links.total})`);
+		lines.push("");
+		for (const link of links.links.slice(0, 200)) {
+			lines.push(`- ${link.href}${link.text ? ` — ${link.text}` : ""}`);
+		}
+		lines.push("");
+	}
+
+	return `${lines.join("\n")}\n`;
+}

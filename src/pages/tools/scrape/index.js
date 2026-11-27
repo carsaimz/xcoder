@@ -11,14 +11,18 @@ import {
 import { fetchRenderedHtml } from "lib/webInspector";
 import {
 	beautifyCode,
+	buildReport,
 	extractAssets,
+	extractLinks,
 	extractMeta,
+	extractTables,
 	findEndpoints,
 	findSecrets,
 	guessLanguage,
 	httpFetch,
 	looksMinified,
 	seoAudit,
+	tableToCsv,
 } from "lib/webScraper";
 import { copyText } from "utils/clipboard";
 import Url from "utils/Url";
@@ -475,6 +479,75 @@ async function saveSource() {
 	}
 }
 
+/**
+ * Saves one extracted table as a CSV file next to the captured source.
+ * @param {{rows: string[][]}} table
+ * @param {number} index
+ */
+async function saveTableCsv(table, index) {
+	const dir = source ? hostDir(source.url) : defaultDownloadDir();
+	const defaultPath = Url.join(dir, `tabela-${index + 1}.csv`);
+	const path = await prompt(
+		t("scraper save as", "Guardar como"),
+		defaultPath,
+		"text",
+	);
+	if (!path) return;
+	try {
+		await ensureDirDeep(Url.dirname(path));
+		const dirFs = fsOperation(Url.dirname(path));
+		const csvFs = fsOperation(path);
+		const csv = tableToCsv(table.rows);
+		if (await csvFs.exists()) {
+			await csvFs.writeFile(csv);
+		} else {
+			await dirFs.createFile(Url.basename(path), csv);
+		}
+		toast(`${t("scraper csv saved", "CSV guardado")}: ${path}`, 2500);
+	} catch (error) {
+		toast(String(error?.message || error), 3000);
+	}
+}
+
+/**
+ * Saves the Markdown reverse-engineering report (SEO + meta + segredos +
+ * endpoints + tabelas + links) next to the captured source.
+ * @param {{seo: any, tables: any[], links: any}} data
+ */
+async function saveReport(data) {
+	if (!source) return;
+	const dir = hostDir(source.url);
+	const defaultPath = Url.join(dir, "relatorio.md");
+	const path = await prompt(
+		t("scraper report save", "Guardar relatório"),
+		defaultPath,
+		"text",
+	);
+	if (!path) return;
+	try {
+		await ensureDirDeep(Url.dirname(path));
+		const dirFs = fsOperation(Url.dirname(path));
+		const reportFs = fsOperation(path);
+		const report = buildReport({
+			url: source.url,
+			seo: data.seo,
+			meta,
+			secrets,
+			endpoints,
+			tables: data.tables,
+			links: { ...data.links, total: data.links.links.length },
+		});
+		if (await reportFs.exists()) {
+			await reportFs.writeFile(report);
+		} else {
+			await dirFs.createFile(Url.basename(path), report);
+		}
+		toast(`${t("scraper report saved", "Relatório guardado")}: ${path}`, 2500);
+	} catch (error) {
+		toast(String(error?.message || error), 3000);
+	}
+}
+
 async function openInEditor() {
 	if (!source) return;
 	try {
@@ -906,6 +979,8 @@ function renderAnalysis() {
 
 	// --- SEO ------------------------------------------------------------
 	const seo = seoAudit(source.raw || source.text, source.url);
+	const tables = extractTables(source.raw || source.text);
+	const links = extractLinks(source.raw || source.text, source.url);
 	$analysis.append(
 		<div className="scr-analysis-card scr-seo">
 			<div className="scr-analysis-title">
@@ -916,6 +991,11 @@ function renderAnalysis() {
 				>
 					{seo.overall}/100
 				</strong>
+				<span
+					className="icon codicon-save-as scr-title-action"
+					title={t("scraper report save", "Guardar relatório")}
+					onclick={() => saveReport({ seo, tables, links })}
+				/>
 			</div>
 			{seo.categories.map((category) => (
 				<details className="scr-seo-cat">
@@ -1013,6 +1093,105 @@ function renderAnalysis() {
 			</div>,
 		);
 	}
+
+	// --- tabelas -----------------------------------------------------------
+	$analysis.append(
+		<div className="scr-analysis-card">
+			<div className="scr-analysis-title">
+				<span className="icon codicon-table" />
+				{t("scraper tables", "Tabelas")} ({tables.length})
+			</div>
+			{tables.length ? (
+				tables.map((table, index) => (
+					<details className="scr-table">
+						<summary>
+							{t("scraper table", "Tabela")} {index + 1} — {table.rows.length}{" "}
+							{t("scraper rows", "linhas")}
+							{table.header ? (
+								<span className="scr-table-head-mark">
+									{t("scraper table header", "cabeçalho")}
+								</span>
+							) : null}
+						</summary>
+						<pre className="scr-table-preview">
+							{table.rows
+								.slice(0, 5)
+								.map((row) => row.join(" | "))
+								.join("\n")}
+						</pre>
+						<div className="scr-table-actions">
+							<button
+								type="button"
+								onclick={() => copyText(tableToCsv(table.rows))}
+							>
+								<span className="icon codicon-copy" />
+								{t("scraper table csv copy", "Copiar CSV")}
+							</button>
+							<button type="button" onclick={() => saveTableCsv(table, index)}>
+								<span className="icon codicon-save-as" />
+								{t("scraper table csv save", "Guardar CSV")}
+							</button>
+						</div>
+					</details>
+				))
+			) : (
+				<div className="ins-empty">
+					{t("scraper tables none", "Nenhuma tabela detectada na página")}
+				</div>
+			)}
+		</div>,
+	);
+
+	// --- links -----------------------------------------------------------
+	$analysis.append(
+		<div className="scr-analysis-card">
+			<div className="scr-analysis-title">
+				<span className="icon codicon-globe" />
+				{t("scraper links", "Links")} ({links.links.length})
+				<span
+					className="icon codicon-copy scr-title-action"
+					title={t("scraper copy links", "Copiar todos")}
+					onclick={() => {
+						if (!links.links.length) {
+							toast(t("scraper links none", "Nenhum link na página"), 2000);
+							return;
+						}
+						copyText(links.links.map((link) => link.href).join("\n"));
+					}}
+				/>
+			</div>
+			{links.links.length ? (
+				<div>
+					<div className="scr-links-counts">
+						<span>
+							{links.internal} {t("scraper links internal", "internos")}
+						</span>
+						<span>
+							{links.external} {t("scraper links external", "externos")}
+						</span>
+					</div>
+					{links.links.slice(0, 80).map((link) => (
+						<div className="scr-link" onclick={() => copyText(link.href)}>
+							<span className="scr-link-href">{link.href}</span>
+							{link.text ? (
+								<span className="scr-link-text">{link.text}</span>
+							) : null}
+						</div>
+					))}
+					{links.links.length > 80 ? (
+						<div className="ins-empty">
+							+{links.links.length - 80}{" "}
+							{t("scraper links more", "links — usar Copiar todos")}
+						</div>
+					) : null}
+				</div>
+			) : (
+				<div className="ins-empty">
+					{t("scraper links none", "Nenhum link na página")}
+				</div>
+			)}
+		</div>,
+	);
 
 	// --- secrets -----------------------------------------------------------
 	$analysis.append(

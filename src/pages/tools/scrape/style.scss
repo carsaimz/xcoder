@@ -574,3 +574,98 @@
 	font-size: 9px;
 	opacity: 0.6;
 }
+
+/* --- tabelas, links e relatório ------------------------------------------ */
+
+.scr-title-action {
+	margin-left: auto;
+	opacity: 0.7;
+
+	&:active {
+		opacity: 1;
+	}
+}
+
+.scr-table {
+	border-top: 1px solid var(--border-color);
+	padding: 6px 0;
+
+	summary {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 12px;
+		cursor: pointer;
+		padding: 4px 0;
+	}
+
+	.scr-table-head-mark {
+		font-size: 10px;
+		opacity: 0.6;
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		padding: 1px 5px;
+	}
+
+	.scr-table-preview {
+		overflow: auto;
+		max-height: 140px;
+		font-size: 11px;
+		line-height: 1.6;
+		background: var(--primary-color);
+		border: 1px solid var(--border-color);
+		border-radius: 6px;
+		padding: 8px;
+		margin: 6px 0;
+		white-space: pre;
+	}
+
+	.scr-table-actions {
+		display: flex;
+		gap: 8px;
+
+		button {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			border: 1px solid var(--border-color);
+			border-radius: 6px;
+			background: var(--primary-color);
+			color: var(--primary-text-color);
+			padding: 5px 10px;
+			font-size: 12px;
+		}
+	}
+}
+
+.scr-links-counts {
+	display: flex;
+	gap: 12px;
+	font-size: 11px;
+	opacity: 0.7;
+	padding: 4px 0 6px;
+}
+
+.scr-link {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	border-top: 1px solid var(--border-color);
+	padding: 5px 0;
+	overflow: hidden;
+
+	.scr-link-href {
+		font-size: 11px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.scr-link-text {
+		font-size: 10px;
+		opacity: 0.6;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
