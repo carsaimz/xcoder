@@ -2062,5 +2062,14 @@
 	"snippets imported": "تم استيراد المقتطفات",
 	"replace file warning": "يوجد بالفعل ملف مقتطفات بهذا الاسم — هل تريد الكتابة فوقه؟",
 	"snippet completion": "استكمال المقتطف",
-	"settings-info-editor-snippet-completion": "اقترح مقتطفات المستخدم (تنسيق VS Code) أثناء الكتابة. قم بإدارتها باستخدام الأمرين «إدراج مقتطف» و«تكوين مقتطفات المستخدم»."
+	"settings-info-editor-snippet-completion": "اقترح مقتطفات المستخدم (تنسيق VS Code) أثناء الكتابة. قم بإدارتها باستخدام الأمرين «إدراج مقتطف» و«تكوين مقتطفات المستخدم».",
+	"press key combo": "مجموعة المفاتيح (على سبيل المثال، Ctrl-Shift-P، الأوتار Ctrl-K Ctrl-C) - مسح لإلغاء الربط",
+	"invalid key combo": "مجموعة مفاتيح غير صالحة (أمثلة: Ctrl-D، Alt-Shift-F، Ctrl-K Ctrl-C)",
+	"key binding saved": "تم حفظ ربط المفتاح",
+	"key binding cleared": "تم مسح ربط المفتاح",
+	"key conflict warning": "تم الحفظ، ولكن هذه المجموعة مستخدمة بالفعل بواسطة أمر آخر",
+	"reset key bindings": "إعادة تعيين كافة الارتباطات الرئيسية",
+	"reset key bindings confirm": "هل ترغب في استعادة روابط المفاتيح الافتراضية؟ سيتم فقدان مجموعاتك المخصصة.",
+	"key bindings restored": "تمت استعادة الارتباطات الرئيسية",
+	"edit key bindings json": "تحرير ملف الارتباطات (JSON)"
 }

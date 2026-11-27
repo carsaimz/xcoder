@@ -275,6 +275,13 @@ export default {
 		importSnippetsFile();
 		return true;
 	},
+	async "open-keybindings"() {
+		const { default: keybindingsEditor } = await import(
+			/* webpackChunkName: "keybindingsEditor" */ "settings/keybindingsEditor"
+		);
+		keybindingsEditor();
+		return true;
+	},
 	"select-all-occurrences"() {
 		const view = editorManager.editor;
 		if (!view?.state) return false;

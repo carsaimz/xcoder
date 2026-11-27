@@ -403,6 +403,13 @@ const APP_BINDING_CONFIG = [
 		readOnly: true,
 	},
 	{
+		name: "openKeybindings",
+		description: "Open keyboard shortcuts editor",
+		key: null,
+		action: "open-keybindings",
+		readOnly: true,
+	},
+	{
 		name: "openLogFile",
 		description: "Open log file",
 		key: null,

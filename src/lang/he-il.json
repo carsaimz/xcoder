@@ -2062,5 +2062,14 @@
 	"snippets imported": "קטעי טקסט יובאו",
 	"replace file warning": "קובץ קטעים בשם זה כבר קיים - להחליף אותו?",
 	"snippet completion": "השלמת קטע",
-	"settings-info-editor-snippet-completion": "הצע קטעי משתמש (פורמט VS Code) תוך כדי הקלדה. נהל אותם עם הפקודות «הוסף קטע קוד» ו-“הגדר קטעי קוד של משתמש”."
+	"settings-info-editor-snippet-completion": "הצע קטעי משתמש (פורמט VS Code) תוך כדי הקלדה. נהל אותם עם הפקודות «הוסף קטע קוד» ו-“הגדר קטעי קוד של משתמש”.",
+	"press key combo": "שילוב מקשים (למשל Ctrl-Shift-P, אקורדים Ctrl-K Ctrl-C) - נקה לביטול הכריכה",
+	"invalid key combo": "צירוף מקשים לא חוקי (דוגמאות: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "כריכת המפתח נשמרה",
+	"key binding cleared": "כריכת המפתח נוקתה",
+	"key conflict warning": "נשמר, אבל השילוב הזה כבר נמצא בשימוש על ידי פקודה אחרת",
+	"reset key bindings": "אפס את כל כריכות המקשים",
+	"reset key bindings confirm": "לשחזר את ברירת המחדל של כריכות המפתח? השילובים המותאמים אישית שלך יאבדו.",
+	"key bindings restored": "כריכות מפתח שוחזרו",
+	"edit key bindings json": "עריכת קובץ כריכות (JSON)"
 }

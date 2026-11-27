@@ -2062,5 +2062,14 @@
 	"snippets imported": "Extraits importés",
 	"replace file warning": "Un fichier d'extraits portant ce nom existe déjà. L'écraser ?",
 	"snippet completion": "Achèvement de l'extrait",
-	"settings-info-editor-snippet-completion": "Suggérez des extraits d’utilisateurs (format VS Code) au fur et à mesure que vous tapez. Gérez-les avec les commandes « Insérer un extrait » et « Configurer les extraits d'utilisateur »."
+	"settings-info-editor-snippet-completion": "Suggérez des extraits d’utilisateurs (format VS Code) au fur et à mesure que vous tapez. Gérez-les avec les commandes « Insérer un extrait » et « Configurer les extraits d'utilisateur ».",
+	"press key combo": "Combinaison de touches (par exemple Ctrl-Shift-P, accords Ctrl-K Ctrl-C) – effacer pour dissocier",
+	"invalid key combo": "Combinaison de touches non valide (exemples : Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Liaison de touches enregistrée",
+	"key binding cleared": "Liaison de clé effacée",
+	"key conflict warning": "Enregistré, mais cette combinaison est déjà utilisée par une autre commande",
+	"reset key bindings": "Réinitialiser toutes les combinaisons de touches",
+	"reset key bindings confirm": "Restaurer les raccourcis clavier par défaut ? Vos combinaisons personnalisées seront perdues.",
+	"key bindings restored": "Raccourcis clavier restaurés",
+	"edit key bindings json": "Modifier le fichier de liaisons (JSON)"
 }

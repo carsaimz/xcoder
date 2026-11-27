@@ -2162,5 +2162,14 @@
 	"snippets imported": "Snippets importados",
 	"replace file warning": "Já existe um ficheiro de snippets com este nome — substituir?",
 	"snippet completion": "Autocompletar de snippets",
-	"settings-info-editor-snippet-completion": "Sugere snippets do utilizador (formato VS Code) enquanto escreve. Gerencie-os com os comandos «Inserir snippet» e «Configurar snippets do utilizador»."
+	"settings-info-editor-snippet-completion": "Sugere snippets do utilizador (formato VS Code) enquanto escreve. Gerencie-os com os comandos «Inserir snippet» e «Configurar snippets do utilizador».",
+	"press key combo": "Combinação de teclas (ex.: Ctrl-Shift-P, acordes Ctrl-K Ctrl-C) — vazio para remover",
+	"invalid key combo": "Combinação de teclas inválida (exemplos: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Atalho guardado",
+	"key binding cleared": "Atalho removido",
+	"key conflict warning": "Guardado, mas esta combinação já é usada por outro comando",
+	"reset key bindings": "Restaurar todos os atalhos",
+	"reset key bindings confirm": "Restaurar os atalhos padrão? As suas combinações personalizadas serão perdidas.",
+	"key bindings restored": "Atalhos restaurados",
+	"edit key bindings json": "Editar ficheiro de atalhos (JSON)"
 }

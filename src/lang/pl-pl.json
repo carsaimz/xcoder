@@ -2062,5 +2062,14 @@
 	"snippets imported": "Zaimportowano fragmenty",
 	"replace file warning": "Plik fragmentów o tej nazwie już istnieje — zastąpić go?",
 	"snippet completion": "Uzupełnianie fragmentu",
-	"settings-info-editor-snippet-completion": "Sugeruj fragmenty użytkownika (w formacie VS Code) podczas pisania. Zarządzaj nimi za pomocą poleceń „Wstaw fragment” i „Konfiguruj fragmenty użytkownika”."
+	"settings-info-editor-snippet-completion": "Sugeruj fragmenty użytkownika (w formacie VS Code) podczas pisania. Zarządzaj nimi za pomocą poleceń „Wstaw fragment” i „Konfiguruj fragmenty użytkownika”.",
+	"press key combo": "Kombinacja klawiszy (np. Ctrl-Shift-P, akordy Ctrl-K Ctrl-C) — wyczyść, aby rozłączyć",
+	"invalid key combo": "Nieprawidłowa kombinacja klawiszy (przykłady: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Przypisanie klawiszy zostało zapisane",
+	"key binding cleared": "Powiązanie klawiszy wyczyszczone",
+	"key conflict warning": "Zapisano, ale ta kombinacja jest już używana przez inne polecenie",
+	"reset key bindings": "Zresetuj wszystkie powiązania klawiszy",
+	"reset key bindings confirm": "Przywrócić domyślne powiązania klawiszy? Twoje niestandardowe kombinacje zostaną utracone.",
+	"key bindings restored": "Przywrócono powiązania klawiszy",
+	"edit key bindings json": "Edytuj plik powiązań (JSON)"
 }

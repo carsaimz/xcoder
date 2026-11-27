@@ -2062,5 +2062,14 @@
 	"snippets imported": "Snippet importati",
 	"replace file warning": "Esiste già un file di frammenti con questo nome: sovrascriverlo?",
 	"snippet completion": "Completamento dello snippet",
-	"settings-info-editor-snippet-completion": "Suggerisci snippet utente (formato VS Code) durante la digitazione. Gestiscili con i comandi «Inserisci snippet» e «Configura snippet utente»."
+	"settings-info-editor-snippet-completion": "Suggerisci snippet utente (formato VS Code) durante la digitazione. Gestiscili con i comandi «Inserisci snippet» e «Configura snippet utente».",
+	"press key combo": "Combinazione di tasti (ad esempio Ctrl-Shift-P, accordi Ctrl-K Ctrl-C) — cancella per separare",
+	"invalid key combo": "Combinazione di tasti non valida (esempi: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Associazione dei tasti salvata",
+	"key binding cleared": "L'associazione dei tasti è stata cancellata",
+	"key conflict warning": "Salvato, ma questa combinazione è già utilizzata da un altro comando",
+	"reset key bindings": "Ripristina tutte le associazioni dei tasti",
+	"reset key bindings confirm": "Ripristinare le associazioni dei tasti predefinite? Le tue combinazioni personalizzate andranno perse.",
+	"key bindings restored": "Associazioni dei tasti ripristinate",
+	"edit key bindings json": "Modifica file di associazioni (JSON)"
 }

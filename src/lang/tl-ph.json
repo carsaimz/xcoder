@@ -2062,5 +2062,14 @@
 	"snippets imported": "Na-import ang mga snippet",
 	"replace file warning": "Mayroon nang snippet file na may ganitong pangalan — i-overwrite ito?",
 	"snippet completion": "Pagkumpleto ng snippet",
-	"settings-info-editor-snippet-completion": "Magmungkahi ng mga snippet ng user (format ng VS Code) habang nagta-type ka. Pamahalaan ang mga ito gamit ang mga command na «Insert snippet» at «Configure user snippet»."
+	"settings-info-editor-snippet-completion": "Magmungkahi ng mga snippet ng user (format ng VS Code) habang nagta-type ka. Pamahalaan ang mga ito gamit ang mga command na «Insert snippet» at «Configure user snippet».",
+	"press key combo": "Key combination (hal. Ctrl-Shift-P, chords Ctrl-K Ctrl-C) — malinaw para i-unbind",
+	"invalid key combo": "Di-wastong kumbinasyon ng key (mga halimbawa: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Na-save ang key binding",
+	"key binding cleared": "Na-clear ang key binding",
+	"key conflict warning": "Nai-save, ngunit ang kumbinasyong ito ay ginagamit na ng isa pang command",
+	"reset key bindings": "I-reset ang lahat ng key binding",
+	"reset key bindings confirm": "Ibalik ang default na key binding? Mawawala ang iyong mga custom na kumbinasyon.",
+	"key bindings restored": "Na-restore ang mga key binding",
+	"edit key bindings json": "I-edit ang bindings file (JSON)"
 }

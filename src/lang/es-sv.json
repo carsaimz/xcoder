@@ -2062,5 +2062,14 @@
 	"snippets imported": "Fragmentos importados",
 	"replace file warning": "Ya existe un archivo de fragmentos con este nombre: ¿sobrescribirlo?",
 	"snippet completion": "Finalización de fragmentos",
-	"settings-info-editor-snippet-completion": "Sugiera fragmentos de usuario (formato de código VS) a medida que escribe. Gestionarlos con los comandos «Insertar fragmento» y «Configurar fragmentos de usuario»."
+	"settings-info-editor-snippet-completion": "Sugiera fragmentos de usuario (formato de código VS) a medida que escribe. Gestionarlos con los comandos «Insertar fragmento» y «Configurar fragmentos de usuario».",
+	"press key combo": "Combinación de teclas (por ejemplo, Ctrl-Shift-P, acordes Ctrl-K Ctrl-C): borre para desvincular",
+	"invalid key combo": "Combinación de teclas no válida (ejemplos: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Encuadernación de teclas guardada",
+	"key binding cleared": "Enlace de teclas borrado",
+	"key conflict warning": "Guardado, pero esta combinación ya la utiliza otro comando",
+	"reset key bindings": "Restablecer todas las combinaciones de teclas",
+	"reset key bindings confirm": "¿Restaurar las combinaciones de teclas predeterminadas? Tus combinaciones personalizadas se perderán.",
+	"key bindings restored": "Enlaces de teclas restaurados",
+	"edit key bindings json": "Editar archivo de enlaces (JSON)"
 }

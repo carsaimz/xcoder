@@ -2062,5 +2062,14 @@
 	"snippets imported": "Snippet'ler içe aktarıldı",
 	"replace file warning": "Bu adda bir snippet dosyası zaten mevcut; üzerine yazılsın mı?",
 	"snippet completion": "Parçacığın tamamlanması",
-	"settings-info-editor-snippet-completion": "Yazarken kullanıcı parçacıkları (VS Code formatı) önerin. Bunları \"Snippet ekle\" ve \"Kullanıcı snippet'lerini yapılandır\" komutlarıyla yönetin."
+	"settings-info-editor-snippet-completion": "Yazarken kullanıcı parçacıkları (VS Code formatı) önerin. Bunları \"Snippet ekle\" ve \"Kullanıcı snippet'lerini yapılandır\" komutlarıyla yönetin.",
+	"press key combo": "Tuş kombinasyonu (örn. Ctrl-Shift-P, akorlar Ctrl-K Ctrl-C) — bağlantıyı kaldırmak için temizleyin",
+	"invalid key combo": "Geçersiz tuş kombinasyonu (örnekler: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Anahtar bağlama kaydedildi",
+	"key binding cleared": "Anahtar bağlama temizlendi",
+	"key conflict warning": "Kaydedildi ancak bu kombinasyon zaten başka bir komut tarafından kullanılıyor",
+	"reset key bindings": "Tüm tuş bağlamalarını sıfırla",
+	"reset key bindings confirm": "Varsayılan anahtar bağlamaları geri yüklensin mi? Özel kombinasyonlarınız kaybolacak.",
+	"key bindings restored": "Tuş bağlantıları geri yüklendi",
+	"edit key bindings json": "Bağlama dosyasını düzenle (JSON)"
 }

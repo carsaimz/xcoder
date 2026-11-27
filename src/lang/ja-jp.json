@@ -2062,5 +2062,14 @@
 	"snippets imported": "スニペットがインポートされました",
 	"replace file warning": "この名前のスニペット ファイルは既に存在します。上書きしますか?",
 	"snippet completion": "スニペットの完成",
-	"settings-info-editor-snippet-completion": "入力時にユーザー スニペット (VS Code 形式) を提案します。これらを管理するには、「スニペットの挿入」コマンドと「ユーザー スニペットの設定」コマンドを使用します。"
+	"settings-info-editor-snippet-completion": "入力時にユーザー スニペット (VS Code 形式) を提案します。これらを管理するには、「スニペットの挿入」コマンドと「ユーザー スニペットの設定」コマンドを使用します。",
+	"press key combo": "キーの組み合わせ (例: Ctrl-Shift-P、コード Ctrl-K Ctrl-C) — クリアしてバインドを解除します",
+	"invalid key combo": "無効なキーの組み合わせ (例: Ctrl-D、Alt-Shift-F、Ctrl-K Ctrl-C)",
+	"key binding saved": "キーバインディングが保存されました",
+	"key binding cleared": "キーバインドがクリアされました",
+	"key conflict warning": "保存されましたが、この組み合わせはすでに別のコマンドで使用されています",
+	"reset key bindings": "すべてのキーバインディングをリセットする",
+	"reset key bindings confirm": "デフォルトのキーバインディングを復元しますか?カスタムの組み合わせは失われます。",
+	"key bindings restored": "キーバインディングが復元されました",
+	"edit key bindings json": "バインディングファイルの編集(JSON)"
 }

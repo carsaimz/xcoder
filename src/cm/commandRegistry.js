@@ -1763,6 +1763,40 @@ export async function resetKeyBindings() {
 	}
 }
 
+/**
+ * Persists one or more key-binding overrides («<name>: <key|null>») to
+ * the keybindings file and re-resolves the active keymap.
+ * @param {Record<string, string|null>} changes command name → new key
+ * (null/"" unbinds)
+ * @returns {Promise<{key:string, command:string, shadowedBy:string}[]>}
+ * the conflicts of the rebuilt keymap (empty when none)
+ */
+export async function saveKeyBindings(changes) {
+	await loadCustomKeyBindings();
+	const bindings = resolvedKeyBindings || keyBindings;
+	for (const [name, key] of Object.entries(changes ?? {})) {
+		const base = bindings[name] ?? keyBindings[name] ?? { name };
+		bindings[name] = {
+			...base,
+			key: key == null || key === "" ? null : String(key),
+		};
+	}
+	try {
+		const fs = fsOperation(KEYBINDING_FILE);
+		const fileName = Url.basename(KEYBINDING_FILE);
+		const content = JSON.stringify(bindings, undefined, 2);
+		if (!(await fs.exists())) {
+			await fsOperation(DATA_STORAGE).createFile(fileName, content);
+		} else {
+			await fs.writeFile(content);
+		}
+	} catch (error) {
+		window.log?.("error", "Save key binding failed!");
+		window.log?.("error", error);
+	}
+	return setKeyBindings();
+}
+
 export { commandKeymapCompartment };
 
 export function registerExternalCommand(descriptor = {}) {

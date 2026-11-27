@@ -50,6 +50,60 @@ export function canonicalizeKeyBinding(combo) {
 }
 
 /**
+ * Validates a typed key combination («Ctrl-Shift-P», «Alt-Shift-F», a
+ * chord «Ctrl-K Ctrl-C», or an empty string to unbind).
+ * @param {string} value raw user input
+ * @returns {string|null} the canonical combo, or null when invalid
+ * (empty input is valid and yields "")
+ */
+/** Keys accepted by the shortcuts editor (beyond single characters). */
+const NAMED_KEYS = new Set([
+	"Escape",
+	"Enter",
+	"Space",
+	"Delete",
+	"Backspace",
+	"Tab",
+	"Home",
+	"End",
+	"PageUp",
+	"PageDown",
+	"Insert",
+	"ArrowLeft",
+	"ArrowRight",
+	"ArrowUp",
+	"ArrowDown",
+]);
+
+function isKnownKey(key) {
+	if (!key) return false;
+	if (NAMED_KEYS.has(key)) return true;
+	if (/^F([1-9]|1[0-9]|2[0-4])$/.test(key)) return true;
+	// any single printable character (letters, digits, punctuation)
+	return [...key].length === 1;
+}
+
+/** Final key token of one CodeMirror stroke («Mod-d» → «d», «Mod--» → «-»). */
+function strokeKey(stroke) {
+	if (stroke.endsWith("--")) return "-";
+	const index = stroke.lastIndexOf("-");
+	return index === -1 ? stroke : stroke.slice(index + 1);
+}
+
+export function normalizeKeyCombo(value) {
+	const combo = String(value ?? "").trim();
+	if (!combo) return "";
+	const cmKey = toCodeMirrorKey(combo);
+	if (!cmKey) return null;
+	// The raw parser accepts any leftover token as the key («not-a-key»
+	// would silently become «key») — every stroke must end in a real key.
+	for (const stroke of cmKey.split(" ")) {
+		if (!isKnownKey(strokeKey(stroke))) return null;
+	}
+	return cmKey;
+}
+
+/**
  * CodeMirror cannot use a key as both a command and a multi-stroke prefix.
  * Chords that merely share a prefix (for example Ctrl-K C and Ctrl-K U) are
  * compatible with each other.

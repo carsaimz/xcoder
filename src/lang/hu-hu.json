@@ -2062,5 +2062,14 @@
 	"snippets imported": "Részletek importálva",
 	"replace file warning": "Már létezik ilyen nevű részletfájl – felülírja?",
 	"snippet completion": "Kivonat befejezése",
-	"settings-info-editor-snippet-completion": "Javasoljon felhasználói kódrészleteket (VS Code formátum) gépelés közben. Kezelje őket a «Kivonat beszúrása» és «Felhasználói kódrészletek konfigurálása» parancsokkal."
+	"settings-info-editor-snippet-completion": "Javasoljon felhasználói kódrészleteket (VS Code formátum) gépelés közben. Kezelje őket a «Kivonat beszúrása» és «Felhasználói kódrészletek konfigurálása» parancsokkal.",
+	"press key combo": "Billentyűkombináció (pl. Ctrl-Shift-P, akkordok Ctrl-K Ctrl-C) – törölje a kötés megszüntetéséhez",
+	"invalid key combo": "Érvénytelen billentyűkombináció (példák: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Kulcskötés mentve",
+	"key binding cleared": "Kulcskötés törölve",
+	"key conflict warning": "Mentve, de ezt a kombinációt egy másik parancs már használja",
+	"reset key bindings": "Állítsa vissza az összes kulcskötést",
+	"reset key bindings confirm": "Visszaállítja az alapértelmezett kulcs-összerendeléseket? Az egyéni kombinációk elvesznek.",
+	"key bindings restored": "Kulcskötések visszaállítva",
+	"edit key bindings json": "Összerendelési fájl szerkesztése (JSON)"
 }

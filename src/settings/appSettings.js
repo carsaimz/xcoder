@@ -399,18 +399,11 @@ export default function otherSettings() {
 			}
 
 			case "keybindings": {
-				value = await select(strings["key bindings"], [
-					["edit", strings.edit],
-					["reset", strings.reset],
-				]);
-				if (!value) return;
-
-				if (value === "edit") {
-					actionStack.pop(2);
-					openFile(KEYBINDING_FILE);
-				} else {
-					resetKeyBindings();
-				}
+				actionStack.pop(2);
+				const { default: keybindingsEditor } = await import(
+					/* webpackChunkName: "keybindingsEditor" */ "settings/keybindingsEditor"
+				);
+				keybindingsEditor();
 				return;
 			}
 

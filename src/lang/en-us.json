@@ -2045,5 +2045,14 @@
 	"snippets imported": "Snippets imported",
 	"replace file warning": "A snippets file with this name already exists — overwrite it?",
 	"snippet completion": "Snippet completion",
-	"settings-info-editor-snippet-completion": "Suggest user snippets (VS Code format) as you type. Manage them with the «Insert snippet» and «Configure user snippets» commands."
+	"settings-info-editor-snippet-completion": "Suggest user snippets (VS Code format) as you type. Manage them with the «Insert snippet» and «Configure user snippets» commands.",
+	"press key combo": "Key combination (e.g. Ctrl-Shift-P, chords Ctrl-K Ctrl-C) — clear to unbind",
+	"invalid key combo": "Invalid key combination (examples: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Key binding saved",
+	"key binding cleared": "Key binding cleared",
+	"key conflict warning": "Saved, but this combination is already used by another command",
+	"reset key bindings": "Reset all key bindings",
+	"reset key bindings confirm": "Restore the default key bindings? Your custom combinations will be lost.",
+	"key bindings restored": "Key bindings restored",
+	"edit key bindings json": "Edit bindings file (JSON)"
 }

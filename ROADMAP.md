@@ -67,6 +67,11 @@ cada sessão, com o que já está no APK e o que vem a seguir.
 - **Multi-cursor estilo VS Code** — `Ctrl-D` adiciona cursor na próxima
   ocorrência, `Ctrl-Shift-L` seleciona todas as ocorrências (Alt+clique e
   seleção retangular nativos do CodeMirror).
+- **Editor de atalhos estilo VS Code** («Preferências: Atalhos de
+  teclado») — lista pesquisável de todos os comandos com a tecla atual,
+  toque para redefinir (digitação de combinações, acordes Ctrl-K Ctrl-C,
+  vazio para remover), deteção de conflitos, restaurar padrões e editar
+  o JSON diretamente; novo comando `openKeybindings` na paleta.
 - **Snippets do utilizador no formato VS Code** — `<DATA>/snippets/`
   (`<linguagem>.json` + `*.code-snippets` com `scope`), autocompletar ao
   escrever, paleta «Inserir snippet», «Configurar snippets do utilizador»
@@ -86,8 +91,7 @@ cada sessão, com o que já está no APK e o que vem a seguir.
 **A portar a seguir (ordem de valor):**
 
 1. **Sticky scroll** — a assinatura da função fixa no topo ao rolar.
-2. **Editor de atalhos** — ver/editar keybindings na UI (o motor já existe).
-3. **Emmet completo** — expandir abreviações HTML/CSS (o `useEmmet` atual
+2. **Emmet completo** — expandir abreviações HTML/CSS (o `useEmmet` atual
    é básico; snippets do VS Code já estão portados).
 4. **Task runner / npm scripts UI** — scripts do `package.json` com painel
    de saída.

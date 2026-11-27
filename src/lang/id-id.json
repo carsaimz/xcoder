@@ -2062,5 +2062,14 @@
 	"snippets imported": "Cuplikan diimpor",
 	"replace file warning": "File cuplikan dengan nama ini sudah ada — timpa?",
 	"snippet completion": "Penyelesaian cuplikan",
-	"settings-info-editor-snippet-completion": "Sarankan cuplikan pengguna (format VS Code) saat Anda mengetik. Kelola dengan perintah “Sisipkan cuplikan” dan “Konfigurasi cuplikan pengguna”."
+	"settings-info-editor-snippet-completion": "Sarankan cuplikan pengguna (format VS Code) saat Anda mengetik. Kelola dengan perintah “Sisipkan cuplikan” dan “Konfigurasi cuplikan pengguna”.",
+	"press key combo": "Kombinasi tombol (misalnya Ctrl-Shift-P, akord Ctrl-K Ctrl-C) — jelas untuk melepas ikatan",
+	"invalid key combo": "Kombinasi tombol tidak valid (contoh: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Pengikatan kunci disimpan",
+	"key binding cleared": "Pengikatan kunci dihapus",
+	"key conflict warning": "Disimpan, tetapi kombinasi ini sudah digunakan oleh perintah lain",
+	"reset key bindings": "Setel ulang semua pengikatan kunci",
+	"reset key bindings confirm": "Pulihkan pengikatan kunci default? Kombinasi khusus Anda akan hilang.",
+	"key bindings restored": "Ikatan kunci dipulihkan",
+	"edit key bindings json": "Edit file pengikatan (JSON)"
 }

@@ -2062,5 +2062,14 @@
 	"snippets imported": "Parchalar import qilindi",
 	"replace file warning": "Bu nomdagi parchalar fayli allaqachon mavjud — uning ustiga yozilsinmi?",
 	"snippet completion": "Snippetni to'ldirish",
-	"settings-info-editor-snippet-completion": "Yozayotganingizda foydalanuvchi parchalarini (VS Code formati) taklif qiling. Ularni «Snippet kiritish» va «Foydalanuvchi parchalarini sozlash» buyruqlari bilan boshqaring."
+	"settings-info-editor-snippet-completion": "Yozayotganingizda foydalanuvchi parchalarini (VS Code formati) taklif qiling. Ularni «Snippet kiritish» va «Foydalanuvchi parchalarini sozlash» buyruqlari bilan boshqaring.",
+	"press key combo": "Tugmalar birikmasi (masalan, Ctrl-Shift-P, Ctrl-K Ctrl-C akkordlari) — ajratish uchun tozalang",
+	"invalid key combo": "Yaroqsiz tugmalar birikmasi (masalan: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "Kalit bogʻlash saqlandi",
+	"key binding cleared": "Kalit bog‘lash tozalandi",
+	"key conflict warning": "Saqlangan, lekin bu kombinatsiya allaqachon boshqa buyruq tomonidan ishlatilgan",
+	"reset key bindings": "Barcha kalit birikmalarini qayta o'rnating",
+	"reset key bindings confirm": "Standart kalit birikmalari tiklansinmi? Shaxsiy kombinatsiyalaringiz yo'qoladi.",
+	"key bindings restored": "Kalit ulanishlari tiklandi",
+	"edit key bindings json": "Bog'lanish faylini tahrirlash (JSON)"
 }

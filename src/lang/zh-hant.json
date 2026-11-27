@@ -2062,5 +2062,14 @@
 	"snippets imported": "導入片段",
 	"replace file warning": "具有此名稱的片段檔案已存在 - 是否覆蓋它？",
 	"snippet completion": "片段完成",
-	"settings-info-editor-snippet-completion": "在您鍵入時建議使用者片段（VS Code 格式）。使用“插入片段”和“設定使用者片段”命令管理它們。"
+	"settings-info-editor-snippet-completion": "在您鍵入時建議使用者片段（VS Code 格式）。使用“插入片段”和“設定使用者片段”命令管理它們。",
+	"press key combo": "組合鍵（例如 Ctrl-Shift-P、和弦 Ctrl-K Ctrl-C）- 清除以解除綁定",
+	"invalid key combo": "無效的組合鍵（例如：Ctrl-D、Alt-Shift-F、Ctrl-K Ctrl-C）",
+	"key binding saved": "按鍵綁定已儲存",
+	"key binding cleared": "鍵綁定已清除",
+	"key conflict warning": "已保存，但該組合已被另一個命令使用",
+	"reset key bindings": "重置所有按鍵綁定",
+	"reset key bindings confirm": "恢復預設鍵綁定？您的自訂組合將會遺失。",
+	"key bindings restored": "按鍵綁定已恢復",
+	"edit key bindings json": "編輯綁定檔 (JSON)"
 }

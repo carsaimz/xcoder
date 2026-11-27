@@ -2062,5 +2062,14 @@
 	"snippets imported": "قطعات وارد شد",
 	"replace file warning": "یک فایل اسنیپت با این نام از قبل وجود دارد - آن را بازنویسی کنید؟",
 	"snippet completion": "تکمیل قطعه",
-	"settings-info-editor-snippet-completion": "هنگام تایپ، تکه‌های کاربر (فرمت VS Code) را پیشنهاد دهید. آنها را با دستورات «Insert snippet» و «Configure user snippet» مدیریت کنید."
+	"settings-info-editor-snippet-completion": "هنگام تایپ، تکه‌های کاربر (فرمت VS Code) را پیشنهاد دهید. آنها را با دستورات «Insert snippet» و «Configure user snippet» مدیریت کنید.",
+	"press key combo": "ترکیب کلید (مثلاً Ctrl-Shift-P، آکوردها Ctrl-K Ctrl-C) - روشن برای باز کردن",
+	"invalid key combo": "ترکیب کلید نامعتبر (مثلاً: Ctrl-D، Alt-Shift-F، Ctrl-K Ctrl-C)",
+	"key binding saved": "صحافی کلید ذخیره شد",
+	"key binding cleared": "صحافی کلید پاک شد",
+	"key conflict warning": "ذخیره شد، اما این ترکیب قبلاً توسط دستور دیگری استفاده شده است",
+	"reset key bindings": "همه اتصالات کلید را بازنشانی کنید",
+	"reset key bindings confirm": "اتصالات کلید پیش فرض را بازیابی کنید؟ ترکیب های سفارشی شما از بین خواهند رفت.",
+	"key bindings restored": "اتصالات کلیدی بازیابی شد",
+	"edit key bindings json": "ویرایش فایل bindings (JSON)"
 }

@@ -2062,5 +2062,14 @@
 	"snippets imported": "가져온 조각",
 	"replace file warning": "이 이름을 가진 조각 파일이 이미 존재합니다. 덮어쓰시겠습니까?",
 	"snippet completion": "스니펫 완성",
-	"settings-info-editor-snippet-completion": "입력할 때 사용자 스니펫(VS Code 형식)을 제안합니다. «코드 조각 삽입» 및 «사용자 코드 조각 구성» 명령을 사용하여 관리하세요."
+	"settings-info-editor-snippet-completion": "입력할 때 사용자 스니펫(VS Code 형식)을 제안합니다. «코드 조각 삽입» 및 «사용자 코드 조각 구성» 명령을 사용하여 관리하세요.",
+	"press key combo": "키 조합(예: Ctrl-Shift-P, 코드 Ctrl-K Ctrl-C) — 바인딩 해제하려면 지우기",
+	"invalid key combo": "잘못된 키 조합(예: Ctrl-D, Alt-Shift-F, Ctrl-K Ctrl-C)",
+	"key binding saved": "키 바인딩이 저장되었습니다.",
+	"key binding cleared": "키 바인딩이 삭제되었습니다.",
+	"key conflict warning": "저장되었지만 이 조합은 이미 다른 명령에서 사용되었습니다.",
+	"reset key bindings": "모든 키 바인딩 재설정",
+	"reset key bindings confirm": "기본 키 바인딩을 복원하시겠습니까? 맞춤 조합이 손실됩니다.",
+	"key bindings restored": "키 바인딩이 복원되었습니다.",
+	"edit key bindings json": "바인딩 파일 편집(JSON)"
 }
