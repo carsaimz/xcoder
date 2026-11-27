@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "स्पष्ट चयन",
 	"scraper nothing selected": "पहले सूची में आइटम चुनें",
 	"scraper fetch raw": "कच्चा स्रोत लाया जा रहा है",
-	"scraper fetch rendered": "प्रस्तुत पृष्ठ लाया जा रहा है"
+	"scraper fetch rendered": "प्रस्तुत पृष्ठ लाया जा रहा है",
+	"diff": "अंतर",
+	"tools hub diff desc": "विज़ुअल डिफ़ एडिटर — दो फ़ाइलों की तुलना साथ-साथ",
+	"diff pick a": "फ़ाइल A",
+	"diff pick b": "फ़ाइल B",
+	"diff swap": "पक्ष बदलें",
+	"diff side by side": "साथ-साथ",
+	"diff inline": "इनलाइन",
+	"diff select two files": "तुलना के लिए दो फ़ाइलें चुनें — साथ-साथ या इनलाइन।",
+	"diff select a file": "फ़ाइल चुनें",
+	"diff identical": "समरूप",
+	"diff added": "जोड़ी गई",
+	"diff removed": "हटाई गई",
+	"diff snapshot": "स्नैपशॉट",
+	"diff current": "वर्तमान",
+	"diff vs current": "वर्तमान फ़ाइल से तुलना करें"
 }

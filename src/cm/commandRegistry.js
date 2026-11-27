@@ -189,6 +189,18 @@ function registerCoreCommands() {
 		},
 	});
 	addCommand({
+		name: "openDiff",
+		description: "Compare two files (visual diff editor)",
+		readOnly: true,
+		requiresView: false,
+		run() {
+			import("pages/tools/diff")
+				.then((mod) => mod.openDiffPage())
+				.catch((error) => console.error(error));
+			return true;
+		},
+	});
+	addCommand({
 		name: "closeCurrentTab",
 		description: "Close current tab",
 		readOnly: false,

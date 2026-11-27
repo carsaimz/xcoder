@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "清除选择",
 	"scraper nothing selected": "首先选择列表中的项目",
 	"scraper fetch raw": "获取原始源",
-	"scraper fetch rendered": "获取渲染页面"
+	"scraper fetch rendered": "获取渲染页面",
+	"diff": "差异对比",
+	"tools hub diff desc": "可视化差异编辑器 — 并排比较两个文件",
+	"diff pick a": "文件 A",
+	"diff pick b": "文件 B",
+	"diff swap": "交换两侧",
+	"diff side by side": "并排显示",
+	"diff inline": "内联显示",
+	"diff select two files": "选择两个文件进行比较 — 并排或内联。",
+	"diff select a file": "选择文件",
+	"diff identical": "完全相同",
+	"diff added": "新增",
+	"diff removed": "删除",
+	"diff snapshot": "快照",
+	"diff current": "当前",
+	"diff vs current": "与当前文件比较"
 }

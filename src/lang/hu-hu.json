@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Kiválasztás törlése",
 	"scraper nothing selected": "Először válassza ki az elemeket a listából",
 	"scraper fetch raw": "Nyers forrás lekérése",
-	"scraper fetch rendered": "Renderelt oldal lekérése"
+	"scraper fetch rendered": "Renderelt oldal lekérése",
+	"diff": "Diff",
+	"tools hub diff desc": "Vizuális diff szerkesztő — két fájl összehasonlítása egymás mellett",
+	"diff pick a": "A fájl",
+	"diff pick b": "B fájl",
+	"diff swap": "Oldalak cseréje",
+	"diff side by side": "egymás mellett",
+	"diff inline": "folyamatos",
+	"diff select two files": "Válasszon két fájlt az összehasonlításhoz — egymás mellett vagy folyamatosan.",
+	"diff select a file": "fájl kiválasztása",
+	"diff identical": "azonosak",
+	"diff added": "hozzáadva",
+	"diff removed": "eltávolítva",
+	"diff snapshot": "pillanatkép",
+	"diff current": "aktuális",
+	"diff vs current": "Összehasonlítás az aktuális fájllal"
 }

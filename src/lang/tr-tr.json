@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Seçimi temizle",
 	"scraper nothing selected": "Önce listedeki öğeleri seçin",
 	"scraper fetch raw": "Ham kaynak getiriliyor",
-	"scraper fetch rendered": "İşlenen sayfa getiriliyor"
+	"scraper fetch rendered": "İşlenen sayfa getiriliyor",
+	"diff": "Fark",
+	"tools hub diff desc": "Görsel fark düzenleyici — iki dosyayı yan yana karşılaştır",
+	"diff pick a": "A Dosyası",
+	"diff pick b": "B Dosyası",
+	"diff swap": "Yanları değiştir",
+	"diff side by side": "yan yana",
+	"diff inline": "alt alta",
+	"diff select two files": "Karşılaştırmak için iki dosya seçin — yan yana veya alt alta.",
+	"diff select a file": "dosya seç",
+	"diff identical": "aynı",
+	"diff added": "eklenen",
+	"diff removed": "silinen",
+	"diff snapshot": "anlık görüntü",
+	"diff current": "geçerli",
+	"diff vs current": "Geçerli dosyayla karşılaştır"
 }

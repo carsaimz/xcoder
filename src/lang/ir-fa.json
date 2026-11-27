@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "پاک کردن انتخاب",
 	"scraper nothing selected": "ابتدا موارد موجود در لیست را انتخاب کنید",
 	"scraper fetch raw": "واکشی منبع خام",
-	"scraper fetch rendered": "در حال واکشی صفحه رندر شده"
+	"scraper fetch rendered": "در حال واکشی صفحه رندر شده",
+	"diff": "مقایسه",
+	"tools hub diff desc": "ویرایشگر تفاوت بصری — مقایسه دو فایل کنار هم",
+	"diff pick a": "فایل آ",
+	"diff pick b": "فایل ب",
+	"diff swap": "جابه‌جایی طرفین",
+	"diff side by side": "کنار هم",
+	"diff inline": "درون‌خطی",
+	"diff select two files": "دو فایل را برای مقایسه انتخاب کنید — کنار هم یا درون‌خطی.",
+	"diff select a file": "انتخاب فایل",
+	"diff identical": "یکسان",
+	"diff added": "اضافه‌شده",
+	"diff removed": "حذف‌شده",
+	"diff snapshot": "اسنپ‌شات",
+	"diff current": "فعلی",
+	"diff vs current": "مقایسه با فایل فعلی"
 }

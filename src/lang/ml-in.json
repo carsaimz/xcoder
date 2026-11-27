@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "തിരഞ്ഞെടുപ്പ് മായ്‌ക്കുക",
 	"scraper nothing selected": "ആദ്യം ലിസ്റ്റിലെ ഇനങ്ങൾ തിരഞ്ഞെടുക്കുക",
 	"scraper fetch raw": "അസംസ്കൃത ഉറവിടം ലഭ്യമാക്കുന്നു",
-	"scraper fetch rendered": "റെൻഡർ ചെയ്ത പേജ് ലഭ്യമാക്കുന്നു"
+	"scraper fetch rendered": "റെൻഡർ ചെയ്ത പേജ് ലഭ്യമാക്കുന്നു",
+	"diff": "വ്യത്യാസം",
+	"tools hub diff desc": "വിഷ്വൽ ഡിഫ് എഡിറ്റർ — രണ്ട് ഫയലുകൾ അരികുചേർത്ത് താരതമ്യം",
+	"diff pick a": "ഫയൽ A",
+	"diff pick b": "ഫയൽ B",
+	"diff swap": "വശങ്ങൾ മാറ്റുക",
+	"diff side by side": "അരികുചേർന്ന്",
+	"diff inline": "ഒരു വരിയിൽ",
+	"diff select two files": "താരതമ്യിക്കാൻ രണ്ട് ഫയലുകൾ തിരഞ്ഞെടുക്കുക — അരികുചേർന്നോ ഒരു വരിയിലോ.",
+	"diff select a file": "ഫയൽ തിരഞ്ഞെടുക്കുക",
+	"diff identical": "തുല്യമാണ്",
+	"diff added": "ചേർത്തു",
+	"diff removed": "നീക്കി",
+	"diff snapshot": "സ്നാപ്ഷോട്ട്",
+	"diff current": "നിലവിലെ",
+	"diff vs current": "നിലവിലെ ഫയലുമായി താരതമ്യം"
 }

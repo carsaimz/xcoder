@@ -226,6 +226,14 @@
 			"required": "github:Acode-Foundation/codemirror-lsp-client#db6930c2b6db67e14978f08ae8f5aeb149d29468"
 		},
 		{
+			"name": "@codemirror/merge",
+			"version": "6.13.0",
+			"license": "MIT",
+			"author": "Marijn Haverbeke",
+			"homepage": "https://github.com/codemirror/merge",
+			"required": "^6.17.0"
+		},
+		{
 			"name": "@codemirror/search",
 			"version": "6.7.1",
 			"license": "MIT",

@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Tanlovni tozalash",
 	"scraper nothing selected": "Avval ro'yxatdagi narsalarni tanlang",
 	"scraper fetch raw": "Xom manba olinmoqda",
-	"scraper fetch rendered": "Tasvirlangan sahifa olinmoqda"
+	"scraper fetch rendered": "Tasvirlangan sahifa olinmoqda",
+	"diff": "Farqlar",
+	"tools hub diff desc": "Vizual farq muharriri — ikki faylni yonma-yon taqqoslash",
+	"diff pick a": "A fayl",
+	"diff pick b": "B fayl",
+	"diff swap": "Tomonlarni almashtirish",
+	"diff side by side": "yonma-yon",
+	"diff inline": "bir ustunda",
+	"diff select two files": "Taqqoslash uchun ikki fayl tanlang — yonma-yon yoki bir ustunda.",
+	"diff select a file": "fayl tanlash",
+	"diff identical": "bir xil",
+	"diff added": "qoʻshildi",
+	"diff removed": "olib tashlandi",
+	"diff snapshot": "snapshot",
+	"diff current": "joriy",
+	"diff vs current": "Joriy fayl bilan taqqoslash"
 }

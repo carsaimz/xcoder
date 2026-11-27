@@ -66,19 +66,23 @@ cada sessão, com o que já está no APK e o que vem a seguir.
   integrado**, multi-cursor e seleção múltipla do CodeMirror, dobragem por
   indentação, guias de indentação, rainbow brackets, markdown GFM, timeline
   do ficheiro, formatação Prettier, **modo zen (novo na v1.8.47)**.
+- **Diff editor visual (novo na v1.8.48)** — `@codemirror/merge`: lado a
+  lado/inline, gutter de alterações, colapsar regiões iguais, chips
+  (+adicionadas/−removidas) e destaque com realce de sintaxe; no hub
+  Ferramentas, na paleta de comandos (`openDiff`) e na **timeline
+  («diff vs ficheiro atual» — comparar um snapshot sem restaurar)**.
 
 **A portar a seguir (ordem de valor):**
 
-1. **Diff editor visual** (`@codemirror/merge`) — diferenças lado a lado/
-   inline antes do commit e comparação entre abas.
-2. **Sticky scroll** — a assinatura da função fixa no topo ao rolar.
-3. **Editor de atalhos** — ver/editar keybindings na UI (o motor já existe).
-4. **Emmet completo** + **snippets no formato VS Code** (importar
+1. **Sticky scroll** — a assinatura da função fixa no topo ao rolar.
+2. **Editor de atalhos** — ver/editar keybindings na UI (o motor já existe).
+3. **Emmet completo** + **snippets no formato VS Code** (importar
    `.vscode/snippets`).
-5. **Task runner / npm scripts UI** — scripts do `package.json` com painel
+4. **Task runner / npm scripts UI** — scripts do `package.json` com painel
    de saída.
-6. **Multi-root workspaces** — mais de uma pasta aberta.
-7. **Timeline com diff** — comparar versões guardadas do ficheiro.
+5. **Multi-root workspaces** — mais de uma pasta aberta.
+6. **Comparar com HEAD/Git** — diff do ficheiro contra o último commit no
+   painel Git (o diff editor já existe, falta ligá-lo ao isomorphic-git).
 
 **Limitações mobile (marcação clara):** atalhos compostos (Ctrl+K Z),
 seleção de coluna por alt+drag, extensões de desktop e depuração remota

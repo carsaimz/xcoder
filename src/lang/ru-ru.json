@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Очистить выбор",
 	"scraper nothing selected": "Сначала выберите элементы в списке",
 	"scraper fetch raw": "Получение необработанного источника",
-	"scraper fetch rendered": "Получение обработанной страницы"
+	"scraper fetch rendered": "Получение обработанной страницы",
+	"diff": "Различия",
+	"tools hub diff desc": "Визуальный редактор различий — сравнение двух файлов рядом",
+	"diff pick a": "Файл A",
+	"diff pick b": "Файл B",
+	"diff swap": "Поменять стороны",
+	"diff side by side": "рядом",
+	"diff inline": "в одну колонку",
+	"diff select two files": "Выберите два файла для сравнения — рядом или в одну колонку.",
+	"diff select a file": "выбрать файл",
+	"diff identical": "идентичны",
+	"diff added": "добавлено",
+	"diff removed": "удалено",
+	"diff snapshot": "снимок",
+	"diff current": "текущий",
+	"diff vs current": "Сравнить с текущим файлом"
 }

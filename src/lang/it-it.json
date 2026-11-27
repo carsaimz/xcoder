@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Cancella selezione",
 	"scraper nothing selected": "Selezionare prima gli elementi nell'elenco",
 	"scraper fetch raw": "Recupero della fonte grezza",
-	"scraper fetch rendered": "Recupero della pagina renderizzata"
+	"scraper fetch rendered": "Recupero della pagina renderizzata",
+	"diff": "Diff",
+	"tools hub diff desc": "Editor di diff visuale — confronta due file affiancati",
+	"diff pick a": "File A",
+	"diff pick b": "File B",
+	"diff swap": "Scambia lati",
+	"diff side by side": "affiancato",
+	"diff inline": "in linea",
+	"diff select two files": "Scegli due file da confrontare — affiancati o in linea.",
+	"diff select a file": "scegli un file",
+	"diff identical": "identici",
+	"diff added": "aggiunte",
+	"diff removed": "rimosse",
+	"diff snapshot": "istantanea",
+	"diff current": "attuale",
+	"diff vs current": "Confronta con il file attuale"
 }

@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "ਚੋਣ ਸਾਫ਼ ਕਰੋ",
 	"scraper nothing selected": "ਪਹਿਲਾਂ ਸੂਚੀ ਵਿੱਚ ਆਈਟਮਾਂ ਦੀ ਚੋਣ ਕਰੋ",
 	"scraper fetch raw": "ਕੱਚਾ ਸਰੋਤ ਲਿਆ ਰਿਹਾ ਹੈ",
-	"scraper fetch rendered": "ਰੈਂਡਰ ਕੀਤੇ ਪੰਨੇ ਨੂੰ ਪ੍ਰਾਪਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ"
+	"scraper fetch rendered": "ਰੈਂਡਰ ਕੀਤੇ ਪੰਨੇ ਨੂੰ ਪ੍ਰਾਪਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ",
+	"diff": "ਅੰਤਰ",
+	"tools hub diff desc": "ਵਿਜ਼ੂਅਲ ਡਿਫ਼ ਐਡੀਟਰ — ਦੋ ਫ਼ਾਈਲਾਂ ਨਾਲ-ਨਾਲ ਤੁਲਨਾ",
+	"diff pick a": "ਫ਼ਾਈਲ A",
+	"diff pick b": "ਫ਼ਾਈਲ B",
+	"diff swap": "ਪਾਸੇ ਬਦਲੋ",
+	"diff side by side": "ਨਾਲ-ਨਾਲ",
+	"diff inline": "ਇਨ-ਲਾਈਨ",
+	"diff select two files": "ਤੁਲਨਾ ਲਈ ਦੋ ਫ਼ਾਈਲਾਂ ਚੁਣੋ — ਨਾਲ-ਨਾਲ ਜਾਂ ਇਨ-ਲਾਈਨ।",
+	"diff select a file": "ਫ਼ਾਈਲ ਚੁਣੋ",
+	"diff identical": "ਇੱਕੋ ਜਿਹੀਆਂ",
+	"diff added": "ਸ਼ਾਮਲ",
+	"diff removed": "ਹਟਾਈਆਂ",
+	"diff snapshot": "ਸਨੈਪਸ਼ਾਟ",
+	"diff current": "ਮੌਜੂਦਾ",
+	"diff vs current": "ਮੌਜੂਦਾ ਫ਼ਾਈਲ ਨਾਲ ਤੁਲਨਾ"
 }

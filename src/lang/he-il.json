@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "נקה בחירה",
 	"scraper nothing selected": "תחילה בחר פריטים ברשימה",
 	"scraper fetch raw": "מביא מקור גולמי",
-	"scraper fetch rendered": "מביא את הדף שעבר עיבוד"
+	"scraper fetch rendered": "מביא את הדף שעבר עיבוד",
+	"diff": "השוואה",
+	"tools hub diff desc": "עורך הבדלים חזותי — השוואת שני קבצים זה לצד זה",
+	"diff pick a": "קובץ א",
+	"diff pick b": "קובץ ב",
+	"diff swap": "החלפת צדדים",
+	"diff side by side": "זה לצד זה",
+	"diff inline": "בשורה",
+	"diff select two files": "בחרו שני קבצים להשוואה — זה לצד זה או בשורה.",
+	"diff select a file": "בחירת קובץ",
+	"diff identical": "זהים",
+	"diff added": "נוספו",
+	"diff removed": "הוסרו",
+	"diff snapshot": "תמונת מצב",
+	"diff current": "נוכחי",
+	"diff vs current": "השוואה לקובץ הנוכחי"
 }

@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Klare Auswahl",
 	"scraper nothing selected": "Wählen Sie zuerst Elemente in der Liste aus",
 	"scraper fetch raw": "Rohquelle abrufen",
-	"scraper fetch rendered": "Die gerenderte Seite wird abgerufen"
+	"scraper fetch rendered": "Die gerenderte Seite wird abgerufen",
+	"diff": "Diff",
+	"tools hub diff desc": "Visueller Diff-Editor — zwei Dateien nebeneinander vergleichen",
+	"diff pick a": "Datei A",
+	"diff pick b": "Datei B",
+	"diff swap": "Seiten tauschen",
+	"diff side by side": "nebeneinander",
+	"diff inline": "inline",
+	"diff select two files": "Wähle zwei Dateien zum Vergleichen — nebeneinander oder inline.",
+	"diff select a file": "Datei wählen",
+	"diff identical": "identisch",
+	"diff added": "hinzugefügt",
+	"diff removed": "entfernt",
+	"diff snapshot": "Schnappschuss",
+	"diff current": "aktuell",
+	"diff vs current": "Mit aktueller Datei vergleichen"
 }

@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "I-clear ang pagpili",
 	"scraper nothing selected": "Pumili muna ng mga item sa listahan",
 	"scraper fetch raw": "Kinukuha ang raw source",
-	"scraper fetch rendered": "Kinukuha ang na-render na page"
+	"scraper fetch rendered": "Kinukuha ang na-render na page",
+	"diff": "Diff",
+	"tools hub diff desc": "Visual na diff editor — paghambingin ang dalawang file na magkatabi",
+	"diff pick a": "File A",
+	"diff pick b": "File B",
+	"diff swap": "Palitan ang gilid",
+	"diff side by side": "magkatabi",
+	"diff inline": "isa-isang linya",
+	"diff select two files": "Pumili ng dalawang file para ikumpara — magkatabi o isa-isang linya.",
+	"diff select a file": "pumili ng file",
+	"diff identical": "magkapareho",
+	"diff added": "nadagdag",
+	"diff removed": "natanggal",
+	"diff snapshot": "snapshot",
+	"diff current": "kasalukuyan",
+	"diff vs current": "Ikumpara sa kasalukuyang file"
 }

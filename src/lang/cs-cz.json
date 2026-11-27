@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Jasný výběr",
 	"scraper nothing selected": "Nejprve vyberte položky v seznamu",
 	"scraper fetch raw": "Načítání surového zdroje",
-	"scraper fetch rendered": "Načítání vykreslené stránky"
+	"scraper fetch rendered": "Načítání vykreslené stránky",
+	"diff": "Diff",
+	"tools hub diff desc": "Vizuální diff editor — porovnání dvou souborů vedle sebe",
+	"diff pick a": "Soubor A",
+	"diff pick b": "Soubor B",
+	"diff swap": "Prohodit strany",
+	"diff side by side": "vedle sebe",
+	"diff inline": "pod sebou",
+	"diff select two files": "Vyberte dva soubory k porovnání — vedle sebe nebo pod sebou.",
+	"diff select a file": "vybrat soubor",
+	"diff identical": "shodné",
+	"diff added": "přidáno",
+	"diff removed": "odstraněno",
+	"diff snapshot": "snímek",
+	"diff current": "aktuální",
+	"diff vs current": "Porovnat s aktuálním souborem"
 }

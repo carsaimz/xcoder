@@ -78,6 +78,12 @@ const TOOLS = [
 		descKey: "tools hub devtools desc",
 		open: () => import("./webdev").then((m) => m.openWebdevPage()),
 	},
+	{
+		icon: "cod:diff",
+		nameKey: "diff",
+		descKey: "tools hub diff desc",
+		open: () => import("./diff").then((m) => m.openDiffPage()),
+	},
 ];
 
 /**

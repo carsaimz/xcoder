@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "مسح التحديد",
 	"scraper nothing selected": "حدد العناصر الموجودة في القائمة أولاً",
 	"scraper fetch raw": "جلب المصدر الخام",
-	"scraper fetch rendered": "جارٍ جلب الصفحة المعروضة"
+	"scraper fetch rendered": "جارٍ جلب الصفحة المعروضة",
+	"diff": "المقارنة",
+	"tools hub diff desc": "محرر الفروق المرئي — مقارنة ملفين جنبًا إلى جنب",
+	"diff pick a": "الملف أ",
+	"diff pick b": "الملف ب",
+	"diff swap": "تبديل الجانبين",
+	"diff side by side": "جنبًا إلى جنب",
+	"diff inline": "مضمّن",
+	"diff select two files": "اختر ملفين للمقارنة — جنبًا إلى جنب أو مضمّنًا.",
+	"diff select a file": "اختر ملفًا",
+	"diff identical": "متطابقان",
+	"diff added": "أُضيفت",
+	"diff removed": "أُزيلت",
+	"diff snapshot": "لقطة",
+	"diff current": "الحالي",
+	"diff vs current": "مقارنة بالملف الحالي"
 }

@@ -48,6 +48,25 @@ export default function Timeline() {
 		if (!$action) return;
 		const { action, stamp } = $action.dataset;
 
+		if (action === "diff") {
+			try {
+				const snapshotText = await readSnapshot(activeFile.uri, Number(stamp));
+				if (snapshotText === null) throw new Error("snapshot missing");
+				const currentText = editorManager.editor.getValue();
+				const { openDiffForTexts } = await import("pages/tools/diff");
+				openDiffForTexts({
+					leftText: snapshotText,
+					rightText: currentText,
+					leftTitle: strings["diff snapshot"] || "snapshot",
+					rightTitle:
+						activeFile.filename || strings["diff current"] || "current",
+				});
+			} catch (error) {
+				helpers.error(error);
+			}
+			return;
+		}
+
 		if (action === "restore") {
 			const message = strings["restore snapshot"] + "?";
 			const ok = await confirm(strings["restore snapshot"], message);
@@ -119,6 +138,14 @@ export default function Timeline() {
 					<span className="xc-timeline-size">
 						{size} {strings["characters"]}
 					</span>
+					<button
+						className="xc-timeline-diff"
+						title={strings["diff vs current"] || "diff vs current"}
+						data-action="diff"
+						data-stamp={t}
+					>
+						<span className="icon codicon-diff" />
+					</button>
 					<button
 						className="xc-timeline-restore"
 						data-action="restore"

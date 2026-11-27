@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "선택 취소",
 	"scraper nothing selected": "먼저 목록에서 항목을 선택하세요.",
 	"scraper fetch raw": "원시 소스를 가져오는 중",
-	"scraper fetch rendered": "렌더링된 페이지를 가져오는 중"
+	"scraper fetch rendered": "렌더링된 페이지를 가져오는 중",
+	"diff": "차이점",
+	"tools hub diff desc": "시각적 diff 편집기 — 두 파일을 나란히 비교",
+	"diff pick a": "파일 A",
+	"diff pick b": "파일 B",
+	"diff swap": "좌우 바꾸기",
+	"diff side by side": "나란히",
+	"diff inline": "인라인",
+	"diff select two files": "비교할 두 파일을 선택하세요 — 나란히 또는 인라인.",
+	"diff select a file": "파일 선택",
+	"diff identical": "동일함",
+	"diff added": "추가됨",
+	"diff removed": "삭제됨",
+	"diff snapshot": "스냅샷",
+	"diff current": "현재",
+	"diff vs current": "현재 파일과 비교"
 }

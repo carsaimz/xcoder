@@ -1,0 +1,151 @@
+/* Visual diff tool — VS Code-style file comparison (side-by-side or
+ * inline) built on @codemirror/merge. The page shell reuses toolPage
+ * (full-viewport flex column); this file only styles the toolbar, the
+ * stat chips and the change highlighting colors. */
+
+.xc-diff {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	gap: 0;
+}
+
+.xc-diff-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px;
+	border-bottom: 1px solid var(--border-color);
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	flex-shrink: 0;
+}
+
+.xc-diff-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	border: 1px solid var(--border-color);
+	background: var(--primary-color);
+	color: var(--primary-text-color);
+	padding: 6px 10px;
+	border-radius: 6px;
+	font-size: 0.85em;
+	white-space: nowrap;
+	max-width: 14em;
+
+	.icon {
+		font-size: 1.1em;
+		opacity: 0.8;
+	}
+
+	&:active {
+		background: var(--surface-hover);
+	}
+}
+
+.xc-diff-swap,
+.xc-diff-mode {
+	padding: 6px 8px;
+}
+
+.xc-diff-mode-label {
+	font-size: 0.9em;
+}
+
+.xc-diff-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.xc-diff-host {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.xc-diff-empty {
+	margin: auto;
+	padding: 1.5em;
+	text-align: center;
+	color: var(--secondary-text-color, inherit);
+	opacity: 0.7;
+}
+
+.xc-diff-stats {
+	display: flex;
+	gap: 8px;
+	padding: 6px 8px;
+	border-top: 1px solid var(--border-color);
+	flex-shrink: 0;
+	flex-wrap: wrap;
+}
+
+.xc-diff-chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 0.78em;
+
+	&.added {
+		background: rgba(87, 166, 74, 0.18);
+		color: #6fbf5f;
+	}
+
+	&.removed {
+		background: rgba(244, 71, 71, 0.16);
+		color: #e06c6c;
+	}
+
+	&.identical {
+		background: rgba(127, 127, 127, 0.15);
+		color: var(--secondary-text-color, inherit);
+		opacity: 0.9;
+	}
+}
+
+/* merge view layout — the editors must share the full page height */
+.xc-diff-host .cm-mergeView {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.xc-diff-host .cm-mergeViewEditors {
+	flex: 1;
+	min-height: 0;
+}
+
+.xc-diff-host .cm-mergeViewEditor {
+	height: 100%;
+	min-width: 0;
+}
+
+/* change highlighting (tuned to the app palette, works in light/dark) */
+.xc-diff-host .cm-insertedLine {
+	background: rgba(87, 166, 74, 0.14);
+}
+
+.xc-diff-host .cm-deletedLine {
+	background: rgba(244, 71, 71, 0.12);
+}
+
+.xc-diff-host .cm-deletedText {
+	background: rgba(244, 71, 71, 0.22);
+}
+
+.xc-diff-host .cm-changedLine {
+	background: rgba(87, 166, 74, 0.14);
+}
+
+.xc-diff-host .cm-changedText {
+	background: rgba(87, 166, 74, 0.24);
+}
+
+.xc-diff-host .cm-merge-revert button {
+	cursor: pointer;
+}

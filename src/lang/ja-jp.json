@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "選択をクリア",
 	"scraper nothing selected": "最初にリスト内の項目を選択してください",
 	"scraper fetch raw": "生のソースを取得しています",
-	"scraper fetch rendered": "レンダリングされたページを取得しています"
+	"scraper fetch rendered": "レンダリングされたページを取得しています",
+	"diff": "差分",
+	"tools hub diff desc": "ビジュアル差分エディター — 2つのファイルを並べて比較",
+	"diff pick a": "ファイルA",
+	"diff pick b": "ファイルB",
+	"diff swap": "左右を入れ替え",
+	"diff side by side": "横に並べて表示",
+	"diff inline": "インライン表示",
+	"diff select two files": "比較する2つのファイルを選んでください — 横並びまたはインライン。",
+	"diff select a file": "ファイルを選択",
+	"diff identical": "同一です",
+	"diff added": "追加",
+	"diff removed": "削除",
+	"diff snapshot": "スナップショット",
+	"diff current": "現在",
+	"diff vs current": "現在のファイルと比較"
 }

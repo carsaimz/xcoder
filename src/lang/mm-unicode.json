@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "ရွေးချယ်မှုကို ရှင်းလင်းပါ။",
 	"scraper nothing selected": "စာရင်းထဲရှိ အရာများကို ဦးစွာရွေးချယ်ပါ။",
 	"scraper fetch raw": "ကုန်ကြမ်းအရင်းအမြစ်ကို ရယူခြင်း။",
-	"scraper fetch rendered": "ပြန်ဆိုထားသော စာမျက်နှာကို ထုတ်ယူနေသည်။"
+	"scraper fetch rendered": "ပြန်ဆိုထားသော စာမျက်နှာကို ထုတ်ယူနေသည်။",
+	"diff": "ကွာခြားချက်",
+	"tools hub diff desc": "မြင်ရလွယ်သော ကွာခြားချက် တည်းဖြတ်ကိရိယာ — ဖိုင်နှစ်ခုကို ယှဉ်ပြသည်",
+	"diff pick a": "ဖိုင် A",
+	"diff pick b": "ဖိုင် B",
+	"diff swap": "နေရာလဲလှယ်",
+	"diff side by side": "ယှဉ်တွဲပြ",
+	"diff inline": "တစ်လျှောက်ပြ",
+	"diff select two files": "နှိုင်းယှဉ်ရန် ဖိုင်နှစ်ခု ရွေးပါ — ယှဉ်တွဲပြ သို့မဟုတ် တစ်လျှောက်ပြ။",
+	"diff select a file": "ဖိုင် ရွေးပါ",
+	"diff identical": "တူညီသည်",
+	"diff added": "ထည့်သွင်း",
+	"diff removed": "ဖျက်သိမ်း",
+	"diff snapshot": "သိမ်းဆည်းချက်",
+	"diff current": "လက်ရှိ",
+	"diff vs current": "လက်ရှိ ဖိုင်နှင့် နှိုင်းယှဉ်"
 }

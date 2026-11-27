@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Xóa lựa chọn",
 	"scraper nothing selected": "Chọn các mục trong danh sách trước",
 	"scraper fetch raw": "Đang tìm nạp nguồn thô",
-	"scraper fetch rendered": "Đang tìm nạp trang được hiển thị"
+	"scraper fetch rendered": "Đang tìm nạp trang được hiển thị",
+	"diff": "So sánh",
+	"tools hub diff desc": "Trình so sánh trực quan — so sánh hai tệp cạnh nhau",
+	"diff pick a": "Tệp A",
+	"diff pick b": "Tệp B",
+	"diff swap": "Hoán đổi hai bên",
+	"diff side by side": "cạnh nhau",
+	"diff inline": "một cột",
+	"diff select two files": "Chọn hai tệp để so sánh — cạnh nhau hoặc một cột.",
+	"diff select a file": "chọn tệp",
+	"diff identical": "giống nhau",
+	"diff added": "thêm vào",
+	"diff removed": "xóa đi",
+	"diff snapshot": "bản chụp",
+	"diff current": "hiện tại",
+	"diff vs current": "So sánh với tệp hiện tại"
 }

@@ -2034,5 +2034,20 @@
 	"scraper clear selection": "Hapus pilihan",
 	"scraper nothing selected": "Pilih item dalam daftar terlebih dahulu",
 	"scraper fetch raw": "Mengambil sumber mentah",
-	"scraper fetch rendered": "Mengambil halaman yang dirender"
+	"scraper fetch rendered": "Mengambil halaman yang dirender",
+	"diff": "Diff",
+	"tools hub diff desc": "Editor diff visual — bandingkan dua berkas berdampingan",
+	"diff pick a": "Berkas A",
+	"diff pick b": "Berkas B",
+	"diff swap": "Tukar sisi",
+	"diff side by side": "berdampingan",
+	"diff inline": "berurutan",
+	"diff select two files": "Pilih dua berkas untuk dibandingkan — berdampingan atau berurutan.",
+	"diff select a file": "pilih berkas",
+	"diff identical": "identik",
+	"diff added": "ditambahkan",
+	"diff removed": "dihapus",
+	"diff snapshot": "cuplikan",
+	"diff current": "saat ini",
+	"diff vs current": "Bandingkan dengan berkas saat ini"
 }

@@ -2017,5 +2017,20 @@
 	"scraper clear selection": "Clear selection",
 	"scraper nothing selected": "Select items in the list first",
 	"scraper fetch raw": "Fetching raw source",
-	"scraper fetch rendered": "Fetching rendered page"
+	"scraper fetch rendered": "Fetching rendered page",
+	"diff": "Diff",
+	"tools hub diff desc": "Visual diff editor — compare two files side by side",
+	"diff pick a": "File A",
+	"diff pick b": "File B",
+	"diff swap": "Swap sides",
+	"diff side by side": "side by side",
+	"diff inline": "inline",
+	"diff select two files": "Pick two files to compare — side by side or inline.",
+	"diff select a file": "pick a file",
+	"diff identical": "identical",
+	"diff added": "added",
+	"diff removed": "removed",
+	"diff snapshot": "snapshot",
+	"diff current": "current",
+	"diff vs current": "Diff vs current file"
 }

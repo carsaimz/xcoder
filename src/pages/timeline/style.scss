@@ -59,6 +59,20 @@
       white-space: nowrap;
     }
 
+    .xc-timeline-diff {
+      padding: 5px 10px;
+      font-size: 0.9rem;
+      color: var(--popup-text-color, inherit);
+      background: rgba(128, 128, 128, 0.14);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+
+      &:active {
+        background: rgba(128, 128, 128, 0.28);
+      }
+    }
+
     .xc-timeline-restore {
       padding: 5px 12px;
       font-size: 0.78rem;
