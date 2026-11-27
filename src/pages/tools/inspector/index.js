@@ -1,5 +1,7 @@
 import "./style.scss";
 import toast from "components/toast";
+import confirm from "dialogs/confirm";
+import prompt from "dialogs/prompt";
 import {
 	activeInspectorSession,
 	closeInspectorSession,
@@ -68,6 +70,19 @@ const consoleEntries = [];
 const networkEntries = [];
 let networkFilter = "all";
 let consoleErrors = 0;
+/** lowercase text filter for the network list (url, method or status) */
+let networkTextFilter = "";
+
+/** console command history (DevTools-style ↑/↓ recall) */
+const consoleHistory = [];
+let consoleHistoryIndex = -1;
+
+/** DevTools-style element picker state («selecionar na página») */
+let pickMode = false;
+/** @type {HTMLElement|null} pick-mode toolbar button */
+let $pick = null;
+/** @type {HTMLElement|null} open bottom sheet (body preview / HTML editor) */
+let $sheet = null;
 
 /**
  * Raw-HTML fallback (DOMParser document) — keeps Elementos/selector search
@@ -103,6 +118,9 @@ function initApp(el) {
 		$network = null;
 		$consoleBadge = null;
 		$networkBadge = null;
+		$pick = null;
+		pickMode = false;
+		$sheet = null;
 	};
 }
 
@@ -175,6 +193,12 @@ function buildUi() {
 					}}
 				/>
 				<span
+					className="icon codicon-target"
+					ref={(el) => ($pick = el)}
+					title={t("inspector pick mode", "Selecionar na página")}
+					onclick={togglePickMode}
+				/>
+				<span
 					className="icon codicon-clear-all"
 					title={t("inspector clear highlight", "Limpar realce")}
 					onclick={clearHighlight}
@@ -214,6 +238,13 @@ function buildUi() {
 					spellcheck={false}
 					onkeydown={(e) => {
 						if (e.key === "Enter") runJs(e.target);
+						else if (e.key === "ArrowUp") {
+							e.preventDefault();
+							consoleHistoryNav(e.target, -1);
+						} else if (e.key === "ArrowDown") {
+							e.preventDefault();
+							consoleHistoryNav(e.target, 1);
+						}
 					}}
 				/>
 				<span
@@ -231,6 +262,20 @@ function buildUi() {
 	const $networkPanel = (
 		<div className="ins-panel hidden" data-panel="network">
 			<div className="ins-panel-toolbar">
+				<input
+					type="search"
+					className="ins-net-filter"
+					placeholder={t(
+						"inspector net filter",
+						"Filtrar url, método ou estado",
+					)}
+					oninput={(e) => {
+						networkTextFilter = String(e.target.value || "")
+							.trim()
+							.toLowerCase();
+						renderNetwork();
+					}}
+				/>
 				<div className="ins-chips">
 					{["all", "xhr", "js", "css", "img", "font"].map((chip) => (
 						<button
@@ -389,6 +434,9 @@ async function stopSession() {
 	fallbackPage = null;
 	pageTitle = "";
 	pageUrl = "";
+	setPickModeUi(false);
+	closeSheet();
+	networkTextFilter = "";
 	setStatus(t("inspector idle", "Introduza um endereço para inspecionar"));
 	treeCache.clear();
 	expanded.clear();
@@ -407,6 +455,7 @@ function handleEvent(event, data) {
 		pageTitle = data?.title || pageTitle;
 		if ($url && pageUrl) $url.value = pageUrl;
 		setStatus(pageTitle || pageUrl);
+		setPickModeUi(false);
 		treeCache.clear();
 		expanded.clear();
 		expanded.add("");
@@ -456,6 +505,12 @@ function handleEvent(event, data) {
 				if (networkEntries.length > 500) networkEntries.shift();
 				updateBadges();
 				renderNetwork();
+				break;
+			case "picked":
+				// element chosen with the picker — leave pick mode
+				// and jump to it in the tree
+				setPickModeUi(false);
+				if (data?.path) applySearchMatches([data], 1);
 				break;
 			case "inspect":
 				renderDetails(data.data);
@@ -878,18 +933,47 @@ function renderDetails(data) {
 						{t("inspector source mode", "modo fonte (HTTP)")}
 					</span>
 				)}
+				{!data.fallback && self.path ? (
+					<span className="ins-details-tools">
+						<span
+							className="icon codicon-edit"
+							title={t("inspector edit html", "Editar HTML")}
+							onclick={() =>
+								editNodeHtml(self.path, data.html || "", nodeLabel(self))
+							}
+						/>
+						<span
+							className="icon codicon-trash"
+							title={t("inspector delete node", "Apagar elemento")}
+							onclick={() => deleteNode(self.path)}
+						/>
+					</span>
+				) : null}
 			</div>
 			<div className="ins-attrs">
 				{attrs.length ? (
 					attrs.map(([name, value]) => (
-						<div
-							className="ins-attr"
-							onclick={() => copyText(`${name}="${value}"`)}
-						>
-							<span className="ins-attr-name">{name}</span>
-							<span className="ins-attr-value">
-								{String(value).slice(0, 120)}
+						<div className="ins-attr">
+							<span
+								className="ins-attr-body"
+								onclick={() =>
+									data.fallback
+										? copyText(`${name}="${value}"`)
+										: editAttribute(self.path, name, value)
+								}
+							>
+								<span className="ins-attr-name">{name}</span>
+								<span className="ins-attr-value">
+									{String(value).slice(0, 120)}
+								</span>
 							</span>
+							{!data.fallback ? (
+								<span
+									className="icon codicon-close ins-attr-del"
+									title={t("inspector remove attr", "Remover atributo")}
+									onclick={() => removeAttribute(self.path, name)}
+								/>
+							) : null}
 						</div>
 					))
 				) : (
@@ -996,6 +1080,12 @@ async function runJs($input) {
 		toast(t("inspector no session", "Abra uma página primeiro"), 2000);
 		return;
 	}
+	// DevTools-style history: the code is recalled with ↑/↓ later
+	if (consoleHistory[consoleHistory.length - 1] !== code) {
+		consoleHistory.push(code);
+		if (consoleHistory.length > 100) consoleHistory.shift();
+	}
+	consoleHistoryIndex = -1;
 	consoleEntries.push({ level: "log", text: `› ${code}`, ts: Date.now() });
 	renderConsole();
 	try {
@@ -1019,6 +1109,27 @@ async function runJs($input) {
 	if ($input) $input.value = "";
 	updateBadges();
 	renderConsole();
+}
+
+/**
+ * Recalls console commands with ↑/↓ (DevTools behaviour): ↑ walks back
+ * through the history, ↓ forward; past the end restores an empty input.
+ * @param {HTMLInputElement} $input
+ * @param {number} dir -1 = older, 1 = newer
+ */
+function consoleHistoryNav($input, dir) {
+	if (!consoleHistory.length) return;
+	if (consoleHistoryIndex === -1 && dir < 0) {
+		consoleHistoryIndex = consoleHistory.length;
+	}
+	consoleHistoryIndex += dir;
+	if (consoleHistoryIndex >= consoleHistory.length) {
+		consoleHistoryIndex = -1;
+		if ($input) $input.value = "";
+		return;
+	}
+	if (consoleHistoryIndex < 0) consoleHistoryIndex = 0;
+	if ($input) $input.value = consoleHistory[consoleHistoryIndex] ?? "";
 }
 
 // ---------------------------------------------------------------- network
@@ -1057,9 +1168,15 @@ function renderNetwork() {
 		return;
 	}
 
-	const rows = networkEntries.filter(
-		(entry) => networkFilter === "all" || networkType(entry) === networkFilter,
-	);
+	const rows = networkEntries.filter((entry) => {
+		if (networkFilter !== "all" && networkType(entry) !== networkFilter) {
+			return false;
+		}
+		if (!networkTextFilter) return true;
+		const haystack =
+			`${entry.method || ""} ${entry.url || ""} ${entry.status ?? ""}`.toLowerCase();
+		return haystack.includes(networkTextFilter);
+	});
 	if (!rows.length) {
 		$network.append(
 			<div className="ins-empty">
@@ -1072,8 +1189,8 @@ function renderNetwork() {
 	for (const entry of rows.slice().reverse()) {
 		$network.append(
 			<div
-				className={`ins-net-row type-${networkType(entry)}${entry.failed ? " failed" : ""}`}
-				onclick={() => copyText(entry.url)}
+				className={`ins-net-row type-${networkType(entry)}${entry.failed ? " failed" : ""}${entry.body ? " has-body" : ""}`}
+				onclick={() => openNetworkBody(entry)}
 			>
 				<span className="ins-net-method">{entry.method}</span>
 				<span className="ins-net-url">{networkLabel(entry.url)}</span>
@@ -1095,6 +1212,28 @@ function renderNetwork() {
 			</div>,
 		);
 	}
+}
+
+/**
+ * Opens the captured response body (DevTools "Response" tab). Entries
+ * without a body only copy the URL.
+ * @param {any} entry
+ */
+function openNetworkBody(entry) {
+	if (!entry?.body) {
+		copyText(entry?.url || "");
+		toast(t("inspector no body", "Sem corpo capturado — url copiada"), 2000);
+		return;
+	}
+	openSheet({
+		title: `${entry.method || "GET"} ${networkLabel(entry.url || "")} — ${entry.failed ? "ERR" : (entry.status ?? "")}`,
+		text: entry.body,
+		readOnly: true,
+		copyLabel: t("inspector copy body", "Copiar corpo"),
+		note: entry.bodyTruncated
+			? t("inspector body truncated", "corpo truncado")
+			: "",
+	});
 }
 
 // -------------------------------------------------------------- utilities
@@ -1126,39 +1265,314 @@ async function clearHighlight() {
 	renderTree();
 }
 
-/** @param {HTMLInputElement} $input */
-async function searchDom($input) {
-	const selector = $input?.value?.trim();
-	if (!selector) return;
-	if (fallbackPage && !activeInspectorSession()) {
-		const matches = [];
-		let nodes = [];
-		try {
-			nodes = Array.prototype.slice.call(
-				fallbackPage.doc.querySelectorAll(selector),
-			);
-		} catch {
-			toast(t("inspector no matches", "Sem correspondências"), 2000);
-			return;
-		}
-		for (const node of nodes.slice(0, 100)) {
-			matches.push(fallbackDescribeForSearch(node));
-		}
-		await applySearchMatches(matches, nodes.length);
+// ------------------------------------------------------------ pick mode
+
+/** Toggles the DevTools-style element picker on the live page. */
+async function togglePickMode() {
+	if (!activeInspectorSession()) {
+		toast(t("inspector live only", "Requer página viva (sessão activa)"), 2000);
 		return;
 	}
-	if (!activeInspectorSession()) return;
+	const next = !pickMode;
 	try {
-		const data = await sendInspectorCommand("searchDom", { selector });
-		const matches = data?.matches || [];
-		if (!matches.length) {
-			toast(t("inspector no matches", "Sem correspondências"), 2000);
-			return;
+		await sendInspectorCommand("setPickMode", { on: next });
+		setPickModeUi(next);
+		if (next) {
+			toast(
+				t(
+					"inspector pick hint",
+					"Toque num elemento na página para o inspecionar",
+				),
+				3000,
+			);
 		}
-		await applySearchMatches(matches, data?.total || matches.length);
 	} catch (error) {
+		setPickModeUi(false);
 		toast(String(error?.message || error), 2500);
 	}
+}
+
+/** Syncs the toolbar button with the pick-mode state. */
+function setPickModeUi(on) {
+	pickMode = on;
+	$pick?.classList.toggle("ins-btn-on", on);
+}
+
+// ---------------------------------------------------------- bottom sheet
+
+function closeSheet() {
+	if ($sheet) {
+		$sheet.remove();
+		$sheet = null;
+	}
+}
+
+/**
+ * Bottom-sheet overlay with an editable/readonly textarea — shared by the
+ * network response viewer and the live HTML editor.
+ * @param {{title: string, text: string, readOnly?: boolean, applyLabel?: string, copyLabel?: string, note?: string, onApply?: (value: string) => void}} options
+ */
+function openSheet(options) {
+	closeSheet();
+	if (!container) return;
+	const $area = <textarea className="ins-sheet-text" spellcheck={false} />;
+	if (options.readOnly) $area.readOnly = true;
+	$area.value = options.text ?? "";
+
+	const $el = (
+		<div
+			className="ins-sheet-overlay"
+			onclick={(e) => {
+				if (e.target === e.currentTarget) closeSheet();
+			}}
+		>
+			<div className="ins-sheet">
+				<div className="ins-sheet-head">
+					<span className="ins-sheet-title">{options.title}</span>
+					<span
+						className="icon codicon-close"
+						title={t("inspector close", "Fechar")}
+						onclick={closeSheet}
+					/>
+				</div>
+				{$area}
+				{options.note ? (
+					<div className="ins-sheet-note">{options.note}</div>
+				) : null}
+				<div className="ins-sheet-actions">
+					{options.copyLabel ? (
+						<button type="button" onclick={() => copyText($area.value)}>
+							<span className="icon codicon-copy" />
+							{options.copyLabel}
+						</button>
+					) : null}
+					{options.applyLabel && options.onApply ? (
+						<button
+							type="button"
+							className="ins-sheet-apply"
+							onclick={() => options.onApply($area.value)}
+						>
+							<span className="icon codicon-check" />
+							{options.applyLabel}
+						</button>
+					) : null}
+				</div>
+			</div>
+		</div>
+	);
+	container.append($el);
+	$sheet = $el;
+}
+
+// ------------------------------------------------------- live DOM editing
+
+/**
+ * Edits one attribute of the selected node in the live page. An empty
+ * value removes the attribute.
+ * @param {string} path
+ * @param {string} name
+ * @param {string} value
+ */
+async function editAttribute(path, name, value) {
+	if (!activeInspectorSession()) {
+		toast(t("inspector live only", "Requer página viva (sessão activa)"), 2000);
+		return;
+	}
+	const next = await prompt(
+		`${t("inspector edit attr", "Editar atributo")} — ${name}`,
+		String(value ?? ""),
+		"text",
+	);
+	if (next === null || next === undefined) return;
+	try {
+		await sendInspectorCommand("setAttr", { path, name, value: next });
+		toast(
+			next === ""
+				? t("inspector attr removed", "Atributo removido")
+				: t("inspector attr saved", "Atributo atualizado"),
+			1800,
+		);
+		fetchTree(path);
+		selectNode(path);
+	} catch (error) {
+		toast(
+			`${t("inspector edit failed", "Falhou ao editar")}: ${error?.message || error}`,
+			2500,
+		);
+	}
+}
+
+/** Removes an attribute of the selected node in the live page. */
+async function removeAttribute(path, name) {
+	if (!activeInspectorSession()) {
+		toast(t("inspector live only", "Requer página viva (sessão activa)"), 2000);
+		return;
+	}
+	try {
+		await sendInspectorCommand("setAttr", { path, name, value: "" });
+		toast(t("inspector attr removed", "Atributo removido"), 1800);
+		fetchTree(path);
+		selectNode(path);
+	} catch (error) {
+		toast(
+			`${t("inspector edit failed", "Falhou ao editar")}: ${error?.message || error}`,
+			2500,
+		);
+	}
+}
+
+/** Deletes the selected node from the live page (with confirmation). */
+async function deleteNode(path) {
+	if (!activeInspectorSession()) {
+		toast(t("inspector live only", "Requer página viva (sessão activa)"), 2000);
+		return;
+	}
+	const ok = await confirm(
+		t("inspector confirm delete", "Apagar este elemento da página?"),
+	);
+	if (!ok) return;
+	try {
+		await sendInspectorCommand("deleteNode", { path });
+		toast(t("inspector node deleted", "Elemento apagado"), 1800);
+		selectedPath = null;
+		renderDetails(null);
+		treeCache.clear();
+		fetchTree("");
+	} catch (error) {
+		toast(
+			`${t("inspector edit failed", "Falhou ao editar")}: ${error?.message || error}`,
+			2500,
+		);
+	}
+}
+
+/** Opens the HTML editor for the selected node (applies to the live page). */
+function editNodeHtml(path, html, label) {
+	if (!activeInspectorSession()) {
+		toast(t("inspector live only", "Requer página viva (sessão activa)"), 2000);
+		return;
+	}
+	openSheet({
+		title: `${t("inspector edit html", "Editar HTML")} — ${label || path}`,
+		text: html,
+		applyLabel: t("inspector apply", "Aplicar"),
+		copyLabel: t("inspector copy html", "Copiar HTML"),
+		onApply: async (value) => {
+			try {
+				await sendInspectorCommand("setOuterHTML", { path, html: value });
+				closeSheet();
+				toast(t("inspector html applied", "HTML aplicado"), 1800);
+				treeCache.clear();
+				fetchTree("");
+				selectNode(path);
+			} catch (error) {
+				toast(
+					`${t("inspector edit failed", "Falhou ao editar")}: ${error?.message || error}`,
+					3000,
+				);
+			}
+		},
+	});
+}
+
+/** @param {HTMLInputElement} $input */
+async function searchDom($input) {
+	const query = $input?.value?.trim();
+	if (!query) return;
+	// «text:» prefix forces the full-text search; otherwise a CSS
+	// selector is tried first and the text search kicks in as a
+	// fallback when the selector matches nothing
+	const forcedText = query.toLowerCase().startsWith("text:")
+		? query.slice(5).trim()
+		: null;
+	let matches = [];
+	let total = 0;
+
+	if (!forcedText) {
+		if (fallbackPage && !activeInspectorSession()) {
+			try {
+				const nodes = Array.prototype.slice.call(
+					fallbackPage.doc.querySelectorAll(query),
+				);
+				total = nodes.length;
+				matches = nodes.slice(0, 100).map(fallbackDescribeForSearch);
+			} catch {
+				matches = [];
+			}
+		} else if (activeInspectorSession()) {
+			try {
+				const data = await sendInspectorCommand("searchDom", {
+					selector: query,
+				});
+				matches = data?.matches || [];
+				total = data?.total || matches.length;
+			} catch {
+				matches = [];
+			}
+		}
+	}
+
+	if (!matches.length) {
+		// selector found nothing (invalid or empty) — search the text
+		const needle = forcedText ?? query;
+		if (fallbackPage && !activeInspectorSession()) {
+			matches = fallbackTextSearch(needle);
+		} else if (activeInspectorSession()) {
+			try {
+				const data = await sendInspectorCommand("searchText", {
+					text: needle,
+				});
+				matches = data?.matches || [];
+			} catch (error) {
+				toast(String(error?.message || error), 2500);
+				return;
+			}
+		}
+		if (matches.length) {
+			setStatus(
+				`${matches.length} ${t("inspector text matches", "correspondências de texto")}`,
+			);
+		}
+	} else {
+		setStatus(
+			`${matches.length} ${t("inspector matches", "correspondências")}`,
+		);
+	}
+
+	if (!matches.length) {
+		toast(t("inspector no matches", "Sem correspondências"), 2000);
+		return;
+	}
+	await applySearchMatches(matches, total || matches.length);
+}
+
+/** Full-text search over the fallback DOMParser document. */
+function fallbackTextSearch(needle) {
+	const needleLower = String(needle || "").toLowerCase();
+	const matches = [];
+	if (!needleLower || !fallbackPage?.doc) return matches;
+	try {
+		const walker = fallbackPage.doc.createTreeWalker(
+			fallbackPage.doc.body || fallbackPage.doc.documentElement,
+			NodeFilter.SHOW_TEXT,
+			null,
+		);
+		const seen = new Set();
+		while (walker.nextNode() && matches.length < 100) {
+			const value = walker.currentNode.nodeValue || "";
+			if (!value.toLowerCase().includes(needleLower)) continue;
+			const el = walker.currentNode.parentElement;
+			if (!el) continue;
+			const info = fallbackDescribeForSearch(el);
+			if (info?.path && !seen.has(info.path)) {
+				seen.add(info.path);
+				matches.push(info);
+			}
+		}
+	} catch {
+		/* ignore */
+	}
+	return matches;
 }
 
 /**

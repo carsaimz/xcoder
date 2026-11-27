@@ -10,8 +10,9 @@
  *  3. The capture script monkey-patches console, window errors, fetch and
  *     XMLHttpRequest, reporting through the `webview.postMessage` bridge.
  *  4. The app drives DOM inspection with command messages
- *     (`__inspectorCmd`) — getTree/inspect/highlight/searchDom — answered
- *     as `__inspector` result messages. Node paths are index chains from
+ *     (`__inspectorCmd`) — getTree/inspect/highlight/searchDom/searchText/
+ *     setAttr/deleteNode/setOuterHTML/setPickMode — answered as
+ *     `__inspector` result messages. Node paths are index chains from
  *     the document root ("0.2.1"), stable for a loaded page.
  *
  * Pure helpers (formatting, path math) live here too so they are
@@ -22,6 +23,10 @@ import webviewApi from "lib/webview";
 
 /** Max characters of outerHTML returned per inspect call. */
 export const OUTER_HTML_LIMIT = 20000;
+
+/** Max characters of a captured fetch/XHR response body (DevTools-style
+ * "Response" preview). Media and binary payloads are never captured. */
+export const BODY_CAPTURE_LIMIT = 262144;
 
 /**
  * The page-side capture + command script. Registered per webview session;
@@ -84,6 +89,24 @@ export const CAPTURE_SCRIPT = String.raw`
   });
   // network capture — fetch
   var of = window.fetch;
+  var BODY_LIMIT = ${BODY_CAPTURE_LIMIT};
+  // Text-ish responses get their body captured (DevTools "Response" tab);
+  // media/binary payloads are skipped and huge bodies race a 1.5s budget
+  // so a slow download can never delay the network entry itself.
+  function captureBody(promise, ct){
+    try {
+      if (!promise) return Promise.resolve(null);
+      if (/^(image|video|audio|font)\//i.test(ct) || /octet-stream/i.test(ct)) return Promise.resolve(null);
+      return Promise.race([
+        promise.then(function(text){
+          text = String(text || "");
+          if (text.length > BODY_LIMIT) return { body: text.slice(0, BODY_LIMIT), truncated: true };
+          return { body: text };
+        }),
+        new Promise(function(resolve){ setTimeout(function(){ resolve(null); }, 1500); })
+      ]);
+    } catch (e) { return Promise.resolve(null); }
+  }
   if (of) {
     window.fetch = function(input, init){
       var url = typeof input === "string" ? input : (input && input.url) || String(input);
@@ -92,7 +115,10 @@ export const CAPTURE_SCRIPT = String.raw`
       return of.apply(this, arguments).then(function(res){
         var ct = "";
         try { ct = (res.headers && res.headers.get("content-type")) || ""; } catch (e) {}
-        send({ cmd: "network", data: { method: method, url: String(url), status: res.status, ok: res.ok, ms: Date.now() - t0, type: ct } });
+        var finish = function(body){
+          send({ cmd: "network", data: { method: method, url: String(url), status: res.status, ok: res.ok, ms: Date.now() - t0, type: ct, body: body && body.body, bodyTruncated: body && body.truncated } });
+        };
+        captureBody(res.clone ? res.clone().text() : null, ct).then(finish, function(){ finish(null); });
         return res;
       }, function(err){
         send({ cmd: "network", data: { method: method, url: String(url), status: 0, failed: 1, ms: Date.now() - t0, error: fmt(err && err.message || err) } });
@@ -118,7 +144,19 @@ export const CAPTURE_SCRIPT = String.raw`
       }
       var ct = "";
       try { ct = self.getResponseHeader("content-type") || ""; } catch (e) {}
-      send({ cmd: "network", data: { method: self.__xc ? self.__xc.method : "GET", url: self.__xc ? self.__xc.url : "", status: self.status, ms: Date.now() - t0, size: size, type: ct } });
+      // response body — text/json only, same limits as the fetch transport
+      var body = null;
+      var truncated = false;
+      try {
+        var raw = "";
+        if (self.responseType === "" || self.responseType === "text") raw = String(self.responseText || "");
+        else if (self.responseType === "json") raw = JSON.stringify(self.response);
+        if (raw && !/^(image|video|audio|font)\//i.test(ct) && !/octet-stream/i.test(ct)) {
+          if (raw.length > BODY_LIMIT) { raw = raw.slice(0, BODY_LIMIT); truncated = true; }
+          body = raw;
+        }
+      } catch (e) {}
+      send({ cmd: "network", data: { method: self.__xc ? self.__xc.method : "GET", url: self.__xc ? self.__xc.url : "", status: self.status, ms: Date.now() - t0, size: size, type: ct, body: body, bodyTruncated: truncated } });
     });
     return os.apply(this, arguments);
   };
@@ -176,6 +214,31 @@ export const CAPTURE_SCRIPT = String.raw`
       }
     }
     return attrs;
+  }
+  // ---- element picker (DevTools «inspect element» cursor) --------------
+  // While active, the FIRST tap anywhere in the page is intercepted,
+  // reported to the app as a "picked" message and the mode exits — the
+  // page never receives the click, so nothing is followed/opened.
+  var pickHandler = null;
+  function enablePick(){
+    if (pickHandler) return;
+    pickHandler = function(e){
+      try {
+        e.preventDefault();
+        e.stopPropagation();
+      } catch (err) {}
+      var d = describe(e && e.target);
+      if (d) send({ cmd: "picked", data: d });
+      disablePick();
+    };
+    document.addEventListener("click", pickHandler, true);
+    try { document.documentElement.style.cursor = "crosshair"; } catch (err) {}
+  }
+  function disablePick(){
+    if (!pickHandler) return;
+    document.removeEventListener("click", pickHandler, true);
+    pickHandler = null;
+    try { document.documentElement.style.cursor = ""; } catch (err) {}
   }
   function describe(node){
     if (!node) return null;
@@ -256,6 +319,61 @@ export const CAPTURE_SCRIPT = String.raw`
           }
         }
         send({ cmd: "searchDom", id: msg.id, data: { matches: results, total: nodes.length } });
+        return;
+      }
+      case "searchText": {
+        var needle = String(msg.text || "").toLowerCase();
+        var textMatches = [];
+        var seenMatch = {};
+        if (needle) {
+          var rootEl = document.body || document.documentElement;
+          var walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null, false);
+          while (walker.nextNode() && textMatches.length < 100) {
+            var value = walker.currentNode.nodeValue || "";
+            if (value.toLowerCase().indexOf(needle) < 0) continue;
+            var hit = walker.currentNode.parentElement;
+            if (!hit) continue;
+            var hitInfo = describe(hit);
+            if (hitInfo && !seenMatch[hitInfo.path]) {
+              seenMatch[hitInfo.path] = 1;
+              textMatches.push(hitInfo);
+            }
+          }
+        }
+        send({ cmd: "searchText", id: msg.id, data: { matches: textMatches } });
+        return;
+      }
+      case "setPickMode": {
+        if (msg.on) enablePick();
+        else disablePick();
+        send({ cmd: "setPickMode", id: msg.id, data: { ok: 1 } });
+        return;
+      }
+      case "setAttr": {
+        var el = asElement(nodeAt(msg.path));
+        if (!el || !msg.name) { send({ cmd: "setAttr", id: msg.id, error: "not found" }); return; }
+        try {
+          if (msg.value === "" || msg.value === null || msg.value === undefined) el.removeAttribute(String(msg.name));
+          else el.setAttribute(String(msg.name), String(msg.value));
+          send({ cmd: "setAttr", id: msg.id, data: { ok: 1, self: describe(el) } });
+        } catch (e) { send({ cmd: "setAttr", id: msg.id, error: fmt(e && e.message || e) }); }
+        return;
+      }
+      case "deleteNode": {
+        var victim = asElement(nodeAt(msg.path));
+        if (!victim || !victim.parentElement) { send({ cmd: "deleteNode", id: msg.id, error: "not found" }); return; }
+        var parentPath = pathOf(victim.parentElement);
+        victim.parentElement.removeChild(victim);
+        send({ cmd: "deleteNode", id: msg.id, data: { ok: 1, parentPath: parentPath } });
+        return;
+      }
+      case "setOuterHTML": {
+        var target = asElement(nodeAt(msg.path));
+        if (!target || !target.parentElement) { send({ cmd: "setOuterHTML", id: msg.id, error: "not found" }); return; }
+        try {
+          target.outerHTML = String(msg.html || "");
+          send({ cmd: "setOuterHTML", id: msg.id, data: { ok: 1, parentPath: pathOf(target.parentElement) || String(msg.path || "") } });
+        } catch (e) { send({ cmd: "setOuterHTML", id: msg.id, error: fmt(e && e.message || e) }); }
         return;
       }
       default:
