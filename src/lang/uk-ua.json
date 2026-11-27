@@ -2051,5 +2051,16 @@
 	"diff current": "поточний",
 	"diff vs current": "Порівняти з поточним файлом",
 	"git diff vs head": "Порівняння з HEAD",
-	"git diff no head": "Немає версії у HEAD для порівняння"
+	"git diff no head": "Немає версії у HEAD для порівняння",
+	"no file open": "Спочатку відкрийте файл",
+	"insert snippet": "Вставте фрагмент",
+	"no snippets": "Немає фрагментів для цієї мови",
+	"snippet inserted": "Фрагмент вставлено",
+	"snippets file created": "Створено файл фрагментів",
+	"import snippets": "Імпорт фрагментів",
+	"not a snippets file": "Не є файлом фрагментів коду VS",
+	"snippets imported": "Фрагменти імпортовано",
+	"replace file warning": "Файл фрагментів із такою назвою вже існує — перезаписати його?",
+	"snippet completion": "Завершення фрагмента",
+	"settings-info-editor-snippet-completion": "Пропонуйте фрагменти користувача (формат коду VS) під час введення. Керуйте ними за допомогою команд «Вставити фрагмент» і «Налаштувати фрагменти користувача»."
 }

@@ -2051,5 +2051,16 @@
 	"diff current": "当前",
 	"diff vs current": "与当前文件比较",
 	"git diff vs head": "与 HEAD 比较",
-	"git diff no head": "HEAD 中没有可比较的版本"
+	"git diff no head": "HEAD 中没有可比较的版本",
+	"no file open": "首先打开一个文件",
+	"insert snippet": "插入片段",
+	"no snippets": "没有该语言的片段",
+	"snippet inserted": "已插入片段",
+	"snippets file created": "已创建片段文件",
+	"import snippets": "导入片段",
+	"not a snippets file": "不是 VS Code 片段文件",
+	"snippets imported": "导入片段",
+	"replace file warning": "具有此名称的片段文件已存在 - 是否覆盖它？",
+	"snippet completion": "片段完成",
+	"settings-info-editor-snippet-completion": "在您键入时建议用户片段（VS Code 格式）。使用“插入片段”和“配置用户片段”命令管理它们。"
 }

@@ -2051,5 +2051,16 @@
 	"diff current": "текущий",
 	"diff vs current": "Сравнить с текущим файлом",
 	"git diff vs head": "Различия с HEAD",
-	"git diff no head": "Нет версии в HEAD для сравнения"
+	"git diff no head": "Нет версии в HEAD для сравнения",
+	"no file open": "Сначала откройте файл",
+	"insert snippet": "Вставить фрагмент",
+	"no snippets": "Нет фрагментов для этого языка",
+	"snippet inserted": "Фрагмент вставлен.",
+	"snippets file created": "Файл фрагментов создан.",
+	"import snippets": "Импортировать фрагменты",
+	"not a snippets file": "Не файл фрагментов кода VS.",
+	"snippets imported": "Фрагменты импортированы",
+	"replace file warning": "Файл фрагментов с таким именем уже существует. Перезаписать его?",
+	"snippet completion": "Завершение фрагмента",
+	"settings-info-editor-snippet-completion": "Предлагайте пользовательские фрагменты (формат VS Code) по мере ввода. Управляйте ими с помощью команд «Вставить фрагмент» и «Настроить пользовательские фрагменты»."
 }

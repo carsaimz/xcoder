@@ -2051,5 +2051,16 @@
 	"diff current": "वर्तमान",
 	"diff vs current": "वर्तमान फ़ाइल से तुलना करें",
 	"git diff vs head": "HEAD से तुलना",
-	"git diff no head": "तुलना के लिए HEAD में कोई संस्करण नहीं"
+	"git diff no head": "तुलना के लिए HEAD में कोई संस्करण नहीं",
+	"no file open": "सबसे पहले एक फ़ाइल खोलें",
+	"insert snippet": "स्निपेट डालें",
+	"no snippets": "इस भाषा के लिए कोई स्निपेट नहीं",
+	"snippet inserted": "स्निपेट डाला गया",
+	"snippets file created": "स्निपेट्स फ़ाइल बनाई गई",
+	"import snippets": "स्निपेट आयात करें",
+	"not a snippets file": "वीएस कोड स्निपेट फ़ाइल नहीं है",
+	"snippets imported": "स्निपेट्स आयातित",
+	"replace file warning": "इस नाम की एक स्निपेट फ़ाइल पहले से मौजूद है - इसे अधिलेखित करें?",
+	"snippet completion": "स्निपेट पूरा होना",
+	"settings-info-editor-snippet-completion": "जैसे ही आप टाइप करें उपयोगकर्ता स्निपेट (वीएस कोड प्रारूप) सुझाएं। उन्हें \"स्निपेट सम्मिलित करें\" और \"उपयोगकर्ता स्निपेट कॉन्फ़िगर करें\" कमांड के साथ प्रबंधित करें।"
 }

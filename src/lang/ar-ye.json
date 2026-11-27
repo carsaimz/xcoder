@@ -2051,5 +2051,16 @@
 	"diff current": "الحالي",
 	"diff vs current": "مقارنة بالملف الحالي",
 	"git diff vs head": "مقارنة بـ HEAD",
-	"git diff no head": "لا توجد نسخة في HEAD للمقارنة"
+	"git diff no head": "لا توجد نسخة في HEAD للمقارنة",
+	"no file open": "افتح ملفًا أولاً",
+	"insert snippet": "إدراج مقتطف",
+	"no snippets": "لا توجد مقتطفات لهذه اللغة",
+	"snippet inserted": "تم إدراج المقتطف",
+	"snippets file created": "تم إنشاء ملف القصاصات",
+	"import snippets": "استيراد مقتطفات",
+	"not a snippets file": "ليس ملف مقتطفات VS Code",
+	"snippets imported": "تم استيراد المقتطفات",
+	"replace file warning": "يوجد بالفعل ملف مقتطفات بهذا الاسم — هل تريد الكتابة فوقه؟",
+	"snippet completion": "استكمال المقتطف",
+	"settings-info-editor-snippet-completion": "اقترح مقتطفات المستخدم (تنسيق VS Code) أثناء الكتابة. قم بإدارتها باستخدام الأمرين «إدراج مقتطف» و«تكوين مقتطفات المستخدم»."
 }

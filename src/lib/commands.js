@@ -5,6 +5,11 @@ import {
 	selectSelectionMatches,
 } from "@codemirror/search";
 import { focusEditorIfEditable } from "cm/editorReadOnly";
+import {
+	configureSnippets,
+	importSnippetsFile,
+	openInsertSnippetPalette,
+} from "cm/snippets";
 import Sidebar from "components/sidebar";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
@@ -257,6 +262,18 @@ export default {
 		const view = editorManager.editor;
 		if (!view?.state) return false;
 		return selectNextOccurrence(view);
+	},
+	"insert-snippet"() {
+		openInsertSnippetPalette();
+		return true;
+	},
+	"configure-snippets"() {
+		configureSnippets();
+		return true;
+	},
+	"import-snippets"() {
+		importSnippetsFile();
+		return true;
 	},
 	"select-all-occurrences"() {
 		const view = editorManager.editor;

@@ -2051,5 +2051,16 @@
 	"diff current": "현재",
 	"diff vs current": "현재 파일과 비교",
 	"git diff vs head": "HEAD와 비교",
-	"git diff no head": "비교할 HEAD 버전이 없습니다"
+	"git diff no head": "비교할 HEAD 버전이 없습니다",
+	"no file open": "먼저 파일을 엽니다",
+	"insert snippet": "스니펫 삽입",
+	"no snippets": "이 언어에 대한 스니펫이 없습니다.",
+	"snippet inserted": "스니펫이 삽입되었습니다.",
+	"snippets file created": "스니펫 파일이 생성되었습니다.",
+	"import snippets": "스니펫 가져오기",
+	"not a snippets file": "VS Code 조각 파일이 아님",
+	"snippets imported": "가져온 조각",
+	"replace file warning": "이 이름을 가진 조각 파일이 이미 존재합니다. 덮어쓰시겠습니까?",
+	"snippet completion": "스니펫 완성",
+	"settings-info-editor-snippet-completion": "입력할 때 사용자 스니펫(VS Code 형식)을 제안합니다. «코드 조각 삽입» 및 «사용자 코드 조각 구성» 명령을 사용하여 관리하세요."
 }

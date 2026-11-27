@@ -2051,5 +2051,16 @@
 	"diff current": "saat ini",
 	"diff vs current": "Bandingkan dengan berkas saat ini",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Tidak ada versi HEAD untuk dibandingkan"
+	"git diff no head": "Tidak ada versi HEAD untuk dibandingkan",
+	"no file open": "Buka file terlebih dahulu",
+	"insert snippet": "Sisipkan cuplikan",
+	"no snippets": "Tidak ada cuplikan untuk bahasa ini",
+	"snippet inserted": "Cuplikan dimasukkan",
+	"snippets file created": "File cuplikan dibuat",
+	"import snippets": "Impor cuplikan",
+	"not a snippets file": "Bukan file cuplikan VS Code",
+	"snippets imported": "Cuplikan diimpor",
+	"replace file warning": "File cuplikan dengan nama ini sudah ada — timpa?",
+	"snippet completion": "Penyelesaian cuplikan",
+	"settings-info-editor-snippet-completion": "Sarankan cuplikan pengguna (format VS Code) saat Anda mengetik. Kelola dengan perintah “Sisipkan cuplikan” dan “Konfigurasi cuplikan pengguna”."
 }

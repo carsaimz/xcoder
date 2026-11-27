@@ -2051,5 +2051,16 @@
 	"diff current": "actuel",
 	"diff vs current": "Comparer au fichier actuel",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Pas de version HEAD à comparer"
+	"git diff no head": "Pas de version HEAD à comparer",
+	"no file open": "Ouvrez d'abord un fichier",
+	"insert snippet": "Insérer un extrait",
+	"no snippets": "Aucun extrait pour cette langue",
+	"snippet inserted": "Extrait inséré",
+	"snippets file created": "Fichier d'extraits créé",
+	"import snippets": "Importer des extraits",
+	"not a snippets file": "Il ne s'agit pas d'un fichier d'extraits de code VS",
+	"snippets imported": "Extraits importés",
+	"replace file warning": "Un fichier d'extraits portant ce nom existe déjà. L'écraser ?",
+	"snippet completion": "Achèvement de l'extrait",
+	"settings-info-editor-snippet-completion": "Suggérez des extraits d’utilisateurs (format VS Code) au fur et à mesure que vous tapez. Gérez-les avec les commandes « Insérer un extrait » et « Configurer les extraits d'utilisateur »."
 }

@@ -2051,5 +2051,16 @@
 	"diff current": "hiện tại",
 	"diff vs current": "So sánh với tệp hiện tại",
 	"git diff vs head": "So sánh với HEAD",
-	"git diff no head": "Không có phiên bản trong HEAD để so sánh"
+	"git diff no head": "Không có phiên bản trong HEAD để so sánh",
+	"no file open": "Trước tiên hãy mở một tập tin",
+	"insert snippet": "Chèn đoạn trích",
+	"no snippets": "Không có đoạn trích cho ngôn ngữ này",
+	"snippet inserted": "Đã chèn đoạn mã",
+	"snippets file created": "Đã tạo tệp đoạn mã",
+	"import snippets": "Nhập đoạn mã",
+	"not a snippets file": "Không phải là tệp đoạn mã VS Code",
+	"snippets imported": "Đoạn mã đã được nhập",
+	"replace file warning": "Tệp đoạn trích có tên này đã tồn tại — ghi đè lên nó?",
+	"snippet completion": "Hoàn thành đoạn mã",
+	"settings-info-editor-snippet-completion": "Đề xuất đoạn mã người dùng (định dạng Mã VS) khi bạn nhập. Quản lý chúng bằng các lệnh “Chèn đoạn mã” và “Định cấu hình đoạn mã người dùng”."
 }

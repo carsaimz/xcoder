@@ -2051,5 +2051,16 @@
 	"diff current": "נוכחי",
 	"diff vs current": "השוואה לקובץ הנוכחי",
 	"git diff vs head": "השוואה ל-HEAD",
-	"git diff no head": "אין גרסה ב-HEAD להשוואה"
+	"git diff no head": "אין גרסה ב-HEAD להשוואה",
+	"no file open": "פתח קובץ קודם",
+	"insert snippet": "הוסף קטע",
+	"no snippets": "אין קטעים לשפה זו",
+	"snippet inserted": "הוכנס קטע טקסט",
+	"snippets file created": "נוצר קובץ Snippets",
+	"import snippets": "ייבוא ​​קטעי טקסט",
+	"not a snippets file": "לא קובץ קטעי קוד VS",
+	"snippets imported": "קטעי טקסט יובאו",
+	"replace file warning": "קובץ קטעים בשם זה כבר קיים - להחליף אותו?",
+	"snippet completion": "השלמת קטע",
+	"settings-info-editor-snippet-completion": "הצע קטעי משתמש (פורמט VS Code) תוך כדי הקלדה. נהל אותם עם הפקודות «הוסף קטע קוד» ו-“הגדר קטעי קוד של משתמש”."
 }

@@ -2051,5 +2051,16 @@
 	"diff current": "joriy",
 	"diff vs current": "Joriy fayl bilan taqqoslash",
 	"git diff vs head": "HEAD bilan farq",
-	"git diff no head": "Taqqoslash uchun HEAD versiyasi yoʻq"
+	"git diff no head": "Taqqoslash uchun HEAD versiyasi yoʻq",
+	"no file open": "Avval faylni oching",
+	"insert snippet": "Parchani kiriting",
+	"no snippets": "Bu til uchun parchalar yoʻq",
+	"snippet inserted": "Snippet kiritildi",
+	"snippets file created": "Snippet fayli yaratildi",
+	"import snippets": "Snippetlarni import qilish",
+	"not a snippets file": "VS Code parchalari fayli emas",
+	"snippets imported": "Parchalar import qilindi",
+	"replace file warning": "Bu nomdagi parchalar fayli allaqachon mavjud — uning ustiga yozilsinmi?",
+	"snippet completion": "Snippetni to'ldirish",
+	"settings-info-editor-snippet-completion": "Yozayotganingizda foydalanuvchi parchalarini (VS Code formati) taklif qiling. Ularni «Snippet kiritish» va «Foydalanuvchi parchalarini sozlash» buyruqlari bilan boshqaring."
 }

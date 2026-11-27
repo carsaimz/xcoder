@@ -68,6 +68,7 @@ import {
 	getModesByName,
 	initModes,
 } from "cm/modelist";
+import { snippetsCompletions } from "cm/snippets";
 import createTouchSelectionMenu from "cm/touchSelectionMenu";
 import "cm/supportedModes";
 import { autocompletion } from "@codemirror/autocomplete";
@@ -952,6 +953,8 @@ async function EditorManager($header, $body) {
 	const localWordCompletionCompartment = new Compartment();
 	// Compartment for icon-library completions (Font Awesome, Bootstrap…)
 	const iconCompletionCompartment = new Compartment();
+	// Compartment for user snippets (VS Code format)
+	const snippetCompletionCompartment = new Compartment();
 	// Compartment for rainbow bracket colorizer
 	const rainbowCompartment = new Compartment();
 	// Compartment for indent guides
@@ -1336,6 +1339,15 @@ async function EditorManager($header, $body) {
 				return appSettings?.value?.iconCompletion === false
 					? []
 					: iconCompletions();
+			},
+		},
+		{
+			keys: ["snippetCompletion"],
+			compartments: [snippetCompletionCompartment],
+			build() {
+				return appSettings?.value?.snippetCompletion === false
+					? []
+					: snippetsCompletions();
 			},
 		},
 		{

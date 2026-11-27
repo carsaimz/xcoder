@@ -1,11 +1,11 @@
-import { MergeView } from "@codemirror/merge";
-import { EditorView, lineNumbers } from "@codemirror/view";
-import { oneDark } from "@codemirror/theme-one-dark";
-import { getThemeExtensions } from "cm/themes";
-import { getModeForPath } from "cm/modelist";
-import FileBrowser from "pages/fileBrowser";
 import fsOperation from "fileSystem";
+import { MergeView } from "@codemirror/merge";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { EditorView, lineNumbers } from "@codemirror/view";
+import { getModeForPath } from "cm/modelist";
+import { getThemeExtensions } from "cm/themes";
 import appSettings from "lib/settings";
+import FileBrowser from "pages/fileBrowser";
 import { openToolPage } from "pages/tools/toolPage";
 import { diffStats } from "./lineDiff";
 import "./style.scss";

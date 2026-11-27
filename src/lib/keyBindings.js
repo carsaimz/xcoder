@@ -382,6 +382,27 @@ const APP_BINDING_CONFIG = [
 		editorOnly: true,
 	},
 	{
+		name: "insertSnippet",
+		description: "Insert snippet",
+		key: null,
+		action: "insert-snippet",
+		readOnly: false,
+	},
+	{
+		name: "configureSnippets",
+		description: "Configure user snippets (VS Code format)",
+		key: null,
+		action: "configure-snippets",
+		readOnly: true,
+	},
+	{
+		name: "importSnippets",
+		description: "Import a VS Code snippets file",
+		key: null,
+		action: "import-snippets",
+		readOnly: true,
+	},
+	{
 		name: "openLogFile",
 		description: "Open log file",
 		key: null,

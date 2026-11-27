@@ -2051,5 +2051,16 @@
 	"diff current": "attuale",
 	"diff vs current": "Confronta con il file attuale",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Nessuna versione HEAD da confrontare"
+	"git diff no head": "Nessuna versione HEAD da confrontare",
+	"no file open": "Apri prima un file",
+	"insert snippet": "Inserisci lo snippet",
+	"no snippets": "Nessuno snippet per questa lingua",
+	"snippet inserted": "Frammento inserito",
+	"snippets file created": "File di frammenti creato",
+	"import snippets": "Importa snippet",
+	"not a snippets file": "Non è un file di frammenti di codice VS",
+	"snippets imported": "Snippet importati",
+	"replace file warning": "Esiste già un file di frammenti con questo nome: sovrascriverlo?",
+	"snippet completion": "Completamento dello snippet",
+	"settings-info-editor-snippet-completion": "Suggerisci snippet utente (formato VS Code) durante la digitazione. Gestiscili con i comandi «Inserisci snippet» e «Configura snippet utente»."
 }

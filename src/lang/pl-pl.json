@@ -2051,5 +2051,16 @@
 	"diff current": "bieżący",
 	"diff vs current": "Porównaj z bieżącym plikiem",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Brak wersji w HEAD do porównania"
+	"git diff no head": "Brak wersji w HEAD do porównania",
+	"no file open": "Najpierw otwórz plik",
+	"insert snippet": "Wstaw fragment",
+	"no snippets": "Brak fragmentów dla tego języka",
+	"snippet inserted": "Wstawiono fragment",
+	"snippets file created": "Utworzono plik fragmentów",
+	"import snippets": "Importuj fragmenty",
+	"not a snippets file": "Nie jest to plik fragmentów kodu VS",
+	"snippets imported": "Zaimportowano fragmenty",
+	"replace file warning": "Plik fragmentów o tej nazwie już istnieje — zastąpić go?",
+	"snippet completion": "Uzupełnianie fragmentu",
+	"settings-info-editor-snippet-completion": "Sugeruj fragmenty użytkownika (w formacie VS Code) podczas pisania. Zarządzaj nimi za pomocą poleceń „Wstaw fragment” i „Konfiguruj fragmenty użytkownika”."
 }

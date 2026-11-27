@@ -2051,5 +2051,16 @@
 	"diff current": "فعلی",
 	"diff vs current": "مقایسه با فایل فعلی",
 	"git diff vs head": "مقایسه با HEAD",
-	"git diff no head": "نسخه‌ای در HEAD برای مقایسه نیست"
+	"git diff no head": "نسخه‌ای در HEAD برای مقایسه نیست",
+	"no file open": "ابتدا یک فایل باز کنید",
+	"insert snippet": "درج قطعه",
+	"no snippets": "هیچ قطعه ای برای این زبان وجود ندارد",
+	"snippet inserted": "قطعه درج شد",
+	"snippets file created": "فایل اسنیپت ایجاد شد",
+	"import snippets": "قطعات را وارد کنید",
+	"not a snippets file": "یک فایل قطعه کد VS نیست",
+	"snippets imported": "قطعات وارد شد",
+	"replace file warning": "یک فایل اسنیپت با این نام از قبل وجود دارد - آن را بازنویسی کنید؟",
+	"snippet completion": "تکمیل قطعه",
+	"settings-info-editor-snippet-completion": "هنگام تایپ، تکه‌های کاربر (فرمت VS Code) را پیشنهاد دهید. آنها را با دستورات «Insert snippet» و «Configure user snippet» مدیریت کنید."
 }

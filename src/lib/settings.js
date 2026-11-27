@@ -158,6 +158,7 @@ class Settings {
 			liveAutoCompletion: true,
 			localWordCompletion: true,
 			iconCompletion: true,
+			snippetCompletion: true,
 			languageCompletion: true,
 			recommendExtensions: true,
 			useEmmet: true,

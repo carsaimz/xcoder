@@ -2034,5 +2034,16 @@
 	"diff current": "current",
 	"diff vs current": "Diff vs current file",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "No HEAD version to compare"
+	"git diff no head": "No HEAD version to compare",
+	"no file open": "Open a file first",
+	"insert snippet": "Insert snippet",
+	"no snippets": "No snippets for this language",
+	"snippet inserted": "Snippet inserted",
+	"snippets file created": "Snippets file created",
+	"import snippets": "Import snippets",
+	"not a snippets file": "Not a VS Code snippets file",
+	"snippets imported": "Snippets imported",
+	"replace file warning": "A snippets file with this name already exists — overwrite it?",
+	"snippet completion": "Snippet completion",
+	"settings-info-editor-snippet-completion": "Suggest user snippets (VS Code format) as you type. Manage them with the «Insert snippet» and «Configure user snippets» commands."
 }

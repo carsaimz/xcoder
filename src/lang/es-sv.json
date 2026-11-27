@@ -2051,5 +2051,16 @@
 	"diff current": "actual",
 	"diff vs current": "Comparar con el archivo actual",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "No hay versión en HEAD para comparar"
+	"git diff no head": "No hay versión en HEAD para comparar",
+	"no file open": "Abra un archivo primero",
+	"insert snippet": "Insertar fragmento",
+	"no snippets": "No hay fragmentos para este idioma",
+	"snippet inserted": "Fragmento insertado",
+	"snippets file created": "Archivo de fragmentos creado",
+	"import snippets": "Importar fragmentos",
+	"not a snippets file": "No es un archivo de fragmentos de código VS",
+	"snippets imported": "Fragmentos importados",
+	"replace file warning": "Ya existe un archivo de fragmentos con este nombre: ¿sobrescribirlo?",
+	"snippet completion": "Finalización de fragmentos",
+	"settings-info-editor-snippet-completion": "Sugiera fragmentos de usuario (formato de código VS) a medida que escribe. Gestionarlos con los comandos «Insertar fragmento» y «Configurar fragmentos de usuario»."
 }

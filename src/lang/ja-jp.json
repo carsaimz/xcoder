@@ -2051,5 +2051,16 @@
 	"diff current": "現在",
 	"diff vs current": "現在のファイルと比較",
 	"git diff vs head": "HEAD との差分",
-	"git diff no head": "比較できる HEAD のバージョンがありません"
+	"git diff no head": "比較できる HEAD のバージョンがありません",
+	"no file open": "まずファイルを開いてください",
+	"insert snippet": "スニペットを挿入",
+	"no snippets": "この言語のスニペットはありません",
+	"snippet inserted": "スニペットが挿入されました",
+	"snippets file created": "スニペットファイルが作成されました",
+	"import snippets": "スニペットをインポートする",
+	"not a snippets file": "VS Code スニペット ファイルではありません",
+	"snippets imported": "スニペットがインポートされました",
+	"replace file warning": "この名前のスニペット ファイルは既に存在します。上書きしますか?",
+	"snippet completion": "スニペットの完成",
+	"settings-info-editor-snippet-completion": "入力時にユーザー スニペット (VS Code 形式) を提案します。これらを管理するには、「スニペットの挿入」コマンドと「ユーザー スニペットの設定」コマンドを使用します。"
 }

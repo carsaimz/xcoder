@@ -2051,5 +2051,16 @@
 	"diff current": "aktuell",
 	"diff vs current": "Mit aktueller Datei vergleichen",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Keine HEAD-Version zum Vergleichen"
+	"git diff no head": "Keine HEAD-Version zum Vergleichen",
+	"no file open": "Öffnen Sie zuerst eine Datei",
+	"insert snippet": "Ausschnitt einfügen",
+	"no snippets": "Keine Snippets für diese Sprache",
+	"snippet inserted": "Ausschnitt eingefügt",
+	"snippets file created": "Snippets-Datei erstellt",
+	"import snippets": "Snippets importieren",
+	"not a snippets file": "Keine VS-Code-Snippets-Datei",
+	"snippets imported": "Snippets importiert",
+	"replace file warning": "Eine Snippets-Datei mit diesem Namen existiert bereits – überschreiben?",
+	"snippet completion": "Snippet-Vervollständigung",
+	"settings-info-editor-snippet-completion": "Schlagen Sie während der Eingabe Benutzerausschnitte (VS-Code-Format) vor. Verwalten Sie sie mit den Befehlen „Snippet einfügen“ und „Benutzer-Snippets konfigurieren“."
 }

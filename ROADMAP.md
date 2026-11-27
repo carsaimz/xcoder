@@ -62,6 +62,17 @@ cada sessão, com o que já está no APK e o que vem a seguir.
 - **Pesquisa em ficheiros + substituição em lote**, barra de estado estilo
   VS Code (linha/coluna, indentação, codificação, modo), temas Dark+/Light+
   e `vscodeDark`/`vscodeLight`, **ícones vscode-icons por defeito**.
+- **Diff editor visual** (lado a lado/inline, na paleta `openDiff` e na
+  timeline «diff vs ficheiro atual», diff vs HEAD no painel Git).
+- **Multi-cursor estilo VS Code** — `Ctrl-D` adiciona cursor na próxima
+  ocorrência, `Ctrl-Shift-L` seleciona todas as ocorrências (Alt+clique e
+  seleção retangular nativos do CodeMirror).
+- **Snippets do utilizador no formato VS Code** — `<DATA>/snippets/`
+  (`<linguagem>.json` + `*.code-snippets` com `scope`), autocompletar ao
+  escrever, paleta «Inserir snippet», «Configurar snippets do utilizador»
+  (abre/cria o JSON da linguagem) e «Importar snippets» (ficheiro do
+  `.vscode/snippets`), toggle nas definições; tabstops/placeholders via
+  engine nativa do CodeMirror.
 - **Git integrado** (Source Control real com isomorphic-git), **terminal
   integrado**, multi-cursor e seleção múltipla do CodeMirror, dobragem por
   indentação, guias de indentação, rainbow brackets, markdown GFM, timeline
@@ -76,8 +87,8 @@ cada sessão, com o que já está no APK e o que vem a seguir.
 
 1. **Sticky scroll** — a assinatura da função fixa no topo ao rolar.
 2. **Editor de atalhos** — ver/editar keybindings na UI (o motor já existe).
-3. **Emmet completo** + **snippets no formato VS Code** (importar
-   `.vscode/snippets`).
+3. **Emmet completo** — expandir abreviações HTML/CSS (o `useEmmet` atual
+   é básico; snippets do VS Code já estão portados).
 4. **Task runner / npm scripts UI** — scripts do `package.json` com painel
    de saída.
 5. **Multi-root workspaces** — mais de uma pasta aberta.
@@ -616,8 +627,13 @@ referência.
   fixo no topo ao navegar dentro de funções longas.
 - [ ] **Minimapa opcional** 🖥️ inspirado no VS Code — Miniatura do
   ficheiro com viewport arrastável; desligada por defeito no telemóvel.
-- [ ] **Multi-cursor: findAll e selectMore** 💡 Acode #2129 — Corrigir
-  selectMoreAfter/Before e findAll (upstream reporta não funcionarem).
+- [x] **Multi-cursor: atalhos do VS Code** — `Ctrl-D` (próxima
+  ocorrência) e `Ctrl-Shift-L` (todas as ocorrências) portados do VS Code
+  com engine nativa do CodeMirror (v1.8.47); o antigo selectMoreAfter
+  quebrado do Acode é substituído por estes.
+- [ ] **Multi-cursor: findAll por pesquisa** 💡 Acode #2129 — adicionar
+  todas as correspondências de uma busca de pesquisa como seleções
+  (Ctrl+Shift+L do painel de pesquisa).
 - [ ] **Dobragem fiável em ficheiros grandes** 💡 Acode #2912 — «Dobrar
   tudo» não deve congelar em ficheiros grandes (fix upstream a verificar no
   nosso build).

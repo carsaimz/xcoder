@@ -2051,5 +2051,16 @@
 	"diff current": "geçerli",
 	"diff vs current": "Geçerli dosyayla karşılaştır",
 	"git diff vs head": "HEAD ile fark",
-	"git diff no head": "Karşılaştırılacak HEAD sürümü yok"
+	"git diff no head": "Karşılaştırılacak HEAD sürümü yok",
+	"no file open": "Önce bir dosya açın",
+	"insert snippet": "Parçayı ekle",
+	"no snippets": "Bu dil için snippet yok",
+	"snippet inserted": "Snippet eklendi",
+	"snippets file created": "Parçacık dosyası oluşturuldu",
+	"import snippets": "Parçacıkları içe aktar",
+	"not a snippets file": "VS Code parçacıkları dosyası değil",
+	"snippets imported": "Snippet'ler içe aktarıldı",
+	"replace file warning": "Bu adda bir snippet dosyası zaten mevcut; üzerine yazılsın mı?",
+	"snippet completion": "Parçacığın tamamlanması",
+	"settings-info-editor-snippet-completion": "Yazarken kullanıcı parçacıkları (VS Code formatı) önerin. Bunları \"Snippet ekle\" ve \"Kullanıcı snippet'lerini yapılandır\" komutlarıyla yönetin."
 }

@@ -2051,5 +2051,16 @@
 	"diff current": "aktuální",
 	"diff vs current": "Porovnat s aktuálním souborem",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Ve HEAD není verze k porovnání"
+	"git diff no head": "Ve HEAD není verze k porovnání",
+	"no file open": "Nejprve otevřete soubor",
+	"insert snippet": "Vložte úryvek",
+	"no snippets": "Žádné úryvky pro tento jazyk",
+	"snippet inserted": "Úryvek vložen",
+	"snippets file created": "Byl vytvořen soubor úryvků",
+	"import snippets": "Importujte úryvky",
+	"not a snippets file": "Nejedná se o soubor fragmentů kódu VS",
+	"snippets imported": "Úryvky importovány",
+	"replace file warning": "Soubor úryvků s tímto názvem již existuje – přepsat jej?",
+	"snippet completion": "Dokončení úryvku",
+	"settings-info-editor-snippet-completion": "Při psaní navrhujte uživatelské úryvky (formát kódu VS). Spravujte je pomocí příkazů «Vložit úryvek» a «Konfigurovat uživatelské úryvky»."
 }

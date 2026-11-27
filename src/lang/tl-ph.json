@@ -2051,5 +2051,16 @@
 	"diff current": "kasalukuyan",
 	"diff vs current": "Ikumpara sa kasalukuyang file",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Walang bersyon sa HEAD na ikukumpara"
+	"git diff no head": "Walang bersyon sa HEAD na ikukumpara",
+	"no file open": "Magbukas muna ng file",
+	"insert snippet": "Maglagay ng snippet",
+	"no snippets": "Walang mga snippet para sa wikang ito",
+	"snippet inserted": "Ipinasok ang snippet",
+	"snippets file created": "Nagawa ang snippet file",
+	"import snippets": "Mag-import ng mga snippet",
+	"not a snippets file": "Hindi isang VS Code snippet file",
+	"snippets imported": "Na-import ang mga snippet",
+	"replace file warning": "Mayroon nang snippet file na may ganitong pangalan — i-overwrite ito?",
+	"snippet completion": "Pagkumpleto ng snippet",
+	"settings-info-editor-snippet-completion": "Magmungkahi ng mga snippet ng user (format ng VS Code) habang nagta-type ka. Pamahalaan ang mga ito gamit ang mga command na «Insert snippet» at «Configure user snippet»."
 }

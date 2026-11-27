@@ -2051,5 +2051,16 @@
 	"diff current": "aktuális",
 	"diff vs current": "Összehasonlítás az aktuális fájllal",
 	"git diff vs head": "Diff a HEAD-hez",
-	"git diff no head": "Nincs HEAD-verzió az összehasonlításhoz"
+	"git diff no head": "Nincs HEAD-verzió az összehasonlításhoz",
+	"no file open": "Először nyisson meg egy fájlt",
+	"insert snippet": "Kódrészlet beszúrása",
+	"no snippets": "Nincsenek kivonatok ehhez a nyelvhez",
+	"snippet inserted": "Részlet beszúrva",
+	"snippets file created": "Részletfájl létrehozva",
+	"import snippets": "Kódrészletek importálása",
+	"not a snippets file": "Nem VS-kódrészlet fájl",
+	"snippets imported": "Részletek importálva",
+	"replace file warning": "Már létezik ilyen nevű részletfájl – felülírja?",
+	"snippet completion": "Kivonat befejezése",
+	"settings-info-editor-snippet-completion": "Javasoljon felhasználói kódrészleteket (VS Code formátum) gépelés közben. Kezelje őket a «Kivonat beszúrása» és «Felhasználói kódrészletek konfigurálása» parancsokkal."
 }

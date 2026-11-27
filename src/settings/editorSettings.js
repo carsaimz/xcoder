@@ -168,6 +168,13 @@ export default function editorSettings() {
 			category: categories.assistance,
 		},
 		{
+			key: "snippetCompletion",
+			text: strings["snippet completion"],
+			checkbox: values.snippetCompletion,
+			info: strings["settings-info-editor-snippet-completion"],
+			category: categories.assistance,
+		},
+		{
 			key: "languageCompletion",
 			text: strings["language package completion"],
 			checkbox: values.languageCompletion ?? true,

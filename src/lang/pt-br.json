@@ -2151,5 +2151,16 @@
 	"diff current": "atual",
 	"diff vs current": "Comparar com o ficheiro atual",
 	"git diff vs head": "Diff vs HEAD",
-	"git diff no head": "Sem versão no HEAD para comparar"
+	"git diff no head": "Sem versão no HEAD para comparar",
+	"no file open": "Abra um ficheiro primeiro",
+	"insert snippet": "Inserir snippet",
+	"no snippets": "Sem snippets para esta linguagem",
+	"snippet inserted": "Snippet inserido",
+	"snippets file created": "Ficheiro de snippets criado",
+	"import snippets": "Importar snippets",
+	"not a snippets file": "Não é um ficheiro de snippets do VS Code",
+	"snippets imported": "Snippets importados",
+	"replace file warning": "Já existe um ficheiro de snippets com este nome — substituir?",
+	"snippet completion": "Autocompletar de snippets",
+	"settings-info-editor-snippet-completion": "Sugere snippets do utilizador (formato VS Code) enquanto escreve. Gerencie-os com os comandos «Inserir snippet» e «Configurar snippets do utilizador»."
 }

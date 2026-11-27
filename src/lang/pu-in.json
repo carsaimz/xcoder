@@ -2051,5 +2051,16 @@
 	"diff current": "ਮੌਜੂਦਾ",
 	"diff vs current": "ਮੌਜੂਦਾ ਫ਼ਾਈਲ ਨਾਲ ਤੁਲਨਾ",
 	"git diff vs head": "HEAD ਨਾਲ ਤੁਲਨਾ",
-	"git diff no head": "ਤੁਲਨਾ ਲਈ HEAD ਵਿੱਚ ਕੋਈ ਵਰਜਨ ਨਹੀਂ"
+	"git diff no head": "ਤੁਲਨਾ ਲਈ HEAD ਵਿੱਚ ਕੋਈ ਵਰਜਨ ਨਹੀਂ",
+	"no file open": "ਪਹਿਲਾਂ ਇੱਕ ਫਾਈਲ ਖੋਲ੍ਹੋ",
+	"insert snippet": "ਸਨਿੱਪਟ ਸ਼ਾਮਲ ਕਰੋ",
+	"no snippets": "ਇਸ ਭਾਸ਼ਾ ਲਈ ਕੋਈ ਸਨਿੱਪਟ ਨਹੀਂ ਹੈ",
+	"snippet inserted": "ਸਨਿੱਪਟ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ",
+	"snippets file created": "ਸਨਿੱਪਟ ਫ਼ਾਈਲ ਬਣਾਈ ਗਈ",
+	"import snippets": "ਸਨਿੱਪਟ ਆਯਾਤ ਕਰੋ",
+	"not a snippets file": "VS ਕੋਡ ਸਨਿੱਪਟ ਫਾਈਲ ਨਹੀਂ ਹੈ",
+	"snippets imported": "ਸਨਿੱਪਟ ਆਯਾਤ ਕੀਤੇ ਗਏ",
+	"replace file warning": "ਇਸ ਨਾਮ ਵਾਲੀ ਇੱਕ ਸਨਿੱਪਟ ਫਾਈਲ ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ - ਇਸਨੂੰ ਓਵਰਰਾਈਟ ਕਰਨਾ ਹੈ?",
+	"snippet completion": "ਸਨਿੱਪਟ ਸੰਪੂਰਨਤਾ",
+	"settings-info-editor-snippet-completion": "ਜਿਵੇਂ ਤੁਸੀਂ ਟਾਈਪ ਕਰਦੇ ਹੋ ਉਪਭੋਗਤਾ ਸਨਿੱਪਟ (VS ਕੋਡ ਫਾਰਮੈਟ) ਦਾ ਸੁਝਾਅ ਦਿਓ। ਉਹਨਾਂ ਨੂੰ \"ਇਨਸਰਟ ਸਨਿੱਪਟ\" ਅਤੇ \"ਯੂਜ਼ਰ ਸਨਿੱਪਟ ਕੌਂਫਿਗਰ ਕਰੋ\" ਕਮਾਂਡਾਂ ਨਾਲ ਪ੍ਰਬੰਧਿਤ ਕਰੋ।"
 }

@@ -1,4 +1,5 @@
 import "./style.scss";
+import fsOperation from "fileSystem";
 import sidebarApps from "sidebarApps";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
@@ -13,7 +14,6 @@ import {
 	signInGitHubFlow,
 	signInWithPat,
 } from "lib/ghSignIn";
-import fsOperation from "fileSystem";
 import * as git from "lib/git";
 import { echoGitCommand } from "lib/git/terminalEcho";
 import { executorAvailable, terminalClone } from "lib/git/terminalGit";
