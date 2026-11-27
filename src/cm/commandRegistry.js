@@ -67,6 +67,27 @@ import {
 } from "@codemirror/lsp-client";
 import { Compartment, EditorSelection } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
+import {
+	balanceInward,
+	balanceOutward,
+	decrementNumber1,
+	decrementNumber01,
+	decrementNumber10,
+	emmetConfig,
+	enterAbbreviationMode,
+	evaluateMath,
+	expandAbbreviation,
+	goToNextEditPoint,
+	goToPreviousEditPoint,
+	goToTagPair,
+	incrementNumber1,
+	incrementNumber01,
+	incrementNumber10,
+	removeTag,
+	selectNextItem,
+	selectPreviousItem,
+	splitJoinTag,
+} from "@emmetio/codemirror6-plugin";
 import { focusEditorIfEditable } from "cm/editorReadOnly";
 import {
 	copyLineDownFoldAware,
@@ -98,31 +119,10 @@ import {
 	findAllReferences as xcoderFindAllReferences,
 	findAllReferencesInTab as xcoderFindAllReferencesInTab,
 } from "cm/lsp/references";
-import {
-	balanceInward,
-	balanceOutward,
-	decrementNumber01,
-	decrementNumber1,
-	decrementNumber10,
-	emmetConfig,
-	enterAbbreviationMode,
-	evaluateMath,
-	expandAbbreviation,
-	goToNextEditPoint,
-	goToPreviousEditPoint,
-	goToTagPair,
-	incrementNumber01,
-	incrementNumber1,
-	incrementNumber10,
-	removeTag,
-	selectNextItem,
-	selectPreviousItem,
-	splitJoinTag,
-} from "@emmetio/codemirror6-plugin";
-import emmetExpandAbbreviation from "emmet";
 import { showDocumentSymbols } from "components/symbolsPanel";
 import toast from "components/toast";
 import prompt from "dialogs/prompt";
+import emmetExpandAbbreviation from "emmet";
 import actions from "handlers/quickTools";
 import keyBindings, {
 	APP_KEY_BINDING_NAMES,

@@ -3,8 +3,8 @@ import fsOperation from "fileSystem";
 import Sidebar from "components/sidebar";
 import toast from "components/toast";
 import { addedFolder } from "lib/openFolder";
-import { sandboxPathOf } from "lib/terminalCwd";
 import TaskRunner, { parsePackageScripts } from "lib/taskRunner";
+import { sandboxPathOf } from "lib/terminalCwd";
 import Url from "utils/Url";
 
 /**@type {HTMLElement} */
