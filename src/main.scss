@@ -943,12 +943,25 @@ input[type="search"]::-webkit-search-results-decoration {
     background: var(--secondary-color);
     min-width: 200px;
     max-width: min(400px, calc(100vw - 40px));
+    /* long error dumps (stack traces, engine messages) must never be cut
+       at the screen border: the card is capped and the text scrolls */
+    max-height: min(480px, 65vh);
+    overflow: auto;
+    overscroll-behavior: contain;
     gap: 12px;
     box-shadow: 0 4px 12px var(--box-shadow-color);
     border: 1px solid var(--border-color);
-    white-space: wrap;
     box-sizing: border-box;
     will-change: transform, opacity;
+  }
+
+  .notification-message {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-height: 360px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   >* {

@@ -76,7 +76,10 @@
     font-size: 12px;
     color: var(--secondary-text-color);
     line-height: 1.4;
-    overflow-wrap: break-word;
+    /* stack traces keep their line breaks and long engine tokens wrap */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     hyphens: auto;
   }
 
