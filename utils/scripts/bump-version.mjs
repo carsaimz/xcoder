@@ -114,20 +114,30 @@ export function computeVersionCode(version) {
  * Smallest strictly-increasing beta successor of `version`:
  *   1.8.45-beta.3 -> 1.8.45-beta.4
  *   1.8.45-beta   -> 1.8.45-beta.2
+ *   1.8.45-beta2  -> 1.8.45-beta3   (no-dot style stays no-dot: semver
+ *                                    sorts numeric identifiers BEFORE
+ *                                    alphanumeric ones, so beta.3 would
+ *                                    compare LOWER than beta2)
  *   1.8.45        -> 1.8.46-beta
- * @param {string} version current version (may carry -beta[.N])
+ * @param {string} version current version (may carry -beta, -beta.N, -betaN)
  * @returns {string}
  */
 export function nextBetaVersion(version) {
         const parsed = parseSemver(version);
         if (!parsed) throw new Error(`Invalid version: ${version}`);
-        if (parsed.prerelease && /^beta(\.\d+)?$/.test(parsed.prerelease)) {
-                const n = parsed.prerelease === "beta" ? 1 : Number(parsed.prerelease.split(".")[1]);
-                return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta.${n + 1}`;
-        }
         if (parsed.prerelease) {
+                const match = parsed.prerelease.match(/^beta(\.(\d+))?$/);
+                if (match) {
+                        const n = match[2] ? Number(match[2]) : 1;
+                        const dot = match[1] || !match[2] ? "." : "";
+                        return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta${dot}${n + 1}`;
+                }
+                const noDot = parsed.prerelease.match(/^beta(\d+)$/);
+                if (noDot) {
+                        return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta${Number(noDot[1]) + 1}`;
+                }
                 throw new Error(
-                        `Unsupported pre-release suffix "-${parsed.prerelease}" (expected -beta or -beta.N)`,
+                        `Unsupported pre-release suffix "-${parsed.prerelease}" (expected -beta, -beta.N or -betaN)`,
                 );
         }
         return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-beta`;

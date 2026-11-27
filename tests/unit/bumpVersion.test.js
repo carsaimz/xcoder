@@ -187,6 +187,22 @@ describe("nextBetaVersion", () => {
 	});
 });
 
+describe("nextBetaVersion no-dot style (shipped v1.8.46-beta2)", () => {
+	it("keeps the no-dot style so the successor compares greater", () => {
+		expect(nextBetaVersion("1.8.46-beta2")).toBe("1.8.46-beta3");
+		expect(compareSemver("1.8.46-beta3", "1.8.46-beta2")).toBe(1);
+		// numeric identifiers sort BEFORE alphanumeric ones in semver —
+		// beta.3 would be LOWER than beta2, hence the same-style rule
+		expect(compareSemver("1.8.46-beta.3", "1.8.46-beta2")).toBe(-1);
+	});
+
+	it("keeps the dot style when the input uses it", () => {
+		expect(nextBetaVersion("1.8.46-beta")).toBe("1.8.46-beta.2");
+		expect(nextBetaVersion("1.8.46-beta.2")).toBe("1.8.46-beta.3");
+		expect(compareSemver("1.8.46-beta.2", "1.8.46-beta")).toBe(1);
+	});
+});
+
 describe("nextStableVersion", () => {
 	it("promotes the base by dropping the pre-release suffix", () => {
 		expect(nextStableVersion("1.8.45-beta")).toBe("1.8.45");
