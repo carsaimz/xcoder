@@ -42,12 +42,16 @@
       "source_fallback": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/inspector/plugin.zip",
       "icon": "https://cdn.jsdelivr.net/gh/carsaimz/xcoder-plugins@main/plugins/inspector/icon.png",
       "keywords": [
-        "inspector",
+        "application",
+        "console",
+        "cookies",
+        "debug",
         "devtools",
         "dom",
-        "console",
+        "inspector",
+        "localstorage",
         "network",
-        "debug"
+        "storage"
       ],
       "downloads": 720,
       "supported_editor": "all",
