@@ -2049,5 +2049,7 @@
 	"diff removed": "삭제됨",
 	"diff snapshot": "스냅샷",
 	"diff current": "현재",
-	"diff vs current": "현재 파일과 비교"
+	"diff vs current": "현재 파일과 비교",
+	"git diff vs head": "HEAD와 비교",
+	"git diff no head": "비교할 HEAD 버전이 없습니다"
 }

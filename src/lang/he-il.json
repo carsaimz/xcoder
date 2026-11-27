@@ -2049,5 +2049,7 @@
 	"diff removed": "הוסרו",
 	"diff snapshot": "תמונת מצב",
 	"diff current": "נוכחי",
-	"diff vs current": "השוואה לקובץ הנוכחי"
+	"diff vs current": "השוואה לקובץ הנוכחי",
+	"git diff vs head": "השוואה ל-HEAD",
+	"git diff no head": "אין גרסה ב-HEAD להשוואה"
 }

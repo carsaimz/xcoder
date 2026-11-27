@@ -2049,5 +2049,7 @@
 	"diff removed": "olib tashlandi",
 	"diff snapshot": "snapshot",
 	"diff current": "joriy",
-	"diff vs current": "Joriy fayl bilan taqqoslash"
+	"diff vs current": "Joriy fayl bilan taqqoslash",
+	"git diff vs head": "HEAD bilan farq",
+	"git diff no head": "Taqqoslash uchun HEAD versiyasi yoʻq"
 }

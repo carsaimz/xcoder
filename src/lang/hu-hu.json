@@ -2049,5 +2049,7 @@
 	"diff removed": "eltávolítva",
 	"diff snapshot": "pillanatkép",
 	"diff current": "aktuális",
-	"diff vs current": "Összehasonlítás az aktuális fájllal"
+	"diff vs current": "Összehasonlítás az aktuális fájllal",
+	"git diff vs head": "Diff a HEAD-hez",
+	"git diff no head": "Nincs HEAD-verzió az összehasonlításhoz"
 }

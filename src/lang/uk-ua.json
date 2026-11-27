@@ -2049,5 +2049,7 @@
 	"diff removed": "видалено",
 	"diff snapshot": "знімок",
 	"diff current": "поточний",
-	"diff vs current": "Порівняти з поточним файлом"
+	"diff vs current": "Порівняти з поточним файлом",
+	"git diff vs head": "Порівняння з HEAD",
+	"git diff no head": "Немає версії у HEAD для порівняння"
 }

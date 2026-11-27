@@ -2049,5 +2049,7 @@
 	"diff removed": "ਹਟਾਈਆਂ",
 	"diff snapshot": "ਸਨੈਪਸ਼ਾਟ",
 	"diff current": "ਮੌਜੂਦਾ",
-	"diff vs current": "ਮੌਜੂਦਾ ਫ਼ਾਈਲ ਨਾਲ ਤੁਲਨਾ"
+	"diff vs current": "ਮੌਜੂਦਾ ਫ਼ਾਈਲ ਨਾਲ ਤੁਲਨਾ",
+	"git diff vs head": "HEAD ਨਾਲ ਤੁਲਨਾ",
+	"git diff no head": "ਤੁਲਨਾ ਲਈ HEAD ਵਿੱਚ ਕੋਈ ਵਰਜਨ ਨਹੀਂ"
 }

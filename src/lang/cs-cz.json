@@ -2049,5 +2049,7 @@
 	"diff removed": "odstraněno",
 	"diff snapshot": "snímek",
 	"diff current": "aktuální",
-	"diff vs current": "Porovnat s aktuálním souborem"
+	"diff vs current": "Porovnat s aktuálním souborem",
+	"git diff vs head": "Diff vs HEAD",
+	"git diff no head": "Ve HEAD není verze k porovnání"
 }

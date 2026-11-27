@@ -2049,5 +2049,7 @@
 	"diff removed": "ဖျက်သိမ်း",
 	"diff snapshot": "သိမ်းဆည်းချက်",
 	"diff current": "လက်ရှိ",
-	"diff vs current": "လက်ရှိ ဖိုင်နှင့် နှိုင်းယှဉ်"
+	"diff vs current": "လက်ရှိ ဖိုင်နှင့် နှိုင်းယှဉ်",
+	"git diff vs head": "HEAD နှင့် နှိုင်းယှဉ်",
+	"git diff no head": "နှိုင်းယှဉ်ရန် HEAD တွင် ဗားရှင်း မရှိပါ"
 }

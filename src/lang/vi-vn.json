@@ -2049,5 +2049,7 @@
 	"diff removed": "xóa đi",
 	"diff snapshot": "bản chụp",
 	"diff current": "hiện tại",
-	"diff vs current": "So sánh với tệp hiện tại"
+	"diff vs current": "So sánh với tệp hiện tại",
+	"git diff vs head": "So sánh với HEAD",
+	"git diff no head": "Không có phiên bản trong HEAD để so sánh"
 }

@@ -378,6 +378,28 @@ export async function log(root, args = {}) {
 }
 
 /**
+ * File content at a ref (HEAD by default) — powers «diff vs HEAD».
+ * Returns null when the file does not exist at that ref (added/untracked
+ * files have no previous version to compare against).
+ * @param {string} [root]
+ * @param {string} filepath repo-relative path
+ * @param {string} [ref] defaults to HEAD
+ * @returns {Promise<string|null>}
+ */
+export async function readAtRef(root, filepath, ref = "HEAD") {
+	root = await gitRoot(root);
+	try {
+		const res = await git.readBlob(
+			await opts(root, { ref, filepath: String(filepath) }),
+		);
+		if (!res?.blob) return null;
+		return new TextDecoder().decode(res.blob);
+	} catch (_) {
+		return null;
+	}
+}
+
+/**
  * Local branches with the current one flagged.
  * @param {string} [root]
  */

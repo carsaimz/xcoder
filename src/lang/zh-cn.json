@@ -2049,5 +2049,7 @@
 	"diff removed": "删除",
 	"diff snapshot": "快照",
 	"diff current": "当前",
-	"diff vs current": "与当前文件比较"
+	"diff vs current": "与当前文件比较",
+	"git diff vs head": "与 HEAD 比较",
+	"git diff no head": "HEAD 中没有可比较的版本"
 }

@@ -2049,5 +2049,7 @@
 	"diff removed": "നീക്കി",
 	"diff snapshot": "സ്നാപ്ഷോട്ട്",
 	"diff current": "നിലവിലെ",
-	"diff vs current": "നിലവിലെ ഫയലുമായി താരതമ്യം"
+	"diff vs current": "നിലവിലെ ഫയലുമായി താരതമ്യം",
+	"git diff vs head": "HEAD മായി താരതമ്യം",
+	"git diff no head": "താരതമ്യിക്കാൻ HEAD-ൽ പതിപ്പില്ല"
 }

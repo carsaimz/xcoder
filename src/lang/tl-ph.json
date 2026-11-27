@@ -2049,5 +2049,7 @@
 	"diff removed": "natanggal",
 	"diff snapshot": "snapshot",
 	"diff current": "kasalukuyan",
-	"diff vs current": "Ikumpara sa kasalukuyang file"
+	"diff vs current": "Ikumpara sa kasalukuyang file",
+	"git diff vs head": "Diff vs HEAD",
+	"git diff no head": "Walang bersyon sa HEAD na ikukumpara"
 }

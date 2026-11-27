@@ -2032,5 +2032,7 @@
 	"diff removed": "removed",
 	"diff snapshot": "snapshot",
 	"diff current": "current",
-	"diff vs current": "Diff vs current file"
+	"diff vs current": "Diff vs current file",
+	"git diff vs head": "Diff vs HEAD",
+	"git diff no head": "No HEAD version to compare"
 }

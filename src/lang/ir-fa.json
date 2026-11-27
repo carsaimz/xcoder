@@ -2049,5 +2049,7 @@
 	"diff removed": "حذف‌شده",
 	"diff snapshot": "اسنپ‌شات",
 	"diff current": "فعلی",
-	"diff vs current": "مقایسه با فایل فعلی"
+	"diff vs current": "مقایسه با فایل فعلی",
+	"git diff vs head": "مقایسه با HEAD",
+	"git diff no head": "نسخه‌ای در HEAD برای مقایسه نیست"
 }

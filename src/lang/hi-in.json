@@ -2049,5 +2049,7 @@
 	"diff removed": "हटाई गई",
 	"diff snapshot": "स्नैपशॉट",
 	"diff current": "वर्तमान",
-	"diff vs current": "वर्तमान फ़ाइल से तुलना करें"
+	"diff vs current": "वर्तमान फ़ाइल से तुलना करें",
+	"git diff vs head": "HEAD से तुलना",
+	"git diff no head": "तुलना के लिए HEAD में कोई संस्करण नहीं"
 }

@@ -13,6 +13,7 @@ import {
 	signInGitHubFlow,
 	signInWithPat,
 } from "lib/ghSignIn";
+import fsOperation from "fileSystem";
 import * as git from "lib/git";
 import { echoGitCommand } from "lib/git/terminalEcho";
 import { executorAvailable, terminalClone } from "lib/git/terminalGit";
@@ -698,6 +699,13 @@ function renderFileRow(row) {
 				<span className="git-file-base">{basename}</span>
 			</span>
 			<span className="git-file-actions">
+				{row.status !== "untracked" && row.status !== "added" ? (
+					<span
+						className="icon codicon-diff git-file-act"
+						title={strings["git diff vs head"] || "Diff vs HEAD"}
+						onclick={() => openDiffVsHead(row.path)}
+					></span>
+				) : null}
 				{staged ? (
 					<span
 						className="icon remove git-file-act"
@@ -1425,6 +1433,38 @@ function countChanges(changes) {
  * Opens a workspace file in the editor.
  * @param {string} relativePath
  */
+/**
+ * Diff vs HEAD (VS Code SCM parity): HEAD content on the left, worktree
+ * on the right, rendered by the visual diff editor.
+ * @param {string} relativePath repo-relative path
+ */
+async function openDiffVsHead(relativePath) {
+	try {
+		const { openDiffForTexts } = await import("pages/tools/diff");
+		const head = await git.readAtRef(undefined, relativePath);
+		if (head === null) {
+			toast(strings["git diff no head"] || "No HEAD version to compare");
+			return;
+		}
+		let worktree = "";
+		try {
+			worktree = await fsOperation(
+				Url.join(vshell.getRoot(), relativePath),
+			).readFile("utf8");
+		} catch (_) {
+			worktree = "";
+		}
+		openDiffForTexts({
+			leftText: head,
+			rightText: worktree,
+			leftTitle: `HEAD · ${Url.basename(relativePath)}`,
+			rightTitle: Url.basename(relativePath),
+		});
+	} catch (error) {
+		toast(`diff: ${error.message || error}`);
+	}
+}
+
 async function openChangedFile(relativePath) {
 	try {
 		const { default: openFile } = await import("lib/openFile");

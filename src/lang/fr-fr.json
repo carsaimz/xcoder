@@ -2049,5 +2049,7 @@
 	"diff removed": "supprimées",
 	"diff snapshot": "instantané",
 	"diff current": "actuel",
-	"diff vs current": "Comparer au fichier actuel"
+	"diff vs current": "Comparer au fichier actuel",
+	"git diff vs head": "Diff vs HEAD",
+	"git diff no head": "Pas de version HEAD à comparer"
 }

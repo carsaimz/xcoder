@@ -2049,5 +2049,7 @@
 	"diff removed": "削除",
 	"diff snapshot": "スナップショット",
 	"diff current": "現在",
-	"diff vs current": "現在のファイルと比較"
+	"diff vs current": "現在のファイルと比較",
+	"git diff vs head": "HEAD との差分",
+	"git diff no head": "比較できる HEAD のバージョンがありません"
 }

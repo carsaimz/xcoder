@@ -2049,5 +2049,7 @@
 	"diff removed": "dihapus",
 	"diff snapshot": "cuplikan",
 	"diff current": "saat ini",
-	"diff vs current": "Bandingkan dengan berkas saat ini"
+	"diff vs current": "Bandingkan dengan berkas saat ini",
+	"git diff vs head": "Diff vs HEAD",
+	"git diff no head": "Tidak ada versi HEAD untuk dibandingkan"
 }

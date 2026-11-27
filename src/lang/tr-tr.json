@@ -2049,5 +2049,7 @@
 	"diff removed": "silinen",
 	"diff snapshot": "anlık görüntü",
 	"diff current": "geçerli",
-	"diff vs current": "Geçerli dosyayla karşılaştır"
+	"diff vs current": "Geçerli dosyayla karşılaştır",
+	"git diff vs head": "HEAD ile fark",
+	"git diff no head": "Karşılaştırılacak HEAD sürümü yok"
 }
