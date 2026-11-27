@@ -31,7 +31,7 @@ const PACKAGE_JSON = path.join(ROOT, "package.json");
 const CONFIG_XML = path.join(ROOT, "config.xml");
 
 const SEMVER_PATTERN =
-	/^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z][0-9A-Za-z.-]*))?$/;
+        /^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z][0-9A-Za-z.-]*))?$/;
 
 /**
  * Strips a leading "v"/"V" and surrounding whitespace.
@@ -39,9 +39,9 @@ const SEMVER_PATTERN =
  * @returns {string}
  */
 export function normalizeVersion(input) {
-	return String(input ?? "")
-		.trim()
-		.replace(/^v/i, "");
+        return String(input ?? "")
+                .trim()
+                .replace(/^v/i, "");
 }
 
 /**
@@ -50,14 +50,14 @@ export function normalizeVersion(input) {
  * @returns {{major: number, minor: number, patch: number, prerelease: string | null} | null}
  */
 export function parseSemver(version) {
-	const match = normalizeVersion(version).match(SEMVER_PATTERN);
-	if (!match) return null;
-	return {
-		major: Number(match[1]),
-		minor: Number(match[2]),
-		patch: Number(match[3]),
-		prerelease: match[4] || null,
-	};
+        const match = normalizeVersion(version).match(SEMVER_PATTERN);
+        if (!match) return null;
+        return {
+                major: Number(match[1]),
+                minor: Number(match[2]),
+                patch: Number(match[3]),
+                prerelease: match[4] || null,
+        };
 }
 
 /**
@@ -69,34 +69,34 @@ export function parseSemver(version) {
  * @returns {number} 1 when a > b, -1 when a < b, 0 when equal
  */
 export function compareSemver(a, b) {
-	const left = parseSemver(a);
-	const right = parseSemver(b);
-	if (!left || !right) throw new Error(`Cannot compare versions: ${a} vs ${b}`);
+        const left = parseSemver(a);
+        const right = parseSemver(b);
+        if (!left || !right) throw new Error(`Cannot compare versions: ${a} vs ${b}`);
 
-	for (const key of ["major", "minor", "patch"]) {
-		if (left[key] !== right[key]) return left[key] > right[key] ? 1 : -1;
-	}
+        for (const key of ["major", "minor", "patch"]) {
+                if (left[key] !== right[key]) return left[key] > right[key] ? 1 : -1;
+        }
 
-	if (!left.prerelease && !right.prerelease) return 0;
-	if (!left.prerelease) return 1;
-	if (!right.prerelease) return -1;
+        if (!left.prerelease && !right.prerelease) return 0;
+        if (!left.prerelease) return 1;
+        if (!right.prerelease) return -1;
 
-	const leftIds = left.prerelease.split(".");
-	const rightIds = right.prerelease.split(".");
-	for (let i = 0; i < Math.max(leftIds.length, rightIds.length); i++) {
-		const l = leftIds[i];
-		const r = rightIds[i];
-		if (l === undefined) return -1; // shorter prefix sorts lower
-		if (r === undefined) return 1;
-		if (l === r) continue;
-		const ln = /^\d+$/.test(l);
-		const rn = /^\d+$/.test(r);
-		if (ln && rn) return Number(l) > Number(r) ? 1 : -1;
-		if (ln) return -1; // numeric < alphanumeric
-		if (rn) return 1;
-		return l > r ? 1 : -1;
-	}
-	return 0;
+        const leftIds = left.prerelease.split(".");
+        const rightIds = right.prerelease.split(".");
+        for (let i = 0; i < Math.max(leftIds.length, rightIds.length); i++) {
+                const l = leftIds[i];
+                const r = rightIds[i];
+                if (l === undefined) return -1; // shorter prefix sorts lower
+                if (r === undefined) return 1;
+                if (l === r) continue;
+                const ln = /^\d+$/.test(l);
+                const rn = /^\d+$/.test(r);
+                if (ln && rn) return Number(l) > Number(r) ? 1 : -1;
+                if (ln) return -1; // numeric < alphanumeric
+                if (rn) return 1;
+                return l > r ? 1 : -1;
+        }
+        return 0;
 }
 
 /**
@@ -105,9 +105,9 @@ export function compareSemver(a, b) {
  * @returns {number}
  */
 export function computeVersionCode(version) {
-	const parsed = parseSemver(version);
-	if (!parsed) throw new Error(`Invalid version: ${version}`);
-	return parsed.major * 10000 + parsed.minor * 100 + parsed.patch;
+        const parsed = parseSemver(version);
+        if (!parsed) throw new Error(`Invalid version: ${version}`);
+        return parsed.major * 10000 + parsed.minor * 100 + parsed.patch;
 }
 
 /**
@@ -119,18 +119,18 @@ export function computeVersionCode(version) {
  * @returns {string}
  */
 export function nextBetaVersion(version) {
-	const parsed = parseSemver(version);
-	if (!parsed) throw new Error(`Invalid version: ${version}`);
-	if (parsed.prerelease && /^beta(\.\d+)?$/.test(parsed.prerelease)) {
-		const n = parsed.prerelease === "beta" ? 1 : Number(parsed.prerelease.split(".")[1]);
-		return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta.${n + 1}`;
-	}
-	if (parsed.prerelease) {
-		throw new Error(
-			`Unsupported pre-release suffix "-${parsed.prerelease}" (expected -beta or -beta.N)`,
-		);
-	}
-	return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-beta`;
+        const parsed = parseSemver(version);
+        if (!parsed) throw new Error(`Invalid version: ${version}`);
+        if (parsed.prerelease && /^beta(\.\d+)?$/.test(parsed.prerelease)) {
+                const n = parsed.prerelease === "beta" ? 1 : Number(parsed.prerelease.split(".")[1]);
+                return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta.${n + 1}`;
+        }
+        if (parsed.prerelease) {
+                throw new Error(
+                        `Unsupported pre-release suffix "-${parsed.prerelease}" (expected -beta or -beta.N)`,
+                );
+        }
+        return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-beta`;
 }
 
 /**
@@ -143,9 +143,9 @@ export function nextBetaVersion(version) {
  * @returns {string}
  */
 export function nextStableVersion(version) {
-	const parsed = parseSemver(version);
-	if (!parsed) throw new Error(`Invalid version: ${version}`);
-	return `${parsed.major}.${parsed.minor}.${parsed.patch}`;
+        const parsed = parseSemver(version);
+        if (!parsed) throw new Error(`Invalid version: ${version}`);
+        return `${parsed.major}.${parsed.minor}.${parsed.patch}`;
 }
 
 /**
@@ -155,9 +155,9 @@ export function nextStableVersion(version) {
  * @returns {string}
  */
 export function suffixVersion(version, suffix) {
-	const base = normalizeVersion(version);
-	const clean = String(suffix ?? "").trim();
-	return clean ? `${base}-${clean}` : base;
+        const base = normalizeVersion(version);
+        const clean = String(suffix ?? "").trim();
+        return clean ? `${base}-${clean}` : base;
 }
 
 const VERSION_FIELD_PATTERN = /("version"\s*:\s*")[^"]*(")/;
@@ -171,19 +171,19 @@ const VERSION_FIELD_PATTERN = /("version"\s*:\s*")[^"]*(")/;
  * @returns {string}
  */
 export function insertVersionIntoPackageJson(content, version) {
-	const afterName = content.replace(
-		/^([ \t]*)("(?:name|displayName)"\s*:\s*"[^"]*",[ \t]*)$/m,
-		(_match, indent, line) => `${indent}${line}\n${indent}"version": "${version}",`,
-	);
-	if (afterName !== content) return afterName;
-	const afterBrace = content.replace(
-		/^([ \t]*)(\{[ \t]*)$/m,
-		(_match, indent, brace) => `${indent}${brace}\n${indent}  "version": "${version}",`,
-	);
-	if (afterBrace !== content) return afterBrace;
-	throw new Error(
-		'package.json: could not insert "version" field (unexpected file shape)',
-	);
+        const afterName = content.replace(
+                /^([ \t]*)("(?:name|displayName)"\s*:\s*"[^"]*",[ \t]*)$/m,
+                (_match, indent, line) => `${indent}${line}\n${indent}"version": "${version}",`,
+        );
+        if (afterName !== content) return afterName;
+        const afterBrace = content.replace(
+                /^([ \t]*)(\{[ \t]*)$/m,
+                (_match, indent, brace) => `${indent}${brace}\n${indent}  "version": "${version}",`,
+        );
+        if (afterBrace !== content) return afterBrace;
+        throw new Error(
+                'package.json: could not insert "version" field (unexpected file shape)',
+        );
 }
 
 /**
@@ -196,11 +196,11 @@ export function insertVersionIntoPackageJson(content, version) {
  * @returns {string}
  */
 export function applyVersionToPackageJson(content, version) {
-	if (!parseSemver(version)) throw new Error(`Invalid version: ${version}`);
-	if (!/"version"\s*:/.test(content)) {
-		return insertVersionIntoPackageJson(content, version);
-	}
-	return content.replace(VERSION_FIELD_PATTERN, `$1${version}$2`);
+        if (!parseSemver(version)) throw new Error(`Invalid version: ${version}`);
+        if (!/"version"\s*:/.test(content)) {
+                return insertVersionIntoPackageJson(content, version);
+        }
+        return content.replace(VERSION_FIELD_PATTERN, `$1${version}$2`);
 }
 
 /**
@@ -212,116 +212,134 @@ export function applyVersionToPackageJson(content, version) {
  * @returns {string}
  */
 export function applyVersionToConfigXml(content, version, versionCode = null) {
-	if (!content.includes("<widget")) {
-		throw new Error("config.xml: <widget> tag not found");
-	}
-	let next = content.replace(/version="[^"]*"/, `version="${version}"`);
-	if (versionCode !== null && versionCode !== undefined) {
-		next = next.replace(
-			/android-versionCode="\d+"/,
-			`android-versionCode="${versionCode}"`,
-		);
-	}
-	return next;
+        if (!content.includes("<widget")) {
+                throw new Error("config.xml: <widget> tag not found");
+        }
+        let next = content.replace(/version="[^"]*"/, `version="${version}"`);
+        if (versionCode !== null && versionCode !== undefined) {
+                next = next.replace(
+                        /android-versionCode="\d+"/,
+                        `android-versionCode="${versionCode}"`,
+                );
+        }
+        return next;
 }
 
 /** CLI entry point. */
 function main() {
-	const args = process.argv.slice(2);
+        const args = process.argv.slice(2);
 
-	const suffixFlag = args.indexOf("--suffix");
-	if (suffixFlag !== -1) {
-		const suffix = args[suffixFlag + 1];
-		if (!suffix) fail("--suffix requires a name (e.g. debug)");
-		const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8"));
-		const stamped = suffixVersion(pkg.version, suffix);
-		const xml = fs.readFileSync(CONFIG_XML, "utf8");
-		fs.writeFileSync(
-			CONFIG_XML,
-			applyVersionToConfigXml(xml, stamped, null),
-		);
-		console.log(`version=${stamped}`);
-		return;
-	}
+        const suffixFlag = args.indexOf("--suffix");
+        if (suffixFlag !== -1) {
+                const suffix = args[suffixFlag + 1];
+                if (!suffix) fail("--suffix requires a name (e.g. debug)");
+                const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8"));
+                const stamped = suffixVersion(pkg.version, suffix);
+                const xml = fs.readFileSync(CONFIG_XML, "utf8");
+                fs.writeFileSync(
+                        CONFIG_XML,
+                        applyVersionToConfigXml(xml, stamped, null),
+                );
+                console.log(`version=${stamped}`);
+                return;
+        }
 
-	// Auto-increment modes: print the next version without writing files.
-	// The caller feeds the output back into the normal bump command.
-	const nextBeta = args.includes("--next-beta");
-	const nextStable = args.includes("--next-stable");
-	if (nextBeta || nextStable) {
-		const latestIndex = args.indexOf("--latest");
-		const latest = latestIndex !== -1 ? normalizeVersion(args[latestIndex + 1]) : null;
-		if (latest !== null && !latest) fail("--latest requires a version (e.g. v1.8.45-beta)");
-		if (latest && !parseSemver(latest)) fail(`Invalid --latest version: "${latest}"`);
-		const current = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8")).version;
-		let candidate = nextBeta ? nextBetaVersion(current) : nextStableVersion(current);
-		while (latest && compareSemver(candidate, latest) <= 0) {
-			const base = parseSemver(candidate);
-			candidate = nextBeta
-				? `${base.major}.${base.minor}.${base.patch + 1}-beta`
-				: `${base.major}.${base.minor}.${base.patch + 1}`;
-		}
-		console.log(`version=${candidate}`);
-		return;
-	}
+        // Auto-increment modes: print the next version without writing files.
+        // The caller feeds the output back into the normal bump command.
+        const nextBeta = args.includes("--next-beta");
+        const nextStable = args.includes("--next-stable");
+        if (nextBeta || nextStable) {
+                const latestIndex = args.indexOf("--latest");
+                const latest = latestIndex !== -1 ? normalizeVersion(args[latestIndex + 1]) : null;
+                if (latest !== null && !latest) fail("--latest requires a version (e.g. v1.8.45-beta)");
+                if (latest && !parseSemver(latest)) fail(`Invalid --latest version: "${latest}"`);
+                const current = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8")).version;
+                let candidate = nextBeta ? nextBetaVersion(current) : nextStableVersion(current);
+                while (latest && compareSemver(candidate, latest) <= 0) {
+                        const base = parseSemver(candidate);
+                        candidate = nextBeta
+                                ? `${base.major}.${base.minor}.${base.patch + 1}-beta`
+                                : `${base.major}.${base.minor}.${base.patch + 1}`;
+                }
+                console.log(`version=${candidate}`);
+                return;
+        }
 
-	const version = args.find((arg, index) => arg && !arg.startsWith("--") && args[index - 1] !== "--greater-than" && args[index - 1] !== "--suffix");
-	const greaterIndex = args.indexOf("--greater-than");
-	const greaterThan = greaterIndex !== -1 ? args[greaterIndex + 1] : null;
-	const checkOnly = args.includes("--check-only");
+        // Prints the next beta of an EXPLICIT version (1.8.46-beta ->
+        // 1.8.46-beta.2). The pre-release workflow uses it to auto-bump a
+        // requested version whose tag already exists instead of failing.
+        const nextFromIndex = args.indexOf("--next-beta-from");
+        if (nextFromIndex !== -1) {
+                const from = normalizeVersion(args[nextFromIndex + 1] ?? "");
+                if (!parseSemver(from)) {
+                        fail(`--next-beta-from requires a version (e.g. 1.8.46-beta), got "${args[nextFromIndex + 1] ?? ""}"`);
+                }
+                try {
+                        console.log(`version=${nextBetaVersion(from)}`);
+                } catch (error) {
+                        fail(String(error?.message || error));
+                }
+                return;
+        }
 
-	if (!version) {
-		fail(
-			"Usage: node utils/scripts/bump-version.mjs <version> [--greater-than <version>] [--check-only]\n" +
-				"       node utils/scripts/bump-version.mjs --suffix debug\n" +
-				"       node utils/scripts/bump-version.mjs --next-beta|--next-stable [--latest <tag>]",
-		);
-	}
-	const normalized = normalizeVersion(version);
-	if (!parseSemver(normalized)) {
-		fail(`Invalid version: "${version}" (expected e.g. 1.4.0 or 1.4.0-beta.1)`);
-	}
-	if (greaterThan) {
-		if (!parseSemver(greaterThan)) {
-			fail(`Invalid --greater-than version: "${greaterThan}"`);
-		}
-		if (compareSemver(normalized, greaterThan) <= 0) {
-			fail(
-				`Version ${normalized} is not greater than ${normalizeVersion(greaterThan)} — refusing to release backwards`,
-			);
-		}
-	}
+        const version = args.find((arg, index) => arg && !arg.startsWith("--") && args[index - 1] !== "--greater-than" && args[index - 1] !== "--suffix" && args[index - 1] !== "--next-beta-from");
+        const greaterIndex = args.indexOf("--greater-than");
+        const greaterThan = greaterIndex !== -1 ? args[greaterIndex + 1] : null;
+        const checkOnly = args.includes("--check-only");
 
-	const code = computeVersionCode(normalized);
+        if (!version) {
+                fail(
+                        "Usage: node utils/scripts/bump-version.mjs <version> [--greater-than <version>] [--check-only]\n" +
+                                "       node utils/scripts/bump-version.mjs --suffix debug\n" +
+                                "       node utils/scripts/bump-version.mjs --next-beta|--next-stable [--latest <tag>]\n" +
+                                "       node utils/scripts/bump-version.mjs --next-beta-from <version>",
+                );
+        }
+        const normalized = normalizeVersion(version);
+        if (!parseSemver(normalized)) {
+                fail(`Invalid version: "${version}" (expected e.g. 1.4.0 or 1.4.0-beta.1)`);
+        }
+        if (greaterThan) {
+                if (!parseSemver(greaterThan)) {
+                        fail(`Invalid --greater-than version: "${greaterThan}"`);
+                }
+                if (compareSemver(normalized, greaterThan) <= 0) {
+                        fail(
+                                `Version ${normalized} is not greater than ${normalizeVersion(greaterThan)} — refusing to release backwards`,
+                        );
+                }
+        }
 
-	if (checkOnly) {
-		console.log(`version=${normalized}`);
-		console.log(`versionCode=${code}`);
-		return;
-	}
+        const code = computeVersionCode(normalized);
 
-	fs.writeFileSync(
-		PACKAGE_JSON,
-		applyVersionToPackageJson(fs.readFileSync(PACKAGE_JSON, "utf8"), normalized),
-	);
-	fs.writeFileSync(
-		CONFIG_XML,
-		applyVersionToConfigXml(
-			fs.readFileSync(CONFIG_XML, "utf8"),
-			normalized,
-			code,
-		),
-	);
-	console.log(`version=${normalized}`);
-	console.log(`versionCode=${code}`);
+        if (checkOnly) {
+                console.log(`version=${normalized}`);
+                console.log(`versionCode=${code}`);
+                return;
+        }
+
+        fs.writeFileSync(
+                PACKAGE_JSON,
+                applyVersionToPackageJson(fs.readFileSync(PACKAGE_JSON, "utf8"), normalized),
+        );
+        fs.writeFileSync(
+                CONFIG_XML,
+                applyVersionToConfigXml(
+                        fs.readFileSync(CONFIG_XML, "utf8"),
+                        normalized,
+                        code,
+                ),
+        );
+        console.log(`version=${normalized}`);
+        console.log(`versionCode=${code}`);
 }
 
 /** @param {string} message */
 function fail(message) {
-	console.error(`::error::${message}`);
-	process.exit(1);
+        console.error(`::error::${message}`);
+        process.exit(1);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
-	main();
+        main();
 }

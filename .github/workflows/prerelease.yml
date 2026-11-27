@@ -29,7 +29,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Pre-release version (e.g. 1.8.46-beta). Empty = auto-increment (beta.N+1)"
+        description: "Pre-release version (e.g. 1.8.46-beta). Empty = auto-increment; a version whose tag already exists auto-bumps to beta.N+1"
         required: false
         type: string
       force:
@@ -90,14 +90,26 @@ jobs:
             esac
             VERSION=$(printf '%s' "$INPUT_VERSION" | tr -d '[:space:]' | sed 's/^v//')
           fi
+          # a version that already ships as a tag is NEVER rebuilt under the
+          # same name: an explicit input whose tag exists auto-bumps to the
+          # next free beta (1.8.46-beta -> 1.8.46-beta.2 -> 1.8.46-beta.3…)
+          # so a repeat dispatch at least produces «beta2»; only an explicit
+          # «force» re-points the tag to the current HEAD and rebuilds
+          if [ "$FORCE" != "true" ]; then
+            TRIES=0
+            while git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; do
+              TRIES=$((TRIES + 1))
+              if [ "$TRIES" -gt 25 ]; then
+                echo "::error::no free version found after 25 auto-bumps (latest beta tag: ${LATEST:-none})"
+                exit 1
+              fi
+              echo "::warning::tag v${VERSION} already exists — auto-bumping to the next beta"
+              OUT=$(node utils/scripts/bump-version.mjs --next-beta-from "$VERSION")
+              VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
+            done
+          fi
           if [ -n "$LATEST" ] && [ "v${VERSION}" != "$LATEST" ]; then
             node utils/scripts/bump-version.mjs "$VERSION" --check-only --greater-than "$LATEST"
-          fi
-          if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
-            if [ "$FORCE" != "true" ]; then
-              echo "::error::Tag v${VERSION} already exists — a version is never released twice. Dispatch with a HIGHER version (latest tag: ${LATEST}; empty input auto-increments), or tick «force» to re-point the tag to the current HEAD and rebuild."
-              exit 1
-            fi
           fi
           OUT=$(node utils/scripts/bump-version.mjs "$VERSION")
           VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')

@@ -197,3 +197,24 @@ describe("nextStableVersion", () => {
 		expect(nextStableVersion("1.8.45")).toBe("1.8.45");
 	});
 });
+
+describe("CLI --next-beta-from", () => {
+	it("prints the next beta of an explicit version (workflow auto-bump)", async () => {
+		const { execFile } = await import("node:child_process");
+		const run = (args) =>
+			new Promise((resolve, reject) => {
+				execFile(
+					process.execPath,
+					["utils/scripts/bump-version.mjs", "--next-beta-from", args],
+					{ cwd: process.cwd() },
+					(error, stdout) => {
+						if (error) reject(error);
+						else resolve(String(stdout).trim());
+					},
+				);
+			});
+		expect(await run("1.8.46-beta")).toBe("version=1.8.46-beta.2");
+		expect(await run("v1.8.46-beta.2")).toBe("version=1.8.46-beta.3");
+		expect(await run("1.8.45")).toBe("version=1.8.46-beta");
+	});
+});
