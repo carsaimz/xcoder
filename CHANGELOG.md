@@ -9,14 +9,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [1.8.48] - 2026-11-27
 
-### Added
-- **Inspector (plugin) 1.2.0 — as abas que estavam mortas voltam a funcionar**: Elementos com estado de carregamento e «Tentar de novo», Consola com filtros por nível (Todas/Log/Info/Avisos/Erros), hora em cada linha e linha de sistema quando a página carrega (a aba nunca fica vazia), Rede com **corpo da resposta ao toque** (paridade «Response» do DevTools) e abas organizadas com **quebra de linha** em ecrãs estreitos (wrap)
-- **Robustez do Inspector**: os comandos de árvore/procura (getTree, inspect, searchDom, searchText) ganharam um segundo canal — espelho por `evaluate` na página — para quando a ponte de mensagens do WebView morre silenciosamente; timeout de comando reduzido de 15 s para 8 s com fallback automático
-- **Script de captura à prova de contexto**: o registo do canal de comandos acontece em TODA a injeção (a ponte reconstruída deixava o handler órfão — Elementos ficava eternamente vazio); i18n: 7 chaves novas nas 31 línguas
-
-### Fixed
-- Linhas da árvore do Inspector mostravam «?» em vez do nome da etiqueta (o plugin lia `node.label`/`node.class`, o capturador devolve `tag`/`classes`)
-- Trocar de aba no Inspector não re-renderizava o painel (Consola ficava presa em «Sem mensagens ainda» mesmo com registos capturados)
+### Maintenance
+- Fixture do plugin inspector no repo (E2E funciona na CI sem o checkout irmão; local continua a usar a fonte viva) — CI verde
 
 ## [1.8.47] - 2026-11-27
 
