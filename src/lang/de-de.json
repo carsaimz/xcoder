@@ -1141,9 +1141,7 @@
 	"version": "Version",
 	"changelog current version": "Aktuelle Version",
 	"changelog latest release": "Neueste Version",
-	"changelog beta version": "Betaversion",
 	"changelog full": "Vollständiges Änderungsprotokoll",
-	"changelog no beta": "Keine Betaversion gefunden",
 	"git time now": "Jetzt",
 	"git time min": "min",
 	"git time hour": "H",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "Links — «Alle kopieren» benutzen",
 	"scraper copy links": "Alle kopieren",
 	"scraper report save": "Bericht speichern",
-	"scraper report saved": "Bericht gespeichert"
+	"scraper report saved": "Bericht gespeichert",
+	"sticky scroll": "Fixierter Bildlauf",
+	"settings-info-editor-sticky-scroll": "Hält die ersten Zeilen der umschließenden Blöcke (Funktion/Klasse) beim Scrollen am oberen Rand fest, wie in VS Code. Tippe auf eine Zeile, um dorthin zu springen."
 }

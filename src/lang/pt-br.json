@@ -1189,9 +1189,7 @@
 	"version": "Versão",
 	"changelog current version": "Versão atual",
 	"changelog latest release": "Versão estável",
-	"changelog beta version": "Versão beta",
 	"changelog full": "Registro completo",
-	"changelog no beta": "Nenhuma versão beta encontrada",
 	"git time now": "agora",
 	"git time min": "min",
 	"git time hour": "h",
@@ -2317,5 +2315,7 @@
 	"scraper links more": "links — usar Copiar todos",
 	"scraper copy links": "Copiar todos",
 	"scraper report save": "Salvar relatório",
-	"scraper report saved": "Relatório salvo"
+	"scraper report saved": "Relatório salvo",
+	"sticky scroll": "Rolagem fixa",
+	"settings-info-editor-sticky-scroll": "Fixa as linhas de abertura dos escopos (função/classe) no topo do editor ao rolar, como no VS Code. Toque numa linha fixa para ir até ela."
 }

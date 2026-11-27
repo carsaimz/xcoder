@@ -1141,9 +1141,7 @@
 	"version": "バージョン",
 	"changelog current version": "現在のバージョン",
 	"changelog latest release": "最新リリース",
-	"changelog beta version": "ベータ版",
 	"changelog full": "完全な変更ログ",
-	"changelog no beta": "ベータ版リリースが見つかりません",
 	"git time now": "今",
 	"git time min": "分",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "リンク — 「すべてコピー」を使用",
 	"scraper copy links": "すべてコピー",
 	"scraper report save": "レポートを保存",
-	"scraper report saved": "レポートを保存しました"
+	"scraper report saved": "レポートを保存しました",
+	"sticky scroll": "固定スクロール",
+	"settings-info-editor-sticky-scroll": "スクロール中に外側のスコープ（関数/クラス）の開始行をエディターの上部に固定します（VS Code と同様）。固定された行をタップするとそこにジャンプします。"
 }

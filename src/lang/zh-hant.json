@@ -1141,9 +1141,7 @@
 	"version": "版本",
 	"changelog current version": "目前版本",
 	"changelog latest release": "最新版本",
-	"changelog beta version": "測試版",
 	"changelog full": "完整變更日誌",
-	"changelog no beta": "未找到測試版本",
 	"git time now": "現在",
 	"git time min": "分分鐘",
 	"git time hour": "小時",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "連結 — 使用「全部複製」",
 	"scraper copy links": "全部複製",
 	"scraper report save": "儲存報告",
-	"scraper report saved": "報告已儲存"
+	"scraper report saved": "報告已儲存",
+	"sticky scroll": "固定捲動",
+	"settings-info-editor-sticky-scroll": "捲動時把外層範圍（函式/類別）的起始行固定在編輯器頂部，與 VS Code 一致。點擊固定行可跳至該行。"
 }

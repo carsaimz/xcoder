@@ -1141,9 +1141,7 @@
 	"version": "גִרְסָה",
 	"changelog current version": "גרסה נוכחית",
 	"changelog latest release": "המהדורה האחרונה",
-	"changelog beta version": "גרסת בטא",
 	"changelog full": "יומן שינויים מלא",
-	"changelog no beta": "לא נמצאה גרסת בטא",
 	"git time now": "עַכשָׁיו",
 	"git time min": "דקה",
 	"git time hour": "ח",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "קישורים — השתמשו בהעתקת הכול",
 	"scraper copy links": "העתקת הכול",
 	"scraper report save": "שמירת דוח",
-	"scraper report saved": "הדוח נשמר"
+	"scraper report saved": "הדוח נשמר",
+	"sticky scroll": "גלילה דביקה",
+	"settings-info-editor-sticky-scroll": "מצמיד את שורות הפתיחה של הטווחים (פונקציה/מחלקה) לראש העורך בזמן גלילה, כמו ב-VS Code. הקש על שורה מוצמדת כדי לקפוץ אליה."
 }

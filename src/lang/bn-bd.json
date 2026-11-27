@@ -1141,9 +1141,7 @@
 	"version": "সংস্করণ",
 	"changelog current version": "বর্তমান সংস্করণ",
 	"changelog latest release": "সর্বশেষ রিলিজ",
-	"changelog beta version": "বিটা সংস্করণ",
 	"changelog full": "সম্পূর্ণ চেঞ্জলগ",
-	"changelog no beta": "কোনো বিটা রিলিজ পাওয়া যায়নি",
 	"git time now": "এখন",
 	"git time min": "মিনিট",
 	"git time hour": "জ",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "লিঙ্ক — সব কপি করুন ব্যবহার করুন",
 	"scraper copy links": "সব কপি করুন",
 	"scraper report save": "রিপোর্ট সংরক্ষণ করুন",
-	"scraper report saved": "রিপোর্ট সংরক্ষিত"
+	"scraper report saved": "রিপোর্ট সংরক্ষিত",
+	"sticky scroll": "স্টিকি স্ক্রল",
+	"settings-info-editor-sticky-scroll": "স্ক্রল করার সময় আশেপাশের ব্লকের (ফাংশন/ক্লাস) শুরুর লাইনগুলো সম্পাদকের উপরে স্থির রাখে, VS Code-এর মতো। সেখানে যেতে স্থির লাইনে ট্যাপ করুন।"
 }

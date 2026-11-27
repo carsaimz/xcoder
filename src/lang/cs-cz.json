@@ -1141,9 +1141,7 @@
 	"version": "Verze",
 	"changelog current version": "Aktuální verze",
 	"changelog latest release": "Nejnovější vydání",
-	"changelog beta version": "Beta verze",
 	"changelog full": "Kompletní seznam změn",
-	"changelog no beta": "Nebyla nalezena žádná beta verze",
 	"git time now": "teď",
 	"git time min": "min",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "odkazy — použijte Kopírovat vše",
 	"scraper copy links": "Kopírovat vše",
 	"scraper report save": "Uložit zprávu",
-	"scraper report saved": "Zpráva uložena"
+	"scraper report saved": "Zpráva uložena",
+	"sticky scroll": "Přilepený posun",
+	"settings-info-editor-sticky-scroll": "Při posouvání přichytí úvodní řádky nadřazených bloků (funkce/třída) k hornímu okraji editoru, jako ve VS Code. Klepnutím na přilepený řádek na něj přeskočíte."
 }

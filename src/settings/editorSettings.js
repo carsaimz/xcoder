@@ -230,6 +230,13 @@ export default function editorSettings() {
 			category: categories.guidesIndicators,
 		},
 		{
+			key: "stickyScroll",
+			text: strings["sticky scroll"] || "Sticky scroll",
+			checkbox: values.stickyScroll ?? true,
+			info: strings["settings-info-editor-sticky-scroll"],
+			category: categories.guidesIndicators,
+		},
+		{
 			key: "fileTimeline",
 			text: strings["timeline"] || "Timeline",
 			checkbox: values.fileTimeline ?? true,

@@ -69,6 +69,7 @@ import {
 	initModes,
 } from "cm/modelist";
 import { snippetsCompletionSource, snippetsCompletions } from "cm/snippets";
+import stickyScroll from "cm/stickyScroll";
 import createTouchSelectionMenu from "cm/touchSelectionMenu";
 import "cm/supportedModes";
 import { autocompletion } from "@codemirror/autocomplete";
@@ -955,6 +956,7 @@ async function EditorManager($header, $body) {
 	const iconCompletionCompartment = new Compartment();
 	// Compartment for user snippets (VS Code format)
 	const snippetCompletionCompartment = new Compartment();
+	const stickyScrollCompartment = new Compartment();
 	// Compartment for rainbow bracket colorizer
 	const rainbowCompartment = new Compartment();
 	// Compartment for indent guides
@@ -1352,6 +1354,14 @@ async function EditorManager($header, $body) {
 				return appSettings?.value?.snippetCompletion === false
 					? []
 					: snippetsCompletions();
+			},
+		},
+		{
+			keys: ["stickyScroll"],
+			compartments: [stickyScrollCompartment],
+			build() {
+				// VS Code sticky scroll (roadmap 🧩 item 1) — on by default
+				return appSettings?.value?.stickyScroll === false ? [] : stickyScroll();
 			},
 		},
 		{

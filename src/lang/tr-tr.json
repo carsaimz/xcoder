@@ -1141,9 +1141,7 @@
 	"version": "Sürüm",
 	"changelog current version": "Güncel Sürüm",
 	"changelog latest release": "Son Sürüm",
-	"changelog beta version": "Beta Sürümü",
 	"changelog full": "Tam Değişiklik Günlüğü",
-	"changelog no beta": "Beta sürümü bulunamadı",
 	"git time now": "Şimdi",
 	"git time min": "dk.",
 	"git time hour": "H",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "bağlantılar — Tümünü kopyala'yı kullan",
 	"scraper copy links": "Tümünü kopyala",
 	"scraper report save": "Raporu kaydet",
-	"scraper report saved": "Rapor kaydedildi"
+	"scraper report saved": "Rapor kaydedildi",
+	"sticky scroll": "Yapışkan kaydırma",
+	"settings-info-editor-sticky-scroll": "Kaydırma sırasında kapsayan blokların (fonksiyon/sınıf) açılış satırlarını düzenleyicinin üstünde sabitler, VS Code gibi. Atlamak için sabit satıra dokunun."
 }

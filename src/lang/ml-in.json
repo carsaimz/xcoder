@@ -1141,9 +1141,7 @@
 	"version": "പതിപ്പ്",
 	"changelog current version": "നിലവിലെ പതിപ്പ്",
 	"changelog latest release": "ഏറ്റവും പുതിയ റിലീസ്",
-	"changelog beta version": "ബീറ്റ പതിപ്പ്",
 	"changelog full": "പൂർണ്ണ ചേഞ്ച്ലോഗ്",
-	"changelog no beta": "ബീറ്റ റിലീസ് കണ്ടെത്തിയില്ല",
 	"git time now": "ഇപ്പോൾ",
 	"git time min": "മിനിറ്റ്",
 	"git time hour": "എച്ച്",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "ലിങ്കുകൾ — എല്ലാം പകർത്തുക ഉപയോഗിക്കുക",
 	"scraper copy links": "എല്ലാം പകർത്തുക",
 	"scraper report save": "റിപ്പോർട്ട് സംരക്ഷിക്കുക",
-	"scraper report saved": "റിപ്പോർട്ട് സംരക്ഷിച്ചു"
+	"scraper report saved": "റിപ്പോർട്ട് സംരക്ഷിച്ചു",
+	"sticky scroll": "സ്റ്റിക്കി സ്ക്രോൾ",
+	"settings-info-editor-sticky-scroll": "സ്ക്രോൾ ചെയ്യുമ്പോൾ ചുറ്റുമുള്ള ബ്ലോക്കുകളുടെ (ഫങ്ഷൻ/ക്ലാസ്) ആദ്യ വരികൾ എഡിറ്ററിന്റെ മുകളിൽ ഉറപ്പിക്കുന്നു (VS Code പോലെ). അതിലേക്ക് പോകാൻ ഉറപ്പിച്ച വരിയിൽ ടാപ്പ് ചെയ്യുക."
 }

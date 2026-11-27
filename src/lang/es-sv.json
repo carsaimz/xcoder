@@ -1139,9 +1139,7 @@
 	"version": "Versión",
 	"changelog current version": "Versión actual",
 	"changelog latest release": "Última versión",
-	"changelog beta version": "Versión beta",
 	"changelog full": "Historial completo de cambios",
-	"changelog no beta": "No se encontró ninguna versión beta",
 	"git time now": "ahora",
 	"git time min": "min",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "enlaces — usar Copiar todos",
 	"scraper copy links": "Copiar todos",
 	"scraper report save": "Guardar informe",
-	"scraper report saved": "Informe guardado"
+	"scraper report saved": "Informe guardado",
+	"sticky scroll": "Desplazamiento fijo",
+	"settings-info-editor-sticky-scroll": "Fija las líneas de apertura de los ámbitos (función/clase) en la parte superior del editor al desplazarse, como en VS Code. Toca una línea fija para saltar a ella."
 }

@@ -1077,9 +1077,7 @@
 	"version": "Version",
 	"changelog current version": "Current Version",
 	"changelog latest release": "Latest Release",
-	"changelog beta version": "Beta Version",
 	"changelog full": "Full Changelog",
-	"changelog no beta": "No beta release found",
 	"git time now": "now",
 	"git time min": "min",
 	"git time hour": "h",
@@ -2317,5 +2315,7 @@
 	"scraper links more": "links — use Copy all",
 	"scraper copy links": "Copy all",
 	"scraper report save": "Save report",
-	"scraper report saved": "Report saved"
+	"scraper report saved": "Report saved",
+	"sticky scroll": "Sticky scroll",
+	"settings-info-editor-sticky-scroll": "Pins the opening lines of the enclosing scopes (function/class) at the top of the editor while scrolling, like VS Code. Tap a pinned line to jump to it."
 }

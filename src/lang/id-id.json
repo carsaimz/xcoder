@@ -1141,9 +1141,7 @@
 	"version": "Versi",
 	"changelog current version": "Versi Saat Ini",
 	"changelog latest release": "Rilis Terbaru",
-	"changelog beta version": "Versi Beta",
 	"changelog full": "Log Perubahan Penuh",
-	"changelog no beta": "Tidak ada rilis beta yang ditemukan",
 	"git time now": "Sekarang",
 	"git time min": "menit",
 	"git time hour": "H",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "tautan — gunakan Salin semua",
 	"scraper copy links": "Salin semua",
 	"scraper report save": "Simpan laporan",
-	"scraper report saved": "Laporan disimpan"
+	"scraper report saved": "Laporan disimpan",
+	"sticky scroll": "Gulir lengket",
+	"settings-info-editor-sticky-scroll": "Menyematkan baris pembuka blok (fungsi/kelas) di bagian atas editor saat menggulir, seperti VS Code. Ketuk baris yang disematkan untuk melompat ke sana."
 }

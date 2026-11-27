@@ -1141,9 +1141,7 @@
 	"version": "Változat",
 	"changelog current version": "Jelenlegi verzió",
 	"changelog latest release": "Legújabb kiadás",
-	"changelog beta version": "Béta verzió",
 	"changelog full": "Teljes változásnapló",
-	"changelog no beta": "Nem található béta kiadás",
 	"git time now": "jelenleg",
 	"git time min": "min",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "hivatkozások — az Összes másolása használata",
 	"scraper copy links": "Összes másolása",
 	"scraper report save": "Jelentés mentése",
-	"scraper report saved": "Jelentés mentve"
+	"scraper report saved": "Jelentés mentve",
+	"sticky scroll": "Ragadós görgetés",
+	"settings-info-editor-sticky-scroll": "Görgetéskor a befoglaló blokkok (függvény/osztály) kezdő sorait az szerkesztő tetejére rögzíti, mint a VS Code. Ugráshoz koppintson a rögzített sorra."
 }

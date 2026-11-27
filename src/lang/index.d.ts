@@ -1079,9 +1079,7 @@ declare type LangStrings = {
   "version": string;
   "changelog current version": string;
   "changelog latest release": string;
-  "changelog beta version": string;
   "changelog full": string;
-  "changelog no beta": string;
   "git time now": string;
   "git time min": string;
   "git time hour": string;
@@ -1722,6 +1720,8 @@ declare type LangStrings = {
   "dev tools style": string;
   "minimap": string;
   "settings-info-editor-minimap": string;
+  "sticky scroll": string;
+  "settings-info-editor-sticky-scroll": string;
   "settings-info-editor-file-timeline": string;
   "ai anchor": string;
   "right dock undock": string;

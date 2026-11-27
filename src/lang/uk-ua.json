@@ -1141,9 +1141,7 @@
 	"version": "Версія",
 	"changelog current version": "Поточна версія",
 	"changelog latest release": "Останній випуск",
-	"changelog beta version": "Бета-версія",
 	"changelog full": "Повний список змін",
-	"changelog no beta": "Бета-версія не знайдена",
 	"git time now": "зараз",
 	"git time min": "хв",
 	"git time hour": "ч",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "посилання — використайте «Копіювати всі»",
 	"scraper copy links": "Копіювати всі",
 	"scraper report save": "Зберегти звіт",
-	"scraper report saved": "Звіт збережено"
+	"scraper report saved": "Звіт збережено",
+	"sticky scroll": "Закріплена прокрутка",
+	"settings-info-editor-sticky-scroll": "Закріплює рядки відкриття областей (функція/клас) вгорі редактора під час прокрутки, як у VS Code. Торкніться закріпленого рядка, щоб перейти до нього."
 }

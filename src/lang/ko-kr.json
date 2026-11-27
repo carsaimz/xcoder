@@ -1141,9 +1141,7 @@
 	"version": "버전",
 	"changelog current version": "현재 버전",
 	"changelog latest release": "최신 릴리스",
-	"changelog beta version": "베타 버전",
 	"changelog full": "전체 변경 내역",
-	"changelog no beta": "베타 릴리스를 찾을 수 없습니다.",
 	"git time now": "지금",
 	"git time min": "분",
 	"git time hour": "시간",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "링크 — 모두 복사 사용",
 	"scraper copy links": "모두 복사",
 	"scraper report save": "보고서 저장",
-	"scraper report saved": "보고서 저장됨"
+	"scraper report saved": "보고서 저장됨",
+	"sticky scroll": "고정 스크롤",
+	"settings-info-editor-sticky-scroll": "스크롤하는 동안 바깥 블록(함수/클래스)의 시작 줄을 편집기 상단에 고정합니다(VS Code와 동일). 고정된 줄을 탭하면 그곳으로 이동합니다."
 }

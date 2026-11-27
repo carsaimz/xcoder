@@ -1141,9 +1141,7 @@
 	"version": "إصدار",
 	"changelog current version": "الإصدار الحالي",
 	"changelog latest release": "أحدث إصدار",
-	"changelog beta version": "النسخة التجريبية",
 	"changelog full": "سجل التغيير الكامل",
-	"changelog no beta": "لم يتم العثور على إصدار تجريبي",
 	"git time now": "الآن",
 	"git time min": "دقيقة",
 	"git time hour": "ح",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "روابط — استخدم نسخ الكل",
 	"scraper copy links": "نسخ الكل",
 	"scraper report save": "حفظ التقرير",
-	"scraper report saved": "تم حفظ التقرير"
+	"scraper report saved": "تم حفظ التقرير",
+	"sticky scroll": "تمرير ثابت",
+	"settings-info-editor-sticky-scroll": "يثبّت أسطر بداية النطاقات (دالة/فئة) في أعلى المحرر أثناء التمرير، مثل VS Code. انقر على سطر مثبت للانتقال إليه."
 }

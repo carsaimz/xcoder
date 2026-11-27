@@ -1141,9 +1141,7 @@
 	"version": "ဗားရှင်း",
 	"changelog current version": "လက်ရှိဗားရှင်း",
 	"changelog latest release": "နောက်ဆုံးထွက်",
-	"changelog beta version": "Beta ဗားရှင်း",
 	"changelog full": "Changelog အပြည့်အစုံ",
-	"changelog no beta": "ဘီတာထွက်ရှိမှု မတွေ့ပါ။",
 	"git time now": "ယခု",
 	"git time min": "မိ",
 	"git time hour": "ဇ",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "လင့်ခ်များ — «အားလုံး ကော်ပီကူး» ကို အသုံးပြုပါ",
 	"scraper copy links": "အားလုံး ကော်ပီကူး",
 	"scraper report save": "အစီရင်ခံစာ သိမ်းဆည်းပါ",
-	"scraper report saved": "အစီရင်ခံစာ သိမ်းဆည်းပြီး"
+	"scraper report saved": "အစီရင်ခံစာ သိမ်းဆည်းပြီး",
+	"sticky scroll": "တွယ်ကပ် scroll",
+	"settings-info-editor-sticky-scroll": "Scroll လုပ်စဉ် အပြင်ဘက် scope (function/class) ၏ စတင်လိုင်းများကို editor အပေါ်ပိုင်းတွင် ကပ်တွယ်ထားပေးသည် (VS Code ကဲ့သို့)။ ကပ်တွယ်ထားသော လိုင်းကို နှိပ်၍ ထိုလိုင်းသို့ ခုန်ပါ။"
 }

@@ -1141,9 +1141,7 @@
 	"version": "ਸੰਸਕਰਣ",
 	"changelog current version": "ਮੌਜੂਦਾ ਸੰਸਕਰਣ",
 	"changelog latest release": "ਨਵੀਨਤਮ ਰਿਲੀਜ਼",
-	"changelog beta version": "ਬੀਟਾ ਸੰਸਕਰਣ",
 	"changelog full": "ਪੂਰਾ ਚੇਂਜਲਾਗ",
-	"changelog no beta": "ਕੋਈ ਬੀਟਾ ਰੀਲੀਜ਼ ਨਹੀਂ ਮਿਲੀ",
 	"git time now": "ਹੁਣ",
 	"git time min": "ਮਿੰਟ",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "ਲਿੰਕ — ਸਭ ਕਾਪੀ ਕਰੋ ਵਰਤੋ",
 	"scraper copy links": "ਸਭ ਕਾਪੀ ਕਰੋ",
 	"scraper report save": "ਰਿਪੋਰਟ ਸੰਭਾਲੋ",
-	"scraper report saved": "ਰਿਪੋਰਟ ਸੰਭਾਲਿਆ ਗਿਆ"
+	"scraper report saved": "ਰਿਪੋਰਟ ਸੰਭਾਲਿਆ ਗਿਆ",
+	"sticky scroll": "ਸਟਿੱਕੀ ਸਕਰੋਲ",
+	"settings-info-editor-sticky-scroll": "ਸਕਰੋਲ ਕਰਦੇ ਸਮੇਂ ਘੇਰੇ ਹੋਏ ਬਲਾਕ (ਫੰਕਸ਼ਨ/ਕਲਾਸ) ਦੀਆਂ ਸ਼ੁਰੂਆਤੀ ਲਾਈਨਾਂ ਸੰਪਾਦਕ ਦੇ ਉੱਪਰ ਸਥਿਰ ਰੱਖਦਾ ਹੈ, VS Code ਵਾਂਗ। ਉੱਥੇ ਜਾਣ ਲਈ ਸਥਿਰ ਲਾਈਨ ਉੱਤੇ ਟੈਪ ਕਰੋ।"
 }

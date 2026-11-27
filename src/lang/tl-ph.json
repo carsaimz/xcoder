@@ -1141,9 +1141,7 @@
 	"version": "Bersyon",
 	"changelog current version": "Kasalukuyang Bersyon",
 	"changelog latest release": "Pinakabagong Paglabas",
-	"changelog beta version": "Beta na Bersyon",
 	"changelog full": "Buong Changelog",
-	"changelog no beta": "Walang nakitang beta release",
 	"git time now": "ngayon",
 	"git time min": "min",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "mga link — gamitin ang Copy all",
 	"scraper copy links": "Copy all",
 	"scraper report save": "I-save ang report",
-	"scraper report saved": "Na-save ang report"
+	"scraper report saved": "Na-save ang report",
+	"sticky scroll": "Nakadikit na scroll",
+	"settings-info-editor-sticky-scroll": "Naka-pin ang mga unang linya ng mga sumasaklaw na bloke (function/class) sa itaas ng editor habang nag-si-scroll, tulad ng VS Code. I-tap ang naka-pin na linya para tumalon doon."
 }

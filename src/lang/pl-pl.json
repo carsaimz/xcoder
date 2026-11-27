@@ -1141,9 +1141,7 @@
 	"version": "Wersja",
 	"changelog current version": "Aktualna wersja",
 	"changelog latest release": "Najnowsze wydanie",
-	"changelog beta version": "Wersja beta",
 	"changelog full": "Pełny dziennik zmian",
-	"changelog no beta": "Nie znaleziono wersji beta",
 	"git time now": "Teraz",
 	"git time min": "min",
 	"git time hour": "H",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "linki — użyj Kopiuj wszystkie",
 	"scraper copy links": "Kopiuj wszystkie",
 	"scraper report save": "Zapisz raport",
-	"scraper report saved": "Raport zapisany"
+	"scraper report saved": "Raport zapisany",
+	"sticky scroll": "Przewijanie lepkie",
+	"settings-info-editor-sticky-scroll": "Przypina linie otwierające bloki (funkcja/klasa) u góry edytora podczas przewijania, jak w VS Code. Dotknij linii, aby do niej przejść."
 }

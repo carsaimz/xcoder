@@ -1141,9 +1141,7 @@
 	"version": "版本",
 	"changelog current version": "当前版本",
 	"changelog latest release": "最新版本",
-	"changelog beta version": "测试版",
 	"changelog full": "完整变更日志",
-	"changelog no beta": "未找到测试版本",
 	"git time now": "现在",
 	"git time min": "分钟",
 	"git time hour": "小时",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "链接 — 使用「全部复制」",
 	"scraper copy links": "全部复制",
 	"scraper report save": "保存报告",
-	"scraper report saved": "报告已保存"
+	"scraper report saved": "报告已保存",
+	"sticky scroll": "固定滚动",
+	"settings-info-editor-sticky-scroll": "滚动时把外层作用域（函数/类）的起始行固定在编辑器顶部，与 VS Code 一致。点击固定行可跳转到该行。"
 }

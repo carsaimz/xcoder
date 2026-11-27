@@ -1141,9 +1141,7 @@
 	"version": "Versiya",
 	"changelog current version": "Joriy versiya",
 	"changelog latest release": "Oxirgi nashr",
-	"changelog beta version": "Beta versiyasi",
 	"changelog full": "To'liq o'zgarishlar jurnali",
-	"changelog no beta": "Hech qanday beta versiyasi topilmadi",
 	"git time now": "hozir",
 	"git time min": "min",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "havolalar — Hammasini nusxalash ishlating",
 	"scraper copy links": "Hammasini nusxalash",
 	"scraper report save": "Hisobotni saqlash",
-	"scraper report saved": "Hisobot saqlandi"
+	"scraper report saved": "Hisobot saqlandi",
+	"sticky scroll": "Yopishqoq aylantirish",
+	"settings-info-editor-sticky-scroll": "Aylantirish vaqti tashqi bloklar (funksiya/klass) ochilish qatorlarini muharrir yuqorisida qadab qo'yadi (VS Code kabi). Sakrash uchun qadalgan qatorga bosing."
 }

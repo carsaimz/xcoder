@@ -1141,9 +1141,7 @@
 	"version": "نسخه",
 	"changelog current version": "نسخه فعلی",
 	"changelog latest release": "آخرین نسخه",
-	"changelog beta version": "نسخه بتا",
 	"changelog full": "تغییرات کامل",
-	"changelog no beta": "نسخه بتا یافت نشد",
 	"git time now": "اکنون",
 	"git time min": "دقیقه",
 	"git time hour": "ساعت",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "پیوندها — از «کپی همه» استفاده کنید",
 	"scraper copy links": "کپی همه",
 	"scraper report save": "ذخیره گزارش",
-	"scraper report saved": "گزارش ذخیره شد"
+	"scraper report saved": "گزارش ذخیره شد",
+	"sticky scroll": "پیمایش چسبنده",
+	"settings-info-editor-sticky-scroll": "خطوط شروع بلوک‌ها (تابع/کلاس) را هنگام پیمایش در بالای ویرایشگر ثابت می‌کند، مانند VS Code. برای پرش روی خط ثابت ضربه بزنید."
 }

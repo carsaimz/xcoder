@@ -1141,9 +1141,7 @@
 	"version": "Версія",
 	"changelog current version": "Актуальная версія",
 	"changelog latest release": "Апошні рэліз",
-	"changelog beta version": "Бэта-версія",
 	"changelog full": "Поўны спіс змяненняў",
-	"changelog no beta": "Бэта-версія не знойдзена",
 	"git time now": "зараз",
 	"git time min": "мін",
 	"git time hour": "ч",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "спасылкі — выкарыстоўвайце «Капіяваць усе»",
 	"scraper copy links": "Капіяваць усе",
 	"scraper report save": "Захаваць справаздачу",
-	"scraper report saved": "Справаздача захавана"
+	"scraper report saved": "Справаздача захавана",
+	"sticky scroll": "Замацаваная пракрутка",
+	"settings-info-editor-sticky-scroll": "Замацоўвае радкі адкрыцця ахопліваючых блокаў (функцыя/клас) уверсе рэдактара падчас пракруткі, як у VS Code. Націсніце на замацаваны радок, каб перайсці да яго."
 }

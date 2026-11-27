@@ -1141,9 +1141,7 @@
 	"version": "Phiên bản",
 	"changelog current version": "Phiên bản hiện tại",
 	"changelog latest release": "Bản phát hành mới nhất",
-	"changelog beta version": "Phiên bản thử nghiệm",
 	"changelog full": "Nhật ký thay đổi đầy đủ",
-	"changelog no beta": "Không tìm thấy bản phát hành beta",
 	"git time now": "Hiện nay",
 	"git time min": "phút",
 	"git time hour": "h",
@@ -2334,5 +2332,7 @@
 	"scraper links more": "liên kết — dùng Sao chép tất cả",
 	"scraper copy links": "Sao chép tất cả",
 	"scraper report save": "Lưu báo cáo",
-	"scraper report saved": "Đã lưu báo cáo"
+	"scraper report saved": "Đã lưu báo cáo",
+	"sticky scroll": "Cuộn dính",
+	"settings-info-editor-sticky-scroll": "Ghim các dòng mở đầu của khối bao ngoài (hàm/lớp) ở đầu trình soạn thảo khi cuộn, giống VS Code. Chạm vào dòng được ghim để nhảy tới đó."
 }

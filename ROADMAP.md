@@ -16,9 +16,24 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Resumo v1.8.24 → v1.8.47
+## ✅ Resumo v1.8.24 → v1.8.48
 
-- **v1.8.45 — ferramentas internas de volta + canal beta:** Inspector
+- **v1.8.48 — beta removido + ferramentas internas saem de vez +
+  sticky scroll:** **canal beta ELIMINADO** (pacote/versão/nome únicos
+  `com.carsaimz.xcoder`, releases estáveis apenas; prerelease.yml e
+  apply-beta-package.mjs apagados) — as pre-releases complicavam
+  comparação de versões e builds; **Inspector, Site Analyzer e Scraper
+  internos REMOVIDOS de vez** (user: "não se resolveu nada nas
+  ferramentas") — os plugins do marketplace Inspector (v1.1.0, agora
+  com aba **Armazenamento**: localStorage/sessionStorage/cookies),
+  Site Analyzer e Scraper são a substituição e atualizam sem APK novo;
+  menu da pré-visualização fica só com Console/SEO (sem handoff); paleta
+  de comandos, diff, quick tools e outros portos VS Code continuam;
+  **sticky scroll PORTADO** (assinaturas dos escopos fixas no topo ao
+  rolar, definição «Sticky scroll», 31 idiomas); lockfile corrigido
+  (Desktop falhava em `npm ci`).
+- **v1.8.45 — ferramentas internas de volta + canal beta (revertido na
+  v1.8.48):** Inspector
   corrigido (`node.getBoundingClientRect` na raiz da árvore —
   Elementos/Consola/Procura funcionam de novo); Analisador, Inspector
   e Scraper restaurados como FERRAMENTAS INTERNAS (páginas próprias)
@@ -90,14 +105,17 @@ cada sessão, com o que já está no APK e o que vem a seguir.
 
 **A portar a seguir (ordem de valor):**
 
-1. **Sticky scroll** — a assinatura da função fixa no topo ao rolar.
 2. **Emmet completo** — expandir abreviações HTML/CSS (o `useEmmet` atual
    é básico; snippets do VS Code já estão portados).
 4. **Task runner / npm scripts UI** — scripts do `package.json` com painel
    de saída.
 5. **Multi-root workspaces** — mais de uma pasta aberta.
-6. **Comparar com HEAD/Git** — diff do ficheiro contra o último commit no
-   painel Git (o diff editor já existe, falta ligá-lo ao isomorphic-git).
+
+**(Feito na v1.8.48)** **Sticky scroll** — cadeia de escopos (classe →
+método → função) fixada no topo do editor ao rolar, toque numa linha
+fixa para ir até ela, definição «Sticky scroll» (Lote I do porte).
+**(Feito na v1.8.47)** **Comparar com HEAD/Git** — diff do ficheiro
+contra o último commit no painel Git (ação «Diff vs HEAD» por ficheiro).
 
 **Limitações mobile (marcação clara):** atalhos compostos (Ctrl+K Z),
 seleção de coluna por alt+drag, extensões de desktop e depuração remota
@@ -107,7 +125,7 @@ ficam no build Electron/desktop; na app aparecem desativados com a nota
 
 ## 🎯 Próximo — v1.8.44+
 
-- **Porte VS Code:** estado e plano na secção 🧩 acima — diff editor, sticky scroll e editor de atalhos são os próximos.
+- **Porte VS Code:** estado e plano na secção 🧩 acima — Emmet completo e task runner são os próximos; sticky scroll, diff vs HEAD, editor de atalhos, snippets e zen mode já estão no APK.
 - **Paridade com o PC (objetivo estratégico):** o APK pode passar de
   100 MB — o alvo é um editor completo para quem não tem PC. Portar
   do VS Code: formatter (Prettier/JS beautify), ESLint + Prettier on
@@ -627,7 +645,7 @@ referência.
 - [ ] **Renderer canvas experimental** 💡 Acode #2988 — Motor de
   renderização por canvas atrás de flag (upstream lançou como experimental
   com @acode.app/canvas-view).
-- [ ] **Sticky scroll** 🖥️ inspirado no VS Code — Cabeçalho do bloco atual
+- [x] **Sticky scroll** 🖥️ inspirado no VS Code (v1.8.48) — Cabeçalho do bloco atual
   fixo no topo ao navegar dentro de funções longas.
 - [ ] **Minimapa opcional** 🖥️ inspirado no VS Code — Miniatura do
   ficheiro com viewport arrastável; desligada por defeito no telemóvel.
@@ -951,7 +969,6 @@ with what already ships in the APK and what comes next.
 
 1. **Visual diff editor** (`@codemirror/merge`) — side-by-side/inline
    diffs before committing and tab-to-tab comparison.
-2. **Sticky scroll** — function signature pinned while scrolling.
 3. **Keybindings editor** — view/edit shortcuts in the UI (engine ready).
 4. **Full Emmet** + **VS Code-format snippets** (import `.vscode/snippets`).
 5. **Task runner / npm scripts UI** — run `package.json` scripts with an
@@ -967,7 +984,7 @@ the Electron/desktop build; in the app they show as disabled with a
 
 ## 🎯 Next — v1.8.44+
 
-- **VS Code port:** see the 🧩 section above — diff editor, sticky scroll and a keybindings editor come first.
+- **VS Code port:** see the 🧩 section above — full Emmet and the task runner come first; sticky scroll, diff vs HEAD, keybindings editor, snippets and zen mode are already in the APK.
 - **PC parity (strategic goal):** the APK may exceed 100 MB — the
   target is a full editor for people without a PC. Port from VS Code:
   formatter (Prettier/JS beautify), ESLint + Prettier on save, full
@@ -1358,7 +1375,7 @@ Rejected/reverted upstream: #2864, #2526, #2930/#2931 (reverted in
 - [ ] **Experimental canvas renderer** 💡 Acode #2988 — Canvas-based
   rendering behind a flag (upstream shipped it as experimental with
   @acode.app/canvas-view).
-- [ ] **Sticky scroll** 🖥️ inspired by VS Code — Current block header
+- [x] **Sticky scroll** 🖥️ inspired by VS Code (v1.8.48) — Current block header
   pinned to the top while scrolling inside long functions.
 - [ ] **Optional minimap** 🖥️ inspired by VS Code — File thumbnail with a
   draggable viewport; off by default on phones.
