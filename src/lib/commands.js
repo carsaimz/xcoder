@@ -1,5 +1,9 @@
 import fsOperation from "fileSystem";
 import { selectAll } from "@codemirror/commands";
+import {
+	selectNextOccurrence,
+	selectSelectionMatches,
+} from "@codemirror/search";
 import { focusEditorIfEditable } from "cm/editorReadOnly";
 import Sidebar from "components/sidebar";
 import confirm from "dialogs/confirm";
@@ -248,6 +252,16 @@ export default {
 		const { activeFile } = editorManager;
 		if (!activeFile?.uri) return;
 		activeFile.editWith?.();
+	},
+	"select-next-occurrence"() {
+		const view = editorManager.editor;
+		if (!view?.state) return false;
+		return selectNextOccurrence(view);
+	},
+	"select-all-occurrences"() {
+		const view = editorManager.editor;
+		if (!view?.state) return false;
+		return selectSelectionMatches(view);
 	},
 	async "find-file"() {
 		const { default: findFile } = await import(
