@@ -105,15 +105,22 @@ cada sessão, com o que já está no APK e o que vem a seguir.
 
 **A portar a seguir (ordem de valor):**
 
-2. **Emmet completo** — expandir abreviações HTML/CSS (o `useEmmet` atual
-   é básico; snippets do VS Code já estão portados).
-4. **Task runner / npm scripts UI** — scripts do `package.json` com painel
-   de saída.
 5. **Multi-root workspaces** — mais de uma pasta aberta.
 
 **(Feito na v1.8.48)** **Sticky scroll** — cadeia de escopos (classe →
 método → função) fixada no topo do editor ao rolar, toque numa linha
 fixa para ir até ela, definição «Sticky scroll» (Lote I do porte).
+**(Feito na v1.8.48)** **Emmet completo** — 19 comandos do plugin oficial
+`@emmetio/codemirror6-plugin` na paleta de comandos e no editor de atalhos
+(expandir, envolver com abreviação, balancear, selecionar item, inc/dec
+número por 1/10/0.1, avaliar matemática, pontos de edição, tag par,
+remover tag, dividir/juntar tag, modo de abreviação), atalhos VS Code
+(`Mod-e`, `Mod-Shift-.`, `Mod-Shift-,`) e autocompletar em HTML/CSS/JSX.
+**(Feito na v1.8.48)** **Task runner** — painel «Tarefas» na barra lateral
+com os scripts do `package.json` do projeto, run/stop por script, saída em
+stream (stdout/stderr) com código de saída, buffer limitado; comandos
+`runNpmTask` e `stopRunningTask` na paleta; execução via terminal Alpine
+(AXS) na pasta do projeto.
 **(Feito na v1.8.47)** **Comparar com HEAD/Git** — diff do ficheiro
 contra o último commit no painel Git (ação «Diff vs HEAD» por ficheiro).
 
@@ -125,7 +132,7 @@ ficam no build Electron/desktop; na app aparecem desativados com a nota
 
 ## 🎯 Próximo — v1.8.44+
 
-- **Porte VS Code:** estado e plano na secção 🧩 acima — Emmet completo e task runner são os próximos; sticky scroll, diff vs HEAD, editor de atalhos, snippets e zen mode já estão no APK.
+- **Porte VS Code:** estado e plano na secção 🧩 acima — multi-root workspaces é o próximo; Emmet completo, task runner, sticky scroll, diff vs HEAD, editor de atalhos, snippets e zen mode já estão no APK.
 - **Paridade com o PC (objetivo estratégico):** o APK pode passar de
   100 MB — o alvo é um editor completo para quem não tem PC. Portar
   do VS Code: formatter (Prettier/JS beautify), ESLint + Prettier on
@@ -970,9 +977,6 @@ with what already ships in the APK and what comes next.
 1. **Visual diff editor** (`@codemirror/merge`) — side-by-side/inline
    diffs before committing and tab-to-tab comparison.
 3. **Keybindings editor** — view/edit shortcuts in the UI (engine ready).
-4. **Full Emmet** + **VS Code-format snippets** (import `.vscode/snippets`).
-5. **Task runner / npm scripts UI** — run `package.json` scripts with an
-   output panel.
 6. **Multi-root workspaces** — more than one open folder.
 7. **Timeline with diff** — compare saved file versions.
 
@@ -984,7 +988,7 @@ the Electron/desktop build; in the app they show as disabled with a
 
 ## 🎯 Next — v1.8.44+
 
-- **VS Code port:** see the 🧩 section above — full Emmet and the task runner come first; sticky scroll, diff vs HEAD, keybindings editor, snippets and zen mode are already in the APK.
+- **VS Code port:** see the 🧩 section above — multi-root workspaces comes first; full Emmet, the task runner, sticky scroll, diff vs HEAD, keybindings editor, snippets and zen mode are already in the APK.
 - **PC parity (strategic goal):** the APK may exceed 100 MB — the
   target is a full editor for people without a PC. Port from VS Code:
   formatter (Prettier/JS beautify), ESLint + Prettier on save, full
