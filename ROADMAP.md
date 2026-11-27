@@ -705,10 +705,12 @@ referência.
 
 ## Lote K — Keyboard & Atalhos
 
-- [ ] **Paleta de comandos** 🖥️ inspirado no VS Code — Todas as ações do
-  app pesquisáveis num só lugar (com usage ranking).
-- [ ] **Keybindings reconfiguráveis** 🖥️ inspirado no VS Code — Remapear
-  atalhos com suporte a chords; export/import do perfil de teclas.
+- [x] **Paleta de comandos** 🖥️ inspirado no VS Code — Todas as ações do
+  app pesquisáveis num só lugar (com usage ranking). (v1.8.38+; i18n
+  `cmd:<comando>` nas 31 línguas)
+- [x] **Keybindings reconfiguráveis** 🖥️ inspirado no VS Code — Editor de
+  atalhos estilo VS Code: lista pesquisável, redefinir, deteção de
+  conflitos, chords (ex. `Ctrl-K Ctrl-C`), `openKeybindings` na paleta.
 - [ ] **Gestos multi-toque** ✨ — 3 dedos ←/→ para desfazer/refazer, 4
   dedos para trocar de aba (configurável).
 - [ ] **Modo vi/emacs básico** 🖥️ inspirado no Vim — Movimentos/modos
@@ -1586,8 +1588,9 @@ Rejected/reverted upstream: #2864, #2526, #2930/#2931 (reverted in
 
 ## Batch Z — Zen & Zoom
 
-- [ ] **Zen mode** 🖥️ inspired by VS Code — Hide everything
+- [x] **Zen mode** 🖥️ inspired by VS Code — Hide everything
   (sidebar/tabs/nav) with an easy exit — full focus on text.
+  (paleta de comandos + chip de saída, v1.8.44)
 - [ ] **Global zoom** ✨ — Scale editor + UI at once (pinch or Ctrl +/-
   with keyboard).
 - [ ] **Reading mode** ✨ — Fold all + fullscreen + reading typography for
