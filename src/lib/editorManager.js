@@ -25,7 +25,6 @@ import {
 	EmmetKnownSyntax,
 	emmetCompletionSource,
 	emmetConfig,
-	expandAbbreviation,
 	wrapWithAbbreviation,
 } from "@emmetio/codemirror6-plugin";
 import createBaseExtensions from "cm/baseExtensions";
@@ -1437,7 +1436,9 @@ async function EditorManager($header, $body) {
 		return [
 			Prec.high(trackerExtension),
 			wrapWithAbbreviation(),
-			keymap.of([{ key: "Mod-e", run: expandAbbreviation }]),
+			// expand/balance/etc. live in the command registry
+			// (commandRegistry.js) so they are palette-listed and
+			// user-rebindable — no duplicated hardcoded keymap here
 			emmetConfigExtension,
 		];
 	}

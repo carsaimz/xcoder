@@ -173,6 +173,8 @@ async function loadApps() {
 		["files", () => import("./files")],
 		["searchInFiles", () => import("./searchInFiles")],
 		["git", () => import("./git")],
+		// task runner: npm scripts of the open project (v1.8.47)
+		["tasks", () => import("./tasks")],
 		["ai", () => import("./ai")],
 		["extensions", () => import("./extensions")],
 		// webdev utilities (shadow/gradient/card/placeholder generators)

@@ -98,6 +98,28 @@ import {
 	findAllReferences as xcoderFindAllReferences,
 	findAllReferencesInTab as xcoderFindAllReferencesInTab,
 } from "cm/lsp/references";
+import {
+	balanceInward,
+	balanceOutward,
+	decrementNumber01,
+	decrementNumber1,
+	decrementNumber10,
+	emmetConfig,
+	enterAbbreviationMode,
+	evaluateMath,
+	expandAbbreviation,
+	goToNextEditPoint,
+	goToPreviousEditPoint,
+	goToTagPair,
+	incrementNumber01,
+	incrementNumber1,
+	incrementNumber10,
+	removeTag,
+	selectNextItem,
+	selectPreviousItem,
+	splitJoinTag,
+} from "@emmetio/codemirror6-plugin";
+import emmetExpandAbbreviation from "emmet";
 import { showDocumentSymbols } from "components/symbolsPanel";
 import toast from "components/toast";
 import prompt from "dialogs/prompt";
@@ -160,7 +182,101 @@ const CODEMIRROR_COMMAND_MAP = new Map(
 	CODEMIRROR_COMMAND_ENTRIES.map(([name, fn]) => [name, fn]),
 );
 
+const EMMET_COMMANDS = [
+	[
+		"emmet.expandAbbreviation",
+		"Expand Emmet abbreviation",
+		expandAbbreviation,
+		"Mod-e",
+	],
+	[
+		"emmet.wrapWithAbbreviation",
+		"Wrap selection with Emmet abbreviation",
+		null,
+		null,
+	],
+	[
+		"emmet.balanceInward",
+		"Emmet: balance inward",
+		balanceInward,
+		"Mod-Shift-.",
+	],
+	[
+		"emmet.balanceOutward",
+		"Emmet: balance outward",
+		balanceOutward,
+		"Mod-Shift-,",
+	],
+	["emmet.selectNextItem", "Emmet: select next item", selectNextItem, null],
+	[
+		"emmet.selectPreviousItem",
+		"Emmet: select previous item",
+		selectPreviousItem,
+		null,
+	],
+	[
+		"emmet.incrementNumber1",
+		"Emmet: increment number by 1",
+		incrementNumber1,
+		null,
+	],
+	[
+		"emmet.incrementNumber10",
+		"Emmet: increment number by 10",
+		incrementNumber10,
+		null,
+	],
+	[
+		"emmet.incrementNumber01",
+		"Emmet: increment number by 0.1",
+		incrementNumber01,
+		null,
+	],
+	[
+		"emmet.decrementNumber1",
+		"Emmet: decrement number by 1",
+		decrementNumber1,
+		null,
+	],
+	[
+		"emmet.decrementNumber10",
+		"Emmet: decrement number by 10",
+		decrementNumber10,
+		null,
+	],
+	[
+		"emmet.decrementNumber01",
+		"Emmet: decrement number by 0.1",
+		decrementNumber01,
+		null,
+	],
+	["emmet.evaluateMath", "Emmet: evaluate math expression", evaluateMath, null],
+	[
+		"emmet.goToNextEditPoint",
+		"Emmet: go to next edit point",
+		goToNextEditPoint,
+		null,
+	],
+	[
+		"emmet.goToPreviousEditPoint",
+		"Emmet: go to previous edit point",
+		goToPreviousEditPoint,
+		null,
+	],
+	["emmet.goToTagPair", "Emmet: go to matching tag", goToTagPair, null],
+	["emmet.removeTag", "Emmet: remove tag", removeTag, null],
+	["emmet.splitJoinTag", "Emmet: split/join tag", splitJoinTag, null],
+	[
+		"emmet.enterAbbreviationMode",
+		"Emmet: enter abbreviation mode",
+		enterAbbreviationMode,
+		null,
+	],
+];
+
 registerCoreCommands();
+registerEmmetCommands();
+registerTaskRunnerCommands();
 registerLspCommands();
 registerLintCommands();
 registerCommandsFromKeyBindings();
@@ -1062,6 +1178,134 @@ function registerCoreCommands() {
 			const resolvedView = resolveView(view);
 			if (!resolvedView) return false;
 			return unfoldAllCodeBlocks(resolvedView);
+		},
+	});
+}
+
+/**
+ * Emmet commands (full VS Code port). Descriptions are translatable
+ * through the "cmd:<name>" lang keys. Every command no-ops (returns
+ * false) when Emmet is disabled in settings or outside an editor view.
+ */
+
+function registerEmmetCommands() {
+	for (const [name, description, command, key] of EMMET_COMMANDS) {
+		addCommand({
+			name,
+			description,
+			key: key ?? null,
+			readOnly: false,
+			requiresView: true,
+			run(view) {
+				if (appSettings.value?.useEmmet === false) return false;
+				const resolvedView = resolveView(view);
+				if (!resolvedView) return false;
+				if (!command) return runEmmetSpecialCommand(name, resolvedView);
+				return command(resolvedView) !== false;
+			},
+		});
+	}
+}
+
+function runEmmetSpecialCommand(name, view) {
+	if (name === "emmet.wrapWithAbbreviation") {
+		return wrapWithEmmetCommand(view);
+	}
+	return false;
+}
+
+/** Base indent ("\\s*") of the line at pos. */
+function lineBaseIndent(state, pos) {
+	const line = state.doc.lineAt(pos);
+	const match = /^\s*/.exec(line.text);
+	return match ? match[0] : "";
+}
+
+/**
+ * Wrap-with-abbreviation command: prompts for an abbreviation and wraps
+ * the selection (or the current line) with the expanded output. Complements
+ * the tracker's own interactive wrap keybinding so the feature is reachable
+ * from the palette and the keybindings editor.
+ */
+async function wrapWithEmmetCommand(view) {
+	const resolvedView = resolveView(view);
+	if (!resolvedView) return false;
+	const state = resolvedView.state;
+	const syntax = state.facet(emmetConfig)?.syntax || "html";
+	const selection = state.selection.main;
+	let from = selection.from;
+	let to = selection.to;
+	if (selection.empty) {
+		const line = state.doc.lineAt(from);
+		from = line.from;
+		to = line.to;
+	}
+	const baseIndent = lineBaseIndent(state, from);
+	const text = state.sliceDoc(from, to);
+	const lines = text
+		.split("\n")
+		.map((line) =>
+			baseIndent && line.startsWith(baseIndent)
+				? line.slice(baseIndent.length)
+				: line,
+		);
+
+	const abbr = await prompt(
+		window.strings?.["wrap with abbreviation"] || "Wrap with abbreviation",
+		"div",
+		"text",
+		{ capitalize: false },
+	);
+	if (!abbr) return false;
+
+	/** @type {string} */
+	let output;
+	try {
+		output = emmetExpandAbbreviation(abbr, {
+			syntax,
+			text: lines,
+			options: {
+				"output.indent": baseIndent,
+				"output.newline": "\n",
+			},
+		});
+	} catch (error) {
+		toast(`Emmet: ${error?.message || error}`);
+		return false;
+	}
+
+	resolvedView.dispatch({
+		changes: { from, to, insert: output },
+		selection: { anchor: from + output.length },
+		scrollIntoView: true,
+	});
+	return true;
+}
+
+/** Task runner (npm scripts) commands, backed by the Tasks sidebar app. */
+function registerTaskRunnerCommands() {
+	addCommand({
+		name: "runNpmTask",
+		description: "Run an npm script from package.json",
+		readOnly: true,
+		requiresView: false,
+		run() {
+			import("sidebarApps/tasks")
+				.then((mod) => mod.runNpmTaskDialog())
+				.catch((error) => console.error(error));
+			return true;
+		},
+	});
+	addCommand({
+		name: "stopRunningTask",
+		description: "Stop the running npm task",
+		readOnly: true,
+		requiresView: false,
+		run() {
+			import("sidebarApps/tasks")
+				.then((mod) => mod.stopActiveNpmTask())
+				.catch((error) => console.error(error));
+			return true;
 		},
 	});
 }

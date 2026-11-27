@@ -442,6 +442,14 @@
 			"required": "^3.4.14"
 		},
 		{
+			"name": "emmet",
+			"version": "2.4.11",
+			"license": "MIT",
+			"author": "Sergey Chikuyonok",
+			"homepage": "https://www.npmjs.com/package/emmet",
+			"required": "^2.4.11"
+		},
+		{
 			"name": "escape-string-regexp",
 			"version": "5.0.0",
 			"license": "MIT",
