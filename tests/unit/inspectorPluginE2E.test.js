@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Window } from "happy-dom";
 
@@ -16,10 +16,13 @@ import { Window } from "happy-dom";
  * the inspected page are different documents.
  */
 
-const PLUGIN_SRC = readFileSync(
-        resolve(process.cwd(), "../xcoder-plugins/plugins/inspector/main.js"),
-        "utf8",
-);
+// Prefer the live sibling checkout of carsaimz/xcoder-plugins (fresh source
+// during local development); CI only has this repo, so it falls back to the
+// committed fixture snapshot.
+const SIBLING_PLUGIN = resolve(process.cwd(), "../xcoder-plugins/plugins/inspector/main.js");
+const FIXTURE_PLUGIN = resolve(process.cwd(), "tests/fixtures/inspector-plugin-main.js");
+const PLUGIN_SRC = (existsSync(SIBLING_PLUGIN) ? SIBLING_PLUGIN : FIXTURE_PLUGIN);
+const PLUGIN_CODE = readFileSync(PLUGIN_SRC, "utf8");
 
 // ── the native JS bridge the Android side injects into every page ──
 const BRIDGE_JS = `(function(){
@@ -263,7 +266,7 @@ describe("Inspector plugin end-to-end", () => {
                                 document.body.appendChild(el);
                         },
                 };
-                new Function(PLUGIN_SRC)();
+                new Function(PLUGIN_CODE)();
                 window.__pluginInit("xcoder.inspector");
                 // open the plugin page like the user does (sidebar/command)
                 const openCmd = commands.get("inspector:open");
