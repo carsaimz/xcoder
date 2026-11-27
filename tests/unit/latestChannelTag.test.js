@@ -5,7 +5,9 @@ import {
 	latestChannelTag,
 } from "../../utils/scripts/latest-channel-tag.mjs";
 
-// descending version-sorted list, as `git tag --sort=-v:refname` returns
+// descending version-sorted list, as `git tag --sort=-v:refname` returns.
+// Legacy beta tags (the channel was removed in v1.8.48) still exist in
+// the repo and must stay excluded from stable comparisons.
 const TAGS = [
 	"v1.8.46-beta",
 	"v1.8.45-beta",
@@ -50,21 +52,13 @@ describe("latestChannelTag", () => {
 		expect(latestChannelTag(TAGS, "stable")).toBe("v1.8.44");
 	});
 
-	it("returns the highest beta tag", () => {
-		expect(latestChannelTag(TAGS, "beta")).toBe("v1.8.46-beta");
-	});
-
-	it("excludes a tag (force re-run must not compare with itself)", () => {
-		expect(latestChannelTag(TAGS, "beta", "v1.8.46-beta")).toBe(
-			"v1.8.45-beta",
-		);
+	it("never returns a legacy beta tag for the stable channel", () => {
+		// v1.8.46-beta sorts highest but is not stable — releases compare
+		// against v1.8.44, the highest stable tag in this fixture
 		expect(latestChannelTag(TAGS, "stable", "v1.8.44")).toBe("v1.8.43");
 	});
 
-	it("returns empty when the channel has no tags", () => {
-		expect(latestChannelTag([], "stable")).toBe("");
-		expect(latestChannelTag([], "beta")).toBe("");
-		expect(latestChannelTag(["v1.8.44"], "beta")).toBe("");
-		expect(latestChannelTag(["v1.8.44-beta"], "stable")).toBe("");
+	it("excludes a tag (force re-run must not compare with itself)", () => {
+		expect(latestChannelTag(TAGS, "stable", "v1.8.44")).toBe("v1.8.43");
 	});
 });

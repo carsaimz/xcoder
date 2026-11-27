@@ -56,9 +56,6 @@ export default async function Changelog() {
         <li action="latest">
           <span class="text">${strings["changelog latest release"] || "Latest Release"}</span>
         </li>
-        <li action="beta">
-          <span class="text">${strings["changelog beta version"] || "Beta Version"}</span>
-        </li>
         <li action="full">
           <span class="text">${strings["changelog full"] || "Full Changelog"}</span>
         </li>
@@ -95,29 +92,6 @@ export default async function Changelog() {
 			return renderChangelog(releases.body || localChangelogMd);
 		} catch (error) {
 			window.log("error", "Failed to load latest release notes:", error);
-			updateVersionSelector();
-			return renderChangelog(localChangelogMd);
-		}
-	}
-
-	async function loadBetaRelease() {
-		try {
-			const releases = await fsOperation(GITHUB_API_URL).readFile("json");
-			const betaRelease = releases.find((r) => r.prerelease);
-			if (!betaRelease) {
-				body.content = (
-					<div className="error">
-						{strings["changelog no beta"] || "No beta release found"}
-					</div>
-				);
-				return;
-			}
-			selectedVersion = betaRelease.tag_name.replace("v", "");
-			selectedStatus = "prerelease";
-			updateVersionSelector();
-			return renderChangelog(betaRelease.body || localChangelogMd);
-		} catch (error) {
-			window.log("error", "Failed to load beta release notes:", error);
 			updateVersionSelector();
 			return renderChangelog(localChangelogMd);
 		}
@@ -260,9 +234,6 @@ export default async function Changelog() {
 				break;
 			case "latest":
 				await loadLatestRelease();
-				break;
-			case "beta":
-				await loadBetaRelease();
 				break;
 			case "full":
 				await loadFullChangelog();

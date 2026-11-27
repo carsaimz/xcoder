@@ -12,15 +12,10 @@ name: Release (signed APK + AAB)
 # A version is NEVER released twice: re-dispatching an existing tag
 # fails unless «force» is ticked (re-points the tag to the current HEAD
 # and rebuilds). Leaving the version empty auto-increments from the
-# latest tag (1.8.45 -> 1.8.46). Beta versions are rejected here — the
-# stable channel is this workflow, pre-releases run prerelease.yml.
-#
-# CHANNELS ARE INDEPENDENT: the checks below only ever compare against
-# STABLE tags (utils/scripts/latest-channel-tag.mjs). Beta tags like
-# v1.8.46-beta never block a stable release of 1.8.45 — the two series
-# have separate version lines and separate apps (side-by-side package).
-# The changelog / release notes also range from the previous STABLE tag,
-# so beta-only commits never leak into stable notes.
+# latest STABLE tag (1.8.45 -> 1.8.46). The beta channel was REMOVED in
+# v1.8.48 (user request): versions with a -beta/-rc suffix are rejected
+# here and legacy beta tags never gate a stable release (the tag script
+# filters them out).
 #
 # Required secrets:
 #   KEYSTORE_BASE64    - base64 of the release keystore (.jks)
@@ -78,25 +73,22 @@ jobs:
           FORCE: ${{ inputs.force }}
         run: |
           set -e
-          # latest STABLE tag only — beta tags (vX.Y.Z-beta.N) live in their
-          # own channel and never gate a stable release
+          # latest STABLE tag — legacy beta tags (vX.Y.Z-beta.N) are
+          # filtered out and never gate a stable release
           LATEST=$(node utils/scripts/latest-channel-tag.mjs || true)
           if [ -z "$INPUT_VERSION" ]; then
-            # empty input = auto-increment from the latest tag (1.8.44 ->
-            # 1.8.45; a pending beta base is promoted first)
+            # empty input = auto-increment from the latest stable tag
+            # (1.8.45 -> 1.8.46)
             OUT=$(node utils/scripts/bump-version.mjs --next-stable ${LATEST:+--latest "$LATEST"})
             VERSION=$(printf '%s' "$OUT" | sed -n 's/^version=//p')
           else
             VERSION=$(printf '%s' "$INPUT_VERSION" | tr -d '[:space:]' | sed 's/^v//')
           fi
-          # pre-releases NEVER go through the stable pipeline — they would
-          # ship stable-looking APK names (XCoder-vX.Y.Z-beta.apk) over the
-          # beta package and flip the release's prerelease flag off. The
-          # beta channel is prerelease.yml (XCoder-Beta-*.apk, side-by-side
-          # package id com.carsaimz.xcoder.beta).
+          # the beta channel no longer exists — a pre-release suffix is
+          # always a mistake in this workflow
           case "$VERSION" in
             *-beta*|*-rc*)
-              echo "::error::'$VERSION' is a pre-release — dispatch .github/workflows/prerelease.yml instead"
+              echo "::error::'$VERSION' carries a pre-release suffix — the beta channel was removed; release a stable version (e.g. 1.8.46)"
               exit 1
               ;;
           esac
@@ -114,7 +106,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # keep CHANGELOG.md in sync (section for this version, from
-          # commits since the previous STABLE tag — beta commits stay out)
+          # commits since the previous stable tag)
           if [ -n "$LATEST" ] && [ "$LATEST" != "v${VERSION}" ]; then
             node utils/scripts/update-changelog.mjs "$VERSION" --from "$LATEST" || true
           else
@@ -198,8 +190,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.version.outputs.tag }}
         run: |
-          # previous STABLE tag — beta tags must not appear as the range
-          # start, otherwise beta-only commits leak into stable notes
+          # previous STABLE tag — the range starts there so the notes
+          # cover exactly this release's commits
           PREV=$(node utils/scripts/latest-channel-tag.mjs --exclude "$TAG" || true)
           BODY=""
           if [ -n "$PREV" ]; then

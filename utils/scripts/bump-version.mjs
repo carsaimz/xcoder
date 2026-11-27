@@ -7,7 +7,8 @@
  *
  * versionCode scheme: major * 10000 + minor * 100 + patch
  *   1.3.0 -> 10300, 1.10.0 -> 11000 (monotonic, always above the legacy 103)
- * Pre-release suffixes (1.4.0-beta.1) keep the base version code.
+ * Pre-release suffixes (1.4.0-rc.1) keep the base version code. The beta
+ * channel was REMOVED in v1.8.48 (user request) — releases are stable-only.
  *
  * Usage:
  *   node utils/scripts/bump-version.mjs <version> [options]
@@ -108,39 +109,6 @@ export function computeVersionCode(version) {
         const parsed = parseSemver(version);
         if (!parsed) throw new Error(`Invalid version: ${version}`);
         return parsed.major * 10000 + parsed.minor * 100 + parsed.patch;
-}
-
-/**
- * Smallest strictly-increasing beta successor of `version`:
- *   1.8.45-beta.3 -> 1.8.45-beta.4
- *   1.8.45-beta   -> 1.8.45-beta.2
- *   1.8.45-beta2  -> 1.8.45-beta3   (no-dot style stays no-dot: semver
- *                                    sorts numeric identifiers BEFORE
- *                                    alphanumeric ones, so beta.3 would
- *                                    compare LOWER than beta2)
- *   1.8.45        -> 1.8.46-beta
- * @param {string} version current version (may carry -beta, -beta.N, -betaN)
- * @returns {string}
- */
-export function nextBetaVersion(version) {
-        const parsed = parseSemver(version);
-        if (!parsed) throw new Error(`Invalid version: ${version}`);
-        if (parsed.prerelease) {
-                const match = parsed.prerelease.match(/^beta(\.(\d+))?$/);
-                if (match) {
-                        const n = match[2] ? Number(match[2]) : 1;
-                        const dot = match[1] || !match[2] ? "." : "";
-                        return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta${dot}${n + 1}`;
-                }
-                const noDot = parsed.prerelease.match(/^beta(\d+)$/);
-                if (noDot) {
-                        return `${parsed.major}.${parsed.minor}.${parsed.patch}-beta${Number(noDot[1]) + 1}`;
-                }
-                throw new Error(
-                        `Unsupported pre-release suffix "-${parsed.prerelease}" (expected -beta, -beta.N or -betaN)`,
-                );
-        }
-        return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-beta`;
 }
 
 /**
@@ -254,45 +222,25 @@ function main() {
                 return;
         }
 
-        // Auto-increment modes: print the next version without writing files.
+        // Auto-increment mode: print the next version without writing files.
         // The caller feeds the output back into the normal bump command.
-        const nextBeta = args.includes("--next-beta");
         const nextStable = args.includes("--next-stable");
-        if (nextBeta || nextStable) {
+        if (nextStable) {
                 const latestIndex = args.indexOf("--latest");
                 const latest = latestIndex !== -1 ? normalizeVersion(args[latestIndex + 1]) : null;
-                if (latest !== null && !latest) fail("--latest requires a version (e.g. v1.8.45-beta)");
+                if (latest !== null && !latest) fail("--latest requires a version (e.g. v1.8.45)");
                 if (latest && !parseSemver(latest)) fail(`Invalid --latest version: "${latest}"`);
                 const current = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8")).version;
-                let candidate = nextBeta ? nextBetaVersion(current) : nextStableVersion(current);
+                let candidate = nextStableVersion(current);
                 while (latest && compareSemver(candidate, latest) <= 0) {
                         const base = parseSemver(candidate);
-                        candidate = nextBeta
-                                ? `${base.major}.${base.minor}.${base.patch + 1}-beta`
-                                : `${base.major}.${base.minor}.${base.patch + 1}`;
+                        candidate = `${base.major}.${base.minor}.${base.patch + 1}`;
                 }
                 console.log(`version=${candidate}`);
                 return;
         }
 
-        // Prints the next beta of an EXPLICIT version (1.8.46-beta ->
-        // 1.8.46-beta.2). The pre-release workflow uses it to auto-bump a
-        // requested version whose tag already exists instead of failing.
-        const nextFromIndex = args.indexOf("--next-beta-from");
-        if (nextFromIndex !== -1) {
-                const from = normalizeVersion(args[nextFromIndex + 1] ?? "");
-                if (!parseSemver(from)) {
-                        fail(`--next-beta-from requires a version (e.g. 1.8.46-beta), got "${args[nextFromIndex + 1] ?? ""}"`);
-                }
-                try {
-                        console.log(`version=${nextBetaVersion(from)}`);
-                } catch (error) {
-                        fail(String(error?.message || error));
-                }
-                return;
-        }
-
-        const version = args.find((arg, index) => arg && !arg.startsWith("--") && args[index - 1] !== "--greater-than" && args[index - 1] !== "--suffix" && args[index - 1] !== "--next-beta-from");
+        const version = args.find((arg, index) => arg && !arg.startsWith("--") && args[index - 1] !== "--greater-than" && args[index - 1] !== "--suffix");
         const greaterIndex = args.indexOf("--greater-than");
         const greaterThan = greaterIndex !== -1 ? args[greaterIndex + 1] : null;
         const checkOnly = args.includes("--check-only");
@@ -301,8 +249,7 @@ function main() {
                 fail(
                         "Usage: node utils/scripts/bump-version.mjs <version> [--greater-than <version>] [--check-only]\n" +
                                 "       node utils/scripts/bump-version.mjs --suffix debug\n" +
-                                "       node utils/scripts/bump-version.mjs --next-beta|--next-stable [--latest <tag>]\n" +
-                                "       node utils/scripts/bump-version.mjs --next-beta-from <version>",
+                                "       node utils/scripts/bump-version.mjs --next-stable [--latest <tag>]",
                 );
         }
         const normalized = normalizeVersion(version);

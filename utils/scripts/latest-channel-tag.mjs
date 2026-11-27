@@ -1,19 +1,17 @@
 #!/usr/bin/env node
 /**
- * Latest tag per release channel.
+ * Latest STABLE tag (highest vX.Y.Z without a -beta/-rc suffix).
  *
- * Channels are INDEPENDENT (user request, v1.8.46): a stable release
- * must never be blocked by a higher beta tag and vice versa, so each
- * workflow compares only against tags of its own channel.
- *
- *   stable channel : v1.8.44, v1.8.45, ...      (no -beta/-rc suffix)
- *   beta channel   : v1.8.45-beta, v1.8.46-beta.2, ...
+ * The beta channel was removed in v1.8.48 (user request) — releases are
+ * stable-only. Legacy beta tags (v1.8.46-beta, v1.8.46-beta2, ...) still
+ * exist in the repository and MUST be excluded from stable comparisons,
+ * otherwise semver would rank them against stable tags.
  *
  * Usage:
- *   node utils/scripts/latest-channel-tag.mjs [--beta] [--exclude <tag>]
+ *   node utils/scripts/latest-channel-tag.mjs [--exclude <tag>]
  *
- * Prints the highest tag of the channel (e.g. "v1.8.44"); empty output
- * when the channel has no tags yet (or only the excluded one).
+ * Prints the highest stable tag (e.g. "v1.8.45"); empty output when
+ * there are no stable tags yet (or only the excluded one).
  */
 
 import { execFileSync } from "node:child_process";
@@ -59,7 +57,7 @@ export function latestChannelTag(tags, channel, exclude) {
 /** CLI entry point. */
 function main() {
         const args = process.argv.slice(2);
-        const channel = args.includes("--beta") ? "beta" : "stable";
+        const channel = "stable";
         const excludeIndex = args.indexOf("--exclude");
         const exclude = excludeIndex !== -1 ? args[excludeIndex + 1] : undefined;
 
