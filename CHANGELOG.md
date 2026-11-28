@@ -9,12 +9,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [1.8.49] - 2026-11-28
 
-### Fixed
-- **«Error: S.A.log is not a function» — a app voltou a arrancar**: `lib/logger` exportava a CLASSE em vez da instância; cada `logger.log(...)` em catch (sidebar apps, páginas Perfil/Apoio) lançava um TypeError próprio que matava o arranque. Agora é um singleton partilhado
-- **Plugin Inspector 1.3.0 — Elementos e Consola nunca mais vazios**: três falhas reais encontradas e corrigidas — (1) SyntaxError no script de captura (`seenMatch[hitInfo.path]` corrompido) que matava TODA a captura na página; (2) os eventos nativos chegavam com o NOME do evento em vez do payload (`callback(event, data)` vs listener de um argumento) — linha «▸» vazia e Elementos sem refrescar; (3) sintaxe válida passa a ser verificada por teste
-- **Inspector à prova de falhas**: captura dupla — os registos ficam em buffer dentro da página E são drenados pela app pelo canal `evaluate` (independente da ponte de mensagens); comandos DOM (árvore/procura) usam `evaluate` como canal primário; `pageFinished` é sintetizado pelo polling quando o evento nativo se perde; Consola mostra linha de sistema logo ao abrir a sessão e erros de sessão aparecem DENTRO da Consola; dedupe por sequência evita duplicados entre canais
-- **Nome da app**: «XCoder Beta» → «XCoder» (config.xml) e hook `beta-package-rewrite` removido — canal beta extinto por completo
-
 ## [1.8.48] - 2026-11-27
 
 ### Maintenance
