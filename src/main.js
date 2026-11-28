@@ -58,7 +58,7 @@ import fonts from "lib/fonts";
 import { registerGhIntentHandler } from "lib/ghWebFlow";
 import lang from "lib/lang";
 import loadPlugins from "lib/loadPlugins";
-import Logger from "lib/logger";
+import logger from "lib/logger";
 import notificationManager from "lib/notificationManager";
 import { registerOAuthIntentHandler } from "lib/oauthIntent";
 import openFolder, { addedFolder } from "lib/openFolder";
@@ -81,7 +81,6 @@ import $_menu from "views/menu.hbs";
 
 const oldPreventDefault = TouchEvent.prototype.preventDefault;
 const previousVersionCode = Number.parseInt(localStorage.versionCode, 10);
-const logger = new Logger();
 
 ajax.response = (xhr) => {
 	return xhr.response;

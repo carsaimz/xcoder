@@ -16,7 +16,23 @@
 > contínua com o upstream [Acode](https://github.com/Acode-Foundation/Acode)
 > (CHANGELOG lido por completo até a v1.13.5).
 
-## ✅ Resumo v1.8.24 → v1.8.48
+## ✅ Resumo v1.8.24 → v1.8.49
+
+- **v1.8.49 — crash de arranque morto + Inspector 1.3.0 de vez + nome sem beta:**
+  **«S.A.log is not a function» resolvido na raiz** (lib/logger exportava a
+  CLASSE; 7 catch blocks recebiam o construtor e o próprio log lançava
+  TypeError — singleton partilhado agora); **Inspector 1.3.0**: (1)
+  SyntaxError no script de captura (`seenMatch[hitInfo.path]` corrompido —
+  toda a captura morria na página; teste de sintaxe garante que nunca mais
+  passa), (2) eventos nativos chegavam com o NOME do evento em vez do
+  payload (`callback(event, data)` vs listener de um argumento — linha
+  «▸» vazia e Elementos sem refrescar), (3) **captura à prova de falhas**:
+  buffer dentro da página drenado pelo canal evaluate (independente da
+  ponte), comandos DOM com evaluate primário, `pageFinished` sintetizado
+  pelo polling quando o evento nativo se perde, Consola com linha de
+  sistema ao abrir a sessão e erros visíveis dentro da Consola, dedupe
+  por sequência; **nome da app «XCoder»** (hook beta-package-rewrite
+  apagado).
 
 - **v1.8.48 — beta removido + ferramentas internas saem de vez +
   sticky scroll + Inspector 1.2.0:** **canal beta ELIMINADO**

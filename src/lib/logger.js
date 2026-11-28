@@ -128,4 +128,14 @@ class Logger {
 	};
 }
 
-export default Logger;
+/**
+ * Shared singleton. Every `import logger from "lib/logger"` call site
+ * (`logger.log(...)`) gets THIS instance — exporting the class itself was
+ * the root cause of «…A.log is not a function»: callers received the
+ * constructor and every error-path log threw a TypeError of its own,
+ * killing the sidebar-app catch handlers at boot (v1.8.49 regression).
+ */
+const logger = new Logger();
+
+export default logger;
+export { Logger };

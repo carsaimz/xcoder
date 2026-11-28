@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.carsaimz.xcoder" android-versionCode="10848" version="1.8.48"
+<widget id="com.carsaimz.xcoder" android-versionCode="10849" version="1.8.49"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>XCoder Beta</name>
+    <name>XCoder</name>
     <description>
         Fast, offline-first code editor and web IDE for Android.
     </description>
@@ -118,8 +118,7 @@
         <hook type="before_prepare" src="hooks/restore-cordova-resources.js" />
         <hook type="before_prepare" src="hooks/modify-java-files.js" />
         <hook type="after_prepare" src="hooks/post-process.js" />
-        <hook type="after_prepare" src="hooks/beta-package-rewrite.js" />
-        <hook type="after_prepare" src="hooks/immersive-fullscreen.js" />
+                <hook type="after_prepare" src="hooks/immersive-fullscreen.js" />
     </platform>
     <preference name="AndroidBlacklistSecureSocketProtocols" value="SSLv3,TLSv1" />
 </widget>

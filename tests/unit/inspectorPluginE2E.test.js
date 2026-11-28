@@ -388,4 +388,78 @@ describe("Inspector plugin end-to-end", () => {
                 const out = window.__pageEl.querySelector(".xin-search-out");
                 expect(out.textContent).toMatch(/match/i);
         });
+
+        /** boot() + openSite() under fake timers — advances awaited timers. */
+        async function bootAdvanced(url) {
+                const bootPromise = boot();
+                await vi.advanceTimersByTimeAsync(120);
+                const ctx = await bootPromise;
+                const openPromise = openSite(url || "https://exemplo.com");
+                await vi.advanceTimersByTimeAsync(120);
+                await openPromise;
+                return ctx;
+        }
+
+        it("drains capture entries through the evaluate channel when the push bridge is dead", async () => {
+                vi.useFakeTimers();
+                try {
+                        const { engine } = await bootAdvanced();
+                        const inst = native.instances.values().next().value;
+                        // device failure mode: the postMessage bridge is dead,
+                        // so NOTHING arrives through the push path
+                        inst.win.webview.postMessage = () => {
+                                throw new Error("bridge dead");
+                        };
+                        // the page logs AFTER the bridge died — buffered only
+                        inst.win.eval(`console.log("page says hi");`);
+                        inst.win.eval(
+                                `window.__xcoderLog.push({__inspector:1,seq:99,cmd:"network",data:{method:"GET",url:"https://x/y",status:200}});`,
+                        );
+                        // let the evaluate-channel drain do its work
+                        await vi.advanceTimersByTimeAsync(1400);
+
+                        // the user checks the Consola tab, then Rede
+                        tabs()[1].click();
+                        await vi.advanceTimersByTimeAsync(10);
+                        const consoleOut = window.__pageEl.querySelector(".xin-console-out");
+                        expect(consoleOut.textContent).toContain("page says hi");
+                        tabs()[2].click();
+                        await vi.advanceTimersByTimeAsync(10);
+                        const networkOut = window.__pageEl.querySelector(".xin-net-out");
+                        expect(networkOut.textContent).toContain("https://x/y");
+                        expect(engine.activeInspectorSession()).toBeTruthy();
+                } finally {
+                        vi.useRealTimers();
+                }
+        });
+
+        it("synthesizes pageFinished (and re-renders the tree) when the native event is lost", async () => {
+                vi.useFakeTimers();
+                try {
+                        await bootAdvanced();
+                        const inst = native.instances.values().next().value;
+                        // drop the native pageFinished listeners — the poll
+                        // must synthesize the event from the evaluate channel
+                        inst._eventCallbacks = inst._eventCallbacks.filter(
+                                (e) => e.event !== "pageFinished",
+                        );
+                        inst.loadURL("https://segunda.example");
+                        await vi.advanceTimersByTimeAsync(1400);
+
+                        const tree = window.__pageEl.querySelector(".xin-tree");
+                        const rows = [...tree.querySelectorAll(".xin-node")].map(
+                                (n) => n.textContent,
+                        );
+                        expect(rows.length).toBeGreaterThan(0);
+                        // the plugin logged the synthesized navigation too:
+                        // boot's native pageFinished + the synthesized one
+                        tabs()[1].click();
+                        await vi.advanceTimersByTimeAsync(10);
+                        const consoleOut = window.__pageEl.querySelector(".xin-console-out");
+                        const systemLines = consoleOut.textContent.split("▸").length - 1;
+                        expect(systemLines).toBeGreaterThanOrEqual(2);
+                } finally {
+                        vi.useRealTimers();
+                }
+        });
 });

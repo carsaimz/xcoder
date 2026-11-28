@@ -42,10 +42,25 @@ export const CAPTURE_SCRIPT = String.raw`
   var seq = 1;
   var highlighted = null;
   var highlightedPrev = null;
+  // Buffered mirror of every CAPTURE entry (console/network/picked). The
+  // app-side session POLLS this array through the independent evaluate()
+  // channel, so entries still reach DevTools even when the postMessage
+  // bridge is dead (rebuilt window.webview, mid-navigation dispatch…).
+  // Initialised BEFORE the one-shot guard so a re-injection never wipes
+  // entries buffered by the previous document context.
+  if (!window.__xcoderLog) { window.__xcoderLog = []; }
   function send(msg){
     try {
       msg.__inspector = 1;
       msg.seq = seq++;
+      if (!msg.id && (msg.cmd === "console" || msg.cmd === "network" || msg.cmd === "picked")) {
+        try {
+          window.__xcoderLog.push(msg);
+          if (window.__xcoderLog.length > 2000) {
+            window.__xcoderLog.splice(0, window.__xcoderLog.length - 2000);
+          }
+        } catch (e2) { /* buffer unavailable */ }
+      }
       if (window.webview && webview.postMessage) { webview.postMessage(JSON.stringify(msg)); }
     } catch (e) { /* bridge unavailable */ }
   }
@@ -402,6 +417,8 @@ export const CAPTURE_SCRIPT = String.raw`
 })();`;
 
 const SESSION_TTL = 30 * 60 * 1000;
+/** Poll cadence for the evaluate-channel capture drain (see POLL_SNIPPET). */
+const POLL_INTERVAL_MS = 1200;
 
 /** @type {import("lib/webview").default|null} active inspector webview */
 let session = null;
@@ -411,6 +428,52 @@ let appHandler = null;
 const pendingCommands = new Map();
 /** @type {ReturnType<typeof setTimeout>|null} */
 let ttlTimer = null;
+/** @type {ReturnType<typeof setInterval>|null} evaluate-channel capture drain */
+let pollTimer = null;
+/** href whose pageFinished was already delivered (native event OR poll) */
+let completedHref = "";
+/** last title delivered to avoid duplicate titleChanged events */
+let deliveredTitle = "";
+/** capture seq values already delivered through the push bridge */
+let deliveredSeq = new Set();
+
+/**
+ * Runs INSIDE the inspected page on every poll tick: drains the buffered
+ * capture entries (console/network/picked) and reports navigation state.
+ * The evaluate channel is independent of the postMessage bridge, so this
+ * keeps Consola/Rede alive even when the bridge silently dies on device.
+ */
+const POLL_SNIPPET = `(function(){
+var out={href:"",title:"",ready:"",entries:null};
+try{out.href=location.href;}catch(e){}
+try{out.title=document.title;}catch(e){}
+try{out.ready=document.readyState;}catch(e){}
+try{if(window.__xcoderLog&&window.__xcoderLog.length){out.entries=window.__xcoderLog.splice(0,window.__xcoderLog.length);}}catch(e){}
+return JSON.stringify(out);})()`;
+
+/** Stops the evaluate-channel capture drain. */
+function stopSessionPolling() {
+	if (pollTimer) {
+		clearInterval(pollTimer);
+		pollTimer = null;
+	}
+}
+
+/**
+ * Marks a capture entry as delivered (push bridge) so the poll drain
+ * never duplicates it.
+ * @param {any} parsed
+ * @returns {boolean} true when the entry was already delivered
+ */
+function alreadyDelivered(parsed) {
+	if (parsed?.seq == null) return false;
+	if (deliveredSeq.has(parsed.seq)) return true;
+	deliveredSeq.add(parsed.seq);
+	if (deliveredSeq.size > 4000) {
+		deliveredSeq = new Set([...deliveredSeq].slice(-2000));
+	}
+	return false;
+}
 
 /** Routes one webview instance message (capture replies). */
 function routeInstanceMessage(parsed) {
@@ -422,20 +485,96 @@ function routeInstanceMessage(parsed) {
 		if (parsed.error) pending.reject(new Error(parsed.error));
 		else pending.resolve(parsed.data);
 	}
+	if (parsed.id) {
+		// command reply — always forwarded (a poll-drained reply still
+		// resolves the pending promise below, but the app handler needs it
+		// only for capture entries)
+		appHandler?.("inspectorMessage", parsed);
+		return;
+	}
+	if (alreadyDelivered(parsed)) return;
 	appHandler?.("inspectorMessage", parsed);
 }
 
 /** Attaches page event + message listeners to a session instance. */
 function attachSession(instance) {
-	instance.on("pageFinished", (data) => appHandler?.("pageFinished", data));
-	instance.on("titleChanged", (data) => appHandler?.("titleChanged", data));
+	// lib/webview.js dispatches event listeners as callback(event, data) —
+	// the payload is the SECOND argument. The one-arg arrow here used to
+	// receive the EVENT NAME string as «data», so the plugin saw
+	// pageFinished with no url/title (empty «▸» console line, dead
+	// Elements refresh) — fetchRenderedHtml already used the right shape.
+	instance.on("pageFinished", (_event, data) => {
+		// the native event is authoritative — remember it so the poll
+		// never re-synthesizes the same navigation (dedupe by href)
+		if (data?.url) completedHref = String(data.url);
+		if (data?.title) deliveredTitle = String(data.title);
+		appHandler?.("pageFinished", data);
+	});
+	instance.on("titleChanged", (_event, data) => {
+		if (data?.title) deliveredTitle = String(data.title);
+		appHandler?.("titleChanged", data);
+	});
 	instance.on("closed", () => {
 		if (session === instance) {
 			session = null;
+			stopSessionPolling();
 			appHandler?.("pageClosed", {});
 		}
 	});
 	instance.onMessage(routeInstanceMessage);
+}
+
+/**
+ * Drains the page-side capture buffer through the independent evaluate
+ * channel and synthesizes pageFinished/titleChanged when the native
+ * events are lost (they share the same Cordova callback as everything
+ * else — a lost callback must not leave the Elements/Consola tabs dead).
+ * @param {import("lib/webview").default} instance
+ */
+function startSessionPolling(instance) {
+	stopSessionPolling();
+	completedHref = "";
+	deliveredTitle = "";
+	deliveredSeq = new Set();
+	pollTimer = setInterval(() => {
+		if (session !== instance) {
+			stopSessionPolling();
+			return;
+		}
+		instance
+			.evaluate(POLL_SNIPPET)
+			.then((raw) => {
+				let parsed;
+				try {
+					parsed = JSON.parse(typeof raw === "string" ? raw : "{}");
+				} catch {
+					return;
+				}
+				const href = String(parsed?.href || "");
+				const title = String(parsed?.title || "");
+				if (
+					(parsed?.ready === "complete" || parsed?.ready === "interactive") &&
+					href &&
+					href !== completedHref
+				) {
+					completedHref = href;
+					if (title) deliveredTitle = title;
+					appHandler?.("pageFinished", { url: href, title });
+				} else if (title && title !== deliveredTitle) {
+					deliveredTitle = title;
+					appHandler?.("titleChanged", { title });
+				}
+				const entries = parsed?.entries;
+				if (Array.isArray(entries)) {
+					for (const entry of entries) {
+						routeInstanceMessage({ ...entry, __polled: true });
+					}
+				}
+			})
+			.catch(() => {
+				/* mid-navigation — retry on the next tick */
+			});
+	}, POLL_INTERVAL_MS);
 }
 
 /**
@@ -461,6 +600,9 @@ export async function openInspectorSession(url, options = {}) {
 	session = instance;
 	armTtl();
 	attachSession(instance);
+	// evaluate-channel capture drain — works even when the message bridge
+	// is dead, so Elements/Consola/Rede are never permanently empty
+	startSessionPolling(instance);
 	// capture hooks BEFORE loadURL → document-start recording
 	await instance.setInjectScript(CAPTURE_SCRIPT);
 	await instance.loadURL(url);
@@ -473,6 +615,7 @@ export async function openInspectorSession(url, options = {}) {
 export async function closeInspectorSession() {
 	clearTimeout(ttlTimer);
 	ttlTimer = null;
+	stopSessionPolling();
 	for (const [token, pending] of pendingCommands) {
 		clearTimeout(pending.timer);
 		pending.reject(new Error("Inspector session closed"));
@@ -566,6 +709,11 @@ export function onInspectorEvent(handler) {
 
 /**
  * Sends an inspector command to the page and resolves with its response.
+ * Commands with an evaluate twin (getTree/inspect/searchDom/searchText)
+ * go through the evaluate channel FIRST — it is the proven, bridge-
+ * independent path (Storage tab, console run) — and only mirror through
+ * the postMessage bridge when evaluate fails. Remaining commands (live
+ * highlight, pick mode, node edits) use the bridge directly.
  * @param {string} cmd
  * @param {Record<string, any>} [payload]
  * @param {number} [timeoutMs]
@@ -573,8 +721,25 @@ export function onInspectorEvent(handler) {
  */
 export function sendInspectorCommand(cmd, payload = {}, timeoutMs = 8000) {
 	if (!session) return Promise.reject(new Error("No inspector session"));
+	if (EVAL_COMMANDS[cmd]) {
+		return commandViaEval(cmd, payload).catch(() =>
+			bridgeCommand(cmd, payload, timeoutMs),
+		);
+	}
+	return bridgeCommand(cmd, payload, timeoutMs);
+}
 
-	const viaBridge = new Promise((resolve, reject) => {
+/**
+ * Sends a command through the webview postMessage bridge and resolves
+ * with the page's reply (8s timeout).
+ * @param {string} cmd
+ * @param {Record<string, any>} [payload]
+ * @param {number} [timeoutMs]
+ * @returns {Promise<any>}
+ */
+function bridgeCommand(cmd, payload = {}, timeoutMs = 8000) {
+	if (!session) return Promise.reject(new Error("No inspector session"));
+	return new Promise((resolve, reject) => {
 		const token = `cmd-${cmd}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 		const timer = setTimeout(() => {
 			pendingCommands.delete(token);
@@ -597,14 +762,6 @@ export function sendInspectorCommand(cmd, payload = {}, timeoutMs = 8000) {
 				reject(error);
 			});
 	});
-	// Belt and braces: when the message bridge cannot answer (rebuilt
-	// window.webview, mid-navigation dispatch), mirror the DOM commands
-	// through the independent evaluate channel so the tabs keep working.
-	return viaBridge.catch((bridgeError) =>
-		commandViaEval(cmd, payload).catch(() => {
-			throw bridgeError;
-		}),
-	);
 }
 
 /**
